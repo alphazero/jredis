@@ -1,0 +1,139 @@
+(This README is mainly addressing the project structure and build.  For information
+about JRedis, please see the RELEASE-NOTES.) 
+
+----------------------------------------------------------
+BUILD
+----------------------------------------------------------
+
+* Requirements:
+
+- maven 
+
+Project uses Maven 2 as the build management system.  You
+will need maven to conveniently build and package the 
+project jars.
+
+Project master is built on Mac OS X 10.5 using maven 2.0.9.
+
+* howto
+
+Project is not yet using assemblies, but is a multi-module
+maven build with master POM in root directory (where you 
+found this document).
+
+Each module has its own pom, but you will need to run maven
+with specific goals at the level of a major sub-module.  As
+of now (intial release alpha.0-04152009) that translates to
+a 'Core' and an 'Examples'.  
+
+If you wish to use JRedis only you will need the product of
+the Core-RI (reference implementation).  
+
+If you wish to run benchmarks + use JRedis, you will also 
+need to build the Core-BENCHMARK.
+
+Simplest thing to do is to run maven with goal package at
+the Core module level.  This will initiate and build each
+module in Core:
+
+API - The specifications, which are mostly interfaces.
+RI - The reference implementation, which is you will use.
+BENCH - The benchmark classes
+ALL - A convenience virtual module that will build a 
+unified jar of all modules besides itself in Core.
+
+On command line in ~/core/., issue:
+
+   mvn install
+
+This will compile, test, package, and install JRedis
+core artifacts in your local repository and create a 
+set of jars in each core module's 'target' directory.
+
+The pom of the Core as well as the super pom in the root
+folder use a source attachment plugin, so a source jar 
+will also be created for each module.  
+
+The poms of core-ri, core-bench, and core-all use a 
+include dependencies mechanism which will build, besides
+the individual module's jar, an aggregate unified jar of
+the module's classes + the classes of any dependency it
+has declared.  (Only install goal will do this -- package
+goal will simply create the module's own jar file(s)).
+
+For example, issuing mvn install from core will create
+in module core-bench's target directory the class and
+source jars for the BENCH module + a single jar containing
+all dependencies, which for BENCH are 'API' and 'RI'.
+
+The build system uses a structured naming convention 
+which results in longish names, but it is very effective.
+(You can obviously simply change the jar names when you
+deploy to your application's lib or jvm classpath as you
+see fit.)
+
+The super pom in project root will initiate the same for
+all modules of JRedis, which as of now are CORE, and
+EXAMPLES.  (Same considerations apply here.)
+
+
+   **** IMPORTANT NOTE REGARDING UNIT TEST ****
+
+Running unit tests is absolutely critical to a sane process
+for developing JRedis, given that it is subject to a very
+demanding refactoring regime (as it is a work in progress).
+
+That means testing is critical for the master copy and
+accordingly ALL poms in the project require SUCCESSFUL 
+tests after compile before continuing.
+
+   **** REDIS MUST BE RUNNING ON LOCALHOST *****
+
+So, as tests on a connector without a server are fairly
+pointless, this project will NOT build unless you have 
+your localhost (6379) Redis server running.
+
+   **** BUILD USES PASSWORD 'jredis' ****
+
+If you do not have password set on your redis, no 
+worries. 
+
+If you do, the build will fail, unless you do one
+of the following:
+
+1) If you are a maven guru (i am not) then simply
+make the appropriate configuration settings and pass
+your password to the unit tests in Core-RI test classes
+that use the password.
+
+(this will also require changes necessary to the unit
+test to obtain the config info from the test harness during
+test phase of build.)
+
+2) Alternatively (still being a maven guru) change the
+surefire settings to allow build on test fail.
+
+[1 or 2 gurus: I'd appreciate your sending me the how to
+for the same.]
+
+3) Hack the unit test case code for Core-RI and BENCH.
+Change the default password setting to reflect your own.
+
+4) If you trust that the code is good (<G>), or, you
+don't care, AND, it is simply not possible for you to 
+change/disable password requirement on your localhost Redis
+server, you can always simply delete the test source folders
+for each of the modules.  
+
+5) you'll change your redis.conf for the build phase or
+even better, create a redis.conf called redis-testing.conf
+and use 'jredis' as password.  
+
+  **** REMEMBER:  TESTS WILL FLUSH DBS 13 AND 10 *****
+
+-
+
+ 
+
+
+

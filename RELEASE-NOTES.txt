@@ -1,0 +1,230 @@
+
+
+                       ~!! n o ' r o o z !!~
+                       
+-------------------------------------------------------------------------
+ n o ' r o o z                                 R E L E A S E   N O T E S
+-------------------------------------------------------------------------
+
+         JREDIS SPECIFICATION AND REFERENCE IMPLEMENTATION
+
+
+ * About 
+ 
+This is the initial (alpha.0) release of JREDIS, (code named "no'rooz").
+Work on this began around the Persian New Year (No'Rooz, meaning New Day)
+and has continued since then almost to the exclusion of nearly everything
+else. 
+
+
+ * Redis compliance
+ 
+The specification and the implementation in this release comply with the 
+the latest redis development release specification as of 04-12-09 and 
+tested against the build of the REDIS server from the github repository.
+
+
+ * Structure
+ 
+JREDIS is composed of a Reference and a reference Implementation, under
+a unified top-level packages.  (A single jar build is provided in this
+release, which can be included in your classpath and simply utilized.)
+
+Further Java artifacts include testing, benchmarking, and example source
+directories.  All these, and the core, can be found under the java 
+directory.  To build JREDIS, you will only need to compile the files
+under ~/java/src/.
+
+
+ * Included features
+
+This initial revision includes a complete functioning Synchronous
+connector for REDIS.  (Asynchronous connection and pipelining support are
+on the immediate TODO shortlist.)  The initial release connection only
+supports (for now) a use case scenario of create, continuously use, and
+discard.  Enhanced connection maintenance and transparent re-connect are
+also on the immediate TODO list for the initial revision.  This connector
+is exposed for use as org.jredis.ri.alphazero.JRedisClient and you simply
+need to instantiate and immediately use it to connect to your localhost
+REDIS server.  This is a synchronous mode connection, with blocking 
+semantics for JRedis API, and is intended for use strictly in a synchronized
+request/reply manner.  To achieve concurrent connections, simply create
+a client instance per thread.  (See the benchmark classes for examples.)
+
+A queuing synchronous mode connector suitable for use in containers is 
+on the drawing board.  (If you can not wait for this, you may hack your
+own by placing a JRedis facade in front of a combination of classes from
+java.util.concurrent and using a pool of JRedisClients behind the scenes.)
+
+Beyond that, JREDIS as of now supports basic Java serialization and you
+can use your Java objects as 'values' for String, Set, and List keys in
+REDIS.  And of course, the JRedis interface has been designed to provide
+flexibility and 'native' REDIS access, so you can always send whatever
+byte[] that you want (which is probably more efficient if you already
+have externalization means for your Java classes).
+
+
+ * Requirements
+
+REDIS:
+Obviously you will need a REDIS server to use JREDIS!  JREDIS is fully
+compliant with all documented REDIS beta-0.09 commands, and also supports 
+EXPIRE.  JREDIS as of now does NOT support the earlier 0.08 versions
+but structurally is able to handle a multiplicity of REDIS versions,
+and you should be able to create your own variant of ProtocolHandler
+to interact with earlier (obsolete) versions of REDIS.
+
+JAVA:
+JREDIS has no external dependencies at this time.  The alpha.0 release
+has been developed using Java 6 to utilize enhanced reporting afforded
+by the compiler to implementations of Java interfaces.  However, JRE 6
+or any of its features or libraries are not a fundamental requirement
+and this release has the incompatible usage instances commented out to
+allow for use with JRE 5.x and above.
+
+Please note that while this software may or may not work under JDK 1.4.x
+or earlier, it is simply *not* a goal for this project to support these
+earlier version of Java, as that would adversely constrain the options
+in both the expression of JRedis semantics and an effective implementation.
+
+TESTS:
+Test source files and classes clearly require the JUnit 3 library files, 
+but these test artifacts are not included in the drop-in jar so JUnit is
+not a requirement for using JRedis.
+
+BUILD:
+JREDIS was built on Eclipse 3.4, on Apple's Mac OS X 10.5 running JVM1.6.
+The JREDIS core software itself can be built simply using jacav and jar
+and this initial distribution does not include either ant or maven build
+files.  Once the decision between one of these two build systems has been
+reached, and that becomes a requirement, it will be included in an update
+release.
+
+
+ * Status
+ 
+This software is a *work in progress* and subject to change.  Careful
+consideration has been given to the concerns and requirements of the end-
+user of this software to minimize the impact of (certain) changes to 
+the code-base as development continues, to extend functionality, to 
+enhance performance, and to address the feedback of its user community.
+
+That said, this is working code that has been tested and stressed, and
+minimally provides a viable and versatile interface between Java systems
+and the REDIS database.  Coding to the specification artifacts will 
+minimize, but will not eliminate, any impact of the un-going developments.  
+
+Rough edges are to be expected, and your patience appreciated while this
+release makes the necessary transition to maturity.
+
+And finally, *all the usual caveats regarding software apply:  So
+to repeat from the license terms,  JREDIS is distributed on an "AS IS" 
+BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
+implied.
+
+
+ * Performance
+
+The performance characteristics of this intial JREDIS No'Rooz implementation
+are acceptable.  In developing a connector for a system such as REDIS, there
+are a few performance bottle necks which are inevitable.  Based on intial
+educated guesses and a few recent insights gained through the use of a 
+profiling tool, every attempt has been made to optimize the performance of
+this initial revision.  Nevertheless (and thankfully), there remain many
+areas for further enhancement of the included sychronous connector (JRedis-
+Client).
+
+a) Network IO
+
+This release has a known bottleneck that can be addressed, and will be 
+likely after the work on the Asynchronous connection has reached the same 
+level of development as the initial synchronous connection in the initial
+release.  While it is expected that a blocking network client would be io-
+bound to a significant degree, this is actually not that bad in this release.
+
+The wip Asynch connection (still using stream sockets, and not yet NIO),
+has been clocked at anywhere from 100,000 to 175,000 PING/INCRs on a single
+non-blocking connection to a localhost REDIS.  (These are relative numbers
+but a reference point is that the REDIS redis-bench program clocks at around
+34K/sec for the same).  The work on this was stopped to get this release
+prepared and resumption of work is a high priority as it was way too much
+fun!
+
+
+b) java.lang.String
+
+The worst offender, and an inescapable one at that, is the String class of
+Java, as far as performance hotspots are concerned.  On one hand, it is 
+great to have a Unicode character string implementations that allows JREDIS
+to use (as tested) Russian, Chinese, and Farsi, keys in storing information 
+in REDIS, nevertheless, the performance hit of conversion of (typical) ASCII
+strings to byte[] required for the protocol are quite annoying: 
+
+Given that String is a final class, little short of caching can be done 
+about it. (Any suggestions addressing this is greatly appreciated.) 
+
+
+c) data conversion and byte shoveling.
+ 
+The current implementation makes every attempt to minimize the allocation
+of byte[] buffers, and subsequent copying of bytes from one array to another,
+but in some cases there is nothing than can be done about it. 
+
+Also, some attempts have been made to optimize conversion from numbers to
+byte[] and back, to avoid a visit to the dreaded String.getBytes <g>. The
+current (hack) solution will cost a few hundred Ks of RAM per classloader
+but its probably worth it.
+
+
+ * Documentation
+ 
+Documentation is a priority item.  In the interim please refer to the java
+api docs.  If you are not familiar with the REDIS command set, you are 
+certainly encouraged to read the Command reference and get to know the
+REDIS vocabulary.  The main critical interfaces exposed by JREDIS is the
+JRedis interface which is a near analog of the redis command set.
+
+The overall connector design itself is documented as a ~UML diagram image
+capture.    
+  
+
+ * Updates
+ 
+Updates about JREDIS specification and reference implementation
+will be posted at:
+
+   JREDIS project site:
+   http://code.google.com/p/jredis/
+
+and
+
+   REDIS Google newsgroup:
+   http://groups.google.com/group/redis-db
+
++spontanous updates will also be posted to twitter under
+
+  http://twitter.com/SunOf27
+
+
+ * Feedback
+    
+Your feedback is welcomed and appreciated.  Please direct your
+questions, suggestion, comments, concerns, and complaints to
+the above public forums, or directly to me @ 
+
+   alphazero@sensesay.net
+
+Most specially, information regarding bugs, performance, and 
+usability issues, will be highly appreciated. 
+
+
+/ Enjoy!
+
+
+~ Dedicated to my lovely parents, Kiyou and Farideh. ~
+
+Joubin 
+04-12-09
+Fairfax Station, NoVA
+
+
