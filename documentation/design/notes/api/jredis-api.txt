@@ -1,14 +1,4 @@
-RPUSH key value Append an element to the tail of the List value at key
-LPUSH key value Append an element to the head of the List value at key
-LLEN key Return the length of the List value at key
-LRANGE key start end Return a range of elements from the List at key
-LTRIM key start end Trim the list at key to the specified range of elements
-LINDEX key index Return the element at index position from the List at key
-LSET key index value Set a new value as the element at index position of the List at key
-LREM key count value Remove the first-N, last-N, or all the elements matching value from the List at key
-LPOP key Return and remove (atomically) the first element of the List at key
-RPOP key Return and remove (atomically) the last element of the List at key
-
+[musings .. nothing structured yet]
 --
 
 The Redis 'list' command names are a bit confusing.  Unlike 'set' commands, which consistently begin with 's', the 'list' command set includes variations beginning with 'r'.  Also, unlike 'set', which has intuitively consistent 'set' semantics, the redis 'list' is either a stack or list, when using one of the r/l<op> commands.  
