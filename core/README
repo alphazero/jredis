@@ -1,0 +1,46 @@
+README : JRedis Module Core
+
+----------------------------------------------------------
+BUILD
+----------------------------------------------------------
+
+For build instructions refer to the README in root.
+
+----------------------------------------------------------
+MODULES
+----------------------------------------------------------
+
+The Core module is composed of all the core elements that
+are used to create JRedis clients and connectors for the
+Redis server.  
+
+This includes: 
+
+- the specification (API),
+- the reference implementation (RI),
+- the benchmark module (BENCH)
+
+An additional module ALL is a virtual module used to 
+create a unified jar for the core.  (Its a hack of manve;
+likely will be replaced by an assembly directive in the
+future.  If you are a maven guru let me know how to do it
+better.)
+
+* JRedis users
+
+If you want to use JRedis clients and connectors, you'll
+only need the classes of API and RI.  
+
+Depending on your preferences and requirements, you may
+either uses the individual jars for each module, OR,
+simply use the jar 'with dependencies' in RI's target 
+directory.
+
+Each module should also produce a source jar.  (See build
+instructions.)
+
+No javadocs are produced as of now.  (c.f. maven newbiness).
+
+**** PLEASE REFER TO UNIT TEST INFO IN ROOT README *****
+
+/end
