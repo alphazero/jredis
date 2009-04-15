@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- parent -->
+  <parent>
+    <groupId>org.jredis</groupId>
+    <artifactId>jredis</artifactId>
+    <version>a.0-SNAPSHOT</version>
+  </parent>
+
+  <!-- coordination | build pom -->
+  <name>JRedis - Core [Build POM]</name>
+  <groupId>org.jredis</groupId>
+  <artifactId>jredis-core</artifactId>
+  <version>a.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <!-- production units -->
+  <modules>
+    <module>api</module>
+    <module>ri</module>
+    <module>bench</module>
+    <module>all</module>
+  </modules>
+  
+  <properties>
+    <test.server.password>jredis</test.server.password>
+    <test.server.db1>13</test.server.db1>
+    <test.server.db1>10</test.server.db1>
+  </properties>
+
+  <!-- info -->
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>Copyright 2009 (c) Joubin Houshyar - All Right Resererved</comments>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>joubin</id>
+      <name>Joubin Houshyar</name>
+      <email>alphazero@sensesay.net</email>
+      <url>http://www.sensesay.net</url>
+      <roles>
+        <role>ReleaseManager</role>
+        <role>Designer</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>UTC-5</timezone>
+    </developer>
+  </developers>
+</project>

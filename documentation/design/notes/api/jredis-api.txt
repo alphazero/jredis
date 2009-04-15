@@ -1,0 +1,89 @@
+RPUSH key value Append an element to the tail of the List value at key
+LPUSH key value Append an element to the head of the List value at key
+LLEN key Return the length of the List value at key
+LRANGE key start end Return a range of elements from the List at key
+LTRIM key start end Trim the list at key to the specified range of elements
+LINDEX key index Return the element at index position from the List at key
+LSET key index value Set a new value as the element at index position of the List at key
+LREM key count value Remove the first-N, last-N, or all the elements matching value from the List at key
+LPOP key Return and remove (atomically) the first element of the List at key
+RPOP key Return and remove (atomically) the last element of the List at key
+
+--
+
+The Redis 'list' command names are a bit confusing.  Unlike 'set' commands, which consistently begin with 's', the 'list' command set includes variations beginning with 'r'.  Also, unlike 'set', which has intuitively consistent 'set' semantics, the redis 'list' is either a stack or list, when using one of the r/l<op> commands.  
+
+The client libraries seem to approach this in various ways.  Python treats all ops on the list extremeties as stack semantics (push and pop) defaulting to the redis list's 'tail' push and pop.  Ruby also usses push and pop with explicit <x>_tail or <x>_head articulation.  The Erlang client uses a direct mapping, as with JRedis, as of now.
+
+I personally find the redis push/pop commands confusing.  Perhaps this is due to mild dyslexia, but the thought occurs that others will share in this difficulty.  In designing JRedis, after initial experiments with java like semantics (redis.addToSet(...), etc.) a decision was made to use a one to one mapping for the api's end-user methods.  But the list's r/l ambiguity seems to detract from the effectiveness of the api.
+
+So, in line with maintaining a close analog with Redis command set, and to address semantic ambiguities, JRedis api methods will change as follows:
+
+All Redis 'string' remain the same.  The 'map' like operations (set, get, setnx, and mget) are fairly self effident.  Perhaps setnx is a candidate for further consideration, but redis.get(key, value) is as obvious as it is going to get.
+
+For the remaning types, JRedis will adopt a uniform naming convention, with 'l' commands mapping to Redis 'list' operations, and 's' commands to 'set'. 
+
+Set commands are already consistent, beginning with s<x>.  SINTER and SINTERSTORE are a bit cryptic for the novice, but there are no issues of ambiguity here.  And potentially will have SJOIN and SJOINSTORE as some point and everything is fine.
+
+List commands will be modified so they all begin with 'l'.  
+Stack semantic ops on 'lists' will be just that:
+
+lpush is a push: 'head' of the list.  (Its perfectly clear what it means - the natural place things are pushed is the head.)  
+
+So:  redis.lpush (list, "go to the head of the class");
+
+
+Same with lpop:  List Pop.  Pop the first element of the list.
+
+redis.lpop () // returns the poped head of the list
+
+rpush is 'adding an item to a list'.  Its an append but 'add' is also fairly clear:  the natural place you add things to a 'list' is the the 'tail'.  (And Redis does not support 'insert' so its a non issue for now.)  Either lappend or ladd will be fairly obvious to the end user.   
+
+... 
+
+One version:
+
+[we'll skip over commands that won't change, such as dbsize, randomkey, etc.]
+
+<Map>	=> <STRING> subset:
+
+set 	=> SET
+get	=> GET
+mget	=> MGET
+setnew	=> SETNX
+
+<Num>
+incr	=> INCR
+decr	=> DECR
+incrby	=> INCRBY
+decrby	=> DECRBY
+
+
+<List>	=> <LIST>
+push
+pop
+append
+take
+range
+trim
+indexof
+modify
+remove
+
+<Set>	=> <SET>
+add
+remove
+card
+ismember
+members
+
+...
+
+Another version:
+
+lset, lget, mget, setnx
+incr, decr, incrby, decrby
+lpush, lpop, ladd, ltake, lrange, ltrim, indexof, lset, lrem
+sadd, srem, scard, sismember, smembers
+ 
+
