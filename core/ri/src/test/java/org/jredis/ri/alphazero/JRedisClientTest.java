@@ -29,7 +29,7 @@ import org.jredis.RedisException;
 import org.jredis.RedisInfo;
 import org.jredis.RedisType;
 import org.jredis.ri.alphazero.JRedisClient;
-import org.jredis.ri.alphazero.support.Encode;
+import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.Log;
 
 import junit.framework.TestCase;
@@ -298,8 +298,8 @@ public class JRedisClientTest extends TestCase {
 			Log.log("TEST: RPUSH");
 			Log.log("TEST: LPUSH");
 			
-			List<String>  range1 = Encode.toStr(redis.lrange(key1, 0, Integer.MAX_VALUE));
-			List<String>  range2 = Encode.toStr(redis.lrange(key2, 0, Integer.MAX_VALUE));
+			List<String>  range1 = DefaultCodec.toStr(redis.lrange(key1, 0, Integer.MAX_VALUE));
+			List<String>  range2 = DefaultCodec.toStr(redis.lrange(key2, 0, Integer.MAX_VALUE));
 			assertTrue(range1.size() == stringList.size());
 			assertTrue(range2.size() == stringList.size());
 			for (String s : stringList) {
@@ -331,10 +331,10 @@ public class JRedisClientTest extends TestCase {
 			redis.lpush(key, "cccc");
 			
 			redis.lset(key, 0, "number zero");
-			assertTrue("Testint LIndex", Encode.toStr(redis.lindex(key, 0)).equals("number zero"));
+			assertTrue("Testint LIndex", DefaultCodec.toStr(redis.lindex(key, 0)).equals("number zero"));
 
 			redis.lset(key, 1, "number nine");
-			assertTrue("Testint LIndex", Encode.toStr(redis.lindex(key, 1)).equals("number nine"));
+			assertTrue("Testint LIndex", DefaultCodec.toStr(redis.lindex(key, 1)).equals("number nine"));
 			Log.log("TEST: LSET");
 			Log.log("TEST: LINDEX");
 			
@@ -353,7 +353,7 @@ public class JRedisClientTest extends TestCase {
 				redis.rpush(key1, i);
 			
 			for(int i=0; i<100; i++)
-				assertTrue("Testing RPOP and encode as well", Encode.toInt(redis.rpop(key1)) == 99-i);
+				assertTrue("Testing RPOP and encode as well", DefaultCodec.toInt(redis.rpop(key1)) == 99-i);
 			Log.log("TEST: RPOP");
 			
 			redis.flushdb();
@@ -361,7 +361,7 @@ public class JRedisClientTest extends TestCase {
 				redis.lpush(key1, i);
 			
 			for(int i=0; i<100; i++)
-				assertTrue("Testing LPOP and encode as well", Encode.toInt(redis.lpop(key1)) == 99-i);
+				assertTrue("Testing LPOP and encode as well", DefaultCodec.toInt(redis.lpop(key1)) == 99-i);
 			Log.log("TEST: LPOP");
 			
 			Log.log("TEST:  Commands Operating On Lists... PASSED");
@@ -396,7 +396,7 @@ public class JRedisClientTest extends TestCase {
 			for (String member : set1){
 				assertTrue(redis.sismember(key1, member));
 			}
-			List<String> redisSet1Members = Encode.toStr(redis.smembers(key1));
+			List<String> redisSet1Members = DefaultCodec.toStr(redis.smembers(key1));
 			assertTrue(redisSet1Members.size() == set1.size());
 			
 			for (String member : set2){
@@ -406,7 +406,7 @@ public class JRedisClientTest extends TestCase {
 			for (String member : set2){
 				assertTrue(redis.sismember(key2, member));
 			}
-			List<String> redisSet2Members = Encode.toStr(redis.smembers(key2));
+			List<String> redisSet2Members = DefaultCodec.toStr(redis.smembers(key2));
 			assertTrue(redisSet2Members.size() == set2.size());
 
 			
@@ -455,7 +455,7 @@ public class JRedisClientTest extends TestCase {
 			TestBean redisBean = null;
 			for (int i=0; i<objectList.size(); i++){
 				redis.set(keys.get(i), objectList.get(i));
-				redisBean = Encode.decode(redis.get(keys.get(i)));
+				redisBean = DefaultCodec.decode(redis.get(keys.get(i)));
 				assertEquals(objectList.get(i), redisBean);
 			}
 
@@ -602,7 +602,7 @@ public class JRedisClientTest extends TestCase {
 				assertEquals(i*10, cntr);
 			}
 			redis.set(cntr_key, 0);
-			assertTrue(0 == Encode.toInt(redis.get(cntr_key)));
+			assertTrue(0 == DefaultCodec.toInt(redis.get(cntr_key)));
 			for(long i = 1; i<mediumcnt; i++){
 				cntr = redis.decrby(cntr_key, 10);
 				assertEquals(i*-10, cntr);

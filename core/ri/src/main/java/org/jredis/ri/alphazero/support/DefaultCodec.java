@@ -38,7 +38,7 @@ import org.jredis.JRedis;
  * @since   alpha.0
  * 
  */
-public class Encode {
+public class DefaultCodec {
 	public final static Charset SUPPORTED_CHARSET = Charset.forName ("UTF-8");
 	
 	/**
@@ -83,11 +83,11 @@ public class Encode {
 	/**
 	 * This helper method will assume the List<byte[]> being presented is the list returned
 	 * from a {@link JRedis} method such as {@link JRedis#smembers(String)}, and that this
-	 * list contains the {@link Encode#encode(Serializable)}ed bytes of the parametric type <code>T</code>.
+	 * list contains the {@link DefaultCodec#encode(Serializable)}ed bytes of the parametric type <code>T</code>.
 	 * <p>
 	 * Specifically, this method will instantiate an {@link ArrayList} for type T, of equal 
 	 * size to the size of bytelist {@link List}.  Then it will iterate over the byte list 
-	 * and for each byte[] list item call {@link Encode#decode(byte[])}.
+	 * and for each byte[] list item call {@link DefaultCodec#decode(byte[])}.
 	 * <p>
 	 * <b>Usage example:</b>
 	 * <pre><code>
@@ -120,7 +120,7 @@ public class Encode {
 	 * and returning the reference <i>t</i>, and throwing any exceptions encountered along
 	 * the way.
 	 * <p>
-	 * This method is the decoding peer of {@link Encode#encode(Serializable)}, and it is
+	 * This method is the decoding peer of {@link DefaultCodec#encode(Serializable)}, and it is
 	 * assumed (and certainly recommended) that you use these two methods in tandem.
 	 * <p>
 	 * Naturally, all caveats, rules, and considerations that generally apply to {@link Serializable}

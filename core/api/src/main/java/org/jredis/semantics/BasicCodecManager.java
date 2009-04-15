@@ -18,6 +18,8 @@ package org.jredis.semantics;
 
 import java.util.Map;
 
+// REFACTOR: this doesn't belong here
+//
 public final class BasicCodecManager implements CodecManager {
 	Map<Class<?>, Codec<?>> map;
 	public void foo () {

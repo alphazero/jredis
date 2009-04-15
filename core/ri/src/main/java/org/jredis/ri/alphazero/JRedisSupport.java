@@ -36,7 +36,7 @@ import org.jredis.ProviderException;
 import org.jredis.connector.ValueResponse;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
-import org.jredis.ri.alphazero.support.Encode;
+import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.SortSupport;
 
 /**
@@ -169,7 +169,7 @@ public abstract class JRedisSupport implements JRedis {
 //	@Override
 	public <T extends Serializable> void rpush (String key, T value) throws RedisException
 	{
-		rpush(key, Encode.encode(value));
+		rpush(key, DefaultCodec.encode(value));
 	}
 
 //	@Override
@@ -201,7 +201,7 @@ public abstract class JRedisSupport implements JRedis {
 //	@Override
 	public <T extends Serializable> boolean sadd (String key, T value) throws RedisException
 	{
-		return sadd (key, Encode.encode(value));
+		return sadd (key, DefaultCodec.encode(value));
 	}
 
 //	@Override
@@ -242,7 +242,7 @@ public abstract class JRedisSupport implements JRedis {
 //	@Override
 	public <T extends Serializable> void set (String key, T value) throws RedisException
 	{
-		set(key, Encode.encode(value));
+		set(key, DefaultCodec.encode(value));
 	}
 	
 //	@Override
@@ -271,7 +271,7 @@ public abstract class JRedisSupport implements JRedis {
 	}
 //	@Override
 	public <T extends Serializable> boolean setnx (String key, T value) throws RedisException {
-		return setnx(key, Encode.encode(value));
+		return setnx(key, DefaultCodec.encode(value));
 	}
 
 //	@Override
@@ -304,7 +304,7 @@ public abstract class JRedisSupport implements JRedis {
 
 //	@Override
 	public <T extends Serializable> boolean sismember(String key, T object) throws RedisException {
-		return sismember(key, Encode.encode(object));
+		return sismember(key, DefaultCodec.encode(object));
 	}
 
 	/* ------------------------------- commands returning int value --------- */
@@ -879,7 +879,7 @@ public abstract class JRedisSupport implements JRedis {
 //	@Override
 	public <T extends Serializable> void lpush (String key, T value) throws RedisException
 	{
-		lpush(key, Encode.encode(value));
+		lpush(key, DefaultCodec.encode(value));
 	}
 	
 
@@ -918,7 +918,7 @@ public abstract class JRedisSupport implements JRedis {
 //	@Override
 	public <T extends Serializable> 
 	long lrem (String listKey, T object, int count) throws RedisException{
-		return lrem (listKey, Encode.encode(object), count);
+		return lrem (listKey, DefaultCodec.encode(object), count);
 	}
 
 
@@ -941,7 +941,7 @@ public abstract class JRedisSupport implements JRedis {
 	}
 //	@Override
 	public <T extends Serializable> void lset (String key, int index, T object) throws RedisException{
-		lset (key, index, Encode.encode(object));
+		lset (key, index, DefaultCodec.encode(object));
 	}
 
 //	@Override
@@ -991,7 +991,7 @@ public abstract class JRedisSupport implements JRedis {
 //	@Override
 	public <T extends Serializable> boolean srem (String key, T value) throws RedisException
 	{
-		return srem (key, Encode.encode(value));
+		return srem (key, DefaultCodec.encode(value));
 	}
 
 
@@ -1024,10 +1024,10 @@ public abstract class JRedisSupport implements JRedis {
 		}
 		return resvalue;
 	}
-	
+
+	// TODO: integrate using KeyCodec and a CodecManager at client spec and init time.
 	// this isn't cooked yet -- lets think more about the implications...
 	// 
-	@SuppressWarnings("unused")
 	static final private Map<String, byte[]>	keyByteCache = new HashMap<String, byte[]>();
 	public static final boolean	CacheKeys	= false;
 	
@@ -1037,7 +1037,7 @@ public abstract class JRedisSupport implements JRedis {
 		if(JRedisSupport.CacheKeys == true)
 			bytes = keyByteCache.get(key);
 		if(null == bytes) {
-			bytes = key.getBytes(Encode.SUPPORTED_CHARSET);
+			bytes = key.getBytes(DefaultCodec.SUPPORTED_CHARSET);
 			for(byte b : bytes) {
 				if (b == (byte)32 || b == (byte)10 || b == (byte)13)
 					throw new IllegalArgumentException ("Key includes invalid byte value: " + (int)b);
