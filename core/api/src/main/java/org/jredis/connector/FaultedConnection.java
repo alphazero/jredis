@@ -55,5 +55,4 @@ public class FaultedConnection implements Connection {
 	{
 		throw new ClientRuntimeException (errorMsg);
 	}
-
 }

@@ -52,7 +52,11 @@ public class DefaultCodec {
 	 */
 	public static final List<String> toStr (List<byte[]> bytearray) {
 		List<String> list = new ArrayList<String>(bytearray.size());
-		for(byte[] b : bytearray) list.add(toStr(b));
+		for(byte[] b : bytearray) 
+			if(null!= b) 
+				list.add(toStr(b)); 
+			else 
+				list.add(null);
 		return list;
 	}
 	/**
@@ -63,10 +67,15 @@ public class DefaultCodec {
 		return new String(bytes, SUPPORTED_CHARSET);
 	}
 	
+	public static final byte[] encode(String value) {
+		return value.getBytes(SUPPORTED_CHARSET);
+	}
+	
 	/**
 	 * @param bytes
 	 * @return
 	 */
+	@Deprecated
 	public static final Integer toInt (byte[]  bytes) {
 		return new Integer(toStr (bytes));
 	}
@@ -78,6 +87,12 @@ public class DefaultCodec {
 	 */
 	public static final Long toLong (byte[]  bytes) {
 		return new Long (toStr (bytes));
+	}
+	
+	public static final List<Long> toLong(List<byte[]> bytearray){
+		List<Long> list = new ArrayList<Long>(bytearray.size());
+		for(byte[] b : bytearray) list.add(toLong(b));
+		return list;
 	}
 
 	/**
@@ -103,8 +118,13 @@ public class DefaultCodec {
 	List<T> decode (List<byte[]> byteList) {
 		List<T>		objectList = new ArrayList<T>(byteList.size());
 		for (byte[] bytes : byteList) {
-			T object = (T) decode(bytes);
-			objectList.add ((T) object);
+			if(null != bytes){
+				T object = (T) decode(bytes);
+				objectList.add ((T) object);
+			}
+			else{
+				objectList.add(null);
+			}
 		}
 		return objectList;
 	}

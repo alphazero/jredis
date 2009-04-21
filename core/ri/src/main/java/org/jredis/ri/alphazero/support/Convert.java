@@ -69,7 +69,7 @@ public class Convert {
 	 * Reduce the constant to adjust memory consumption as required.
 	 */
 	static {
-		for(int i=0; i<INT_P_65535; i++) getBytes(i);
+		for(int i=0; i<INT_P_65535; i++) Integer.toString(i).getBytes();
 	}
 	
 	// ------------------------------------------------------------------------
@@ -103,16 +103,29 @@ public class Convert {
 				i = 0 - i;
 			}
 			if(null == i2b_65535[i]){
-				i2b_65535[i] = getBytes(i);
+				i2b_65535[i] = Integer.toString(i).getBytes();
 			}
 			data = i2b_65535[i];
 			if(negative) data = getSignedNumberBytes(data, negative);
 		}
 		else {
-			data = getBytes(i);
+			data = Integer.toString(i).getBytes();
 		}
 		if(null == data) throw new RuntimeException("null for i=" + i + " and cache is: " + i2b_65535[i]);
 		return data;
+	}
+	/**
+	 * Will delegate to {@link Convert#getBytes(int)} if the 'long' number is actually
+	 * within the range of our int cache, otherwise it will return the bytes using std
+	 * JDK mechanisms.
+	 * @param lnum
+	 * @return
+	 */
+	public static final byte[] toBytes(long lnum){
+		if(lnum >= INT_N_65535 && lnum <= INT_P_65535) 
+			return toBytes((int)lnum);
+		
+		return Long.toString(lnum).getBytes();
 	}
 	/**
 	 * Converts the byte[]s of the ASCII representation of a decimal number to an int.  
@@ -227,15 +240,5 @@ public class Convert {
 		data [0] = negative ? BYTE_MINUS : BYTE_PLUS;
 		System.arraycopy(unsigned, 0, data, 1, unsigned_length);
 		return data;
-	}
-	/**
-	 * return the bytes of the string representation of the integer.  Perhaps
-	 * should be called getNumberBytes, or perhaps getHumanReadableBytes()  
-	 * Ex:  444 => "444".getBytes() => new byte[3]={52, 52, 52}
-	 * @param i
-	 * @return
-	 */
-	private static final byte[] getBytes(int i){
-		return Integer.toString(i).getBytes();
 	}
 }

@@ -24,33 +24,15 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import org.jredis.ClientRuntimeException;
-import org.jredis.Redis;
-import org.jredis.connector.Protocol;
 import org.jredis.ProviderException;
+import org.jredis.Redis;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Log;
 
 
 /**
- * [TODO: reconnect, timeoout, etc. ]
+ * [TODO: document me!]
  * 
- * A delegating {@link Protocol} that is mainly responsible for managing the 
- * network connection to the redis server, and in support of the 
- * {@link ProtocolHandler#serviceRequest(Command, byte[]...)} method uses another,
- * redis version specific, protool handler to provide support for createRequest
- * and createResponse methods.  This class will provide the IO streams required by
- * Request and Response objects to be send and received.  
- * 
- * <p>This client will open and maintain a single socket connection to the server
- * identified and [TODO] will handle reconnects and timeouts (which is why it is
- * in the loop as a {@link Protocol}.
- * 
- * <p>This class only supports the {@link ProtocolHandler#serviceRequest(Command, byte[]...)}
- * method of the communication aspects of the protocol handler to insure control
- * over the sequence and modality of message processing.
- * 
- * <p><b>This class is not (as of now 04/02/09) thread-safe</b>.
- *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09
  * @since   alpha.0
@@ -58,6 +40,7 @@ import org.jredis.ri.alphazero.support.Log;
  */
 @Redis(versions={"*"})
 public class SocketConnection  {
+	
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
@@ -68,7 +51,7 @@ public class SocketConnection  {
 	private InputStream		    input_stream;
 	private OutputStream	    output_stream;
 	private Socket				socket;
-	private boolean isConnected = false;
+	private boolean 			isConnected = false;
 
 	// ------------------------------------------------------------------------
 	// Construct and initialize

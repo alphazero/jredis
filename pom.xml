@@ -16,6 +16,7 @@
   </modules>
   
   <build>
+  
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -30,6 +31,7 @@
           </execution>
         </executions>
       </plugin>
+      
       <!-- JDK Compliance level -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -40,15 +42,40 @@
           <target>1.5</target>
         </configuration>
       </plugin>
-      <!-- JDK Compliance level -->
+      
+      <!-- surefire testrunner 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <property><name>redis.host</name>     <value>localhost</value></property>
+            <property><name>redis.port</name>     <value>6379</value></property>
+            <property><name>redis.password</name> <value>jredis</value></property>
+            <property><name>redis.db.1</name>     <value>13</value></property>
+            <property><name>redis.db.2</name>     <value>10</value></property>
+          </systemProperties>
+        </configuration>
+      </plugin>
+      -->
     </plugins>
   </build>
+
   <dependencyManagement>
+    <!-- testing only -->
     <dependencies>
+      <dependency>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <version>5.8</version>
+        <scope>test</scope>
+        <classifier>jdk15</classifier>
+      </dependency>
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>3.8.1</version>
+<!--        <version>3.8.1</version> -->
+        <version>4.1</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
@@ -60,7 +87,7 @@
     <license>
       <name>Apache 2</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
+      <distribution>all</distribution>
       <comments>Copyright 2009 (c) Joubin Houshyar - All Right Resererved</comments>
     </license>
   </licenses>

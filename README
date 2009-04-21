@@ -101,39 +101,19 @@ worries.
 If you do, the build will fail, unless you do one
 of the following:
 
-1) If you are a maven guru (i am not) then simply
-make the appropriate configuration settings and pass
-your password to the unit tests in Core-RI test classes
-that use the password.
+1) Change the password in core/pom.xml to match your
+password in redis.conf
 
-(this will also require changes necessary to the unit
-test to obtain the config info from the test harness during
-test phase of build.)
+2) Alternatively tell maven to skip tests:
 
-2) Alternatively (still being a maven guru) change the
-surefire settings to allow build on test fail.
+   mvn -Dmaven.test.skip=true install
 
-[1 or 2 gurus: I'd appreciate your sending me the how to
-for the same.]
-
-3) Hack the unit test case code for Core-RI and BENCH.
-Change the default password setting to reflect your own.
-
-4) If you trust that the code is good (<G>), or, you
-don't care, AND, it is simply not possible for you to 
-change/disable password requirement on your localhost Redis
-server, you can always simply delete the test source folders
-for each of the modules.  
-
-5) you'll change your redis.conf for the build phase or
-even better, create a redis.conf called redis-testing.conf
-and use 'jredis' as password.  
 
   **** REMEMBER:  TESTS WILL FLUSH DBS 13 AND 10 *****
 
 -
 
- 
+04-21-09 
 
 
 

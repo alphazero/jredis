@@ -131,7 +131,7 @@ public interface JRedis {
 	
 	public String randomkey() throws RedisException;
 	
-	public String rename (String oldkey, String newkey) throws RedisException;
+	public void rename (String oldkey, String newkey) throws RedisException;
 	
 	public boolean renamenx (String oldkey, String brandnewkey) throws RedisException;
 	
@@ -155,11 +155,11 @@ public interface JRedis {
 	public <T extends Serializable> 
 		   void lpush (String listkey, T object) throws RedisException;
 	
-	public void lset (String key, int index, byte[] value) throws RedisException;
-	public void lset (String key, int index, String stringValue) throws RedisException;
-	public void lset (String key, int index, Number numberValue) throws RedisException;
+	public void lset (String key, long index, byte[] value) throws RedisException;
+	public void lset (String key, long index, String stringValue) throws RedisException;
+	public void lset (String key, long index, Number numberValue) throws RedisException;
 	public <T extends Serializable> 
-		   void lset (String key, int index, T object) throws RedisException;
+		   void lset (String key, long index, T object) throws RedisException;
 	
 
 	public long lrem (String listKey, byte[] value,       int count) throws RedisException;
@@ -170,11 +170,11 @@ public interface JRedis {
 	
 	public long llen (String listkey) throws RedisException;
 	
-	public List<byte[]> lrange (String listkey, int from, int to) throws RedisException; 
+	public List<byte[]> lrange (String listkey, long from, long to) throws RedisException; 
 
-	public void ltrim (String listkey, int keepFrom, int keepTo) throws RedisException;
+	public void ltrim (String listkey, long keepFrom, long keepTo) throws RedisException;
 	
-	public byte[] lindex (String listkey, int index) throws RedisException;
+	public byte[] lindex (String listkey, long index) throws RedisException;
 	
 	public byte[] lpop (String listKey) throws RedisException;
 	
@@ -207,6 +207,10 @@ public interface JRedis {
 	public List<byte[]> sinter (String set1, String...sets) throws RedisException;
 
 	public void sinterstore (String destSetKey, String...sets) throws RedisException;
+
+	public List<byte[]> sunion (String set1, String...sets) throws RedisException;
+
+	public void sunionstore (String destSetKey, String...sets) throws RedisException;
 
 	public List<byte[]> smembers (String setkey) throws RedisException;
 	

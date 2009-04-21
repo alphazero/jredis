@@ -19,21 +19,23 @@ package org.jredis.ri.alphazero;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jredis.ClientRuntimeException;
 import org.jredis.Command;
+import org.jredis.ProviderException;
 import org.jredis.connector.BulkResponse;
 import org.jredis.connector.MultiBulkResponse;
 import org.jredis.connector.Protocol;
-import org.jredis.ProviderException;
 import org.jredis.connector.Request;
 import org.jredis.connector.Response;
 import org.jredis.connector.ResponseStatus;
 import org.jredis.connector.StatusResponse;
 import org.jredis.connector.ValueResponse;
 import org.jredis.ri.alphazero.support.Convert;
+import org.jredis.ri.alphazero.support.Log;
 
 
 /**
@@ -206,6 +208,15 @@ public class SynchProtocol extends ProtocolBase {
 		/**
 		 * Makes blocking calls to input stream until it gets crlf. Should not be
 		 * used for size/count lines.
+		 * <p>
+		 * This is a major bottleneck.  Its surprising how great a percentage of request/response 
+		 * (combined) processing time is spent here.  The issue is the Redis protocol, which is 
+		 * working against redis being a high performance system.  The protocol has conflicting goals
+		 * of being easy to develop for AND serve a high throughput system.  There should be a fixed
+		 * frame here indicating Status and number of bytes to follow.
+		 * <p>As it is, its either a status flag followed by a variable length textual representation of
+		 * a number delimited by crlf, or, an error message, or, a value, such as a number or key.
+		 * That means this protocol can't simply do a blocking call
 		 * @param in
 		 */
 		void readLine (InputStream in) {
@@ -217,15 +228,23 @@ public class SynchProtocol extends ProtocolBase {
 				while (available > 0 && (c = in.read(buffer, offset, available)) != -1) {
 					offset += c; 
 					available -= c;
-					readcnt +=c;
-					if(offset > 3 && buffer[offset-2]==(byte)13 && buffer[offset-1]==(byte)10){
+					readcnt +=c;  // this *is* offset
+					if(offset > 2 && buffer[offset-2]==(byte)13 && buffer[offset-1]==(byte)10){
 						break;  // we're done
 					}
 				}
+				if(c == -1) {
+					Log.error("-1 read count in readLine() while reading response line.");
+					throw new UnexpectedEOFException ("Unexpected EOF (read -1) in readLine.  Command: " + cmd.code);
+				}
+			}
+			catch (SocketException e) {
+				// on connection reset
+				throw new ConnectionResetException("SocketException in readLine.  Command: " + cmd.code, e);
 			}
 			catch (IOException e) {
 				e.printStackTrace();
-				throw new ClientRuntimeException ("IOEx while reading line for command " + cmd.code, e);
+				throw new ClientRuntimeException ("IOException in readLine.  Command: " + cmd.code, e);
 			}
 		}
 		/**
@@ -441,6 +460,7 @@ public class SynchProtocol extends ProtocolBase {
 					throw new ProviderException ("Bug: reading the bulk data bytes.  expecting " + size + " bytes.", bug);
 				}
 			}
+			else if(size == 0) data = new byte[0];
 			didRead = true;
 			return;
 		}

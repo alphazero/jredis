@@ -26,15 +26,15 @@ import java.util.StringTokenizer;
 import org.jredis.ClientRuntimeException;
 import org.jredis.Command;
 import org.jredis.JRedis;
+import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.RedisType;
 import org.jredis.Sort;
 import org.jredis.connector.BulkResponse;
 import org.jredis.connector.Connection;
 import org.jredis.connector.MultiBulkResponse;
-import org.jredis.ProviderException;
+import org.jredis.connector.Response;
 import org.jredis.connector.ValueResponse;
-import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.SortSupport;
@@ -53,27 +53,69 @@ public abstract class JRedisSupport implements JRedis {
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
-	/** No setter or getters for this property - it is initialized at construct time. */
-	private Connection	connection;
+//	/** No setter or getters for this property - it is initialized at construct time. */
+//	private Connection	connection;
 
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
-	/**
-	 * @param connection
+//	/**
+//	 * @param connection
+//	 */
+//	protected final void setConnection (Connection connection) {
+//		this.connection = Assert.notNull(connection, "connection on setConnection()", ClientRuntimeException.class);
+//	}
+//	/**
+//	 * @return
+//	 */
+//	protected final Connection getConnection () {
+//		return this.connection;
+//	}
+	
+	// ------------------------------------------------------------------------
+	// Extension point(s)
+	/*
+	 * This class provides the convenience of a uniform implementation wide mapping
+	 * of JRedis api semantics to the native protocol level semantics of byte[]s.
+	 * 
+	 * Extensions can use the provided extension points to provide or delegate the
+	 * servicing of request calls.  
 	 */
-	protected final void setConnection (Connection connection) {
-		this.connection = Assert.notNull(connection, "connection on setConnection()", ClientRuntimeException.class);
-	}
+	// ------------------------------------------------------------------------
+	
 	/**
+	 * This method mimics the eponymous {@link Connection#serviceRequest(Command, byte[]...)}
+	 * which defines the blocking api semantics of Synchronous connections.  The extending class
+	 * can either directly (a) implement the protocol requirements, or, (b) delegate to a
+	 * {@link Connection} instance, or, (c) utilize a pool of {@link Connection}s.  
+	 * 
+	 * @param cmd
+	 * @param args
 	 * @return
+	 * @throws RedisException
+	 * @throws ClientRuntimeException
+	 * @throws ProviderException
 	 */
-	protected final Connection getConnection () {
-		return this.connection;
-	}
+	protected abstract Response serviceRequest (Command cmd, byte[]...args) throws RedisException, ClientRuntimeException, ProviderException; 
 	// ------------------------------------------------------------------------
 	// INTERFACE
 	// ================================================================ Redis
+	/*
+	 * Support of all the JRedis interface methods.
+	 * 
+	 * This class uses the UTF-8 character set for all conversions due to its
+	 * use of the Convert and Codec support classes.
+	 * 
+	 * All calls are forwarded to an abstract serviceRequest method that the
+	 * extending classes are expected to implement.  
+	 * 
+	 * Implementation note:
+	 * The methods in this class use redundant code in marshalling request params
+	 * and in unmarshalling the response data.  We certainly can use a few helper
+	 * functions to reduce the redundancy, but given that such methods would be
+	 * repeatedly called, it was decided to effectively inline these statements in 
+	 * each method body.  
+	 */
 	// ------------------------------------------------------------------------
 
 
@@ -83,37 +125,36 @@ public abstract class JRedisSupport implements JRedis {
 		if((keydata = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
-		connection.serviceRequest(Command.AUTH, keydata);
-		
+		this.serviceRequest(Command.AUTH, keydata);
 		return this;
 	}
 //	@Override
 	public void bgsave() throws RedisException {
-		connection.serviceRequest(Command.BGSAVE);
+		this.serviceRequest(Command.BGSAVE);
 	}
 //	@Override
 	public JRedis ping() throws RedisException {
-		connection.serviceRequest(Command.PING);
+		this.serviceRequest(Command.PING);
 		return this;
 	}
 
 //	@Override
 	public JRedis flushall() throws RedisException {
-		connection.serviceRequest(Command.FLUSHALL).getStatus();
+		this.serviceRequest(Command.FLUSHALL).getStatus();
 		return this;
 	}
 //	@Override
 	public JRedis flushdb() throws RedisException {
-		connection.serviceRequest(Command.FLUSHDB).getStatus();
+		this.serviceRequest(Command.FLUSHDB).getStatus();
 		return this;
 	}
 //	@Override
 	public JRedis select(int index) throws RedisException {
-		connection.serviceRequest(Command.SELECT, Convert.toBytes(index));
+		this.serviceRequest(Command.SELECT, Convert.toBytes(index));
 		return this;
 	}
 //	@Override
-	public String rename(String oldkey, String newkey) throws RedisException {
+	public void rename(String oldkey, String newkey) throws RedisException {
 		byte[] oldkeydata = null;
 		if((oldkeydata = getKeyBytes(oldkey)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+oldkey+"]");
@@ -122,8 +163,7 @@ public abstract class JRedisSupport implements JRedis {
 		if((newkeydata = getKeyBytes(newkey)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+newkey+"]");
 
-		connection.serviceRequest(Command.RENAME, oldkeydata, newkeydata);
-		return newkey;
+		this.serviceRequest(Command.RENAME, oldkeydata, newkeydata);
 	}
 	
 //	@Override
@@ -139,7 +179,7 @@ public abstract class JRedisSupport implements JRedis {
 		/* boolean ValueRespose */
 		boolean value = false;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.RENAMENX, oldkeydata, newkeydata);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.RENAMENX, oldkeydata, newkeydata);
 			value = valResponse.getBooleanValue();
 		}
 		catch (ClassCastException e){
@@ -156,11 +196,12 @@ public abstract class JRedisSupport implements JRedis {
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 		
-		connection.serviceRequest(Command.RPUSH, keybytes, value);
+		this.serviceRequest(Command.RPUSH, keybytes, value);
 	}
 //	@Override
 	public void rpush(String key, String value) throws RedisException {
-		rpush(key, value.getBytes());
+//		rpush(key, DefaultCodec.encode(value));
+		rpush(key, DefaultCodec.encode(value));
 	}
 //	@Override
 	public void rpush(String key, Number value) throws RedisException {
@@ -182,7 +223,7 @@ public abstract class JRedisSupport implements JRedis {
 		/* boolean ValueRespose */
 		boolean res = false;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.SADD, keybytes, member);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.SADD, keybytes, member);
 			res = valResponse.getBooleanValue();
 		}
 		catch (ClassCastException e){
@@ -192,7 +233,7 @@ public abstract class JRedisSupport implements JRedis {
 	}
 //	@Override
 	public boolean sadd (String key, String value) throws RedisException {
-		return sadd (key, value.getBytes());
+		return sadd (key, DefaultCodec.encode(value));
 	}
 //	@Override
 	public boolean sadd (String key, Number value) throws RedisException {
@@ -208,11 +249,11 @@ public abstract class JRedisSupport implements JRedis {
 	public void save() 
 	throws RedisException 
 	{
-		connection.serviceRequest(Command.SAVE);
+		this.serviceRequest(Command.SAVE);
 //		/* boolean ValueRespose */
 //		boolean res = false;
 //		try {
-//			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.SAVE);
+//			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.SAVE);
 //			res = valResponse.getBooleanValue();
 //		}
 //		catch (ClassCastException e){
@@ -229,11 +270,11 @@ public abstract class JRedisSupport implements JRedis {
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
-		connection.serviceRequest(Command.SET, keybytes, value);
+		this.serviceRequest(Command.SET, keybytes, value);
 	}
 //	@Override
 	public void set(String key, String value) throws RedisException {
-		set(key, value.getBytes());
+		set(key, DefaultCodec.encode(value));
 	}
 //	@Override
 	public void set(String key, Number value) throws RedisException {
@@ -253,7 +294,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		boolean resvalue = false;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.SETNX, keybytes, value);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.SETNX, keybytes, value);
 			resvalue = valResponse.getBooleanValue();
 		}
 		catch (ClassCastException e){
@@ -263,7 +304,7 @@ public abstract class JRedisSupport implements JRedis {
 	}
 //	@Override
 	public boolean setnx(String key, String value) throws RedisException {
-		return setnx(key, value.getBytes());
+		return setnx(key, DefaultCodec.encode(value));
 	}
 //	@Override
 	public boolean setnx(String key, Number value) throws RedisException {
@@ -283,7 +324,7 @@ public abstract class JRedisSupport implements JRedis {
 		/* boolean ValueRespose */
 		boolean value = false;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.SISMEMBER, keybytes, member);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.SISMEMBER, keybytes, member);
 			value = valResponse.getBooleanValue();
 		}
 		catch (ClassCastException e){
@@ -293,8 +334,8 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
-	public boolean sismember(String key, String stringValue) throws RedisException {
-		return sismember(key, stringValue.getBytes());
+	public boolean sismember(String key, String value) throws RedisException {
+		return sismember(key, DefaultCodec.encode(value));
 	}
 
 //	@Override
@@ -318,12 +359,12 @@ public abstract class JRedisSupport implements JRedis {
 		/* ValueRespose */
 		long value = Long.MIN_VALUE;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.INCR, keybytes);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.INCR, keybytes);
 			value = valResponse.getLongValue();
 		}
 //		int value = Integer.MIN_VALUE;
 //		try {
-//			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.INCR, keybytes);
+//			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.INCR, keybytes);
 //			value = valResponse.getIntValue();
 //		}
 		catch (ClassCastException e){
@@ -341,12 +382,12 @@ public abstract class JRedisSupport implements JRedis {
 		/* ValueRespose */
 		long value = Long.MIN_VALUE;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.INCRBY, keybytes, Convert.toBytes(delta));
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.INCRBY, keybytes, Convert.toBytes(delta));
 			value = valResponse.getLongValue();
 		}
 //		int value = Integer.MIN_VALUE;
 //		try {
-//			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.INCRBY, keybytes, Convert.toBytes(delta));
+//			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.INCRBY, keybytes, Convert.toBytes(delta));
 //			value = valResponse.getIntValue();
 //		}
 		catch (ClassCastException e){
@@ -364,12 +405,12 @@ public abstract class JRedisSupport implements JRedis {
 		/* ValueRespose */
 		long value = Long.MAX_VALUE;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.DECR, keybytes);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.DECR, keybytes);
 			value = valResponse.getLongValue();
 		}
 //		int value = Integer.MIN_VALUE;
 //		try {
-//			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.DECR, keybytes);
+//			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.DECR, keybytes);
 //			value = valResponse.getIntValue();
 //		}
 		catch (ClassCastException e){
@@ -387,12 +428,12 @@ public abstract class JRedisSupport implements JRedis {
 		/* ValueRespose */
 		long value = Long.MAX_VALUE;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.DECRBY, keybytes, Convert.toBytes(delta));
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.DECRBY, keybytes, Convert.toBytes(delta));
 			value = valResponse.getLongValue();
 		}
 //		int value = Integer.MIN_VALUE;
 //		try {
-//			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.DECRBY, keybytes, Convert.toBytes(delta));
+//			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.DECRBY, keybytes, Convert.toBytes(delta));
 //			value = valResponse.getIntValue();
 //		}
 		catch (ClassCastException e){
@@ -410,12 +451,12 @@ public abstract class JRedisSupport implements JRedis {
 		/* ValueRespose */ /* int since max size is 1GB, an integer 1,073,741,824 */
 		long value = Integer.MIN_VALUE;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.LLEN, keybytes);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.LLEN, keybytes);
 			value = valResponse.getLongValue();
 		}
 //		int value = Integer.MIN_VALUE;
 //		try {
-//			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.LLEN, keybytes);
+//			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.LLEN, keybytes);
 //			value = valResponse.getIntValue();
 //		}
 		catch (ClassCastException e){
@@ -431,12 +472,12 @@ public abstract class JRedisSupport implements JRedis {
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 		long value = Long.MIN_VALUE;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.SCARD, keybytes);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.SCARD, keybytes);
 			value = valResponse.getLongValue();
 		}
 //		int value = Integer.MIN_VALUE;
 //		try {
-//			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.SCARD, keybytes);
+//			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.SCARD, keybytes);
 //			value = valResponse.getIntValue();
 //		}
 		catch (ClassCastException e){
@@ -451,7 +492,7 @@ public abstract class JRedisSupport implements JRedis {
 	public long dbsize() throws RedisException {
 		long value = Long.MIN_VALUE;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.DBSIZE);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.DBSIZE);
 			value = valResponse.getLongValue();
 		}
 		catch (ClassCastException e){
@@ -463,7 +504,7 @@ public abstract class JRedisSupport implements JRedis {
 	public long lastsave() throws RedisException {
 		long value = Long.MIN_VALUE;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.LASTSAVE);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.LASTSAVE);
 			value = valResponse.getLongValue();
 		}
 		catch (ClassCastException e){
@@ -482,7 +523,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		byte[] bulkData= null;
 		try {
-			BulkResponse response = (BulkResponse) connection.serviceRequest(Command.GET, keybytes);
+			BulkResponse response = (BulkResponse) this.serviceRequest(Command.GET, keybytes);
 			bulkData = response.getBulkData();
 		}
 		catch (ClassCastException e){
@@ -492,14 +533,14 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
-	public byte[] lindex(String key, int index) throws RedisException {
+	public byte[] lindex(String key, long index) throws RedisException {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] bulkData= null;
 		try {
-			BulkResponse response = (BulkResponse) connection.serviceRequest(Command.LINDEX, keybytes, Convert.toBytes(index));
+			BulkResponse response = (BulkResponse) this.serviceRequest(Command.LINDEX, keybytes, Convert.toBytes(index));
 			bulkData = response.getBulkData();
 		}
 		catch (ClassCastException e){
@@ -515,7 +556,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		byte[] bulkData= null;
 		try {
-			BulkResponse response = (BulkResponse) connection.serviceRequest(Command.LPOP, keybytes);
+			BulkResponse response = (BulkResponse) this.serviceRequest(Command.LPOP, keybytes);
 			bulkData = response.getBulkData();
 		}
 		catch (ClassCastException e){
@@ -532,7 +573,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		byte[] bulkData= null;
 		try {
-			BulkResponse response = (BulkResponse) connection.serviceRequest(Command.RPOP, keybytes);
+			BulkResponse response = (BulkResponse) this.serviceRequest(Command.RPOP, keybytes);
 			bulkData = response.getBulkData();
 		}
 		catch (ClassCastException e){
@@ -549,7 +590,7 @@ public abstract class JRedisSupport implements JRedis {
 		/* ValueRespose */
 		String stringValue = null;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.RANDOMKEY);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.RANDOMKEY);
 			stringValue = valResponse.getStringValue();
 		}
 		catch (ClassCastException e){
@@ -566,7 +607,7 @@ public abstract class JRedisSupport implements JRedis {
 		RedisType	type = null;
 		/* ValueRespose */
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.TYPE, keybytes);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.TYPE, keybytes);
 			String stringValue = valResponse.getStringValue();
 			type = RedisType.valueOf(stringValue);
 		}
@@ -583,7 +624,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		byte[] bulkData= null;
 		try {
-			BulkResponse response = (BulkResponse) connection.serviceRequest(Command.INFO);
+			BulkResponse response = (BulkResponse) this.serviceRequest(Command.INFO);
 			bulkData = response.getBulkData();
 		}
 		catch (ClassCastException e){
@@ -621,7 +662,7 @@ public abstract class JRedisSupport implements JRedis {
 		
 		List<byte[]> multiBulkData= null;
 		try {
-			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) connection.serviceRequest(Command.MGET, keybytes);
+			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.MGET, keybytes);
 			multiBulkData = MultiBulkResponse.getMultiBulkData();
 		}
 		catch (ClassCastException e){
@@ -638,7 +679,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		List<byte[]> multiBulkData= null;
 		try {
-			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) connection.serviceRequest(Command.SMEMBERS, keydata);
+			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.SMEMBERS, keydata);
 			multiBulkData = MultiBulkResponse.getMultiBulkData();
 		}
 		catch (ClassCastException e){
@@ -660,7 +701,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		byte[] bulkData= null;
 		try {
-			BulkResponse response = (BulkResponse) connection.serviceRequest(Command.KEYS, keydata);
+			BulkResponse response = (BulkResponse) this.serviceRequest(Command.KEYS, keydata);
 			bulkData = response.getBulkData();
 		}
 		catch (ClassCastException e){
@@ -676,7 +717,7 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
-	public List<byte[]> lrange(String key, int from, int to) throws RedisException {
+	public List<byte[]> lrange(String key, long from, long to) throws RedisException {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -686,7 +727,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		List<byte[]> multiBulkData= null;
 		try {
-			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) connection.serviceRequest(Command.LRANGE, keybytes, fromBytes, toBytes);
+			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.LRANGE, keybytes, fromBytes, toBytes);
 			multiBulkData = MultiBulkResponse.getMultiBulkData();
 		}
 		catch (ClassCastException e){
@@ -710,7 +751,7 @@ public abstract class JRedisSupport implements JRedis {
 				
 				List<byte[]> multiBulkData= null;
 				try {
-					MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) client.connection.serviceRequest(Command.SORT, keyBytes, sortSpecBytes);
+					MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) client.serviceRequest(Command.SORT, keyBytes, sortSpecBytes);
 					multiBulkData = MultiBulkResponse.getMultiBulkData();
 				}
 				catch (ClassCastException e){
@@ -727,7 +768,7 @@ public abstract class JRedisSupport implements JRedis {
 //	@Override
 	public void quit()  {
 		try {
-			connection.serviceRequest(Command.QUIT);
+			this.serviceRequest(Command.QUIT);
 		}
 		catch (RedisException e) { /* NotConnectedException is OK */
 			e.printStackTrace();
@@ -738,7 +779,7 @@ public abstract class JRedisSupport implements JRedis {
 //	@Override
 	public void shutdown() {
 		try {
-			connection.serviceRequest(Command.SHUTDOWN);
+			this.serviceRequest(Command.SHUTDOWN);
 		}
 		catch (RedisException e) { /* NotConnectedException is OK */
 			e.printStackTrace();
@@ -762,7 +803,32 @@ public abstract class JRedisSupport implements JRedis {
 		
 		List<byte[]> multiBulkData= null;
 		try {
-			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) connection.serviceRequest(Command.SINTER, keybytes);
+			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.SINTER, keybytes);
+			multiBulkData = MultiBulkResponse.getMultiBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return multiBulkData;
+	}
+
+//	@Override
+	public List<byte[]> sunion(String set1, String... sets) throws RedisException {
+		byte[] keydata = null;
+		if((keydata = getKeyBytes(set1)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+set1+"]");
+
+		byte[][] keybytes = new byte[1+sets.length][];
+		int i=0; keybytes[i++] = keydata;
+		for(String k : sets) {
+			if((keydata = getKeyBytes(k)) == null) 
+				throw new IllegalArgumentException ("invalid key => ["+k+"]");
+			keybytes[i++] = keydata;
+		}
+		
+		List<byte[]> multiBulkData= null;
+		try {
+			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.SUNION, keybytes);
 			multiBulkData = MultiBulkResponse.getMultiBulkData();
 		}
 		catch (ClassCastException e){
@@ -787,7 +853,26 @@ public abstract class JRedisSupport implements JRedis {
 			setbytes[i++] = setdata;
 		}
 		
-		connection.serviceRequest(Command.SINTERSTORE, setbytes);
+		this.serviceRequest(Command.SINTERSTORE, setbytes);
+	}
+
+//	@Override
+	public void sunionstore(String dest, String... sets) throws RedisException {
+		byte[] keydata = null;
+		if((keydata = getKeyBytes(dest)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+dest+"]");
+
+		byte[][] setbytes = new byte[1+sets.length][];
+		int i=0; 
+		setbytes[i++] = keydata;
+		byte[] setdata =null;
+		for(String k : sets) {
+			if((setdata = getKeyBytes(k)) == null) 
+				throw new IllegalArgumentException ("invalid key => ["+k+"]");
+			setbytes[i++] = setdata;
+		}
+		
+		this.serviceRequest(Command.SUNIONSTORE, setbytes);
 	}
 
 ////	@Override
@@ -811,10 +896,10 @@ public abstract class JRedisSupport implements JRedis {
 //			setbytes[i++] = setdata;
 //		}
 //		
-//		connection.serviceRequest(Command.SINTERSTORE, setbytes);
+//		this.serviceRequest(Command.SINTERSTORE, setbytes);
 ////		boolean resvalue = false;
 ////		try {
-////			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.SINTERSTORE, setbytes);
+////			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.SINTERSTORE, setbytes);
 ////			resvalue = valResponse.getBooleanValue();
 ////		}
 ////		catch (ClassCastException e){
@@ -832,7 +917,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		boolean resvalue = false;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.DEL, keybytes);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.DEL, keybytes);
 			resvalue = valResponse.getBooleanValue();
 		}
 		catch (ClassCastException e){
@@ -850,7 +935,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		boolean resvalue = false;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.EXISTS, keybytes);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.EXISTS, keybytes);
 			resvalue = valResponse.getBooleanValue();
 		}
 		catch (ClassCastException e){
@@ -866,11 +951,11 @@ public abstract class JRedisSupport implements JRedis {
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 		
-		connection.serviceRequest(Command.LPUSH, keybytes, value);
+		this.serviceRequest(Command.LPUSH, keybytes, value);
 	}
 //	@Override
 	public void lpush(String key, String value) throws RedisException {
-		lpush(key, value.getBytes());
+		lpush(key, DefaultCodec.encode(value));
 	}
 //	@Override
 	public void lpush(String key, Number value) throws RedisException {
@@ -894,12 +979,12 @@ public abstract class JRedisSupport implements JRedis {
 
 		long remcnt = 0;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.LREM, keybytes, value, countBytes);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.LREM, keybytes, value, countBytes);
 			remcnt = valResponse.getLongValue();
 		}
 //		int remcnt = 0;
 //		try {
-//			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.LREM, keybytes, value, countBytes);
+//			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.LREM, keybytes, value, countBytes);
 //			remcnt = valResponse.getIntValue();
 //		}
 		catch (ClassCastException e){
@@ -908,8 +993,8 @@ public abstract class JRedisSupport implements JRedis {
 		return remcnt;
 	}
 //	@Override
-	public long lrem (String listKey, String stringValue, int count) throws RedisException{
-		return lrem (listKey, stringValue.getBytes(), count);
+	public long lrem (String listKey, String value, int count) throws RedisException{
+		return lrem (listKey, DefaultCodec.encode(value), count);
 	}
 //	@Override
 	public long lrem (String listKey, Number numberValue, int count) throws RedisException {
@@ -923,24 +1008,24 @@ public abstract class JRedisSupport implements JRedis {
 
 
 //	@Override
-	public void lset(String key, int index, byte[] value) throws RedisException {
+	public void lset(String key, long index, byte[] value) throws RedisException {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] indexBytes = Convert.toBytes(index);
-		connection.serviceRequest(Command.LSET, keybytes, indexBytes, value);
+		this.serviceRequest(Command.LSET, keybytes, indexBytes, value);
 	}
 //	@Override
-	public void lset (String key, int index, String stringValue) throws RedisException {
-		lset (key, index, stringValue.getBytes());
+	public void lset (String key, long index, String value) throws RedisException {
+		lset (key, index, DefaultCodec.encode(value));
 	}
 //	@Override
-	public void lset (String key, int index, Number numberValue) throws RedisException{
+	public void lset (String key, long index, Number numberValue) throws RedisException{
 		lset (key, index, String.valueOf(numberValue).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> void lset (String key, int index, T object) throws RedisException{
+	public <T extends Serializable> void lset (String key, long index, T object) throws RedisException{
 		lset (key, index, DefaultCodec.encode(object));
 	}
 
@@ -954,7 +1039,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		boolean resvalue = false;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.MOVE, keybytes, toBytes);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.MOVE, keybytes, toBytes);
 			resvalue = valResponse.getBooleanValue();
 		}
 		catch (ClassCastException e){
@@ -972,7 +1057,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		boolean resvalue = false;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.SREM, keybytes, member);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.SREM, keybytes, member);
 			resvalue = valResponse.getBooleanValue();
 		}
 		catch (ClassCastException e){
@@ -982,7 +1067,7 @@ public abstract class JRedisSupport implements JRedis {
 	}
 //	@Override
 	public boolean srem (String key, String value) throws RedisException {
-		return srem (key, value.getBytes());
+		return srem (key, DefaultCodec.encode(value));
 	}
 //	@Override
 	public boolean srem (String key, Number value) throws RedisException {
@@ -996,14 +1081,14 @@ public abstract class JRedisSupport implements JRedis {
 
 
 //	@Override
-	public void ltrim(String key, int keepFrom, int keepTo) throws RedisException {
+	public void ltrim(String key, long keepFrom, long keepTo) throws RedisException {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] fromBytes = Convert.toBytes(keepFrom);
 		byte[] toBytes = Convert.toBytes(keepTo);
-		connection.serviceRequest(Command.LTRIM, keybytes, fromBytes, toBytes);
+		this.serviceRequest(Command.LTRIM, keybytes, fromBytes, toBytes);
 	}
 
 //	@Override
@@ -1016,7 +1101,7 @@ public abstract class JRedisSupport implements JRedis {
 		
 		boolean resvalue = false;
 		try {
-			ValueResponse valResponse = (ValueResponse) connection.serviceRequest(Command.EXPIRE, keybytes, ttlbytes);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.EXPIRE, keybytes, ttlbytes);
 			resvalue = valResponse.getBooleanValue();
 		}
 		catch (ClassCastException e){

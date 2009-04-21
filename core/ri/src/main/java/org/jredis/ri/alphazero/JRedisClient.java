@@ -16,22 +16,21 @@
 
 package org.jredis.ri.alphazero;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import org.jredis.ClientRuntimeException;
+import org.jredis.Command;
 import org.jredis.JRedis;
-import org.jredis.NotSupportedException;
 import org.jredis.ProviderException;
 import org.jredis.Redis;
+import org.jredis.RedisException;
 import org.jredis.connector.Connection;
-import org.jredis.connector.FaultedConnection;
 import org.jredis.connector.Protocol;
+import org.jredis.connector.Response;
 import org.jredis.ri.alphazero.support.Assert;
-import org.jredis.ri.alphazero.support.Log;
 
 
 /**
+ * [TODO: check documentation and make necessary changes made during refactoring]
+ * 
  * A basic client, using {@link SocketConnection} and handler delegate 
  * <p>
  * This class is simply an assembly of various other components that address distinct
@@ -63,13 +62,18 @@ import org.jredis.ri.alphazero.support.Log;
  * 
  */
 @Redis(versions={"0.09"})
-public class JRedisClient  extends JRedisSupport  {
+public class JRedisClient extends SynchJRedisBase  {
 	
+	// ------------------------------------------------------------------------
+	// Properties
+	// ------------------------------------------------------------------------
+
+	private Connection	connection;
+
 	// ------------------------------------------------------------------------
 	// Construct and initialize
 	// ------------------------------------------------------------------------
 
-	
 	/**
 	 * New RedisClient for the default protocol version {@link RedisVersion} 
 	 * obtained from the {@link ProtocolManager}
@@ -113,34 +117,38 @@ public class JRedisClient  extends JRedisSupport  {
 		Assert.notNull(host, "host parameter", IllegalArgumentException.class);
 		Assert.notNull(redisVersion, "redisVersion paramter", IllegalArgumentException.class);
 		
-		InetAddress 	address = null;
-		Connection 		connection = null;
-		try {
-			address = InetAddress.getByName(host);
-			connection = new SynchConnection(address, port, redisVersion);
-			Assert.notNull(connection, "connection delegate", ClientRuntimeException.class);
-			
-			super.setConnection (connection);
-		}
-		catch (NotSupportedException e) {
-			Log.log("Can not support redis protocol '%s'", redisVersion);
-			throw e;
-		}
-		catch (ProviderException e) {
-			Log.bug("Couldn't create the handler delegate.  => " + e.getLocalizedMessage());
-			throw e;
-		}
-		catch (ClientRuntimeException e) {
-			String msg = e.getMessage() + "\nMake sure your server is running.";
-			Log.error ("Error creating connection -> " + e.getLocalizedMessage());
-			super.setConnection(new FaultedConnection(msg));
-//			throw e;
-		}
-		catch (UnknownHostException e) {
-			String msg = "Couldn't obtain InetAddress for "+host;
-			Log.problem (msg+"  => " + e.getLocalizedMessage());
-			throw new ClientRuntimeException(msg, e);
-		}
-//		Log.log("RedisClient [ver: %s] created and connected", redisVersion);
+		Connection synchConnection = createSynchConnection (host, port, redisVersion);
+		setConnection (synchConnection);
+	}
+	
+	// ------------------------------------------------------------------------
+	// Super overrides
+	// ------------------------------------------------------------------------
+	@Override
+	protected Response serviceRequest(Command cmd, byte[]... args)
+			throws RedisException, ClientRuntimeException, ProviderException 
+	{
+		return connection.serviceRequest(cmd, args);
+	}
+	@Override
+	protected final void setConnection (Connection connection)  {
+		this.connection = Assert.notNull(connection, "connection on setConnection()", ClientRuntimeException.class);
+	}
+	
+	// ------------------------------------------------------------------------
+	// Interface
+	// =========================================================== Resource<T>
+	/*
+	 * Provides basic Resource support without any state management.  Extensions
+	 * that use context in a simply manner can rely on these methods.  Others may
+	 * wish to override.
+	 */
+	// ------------------------------------------------------------------------
+	/* (non-Javadoc)
+	 * @see org.jredis.resource.Resource#getInterface()
+	 */
+	@Override
+	public JRedis getInterface() {
+		return this;
 	}
 }

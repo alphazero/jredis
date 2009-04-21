@@ -31,6 +31,7 @@ import org.jredis.connector.Response;
 import org.jredis.connector.ResponseStatus;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
+import org.jredis.ri.alphazero.support.Log;
 
 
 /**
@@ -213,6 +214,8 @@ public abstract class ProtocolBase implements Protocol {
 
 			case SINTER: /* sinter key [key1 [key2 [...]]] */
 			case SINTERSTORE:
+			case SUNION: 
+			case SUNIONSTORE:
 			case MGET:
 			{
 				int keycnt = args.length;
@@ -259,6 +262,7 @@ public abstract class ProtocolBase implements Protocol {
 		case LSET:
 		case LTRIM:
 		case SINTERSTORE:
+		case SUNIONSTORE:
 		case FLUSHALL: 		
 		case FLUSHDB:		
 		case SELECT:		
@@ -323,6 +327,7 @@ public abstract class ProtocolBase implements Protocol {
 		case MGET:
 		case LRANGE:
 		case SINTER:
+		case SUNION:
 		case SMEMBERS:
 		case SORT:
 			response = createMultiBulkResponse (cmd);
@@ -467,11 +472,18 @@ public abstract class ProtocolBase implements Protocol {
 //		@Override
 		public void write(OutputStream out) throws ClientRuntimeException, ProviderException {
 			try {
-				buffer.writeTo (out);
+				buffer.writeTo (out); // regrettably this does NOT throw exceptions
+									  // if redis has disconnected .. 
 				out.flush();
 			}
-			catch (SocketException e){ throw new ClientRuntimeException ("socket exception", e);}
-			catch (IOException e) { throw new ClientRuntimeException ("stream io exception", e);}
+			catch (SocketException e){
+				Log.error("StreamBufferRequest.write(): SocketException on write: " + e.getLocalizedMessage());
+				throw new ClientRuntimeException ("socket exception", e);
+			}
+			catch (IOException e) { 
+				Log.error("StreamBufferRequest.write(): IOException on write: " + e.getLocalizedMessage());
+				throw new ClientRuntimeException ("stream io exception", e);
+			}
 		}
 	}
 }

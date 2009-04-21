@@ -21,7 +21,7 @@ package org.jredis;
 /**
  * Used by JRedis implementation providers to indicate an exception related to the
  * implementation of the specification.  Effectively, this exception and its extensions
- * should only be thrown when a fault has occured that is neither a {@link SystemException},
+ * should only be thrown when a fault has occurred that is neither a {@link SystemException},
  * nor a Redis prompted server side error.
  * 
  * @author  Joubin Houshyar (alphazero@sensesay.net)

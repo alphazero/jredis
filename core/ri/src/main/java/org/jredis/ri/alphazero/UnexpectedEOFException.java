@@ -14,34 +14,28 @@
  *   limitations under the License.
  */
 
-package org.jredis;
+package org.jredis.ri.alphazero;
 
-import java.util.Set;
 
 /**
- * [NOTE: This interface is not officially in spec but projected to be included
- * in subject to further consideration.]
  * [TODO: document me!]
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, Apr 08, 2009
+ * @version alpha.0, Apr 15, 2009
  * @since   alpha.0
  * 
- * @param <T>
  */
-public interface JavaSemantics <T> {
-	
-	public RedisSet  <T> 	set  (String aSetTypeKey) throws RedisException;
-	public RedisList <T> 	list (String aListTypeKey) throws RedisException;
-	public RedisMap  <T> 	map (String aStringTypeKey) throws RedisException;
-	
-	public interface RedisSet<T> extends Set<T> {
-		
+
+public class UnexpectedEOFException extends ConnectionException {
+	/**
+	 * @param msg
+	 * @param e
+	 */
+	public UnexpectedEOFException(String msg) {
+		super(msg);
 	}
-	public interface RedisList<T> extends Set<T> {
-		
-	}
-	public interface RedisMap <T> extends Set<T> {
-		
-	}
+
+	/**  */
+	private static final long serialVersionUID = _specification.Version.major;
+
 }

@@ -22,7 +22,7 @@ import org.jredis.JRedis;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.ri.alphazero.JRedisClient;
-import org.jredis.ri.alphazero.support.Encode;
+import static org.jredis.ri.alphazero.support.DefaultCodec.*;
 
 /**
  * [TODO: document me!]
@@ -56,7 +56,7 @@ public class HelloAgain {
 				return;
 			}
 			
-			String msg = Encode.toStr ( jredis.get(key) );
+			String msg = toStr ( jredis.get(key) );
 			
 			System.out.format("%s\n", msg);
 		}

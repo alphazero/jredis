@@ -8,6 +8,7 @@
 
          JREDIS SPECIFICATION AND REFERENCE IMPLEMENTATION
 
+[updated on 04-21-09]
 
  * About 
  
@@ -20,7 +21,7 @@ else.
  * Redis compliance
  
 The specification and the implementation in this release comply with the 
-the latest redis development release specification as of 04-12-09 and 
+the latest redis development release specification as of 04-21-09 and 
 tested against the build of the REDIS server from the github repository.
 
 
@@ -56,6 +57,10 @@ on the drawing board.  (If you can not wait for this, you may hack your
 own by placing a JRedis facade in front of a combination of classes from
 java.util.concurrent and using a pool of JRedisClients behind the scenes.)
 
+If you elect to do this, do note that connections to Redis are effectively
+stateful and you can not trivially use a connection to serve the requests
+of multiple requesters (threads) IFF you use commands such as SELECT.
+
 Beyond that, JREDIS as of now supports basic Java serialization and you
 can use your Java objects as 'values' for String, Set, and List keys in
 REDIS.  And of course, the JRedis interface has been designed to provide
@@ -88,18 +93,16 @@ earlier version of Java, as that would adversely constrain the options
 in both the expression of JRedis semantics and an effective implementation.
 
 TESTS:
-Test source files and classes clearly require the JUnit 3 library files, 
+Test source files and classes clearly require TestNG library , 
 but these test artifacts are not included in the drop-in jar so JUnit is
 not a requirement for using JRedis.
 
 BUILD:
 JREDIS was built on Eclipse 3.4, on Apple's Mac OS X 10.5 running JVM1.6.
 The JREDIS core software itself can be built simply using jacav and jar
-and this initial distribution does not include either ant or maven build
-files.  Once the decision between one of these two build systems has been
-reached, and that becomes a requirement, it will be included in an update
-release.
 
+That said, the current release uses structured Maven 2 poms to build
+the project and execute the tests.
 
  * Status
  

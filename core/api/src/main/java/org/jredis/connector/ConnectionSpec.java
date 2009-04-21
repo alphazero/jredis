@@ -18,7 +18,6 @@ package org.jredis.connector;
 
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Map;
 
 
 /**
@@ -31,6 +30,7 @@ import java.util.Map;
  */
 public interface ConnectionSpec {
 	
+	public int	getReconnectCnt ();
 	public InetAddress getAddress();
 	public int getPort ();
 	public boolean getSocketFlag (ConnectionSpec.SocketFlag flag);
@@ -43,6 +43,7 @@ public interface ConnectionSpec {
 	 *
 	 */
 	public enum SocketFlag {
+		/** Corresponds to SO_KEEP_ALIVE flag of {@link Socket}.  @see {@link Socket#setSoTimeout(int)} */
 		SO_KEEP_ALIVE
 	}
 	
@@ -57,17 +58,17 @@ public interface ConnectionSpec {
 		 * Corresponds to <code><b>SO_SNDBUF</b></code> flag. see {@link Socket#setSendBufferSize(int)} 
 		 * <p>expected value is an <b><code>int</code></b> or an {@link Integer}.
 		 */
-		send_buffer_size,
+		SO_SNDBUF,
 		
 		/** 
 		 * corresponds to SO_RCVBUF flag. see {@link Socket#setReceiveBufferSize(int)} 
 		 */
-		receive_buffer_size,
+		SO_RCVBUF,
 		
 		/** 
 		 * corresponds to SO_TIMEOUT flag.  see {@link Socket#setSoTimeout(int)} 
 		 */
-		timeout,
+		SO_TIMEOUT,
 		
 		/**
 		 * Socket performance preferences.
@@ -76,7 +77,7 @@ public interface ConnectionSpec {
 		 * @See {@link SocketProperty#bandwidth}
 		 * @See {@link Socket#setPerformancePreferences(int, int, int)} for details.
 		 */
-		connection_time,
+		SO_PREF_CONN_TIME,
 
 		/**
 		 * Socket performance preferences.
@@ -85,7 +86,7 @@ public interface ConnectionSpec {
 		 * @See {@link SocketProperty#connection_time}
 		 * @See {@link Socket#setPerformancePreferences(int, int, int)} for details.
 		 */
-		latency,
+		SO_PREF_LATENCY,
 
 		/**
 		 * Socket performance preferences.
@@ -94,27 +95,27 @@ public interface ConnectionSpec {
 		 * @See {@link SocketProperty#connection_time}
 		 * @See {@link Socket#setPerformancePreferences(int, int, int)} for details.
 		 */
-		bandwidth,
+		SO_PREF_BANDWIDTH,
 	}
-
-	/**
-	 * @see SocketFlag
-	 * @see ConnectionSpec#getSocketFlag(SocketFlag)
-	 * 
-	 * @return the socket flag map.  Whether this is a copy or the reference to underlying references
-	 * is un-Specified.  What is specified is that changes to this set after connection has been established are
-	 * of no effect.
-	 */
-	public Map<SocketFlag, Boolean> getSocketFlags();
-	
-	/**
-	 * @see SocketProperty
-	 * @see ConnectionSpec#getSocketProperty(SocketProperty)
-	 * 
-	 * @return the socket property map.  Whether this is a copy or the reference to underlying references
-	 * is un-Specified.  What is specified is that changes to this set after connection has been established are
-	 * of no effect.
-	 */
-	public Map<SocketProperty, Integer> getSocketProperties();
+// 2much - keep it simple: the getters above are sufficient - this serves not additional purpose.
+//	/**
+//	 * @see SocketFlag
+//	 * @see ConnectionSpec#getSocketFlag(SocketFlag)
+//	 * 
+//	 * @return the socket flag map.  Whether this is a copy or the reference to underlying references
+//	 * is un-Specified.  What is specified is that changes to this set after connection has been established are
+//	 * of no effect.
+//	 */
+//	public Map<SocketFlag, Boolean> getSocketFlags();
+//	
+//	/**
+//	 * @see SocketProperty
+//	 * @see ConnectionSpec#getSocketProperty(SocketProperty)
+//	 * 
+//	 * @return the socket property map.  Whether this is a copy or the reference to underlying references
+//	 * is un-Specified.  What is specified is that changes to this set after connection has been established are
+//	 * of no effect.
+//	 */
+//	public Map<SocketProperty, Integer> getSocketProperties();
 	
 }
