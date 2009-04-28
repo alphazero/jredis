@@ -1567,6 +1567,70 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#sismember(java.lang.String, byte[])}.
 	 */
 	@Test
+	public void testSmoveStringByteArray() {
+		test = Command.SMOVE.code + " byte[]";
+		Log.log("TEST: %s command", test);
+		try {
+			jredis.select(db1).flushdb();
+			
+			String srckey = keys.get(0);
+			String destkey = keys.get(1);
+			for(int i=0;i<SMALL_CNT; i++)
+				assertTrue(jredis.sadd(srckey, dataList.get(i)), "sadd of random element should be true");
+			
+			for(int i=0;i<SMALL_CNT; i++) {
+				assertTrue(jredis.sismember(srckey, dataList.get(i)), "should be a member of the src before move");
+				
+				/* smove */
+				assertTrue(jredis.smove (srckey, destkey, dataList.get(i)), "move should be ok");
+				
+				assertTrue(jredis.sismember(destkey, dataList.get(i)), "should be a member of the dest after move");
+				assertFalse(jredis.sismember(srckey, dataList.get(i)), "should NOT be a member of the src after move");
+			}
+			
+			// lets try the error conditions by using wrong type for src or dest
+			boolean expectedError;
+			
+			String stringKey = "foo";
+			jredis.set(stringKey, "smove test");
+			
+			String listKey = "bar";
+			jredis.lpush(listKey, "smove test");
+			
+			// wrong dest
+			expectedError = false;
+			try {
+				Log.log("Expecting an operation against key holding the wrong kind of value ERROR..");
+				assertTrue(jredis.smove (destkey, stringKey, dataList.get(0)), "dest is wrong type");
+			}
+			catch (RedisException e) { expectedError = true; }
+			assertTrue(expectedError, "should have raised an exception but did not");
+			
+			// wrong src
+			expectedError = false;
+			try {
+				Log.log("Expecting an operation against key holding the wrong kind of value ERROR..");
+				assertTrue(jredis.smove (stringKey, srckey, dataList.get(0)), "src is wrong type");
+			}
+			catch (RedisException e) { expectedError = true; }
+			assertTrue(expectedError, "should have raised an exception but did not");
+			
+			// wrong src and dest
+			expectedError = false;
+			try {
+				Log.log("Expecting an operation against key holding the wrong kind of value ERROR..");
+				assertTrue(jredis.smove (listKey, stringKey, dataList.get(0)), "src and dest are wrong type");
+			}
+			catch (RedisException e) { expectedError = true; }
+			assertTrue(expectedError, "should have raised an exception but did not");
+		} 
+		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#sismember(java.lang.String, byte[])}.
+	 */
+	@Test
 	public void testSismemberStringByteArray() {
 		test = Command.SISMEMBER.code + " byte[]";
 		Log.log("TEST: %s command", test);

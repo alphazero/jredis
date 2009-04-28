@@ -49,21 +49,18 @@ public class JRedisJProfileSubject {
 		Log.log("***** JProfileTestCase ****");
 		jredis.auth("jredis").ping().flushall();
 		
-		int iter = 500000;
-		String key = "foo";
+		int iter = 100000;
+		String key = "foostring";
+		String cntrkey = "foocntr";
+		String listkey = "foolist";
+		String setkey = "fooset";
 		byte[] data = "meow".getBytes();
-		jredis.incrby(key, Integer.MAX_VALUE*2);
 		long start = System.currentTimeMillis();
 		for(Long j=0L; j<iter; j++) {
-			jredis.ping();
-			jredis.select(1);
-			jredis.incr(key);
-			jredis.select(2);
+			jredis.incr(cntrkey);
 			jredis.set(key, data);
-			jredis.select(3);
-			jredis.sadd(key, data);
-			jredis.select(4);
-			jredis.rpush(key, data);
+			jredis.sadd(setkey, data);
+			jredis.rpush(listkey, data);
 		}
 		long delta = System.currentTimeMillis() - start;
 		float rate = (iter * 1000) / delta;

@@ -369,6 +369,39 @@ public abstract class JRedisSupport implements JRedis {
 		return sismember(key, DefaultCodec.encode(object));
 	}
 
+	public boolean smove (String srcKey, String destKey, byte[] member) throws RedisException {
+		byte[] srcKeyBytes = null;
+		if((srcKeyBytes = getKeyBytes(srcKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+srcKey+"]");
+
+		byte[] destKeyBytes = null;
+		if((destKeyBytes = getKeyBytes(destKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+destKey+"]");
+
+		/* boolean ValueRespose */
+		boolean value = false;
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.SMOVE, srcKeyBytes, destKeyBytes, member);
+			value = valResponse.getBooleanValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return value;
+	}
+	public boolean smove (String srcKey, String destKey, String stringValue) throws RedisException {
+		return smove (srcKey, destKey, DefaultCodec.encode(stringValue));
+	}
+	public boolean smove (String srcKey, String destKey, Number numberValue) throws RedisException {
+		return smove (srcKey, destKey, String.valueOf(numberValue).getBytes());
+	}
+	public <T extends Serializable> 
+		   boolean smove (String srcKey, String destKey, T object) throws RedisException {
+		return smove (srcKey, destKey, DefaultCodec.encode(object));
+	}
+		   
+	
+	
 	/* ------------------------------- commands returning int value --------- */
 
 //	@Override

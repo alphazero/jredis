@@ -183,6 +183,7 @@ public abstract class ProtocolBase implements Protocol {
 			break;
 
 			case LSET:
+			case SMOVE: // "index arg" is really "destKey" but identical to LSET effectively
 			{
 				byte[] value = Assert.notNull(args[2], "value arg", ProviderException.class);
 				// -------------------
@@ -288,7 +289,8 @@ public abstract class ProtocolBase implements Protocol {
 		case SISMEMBER:
 		case SREM:
 		case EXPIRE:
-		case MOVE:			
+		case MOVE:
+		case SMOVE:
 			response = createBooleanResponse(cmd);
 			break;
 

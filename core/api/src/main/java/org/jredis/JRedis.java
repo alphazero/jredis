@@ -209,6 +209,12 @@ public interface JRedis {
 	public <T extends Serializable> 
 		   boolean sismember (String setKey, T object) throws RedisException;
 	
+	public boolean smove (String srcKey, String destKey, byte[] member) throws RedisException;
+	public boolean smove (String srcKey, String destKey, String stringValue) throws RedisException;
+	public boolean smove (String srcKey, String destKey, Number numberValue) throws RedisException;
+	public <T extends Serializable> 
+		   boolean smove (String srcKey, String destKey, T object) throws RedisException;
+	
 	public long scard (String setKey) throws RedisException;	
 	
 	public List<byte[]> sinter (String set1, String...sets) throws RedisException;
