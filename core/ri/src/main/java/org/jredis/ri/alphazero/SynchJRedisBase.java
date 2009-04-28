@@ -28,6 +28,7 @@ import org.jredis.connector.FaultedConnection;
 import org.jredis.resource.Context;
 import org.jredis.resource.Resource;
 import org.jredis.resource.ResourceException;
+import org.jredis.ri.alphazero.connection.SynchConnection;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Log;
 
@@ -114,13 +115,6 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 	// ------------------------------------------------------------------------
 	
 	private Context context;
-	/* (non-Javadoc)
-	 * @see org.jredis.resource.Resource#getInterface()
-	 */
-//	@Override
-//	public JRedis getInterface() {
-//		return this;
-//	}
 
 	@Override
 	public final Context getContext() throws ResourceException {

@@ -43,7 +43,10 @@ public class HelloAgain {
 
 	private void run(String password) {
 		try {
-			JRedis	jredis = new JRedisClient();
+			// use explicit constructor params for example
+			// but localhost:6379 is the default setting
+			//
+			JRedis	jredis = new JRedisClient("localhost", 6379);
 			jredis.ping();
 			if(!password.equals("")) 
 				jredis.auth(password);

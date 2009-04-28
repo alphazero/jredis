@@ -25,6 +25,7 @@ import org.jredis.connector.Connection;
 import org.jredis.connector.Protocol;
 import org.jredis.connector.ProtocolFactory;
 import org.jredis.ProviderException;
+import org.jredis.ri.alphazero.protocol.SynchProtocol;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Log;
 
@@ -131,82 +132,4 @@ public class ProtocolManager implements ProtocolFactory {
 		// done.
 		return Assert.notNull(handler, "how did this happen??", ProviderException.class);
 	}
-
-//	/**
-//	 * @param redisVersionId
-//	 * @return
-//	 * @throws NotSupportedException
-//	 * @throws ClientRuntimeException
-//	 * @throws IllegalArgumentException
-//	 */
-//	private Protocol createSynchProtocolHandler (RedisVersion version) 
-//		throws NotSupportedException, ClientRuntimeException, IllegalArgumentException
-//	{
-//		Class<?> handlerClass = Assert.notNull(
-//				synchHandlers.get(version), "registered protocol handler for version " + version.id, 
-//				NotSupportedException.class);
-//
-//		// instantiate protocol handler object
-//		//
-//		Protocol handler = null;
-//		try {
-//			handler = (Protocol) handlerClass.getConstructor().newInstance();
-//			Assert.isTrue(handler.isCompatibleWithVersion(version.id), "supports version " + version.id, ProviderException.class);
-//		}
-//		catch (SecurityException e) {
-//			Log.problem("SecurityException when attempting to instantiate a " + handlerClass.getCanonicalName());
-//			throw new ClientRuntimeException ("Check the security policy -- we have a problem => "+ e.getLocalizedMessage(), e);
-//		}
-//		catch (Exception e) {
-//			String bugMsg = 
-//				"Couldn't instantiate handler of class " + 
-//				handlerClass.getCanonicalName() + " to service protocal version " + 
-//				version.id + "\n thrown => " + e.getLocalizedMessage(); 
-//
-//			Log.bug(bugMsg);
-//			throw new ProviderException(bugMsg, e);
-//		}
-//
-//		// done.
-//		return Assert.notNull(handler, "how did this happen??", ProviderException.class);
-//	}
-//	
-//	/**
-//	 * @param redisVersionId
-//	 * @return
-//	 * @throws NotSupportedException
-//	 * @throws ClientRuntimeException
-//	 * @throws IllegalArgumentException
-//	 */
-//	private Protocol createAsynchProtocolHandler (RedisVersion version) 
-//		throws NotSupportedException, ClientRuntimeException, IllegalArgumentException
-//	{
-//			Class<?> handlerClass = Assert.notNull(
-//					asynchHandlers.get(version), "registered protocol handler for version " + version.id, 
-//					NotSupportedException.class);
-//
-//			// instantiate protocol handler object
-//			//
-//			Protocol handler = null;
-//			try {
-//				handler = (Protocol) handlerClass.getConstructor().newInstance();
-//				Assert.isTrue(handler.isCompatibleWithVersion(version.id), "supports version " + version.id, ProviderException.class);
-//			}
-//			catch (SecurityException e) {
-//				Log.problem("SecurityException when attempting to instantiate a " + handlerClass.getCanonicalName());
-//				throw new ClientRuntimeException ("Check the security policy -- we have a problem => "+ e.getLocalizedMessage(), e);
-//			}
-//			catch (Exception e) {
-//				String bugMsg = 
-//					"Couldn't instantiate handler of class " + 
-//					handlerClass.getCanonicalName() + " to service protocal version " + 
-//					version.id + "\n thrown => " + e.getLocalizedMessage(); 
-//
-//				Log.bug(bugMsg);
-//				throw new ProviderException(bugMsg, e);
-//			}
-//
-//			// done.
-//			return Assert.notNull(handler, "how did this happen??", ProviderException.class);
-//	}
 }

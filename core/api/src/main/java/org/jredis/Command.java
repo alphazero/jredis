@@ -38,7 +38,7 @@ public enum Command {
 	PING, QUIT, 
 
 	// String values operations
-	SET, GET, MGET, SETNX, INCR, INCRBY,  DECR , DECRBY, EXISTS , DEL, TYPE ,
+	SET, GET, GETSET, MGET, SETNX, INCR, INCRBY,  DECR , DECRBY, EXISTS , DEL, TYPE ,
 
 	// "Commands operating on the key space"
 	KEYS, RANDOMKEY, RENAME, RENAMENX, DBSIZE, EXPIRE,

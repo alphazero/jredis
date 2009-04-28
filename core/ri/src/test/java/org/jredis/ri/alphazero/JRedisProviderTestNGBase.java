@@ -70,6 +70,62 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#auth(java.lang.String)}.
 	 */
 	@Test
+	public void testElicitErrors() {
+		test = Command.AUTH.code;
+		Log.log("TEST: Elicit errors", test);
+		try {
+			jredis.select(db1).flushdb();
+			
+			String key = keys.get(0);
+			jredis.set(key, smallData);
+			boolean expectedError;
+			
+			// -- commands returning status response 
+			expectedError = false;
+			try {
+				Log.log("Expecting an operation against key holding the wrong kind of value ERROR..");
+				jredis.sadd(key, dataList.get(0)); 
+			}
+			catch (RedisException e) { expectedError = true; }
+			assertTrue(expectedError, "should have raised an exception but did not");
+			
+			// -- commands returning value response 
+			expectedError = false;
+			try {
+				Log.log("Expecting an operation against key holding the wrong kind of value ERROR..");
+				jredis.scard(key); 
+			}
+			catch (RedisException e) { expectedError = true; }
+			assertTrue(expectedError, "should have raised an exception but did not");
+			
+			// -- commands returning bulk response
+			expectedError = false;
+			try {
+				Log.log("Expecting an operation against key holding the wrong kind of value ERROR..");
+				jredis.lpop(key); 
+			}
+			catch (RedisException e) { expectedError = true; }
+			assertTrue(expectedError, "should have raised an exception but did not");
+			
+			
+			// -- commands returning multi-bulk response 
+			expectedError = false;
+			try {
+				Log.log("Expecting an operation against key holding the wrong kind of value ERROR..");
+				jredis.smembers(key); 
+			}
+			catch (RedisException e) { expectedError = true; }
+			assertTrue(expectedError, "should have raised an exception but did not");
+			
+			
+		} 
+		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#auth(java.lang.String)}.
+	 */
+	@Test
 	public void testAuth() {
 		test = Command.AUTH.code;
 		Log.log("TEST: %s command", test);
@@ -340,6 +396,92 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		} 
 		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
+
+	
+	
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, byte[])}.
+	 */
+	@Test
+	public void testGetSetStringByteArray() {
+		test = Command.SET.code + " | " + Command.GETSET.code + " byte[] ";
+		Log.log("TEST: %s command", test);
+		try {
+			jredis.select(db1).flushdb();
+			
+			jredis.set(keys.get(0), dataList.get(0));
+			assertEquals(dataList.get(0), jredis.get(keys.get(0)), "data and get results");
+			
+			assertEquals (jredis.getset(keys.get(0), dataList.get(1)), dataList.get(0), "getset key");
+			
+			assertEquals (jredis.get(keys.get(1)), null, "non existent key should be null");
+			assertEquals (jredis.getset(keys.get(1), dataList.get(1)), null, "getset on null key should be null");
+		} 
+		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, java.lang.String)}.
+	 */
+//	@Test
+//	public void testGetSetStringString() {
+//		test = Command.SET.code + " | " + Command.GETSET.code + " String ";
+//		Log.log("TEST: %s command", test);
+//		try {
+//			jredis.select(db1).flushdb();
+//			
+//			jredis.set(keys.get(0), stringList.get(0));
+//			assertEquals(stringList.get(0), toStr(jredis.get(keys.get(0))), "string and get results");
+//			
+//			assertTrue(jredis.setnx(keys.get(1), stringList.get(1)), "set key");
+//			assertNotNull(jredis.get(keys.get(1)));
+//			assertFalse(jredis.setnx(keys.get(1), stringList.get(2)), "key was already set");
+//		} 
+//		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
+//	}
+
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, java.lang.Number)}.
+	 */
+//	@Test
+//	public void testGetSetStringNumber() {
+//		test = Command.SET.code + " | " + Command.GETSET.code + " Number ";
+//		Log.log("TEST: %s command", test);
+//		try {
+//			jredis.select(db1).flushdb();
+//			
+//			jredis.set(keys.get(0), longList.get(0));
+//			assertTrue(longList.get(0).equals(toLong(jredis.get(keys.get(0)))), "long and get results");
+//			
+//			assertTrue(jredis.setnx(keys.get(1), longList.get(1)), "set key");
+//			assertNotNull(jredis.get(keys.get(1)));
+//			assertFalse(jredis.setnx(keys.get(1), longList.get(2)), "key was already set");
+//		} 
+//		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
+//	}
+
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, java.io.Serializable)}.
+	 */
+//	@Test
+//	public void testGetSetStringT() {
+//		test = Command.SET.code + " | " + Command.GETSET.code + " Java Object ";
+//		Log.log("TEST: %s command", test);
+//		try {
+//			jredis.select(db1).flushdb();
+//			
+//			jredis.set(keys.get(0), objectList.get(0));
+//			assertTrue(objectList.get(0).equals(decode(jredis.get(keys.get(0)))), "object and get results");
+//			
+//			assertTrue(jredis.setnx(keys.get(1), objectList.get(1)), "set key");
+//			assertNotNull(jredis.get(keys.get(1)));
+//			assertFalse(jredis.setnx(keys.get(1), objectList.get(2)), "key was already set");
+//		} 
+//		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
+//	}
+
+	
+	
 
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#incr(java.lang.String)}.
@@ -742,7 +884,8 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 			assertEquals(jredis.llen(listkey), 1, "list length should be 1");
 
 			byte[] lastItem = jredis.lpop(listkey);
-			assertEquals(jredis.llen(listkey), 0, "expecting empty list");
+			assertNotNull(lastItem, "last item should not have been null");
+			assertEquals(jredis.llen(listkey), 0, "expecting empty list after trims and pop");
 		} 
 		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
@@ -1638,7 +1781,6 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 			for(int i=0;i<SMALL_CNT; i++) 
 				assertTrue(jredis.sadd(setkey, dataList.get(i)), "sadd of random element should be true");
 			
-			TestBean member = null;
 			for(int i=0;i<SMALL_CNT; i++) 
 				assertTrue(jredis.srem(setkey, dataList.get(i)), "should be a removable member of the set");
 			
@@ -1660,7 +1802,6 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 			for(int i=0;i<SMALL_CNT; i++) 
 				assertTrue(jredis.sadd(setkey, stringList.get(i)), "sadd of random element should be true");
 			
-			TestBean member = null;
 			for(int i=0;i<SMALL_CNT; i++) 
 				assertTrue(jredis.srem(setkey, stringList.get(i)), "should be a removable member of the set");
 			
@@ -1682,7 +1823,6 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 			for(int i=0;i<SMALL_CNT; i++) 
 				assertTrue(jredis.sadd(setkey, longList.get(i)), "sadd of random element should be true");
 			
-			TestBean member = null;
 			for(int i=0;i<SMALL_CNT; i++) 
 				assertTrue(jredis.srem(setkey, longList.get(i)), "should be a removable member of the set");
 			
@@ -1704,7 +1844,6 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 			for(int i=0;i<SMALL_CNT; i++) 
 				assertTrue(jredis.sadd(setkey, objectList.get(i)), "sadd of random element should be true");
 			
-			TestBean member = null;
 			for(int i=0;i<SMALL_CNT; i++) 
 				assertTrue(jredis.srem(setkey, objectList.get(i)), "should be a removable member of the set");
 			
@@ -1927,10 +2066,20 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 
 	private int	 		cnt;
 	private String 		key = null;
+	
+	@SuppressWarnings("unused")
 	private byte   		bytevalue;
+	
+	@SuppressWarnings("unused")
 	private String		stringvalue;
+	
+	@SuppressWarnings("unused")
 	private int			intValue;
+	
+	@SuppressWarnings("unused")
 	private long		longValue;
+	
+	@SuppressWarnings("unused")
 	private TestBean 	objectvalue;
 	
 	

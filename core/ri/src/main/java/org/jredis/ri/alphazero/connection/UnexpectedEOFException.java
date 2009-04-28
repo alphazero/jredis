@@ -14,9 +14,10 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.alphazero;
+package org.jredis.ri.alphazero.connection;
 
-import java.net.SocketException;
+import org.jredis.ri.alphazero._specification;
+
 
 /**
  * [TODO: document me!]
@@ -27,17 +28,16 @@ import java.net.SocketException;
  * 
  */
 
-public class ConnectionResetException extends ConnectionException {
+public class UnexpectedEOFException extends ConnectionException {
+	/**
+	 * @param msg
+	 * @param e
+	 */
+	public UnexpectedEOFException(String msg) {
+		super(msg);
+	}
 
 	/**  */
 	private static final long serialVersionUID = _specification.Version.major;
-
-	/**
-	 * @param string
-	 * @param e
-	 */
-	public ConnectionResetException(String msg, SocketException e) {
-		super(msg, e);
-	}
 
 }

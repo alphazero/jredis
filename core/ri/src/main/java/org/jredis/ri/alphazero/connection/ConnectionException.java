@@ -14,8 +14,12 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.alphazero;
+package org.jredis.ri.alphazero.connection;
 
+import java.net.SocketException;
+
+import org.jredis.ClientRuntimeException;
+import org.jredis.ri.alphazero._specification;
 
 /**
  * [TODO: document me!]
@@ -26,16 +30,23 @@ package org.jredis.ri.alphazero;
  * 
  */
 
-public class UnexpectedEOFException extends ConnectionException {
-	/**
-	 * @param msg
-	 * @param e
-	 */
-	public UnexpectedEOFException(String msg) {
-		super(msg);
-	}
+public class ConnectionException extends ClientRuntimeException{
 
 	/**  */
 	private static final long serialVersionUID = _specification.Version.major;
+	
+	/**
+	 * TODO: not sure if specifying {@link SocketException} is a good idea.
+	 * @param msg
+	 * @param e
+	 */
+	public ConnectionException(String msg, SocketException e) {
+		super(msg, e);
+	}
 
+	/**
+	 * @param msg
+	 */
+	public ConnectionException(String msg) {
+	}
 }

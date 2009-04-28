@@ -104,6 +104,13 @@ public interface JRedis {
 
 	public byte[] get (String key)  throws RedisException;
 
+	public byte[] getset (String key, byte[] value) throws RedisException;
+	public byte[] getset (String key, String stringValue) throws RedisException;
+	public byte[] getset (String key, Number numberValue) throws RedisException;
+	public <T extends Serializable> 
+		byte[] getset (String key, T object) throws RedisException;
+
+	
 	public List<byte[]> mget(String key, String...moreKeys) throws RedisException;
 
 	public long incr (String key) throws RedisException;

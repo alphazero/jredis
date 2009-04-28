@@ -14,11 +14,16 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.alphazero;
+package org.jredis.ri.alphazero.connection;
 
-import static org.jredis.ri.alphazero.support.Assert.*;
-import static org.jredis.connector.ConnectionSpec.SocketFlag.*;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.*;
+import static org.jredis.connector.ConnectionSpec.SocketFlag.SO_KEEP_ALIVE;
+import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_PREF_BANDWIDTH;
+import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_PREF_CONN_TIME;
+import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_PREF_LATENCY;
+import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_RCVBUF;
+import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_SNDBUF;
+import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_TIMEOUT;
+import static org.jredis.ri.alphazero.support.Assert.notNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -184,7 +189,7 @@ public abstract class ConnectionBase implements Connection {
 	 * @throws IllegalStateException if not (logically) connected.
 	 */
 	protected final void reconnect () {
-		Log.log("RedisConnection - reconnecting");
+//		Log.log("RedisConnection - reconnecting");
 		disconnect();
 		connect ();
 	}
@@ -218,7 +223,7 @@ public abstract class ConnectionBase implements Connection {
 		
 		isConnected = true;
 
-		Log.log("RedisConnection - connected.");
+//		Log.log("RedisConnection - connected.");
 	}
 
 	/**
@@ -230,7 +235,7 @@ public abstract class ConnectionBase implements Connection {
 		socketClose();
 		isConnected = false;
 
-		Log.log("RedisConnection - disconnected");
+//		Log.log("RedisConnection - disconnected");
 	}
 	
 	/**
@@ -440,13 +445,13 @@ public abstract class ConnectionBase implements Connection {
 			int value = 0;
 			switch (property){
 				case SO_PREF_BANDWIDTH:
-					value = 2;
+					value = 1;
 					break;
 				case SO_PREF_CONN_TIME:
-					value = 0;
+					value = 2;
 					break;
 				case SO_PREF_LATENCY:
-					value = 1;
+					value = 0;
 					break;
 				case SO_RCVBUF:
 					value = DEFAULT_RCV_BUFF_SIZE;

@@ -16,12 +16,11 @@
 
 package org.jredis.ri.alphazero;
 
-import org.jredis.RedisException;
+import static org.testng.Assert.fail;
+
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-import static org.testng.Assert.*;
 
 /**
  * [TODO: document me!]

@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.alphazero;
+package org.jredis.ri.alphazero.protocol;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,6 +34,8 @@ import org.jredis.connector.Response;
 import org.jredis.connector.ResponseStatus;
 import org.jredis.connector.StatusResponse;
 import org.jredis.connector.ValueResponse;
+import org.jredis.ri.alphazero.connection.ConnectionResetException;
+import org.jredis.ri.alphazero.connection.UnexpectedEOFException;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.Log;
 
@@ -53,7 +55,10 @@ public class SynchProtocol extends ProtocolBase {
 	// ------------------------------------------------------------------------
 
 	/** Preferred size of request data buffer */
-	private static final int			PREFERRED_SIZE	= 1024;
+	protected static final int			PREFERRED_REQUEST_BUFFER_SIZE	= 1024;
+	
+	/** Initial size of the shared line buffer */
+	protected static final int			PREFERRED_LINE_BUFFER_SIZE = 128;
 	
 	// ------------------------------------------------------------------------
 	// SynchConnection's can use the same buffers again and again and ...
@@ -62,8 +67,10 @@ public class SynchProtocol extends ProtocolBase {
 	/** Shared by <b>all</b> {@link Request} instances of this <b>non-thread-safe</b> {@link Protocol} implementation. */
 	private final ByteArrayOutputStream sharedRequestBuffer;
 
+	/** Shared {@link Request} instance of this <b>non-thread-safe</b> {@link Protocol} implementation. */
+	private final StreamBufferRequest   sharedRequestObject;
+
 	/** Shared by <b>all</b> {@link Response} instances of this <b>non-thread-safe</b> {@link Protocol} implementation. */
-//	private final ExtByteArrayOutputStream sharedResponseBuffer;
 	private final byte[]	sharedResponseBuffer;
 
 	// ------------------------------------------------------------------------
@@ -71,8 +78,10 @@ public class SynchProtocol extends ProtocolBase {
 	// ------------------------------------------------------------------------
 	
 	public SynchProtocol() {
-		sharedRequestBuffer = new ByteArrayOutputStream (PREFERRED_SIZE);
-		sharedResponseBuffer = new byte [1024];
+		sharedRequestBuffer = new ByteArrayOutputStream (PREFERRED_REQUEST_BUFFER_SIZE);
+		sharedRequestObject = new StreamBufferRequest (sharedRequestBuffer);
+		sharedResponseBuffer = new byte [PREFERRED_LINE_BUFFER_SIZE];
+
 	}
 	
 	// ------------------------------------------------------------------------
@@ -90,6 +99,12 @@ public class SynchProtocol extends ProtocolBase {
 		sharedRequestBuffer.reset();
 		return sharedRequestBuffer;
 	}
+	
+	protected Request createRequest (ByteArrayOutputStream buffer) {
+//		sharedRequestObject.reset(buffer);
+		return sharedRequestObject;
+	}
+
 	SynchLineResponse cache_synchLineResponse = null;
 	@Override
 	protected Response createStatusResponse(Command cmd) {
@@ -99,7 +114,6 @@ public class SynchProtocol extends ProtocolBase {
 			cache_synchLineResponse.reset(cmd);
 		}
 		return cache_synchLineResponse;
-//		return new SynchLineResponse(cmd);
 	}
 	@Override
 	protected Response createBooleanResponse(Command cmd) {
@@ -109,7 +123,6 @@ public class SynchProtocol extends ProtocolBase {
 			cache_synchLineResponse.reset(cmd, ValueType.BOOLEAN);
 		}
 		return cache_synchLineResponse;
-//		return new SynchLineResponse(cmd, ValueType.BOOLEAN);
 	}
 	@Override
 	protected Response createStringResponse(Command cmd) {
@@ -119,19 +132,16 @@ public class SynchProtocol extends ProtocolBase {
 			cache_synchLineResponse.reset(cmd, ValueType.STRING);
 		}
 		return cache_synchLineResponse;
-//		return new SynchLineResponse(cmd, ValueType.STRING);
 	}
 	@Override
 	protected Response createNumberResponse(Command cmd /*, boolean isBigNum*/) {
 		ValueType flavor = ValueType.NUMBER64;
-//		if(isBigNum) flavor = ValueType.NUMBER64;
 		if(null == cache_synchLineResponse)
-			cache_synchLineResponse = new SynchLineResponse(cmd, ValueType.NUMBER64);
+			cache_synchLineResponse = new SynchLineResponse(cmd, flavor);
 		else {
 			cache_synchLineResponse.reset(cmd, flavor);
 		}
 		return cache_synchLineResponse;
-//		return new SynchLineResponse(cmd, flavor);
 	}
 	
 	SynchBulkResponse  cache_synchBulkResponse = null;
@@ -161,11 +171,9 @@ public class SynchProtocol extends ProtocolBase {
 	// Inner Type
 	// ========================================================================
 	// ------------------------------------------------------------------------
-	private enum ValueType {
+	protected enum ValueType {
 		STATUS,
 		BOOLEAN,
-//		@Deprecated
-//		NUMBER32,
 		NUMBER64,
 		STRING
 	}
@@ -188,16 +196,16 @@ public class SynchProtocol extends ProtocolBase {
 	 */
 	public abstract class SynchResponseBase extends ResponseSupport {
 
-		final byte[]	buffer;
-		int				offset;
-		public SynchResponseBase(Command cmd, Type type) {
+		byte[]		buffer;
+		int			offset;
+		
+		protected SynchResponseBase(byte[] buffer, Command cmd, Type type) {
 			super(cmd, type);
-			buffer = sharedResponseBuffer;
+			this.buffer = buffer;
 			offset = 0;
 		}
 //		@Override
 		protected void reset (Command cmd, Type type) {
-//			super.reset(cmd, type);
 			this.cmd = cmd;
 			this.type = type;
 			offset = 0;
@@ -221,22 +229,30 @@ public class SynchProtocol extends ProtocolBase {
 		 */
 		void readLine (InputStream in) {
 			offset = 0;
-			int readcnt = 0;
 			int c = -1;
 			int available = buffer.length - offset;  // offset=0 now
 			try {
-				while (available > 0 && (c = in.read(buffer, offset, available)) != -1) {
+				while ((c = in.read(buffer, offset, available)) != -1) {
 					offset += c; 
 					available -= c;
-					readcnt +=c;  // this *is* offset
 					if(offset > 2 && buffer[offset-2]==(byte)13 && buffer[offset-1]==(byte)10){
 						break;  // we're done
+					}
+					if(available == 0) {
+						byte[] newbuff = new byte[buffer.length * 2];
+						System.arraycopy(buffer, 0, newbuff, 0, buffer.length);
+						buffer = newbuff;
+						available = buffer.length - offset;
 					}
 				}
 				if(c == -1) {
 					Log.error("-1 read count in readLine() while reading response line.");
 					throw new UnexpectedEOFException ("Unexpected EOF (read -1) in readLine.  Command: " + cmd.code);
 				}
+				if((this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) 
+					status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
+				else 
+					status = ResponseStatus.STATUS_OK;
 			}
 			catch (SocketException e) {
 				// on connection reset
@@ -249,7 +265,10 @@ public class SynchProtocol extends ProtocolBase {
 		}
 		/**
 		 * Resets offset and reads bytes until CRLF is found.  Offset on find is the offset the subsequent
-		 * element after \n.
+		 * element after \n.  This is basically identical to readLine, except that it reads one byte at a time
+		 * (which is not so efficient).  Didn't wish to consolidate to one shared method as that would be
+		 * yet another method call and these methods get called all the time.  Regardless, both of these
+		 * methods are the bottle necks in this implementation.  
 		 * @param in
 		 */
 		void seekToCRLF (InputStream in){
@@ -257,10 +276,17 @@ public class SynchProtocol extends ProtocolBase {
 			int c = -1;
 			int available = buffer.length - offset;
 			try {
-				while (available > 0 && (c = in.read(buffer, offset, 1)) != -1) {
-					offset += c; 
+				while ((c = in.read(buffer, offset, 1)) != -1) {
+					offset ++;
+					available --;
 					if(offset > 2 && buffer[offset-2]==(byte)13 && buffer[offset-1]==(byte)10){
 						break;  // we're done
+					}
+					if(available == 0) {
+						byte[] newbuff = new byte[buffer.length * 2];
+						System.arraycopy(buffer, 0, newbuff, 0, buffer.length);
+						buffer = newbuff;
+						available = buffer.length - offset;
 					}
 				}
 			}
@@ -277,19 +303,7 @@ public class SynchProtocol extends ProtocolBase {
 		 * @return
 		 */
 		int readSize (InputStream in, boolean checkForError) {
-
 			return readControlLine(in, checkForError, SIZE_BYTE);
-//			seekToCRLF(in);
-//			if(checkForError && (this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) {
-//				status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
-//				didRead = true;
-//				return -2;
-//			}
-//			if(buffer[0] != SIZE_BYTE) {
-//				throw new ProviderException ("Bug?  Expecting status code for size");
-//			}
-//			status = ResponseStatus.STATUS_OK;
-//			return Convert.getInt (buffer, 1, offset-3);
 		}
 		
 		/**
@@ -310,7 +324,7 @@ public class SynchProtocol extends ProtocolBase {
 			seekToCRLF(in);
 			if(checkForError && (this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) {
 				status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
-				didRead = true;
+				didRead = true;  // we're done - error's are only one line
 				return -2;
 			}
 			if(buffer[0] != ctlByte) {
@@ -358,13 +372,25 @@ public class SynchProtocol extends ProtocolBase {
 		/**  */
 		List<byte[]>   datalist;
 		
-		public SynchMultiBulkResponse(Command cmd) {
-			super(cmd, Type.MultiBulk);
+		/**
+		 * @param cmd
+		 */
+		private SynchMultiBulkResponse(Command cmd) {
+//			super(sharedResponseBuffer, cmd, Type.MultiBulk);
+			this (sharedResponseBuffer, cmd);
 		}
+		/**
+		 * @param buff
+		 * @param cmd
+		 */
+		public SynchMultiBulkResponse(byte[] buff, Command cmd) {
+			super (buff, cmd, Type.MultiBulk);
+		}
+		/**
+		 * @param cmd
+		 */
 		protected void reset (Command cmd){
 			super.reset(cmd, Type.Bulk);
-//			this.cmd = cmd;
-//			this.type = Type.Value;
 			this.datalist = null;
 		}
 
@@ -377,7 +403,8 @@ public class SynchProtocol extends ProtocolBase {
 //		@Override
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
-			int count = super.readCount(in, true);
+//			int count = super.readCount(in, true); // COUNT_BYTE
+			int count = super.readControlLine (in, true, COUNT_BYTE);
 			if(status.isError()) {
 				didRead = true;
 				return;
@@ -388,7 +415,9 @@ public class SynchProtocol extends ProtocolBase {
 				try {
 					int size = -1;
 					for(int i=0;i<count; i++){
-						size = readSize(in, false);
+//						size = readSize(in, false);
+						size = readControlLine(in, false, SIZE_BYTE);
+
 						if(size > 0)
 							datalist.add (super.readBulkData(in, size));
 						else
@@ -426,13 +455,24 @@ public class SynchProtocol extends ProtocolBase {
 		/**  */
 		byte[] data = null;
 
-		public SynchBulkResponse(Command cmd) {
-			super(cmd, Type.Bulk);
+		/**
+		 * Uses the sharedResponseBuffer for reading of the response control line.
+		 * @param cmd
+		 */
+		private SynchBulkResponse(Command cmd) {
+//			super(sharedResponseBuffer, cmd, Type.Bulk);
+			this (sharedResponseBuffer, cmd);
 		}
+		/**
+		 * @param buff
+		 * @param cmd
+		 */
+		public SynchBulkResponse(byte[] buff, Command cmd) {
+			super (buff, cmd, Type.Bulk);
+		}
+		
 		protected void reset (Command cmd){
 			super.reset(cmd, Type.Bulk);
-//			this.cmd = cmd;
-//			this.type = Type.Value;
 			this.data = null;
 		}
 
@@ -444,8 +484,15 @@ public class SynchProtocol extends ProtocolBase {
 //		@Override
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
+
+//			int size = super.readSize(in, true);
+			int size = readControlLine(in, true, SIZE_BYTE);
+
+			if(status.isError()) {
+				didRead = true;
+				return;
+			}
 			
-			int size = super.readSize(in, true);
 			if(size > 0){
 				try {
 					data = super.readBulkData(in, size);
@@ -489,8 +536,18 @@ public class SynchProtocol extends ProtocolBase {
 //			super(cmd, Type.Status);
 //			flavor = ValueType.STATUS;
 //		}
-		public SynchLineResponse(Command cmd, ValueType flavor) {
-			super(cmd, Type.Value);
+		private SynchLineResponse(Command cmd, ValueType flavor) {
+			this (sharedResponseBuffer, cmd, flavor);
+//			super(sharedResponseBuffer, cmd, Type.Value);
+//			this.flavor = flavor;
+		}
+		/**
+		 * @param bs
+		 * @param cmd
+		 * @param status
+		 */
+		public  SynchLineResponse(byte[] buff, Command cmd, ValueType flavor) {
+			super(buff, cmd, Type.Value);
 			this.flavor = flavor;
 		}
 		protected void reset (Command cmd){
@@ -505,16 +562,13 @@ public class SynchProtocol extends ProtocolBase {
 //			this.type = Type.Value;
 			this.flavor = flavor;
 		}
+
 //		@Override
 		public boolean getBooleanValue() throws IllegalStateException {
 			if(flavor != ValueType.BOOLEAN) throw new IllegalStateException ("Response value type is " + flavor.name() + " not " + ValueType.BOOLEAN.name());
 			return booleanValue;
 		}
-////		@Override
-//		public int getIntValue() throws IllegalStateException {
-//			if(flavor != ValueType.NUMBER32) throw new IllegalStateException ("Response value type is " + flavor.name() + " not " + ValueType.NUMBER32.name());
-//			return intValue;
-//		}
+		
 //		@Override
 		public long getLongValue() throws IllegalStateException {
 			if(flavor != ValueType.NUMBER64) throw new IllegalStateException ("Response value type is " + flavor.name() + " not " + ValueType.NUMBER64.name());
@@ -525,43 +579,36 @@ public class SynchProtocol extends ProtocolBase {
 			if(flavor != ValueType.STRING) throw new IllegalStateException ("Response value type is " + flavor.name() + " not " + ValueType.STRING.name());
 			return stringValue;
 		}
+		
 		/**
-		 * Its a synchronous connection (right?) so we'll never get anything more
-		 * than a response to a command returning a bunch of bytes ending in CRLF.
-		 * And that' what's we're looking for here.
+		 * Delegates the io handling to the base class and parses the value reponse
+		 * based on the data flavor.
 		 */
 //		@Override
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
+			
 			super.readLine (in);
 			
-			if((this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) {
-				status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
+			if(status.isError()) {
+				didRead = true;
+				return;
 			}
-			else {
-				status = ResponseStatus.STATUS_OK;
-				if(flavor != ValueType.STATUS){
-					// TODO: verify for these!
-					switch (flavor){
-						case BOOLEAN:
-							booleanValue = buffer[1]==49?true:false;
-							break;
-//						case NUMBER32:
-//							intValue = Convert.getInt (buffer, 1, offset-3);
-//							break;
-						case NUMBER64:
-//							longValue = Long.parseLong(new String(buffer, 1, offset-3));
-							longValue = Convert.getLong (buffer, 1, offset-3);
-							break;
-						case STATUS:
-							break;
-						case STRING:
-							stringValue = new String (buffer, 1, offset-3);
-							break;
-					}
-				}
-				else {
-					status = ResponseStatus.STATUS_OK;
+			// TODO: not quite happy with the access to raw buffer here -- a method call would
+			// slow things done but this is fragile in light of possible future code re-factoring.
+			if(flavor != ValueType.STATUS){
+				switch (flavor){
+				case BOOLEAN:
+					booleanValue = buffer[1]==49?true:false;
+					break;
+				case NUMBER64:
+					longValue = Convert.getLong (buffer, 1, offset-3);
+					break;
+				case STATUS:
+					break;
+				case STRING:
+					stringValue = new String (buffer, 1, offset-3);
+					break;
 				}
 			}
 			didRead = true;

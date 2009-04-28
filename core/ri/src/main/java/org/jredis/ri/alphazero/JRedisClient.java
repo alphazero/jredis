@@ -25,6 +25,7 @@ import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.Protocol;
 import org.jredis.connector.Response;
+//import org.jredis.ri.alphazero.connection.SocketConnection;
 import org.jredis.ri.alphazero.support.Assert;
 
 
@@ -46,12 +47,6 @@ import org.jredis.ri.alphazero.support.Assert;
  * by a <b>single</b> thread, or strictly sequential access by a pool of threads.  You can
  * create multiple instances of this class and use dedicated threads for each to create a
  * service (if you wish).
- * <p>
- * Connection management issues are handled by the {@link SocketConnection} delegate and
- * you should read the docs for that class for details of its operations.  But as far as
- * {@link JRedis} support is concerned, a call to {@link JRedis#quit()} or {@link JRedis#shutdown()}
- * will close the connections and subsequent calls to the interface will prompt the throwing of an
- * exception.
  * <p>
  * Redis protocol is handled by a {@link Protocol} instance obtained from the {@link ProtocolManager}.
  * This class will by default specify the {@link RedisVersion#current_revision}.  
@@ -128,8 +123,28 @@ public class JRedisClient extends SynchJRedisBase  {
 	protected Response serviceRequest(Command cmd, byte[]... args)
 			throws RedisException, ClientRuntimeException, ProviderException 
 	{
-		return connection.serviceRequest(cmd, args);
+		Response response = connection.serviceRequest(cmd, args);
+		// temp bench
+//		reqCnt ++;
+//		if(reqCnt == benchCnt) {
+//			if(start == -1) {
+//				start = System.currentTimeMillis();
+//			}
+//				else {
+//				long delta = System.currentTimeMillis() - start;
+//				float rate = (benchCnt * 1000)/delta;
+//				Log.log("JRedisService: served %d at %9.2f /sec in %d msecs\n", benchCnt, rate, delta);
+//				start = System.currentTimeMillis();
+//			}
+//			reqCnt = 0;
+//		}
+		return response;
 	}
+//	long reqCnt = 0;
+//	long start = -1;
+//	int benchCnt = 1000*1;
+	
+	
 	@Override
 	protected final void setConnection (Connection connection)  {
 		this.connection = Assert.notNull(connection, "connection on setConnection()", ClientRuntimeException.class);

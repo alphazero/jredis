@@ -14,11 +14,11 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.alphazero;
+package org.jredis.ri.alphazero.connection;
 
 import java.net.SocketException;
 
-import org.jredis.ClientRuntimeException;
+import org.jredis.ri.alphazero._specification;
 
 /**
  * [TODO: document me!]
@@ -29,23 +29,17 @@ import org.jredis.ClientRuntimeException;
  * 
  */
 
-public class ConnectionException extends ClientRuntimeException{
+public class ConnectionResetException extends ConnectionException {
 
 	/**  */
 	private static final long serialVersionUID = _specification.Version.major;
-	
+
 	/**
-	 * TODO: not sure if specifying {@link SocketException} is a good idea.
-	 * @param msg
+	 * @param string
 	 * @param e
 	 */
-	public ConnectionException(String msg, SocketException e) {
+	public ConnectionResetException(String msg, SocketException e) {
 		super(msg, e);
 	}
 
-	/**
-	 * @param msg
-	 */
-	public ConnectionException(String msg) {
-	}
 }

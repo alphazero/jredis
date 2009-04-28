@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.alphazero;
+package org.jredis.ri.alphazero.protocol;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -74,6 +74,11 @@ public abstract class ProtocolBase implements Protocol {
 	}
 	
 //	@Override
+	/**
+	 * Performance note:  
+	 * <p>
+	 * 
+	 */
 	public Request createRequest(Command cmd, byte[]... args) throws ProviderException, IllegalArgumentException {
 		
 		ByteArrayOutputStream buffer = createRequestBufffer (cmd);
@@ -155,6 +160,7 @@ public abstract class ProtocolBase implements Protocol {
 				break;
 
 			case SET:
+			case GETSET:
 			case SETNX:
 			case SADD:
 			case SREM:
@@ -235,10 +241,9 @@ public abstract class ProtocolBase implements Protocol {
 		catch (Exception e) {
 			throw new ProviderException("Problem writing to the buffer" + e.getLocalizedMessage());
 		}
-//		return new SimpleRequest (buffer.toByteArray(), buffer.size());
-		return new StreamBufferRequest (buffer);
+		return createRequest(buffer);
 	}
-
+	
 //	@Override
 	public Response createResponse(Command cmd) throws ProviderException, ClientRuntimeException {
 
@@ -287,19 +292,7 @@ public abstract class ProtocolBase implements Protocol {
 			response = createBooleanResponse(cmd);
 			break;
 
-			/* ----------- TODO: LONG'EM-------- Value number    Responses ----------------------------------- */
-//		case INCR:	    	
-//		case INCRBY:	     
-//		case DECR:	    	 
-//		case DECRBY:	     
-//		case SCARD:	    	 
-//		case LLEN:	    	 
-//		case LREM:
-
-//			response = createNumberResponse (cmd, false);
-//			break;
-
-			/* ------------------------------ Value  BIG number    Responses ----------------------------------- */
+			/* ------------------------------ Value  64bit number    Responses ----------------------------------- */
 			// -- moving all to long ..
 		case INCR:	    	
 		case INCRBY:	     
@@ -316,6 +309,7 @@ public abstract class ProtocolBase implements Protocol {
 
 			/* ------------------------------ Bulk      Responses ----------------------------------- */
 		case GET:
+		case GETSET:
 		case KEYS:
 		case INFO:
 		case LPOP:
@@ -347,6 +341,7 @@ public abstract class ProtocolBase implements Protocol {
 	// ------------------------------------------------------------------------
 	
 	protected abstract ByteArrayOutputStream createRequestBufffer(Command cmd);
+	protected abstract Request createRequest (ByteArrayOutputStream buffer);
 	protected abstract Response createMultiBulkResponse(Command cmd) ;
 	protected abstract Response createBulkResponse(Command cmd) ;
 	protected abstract Response createNumberResponse(Command cmd /*, boolean bigNum*/) ;
@@ -449,11 +444,14 @@ public abstract class ProtocolBase implements Protocol {
 	public static class StreamBufferRequest implements Request {
 
 		/**  */
-		final ByteArrayOutputStream buffer;
+		ByteArrayOutputStream buffer;
 		/**
 		 * @param buffer
 		 */
 		public StreamBufferRequest (ByteArrayOutputStream	buffer) {
+			this.buffer = buffer;
+		}
+		public void reset (ByteArrayOutputStream	buffer) {
 			this.buffer = buffer;
 		}
 		/* (non-Javadoc)

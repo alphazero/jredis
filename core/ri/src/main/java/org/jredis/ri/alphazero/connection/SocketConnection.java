@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.alphazero;
+package org.jredis.ri.alphazero.connection;
 
 import java.io.IOException;
 import java.io.InputStream;
