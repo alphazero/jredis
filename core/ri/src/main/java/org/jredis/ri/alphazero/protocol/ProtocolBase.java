@@ -119,6 +119,7 @@ public abstract class ProtocolBase implements Protocol {
 			case LLEN:
 			case LPOP:
 			case RPOP:
+			case TTL:
 				// -------------------
 				buffer.write(cmd.bytes);
 				buffer.write(SPACE);
@@ -132,8 +133,8 @@ public abstract class ProtocolBase implements Protocol {
 			case INCRBY:  // 2nd key is actually a number o/c
 			case DECRBY:  // 2nd key is actually a number o/c
 			case LINDEX:  // 2nd key is actually a number o/c
-			case MOVE:
-			case EXPIRE:
+			case MOVE:	  // 2nd key is actually a number o/c
+			case EXPIRE:  // 2nd key is actually a number o/c
 			case SORT:
 				// -------------------
 				buffer.write(cmd.bytes);
@@ -223,6 +224,8 @@ public abstract class ProtocolBase implements Protocol {
 			case SINTERSTORE:
 			case SUNION: 
 			case SUNIONSTORE:
+			case SDIFF: 
+			case SDIFFSTORE:
 			case MGET:
 			{
 				int keycnt = args.length;
@@ -269,6 +272,7 @@ public abstract class ProtocolBase implements Protocol {
 		case LTRIM:
 		case SINTERSTORE:
 		case SUNIONSTORE:
+		case SDIFFSTORE:
 		case FLUSHALL: 		
 		case FLUSHDB:		
 		case SELECT:		
@@ -303,6 +307,7 @@ public abstract class ProtocolBase implements Protocol {
 		case SCARD:	    	 
 		case LLEN:	    	 
 		case LREM:
+		case TTL:
 			// -- moving all to long ..
 		case DBSIZE:
 		case LASTSAVE:
@@ -324,6 +329,7 @@ public abstract class ProtocolBase implements Protocol {
 		case LRANGE:
 		case SINTER:
 		case SUNION:
+		case SDIFF:
 		case SMEMBERS:
 		case SORT:
 			response = createMultiBulkResponse (cmd);

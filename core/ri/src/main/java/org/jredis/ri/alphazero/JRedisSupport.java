@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jredis.ClientRuntimeException;
 import org.jredis.Command;
@@ -862,6 +863,31 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
+	public List<byte[]> sdiff(String set1, String... sets) throws RedisException {
+		byte[] keydata = null;
+		if((keydata = getKeyBytes(set1)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+set1+"]");
+
+		byte[][] keybytes = new byte[1+sets.length][];
+		int i=0; keybytes[i++] = keydata;
+		for(String k : sets) {
+			if((keydata = getKeyBytes(k)) == null) 
+				throw new IllegalArgumentException ("invalid key => ["+k+"]");
+			keybytes[i++] = keydata;
+		}
+		
+		List<byte[]> multiBulkData= null;
+		try {
+			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.SDIFF, keybytes);
+			multiBulkData = MultiBulkResponse.getMultiBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return multiBulkData;
+	}
+
+//	@Override
 	public void sinterstore(String dest, String... sets) throws RedisException {
 		byte[] keydata = null;
 		if((keydata = getKeyBytes(dest)) == null) 
@@ -897,6 +923,25 @@ public abstract class JRedisSupport implements JRedis {
 		}
 		
 		this.serviceRequest(Command.SUNIONSTORE, setbytes);
+	}
+
+//	@Override
+	public void sdiffstore(String dest, String... sets) throws RedisException {
+		byte[] keydata = null;
+		if((keydata = getKeyBytes(dest)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+dest+"]");
+
+		byte[][] setbytes = new byte[1+sets.length][];
+		int i=0; 
+		setbytes[i++] = keydata;
+		byte[] setdata =null;
+		for(String k : sets) {
+			if((setdata = getKeyBytes(k)) == null) 
+				throw new IllegalArgumentException ("invalid key => ["+k+"]");
+			setbytes[i++] = setdata;
+		}
+		
+		this.serviceRequest(Command.SDIFFSTORE, setbytes);
 	}
 
 //	@Override
@@ -1095,11 +1140,30 @@ public abstract class JRedisSupport implements JRedis {
 		return resvalue;
 	}
 
+//	@Override
+	public long ttl (String key) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		
+		long value = Long.MIN_VALUE;
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.TTL, keybytes);
+			value = valResponse.getLongValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return value;
+	}
+
 	// TODO: integrate using KeyCodec and a CodecManager at client spec and init time.
+	// TODO: (implied) ClientSpec (impls. ConnectionSpec)
 	// this isn't cooked yet -- lets think more about the implications...
 	// 
-	static final private Map<String, byte[]>	keyByteCache = new HashMap<String, byte[]>();
-	public static final boolean	CacheKeys	= true;
+	static final private Map<String, byte[]>	keyByteCache = new ConcurrentHashMap<String, byte[]>();
+	public static final boolean	CacheKeys	= false;
 	
 	private byte[] getKeyBytes(String key) throws IllegalArgumentException {
 		if(null == key) throw new IllegalArgumentException("key is null");

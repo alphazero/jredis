@@ -146,6 +146,8 @@ public interface JRedis {
 	
 	public boolean expire (String key, int ttlseconds) throws RedisException; 
 	
+	public long ttl (String key) throws RedisException;
+	
 	// ------------------------------------------------------------------------
 	// Commands operating on lists
 	// ------------------------------------------------------------------------
@@ -218,12 +220,13 @@ public interface JRedis {
 	public long scard (String setKey) throws RedisException;	
 	
 	public List<byte[]> sinter (String set1, String...sets) throws RedisException;
-
 	public void sinterstore (String destSetKey, String...sets) throws RedisException;
 
 	public List<byte[]> sunion (String set1, String...sets) throws RedisException;
-
 	public void sunionstore (String destSetKey, String...sets) throws RedisException;
+
+	public List<byte[]> sdiff (String set1, String...sets) throws RedisException;
+	public void sdiffstore (String destSetKey, String...sets) throws RedisException;
 
 	public List<byte[]> smembers (String setkey) throws RedisException;
 	

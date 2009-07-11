@@ -20,10 +20,9 @@
 package org.jredis.semantics;
 
 /**
- * Encoding and decoding keys is not a huge, but significant
- * performance bottleneck.   
+ * Encoding and decoding keys is a significant (but not major) performance bottleneck.   
  * <p>
- * A KeyCodec then is a {@link String} {@link Codec} that is tasked
+ * A KeyCodec is a {@link String} {@link Codec} that is tasked
  * with the optimal performance of encoding and decoding String keys
  * for use by connector implementations that support such extended
  * mechanisms.

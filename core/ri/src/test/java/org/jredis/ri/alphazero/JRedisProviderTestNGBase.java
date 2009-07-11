@@ -39,6 +39,7 @@ import org.jredis.RedisException;
 import org.jredis.RedisInfo;
 import org.jredis.RedisType;
 import org.jredis.ri.JRedisTestSuiteNGBase;
+import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Parameters;
@@ -150,33 +151,44 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
 	/**
-	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#expire(java.lang.String, int)}.
+	 * Tests:
+	 * <li>Test method for {@link org.jredis.ri.alphazero.JRedisSupport#exists(java.lang.String)}.
+	 * <li>Test method for {@link org.jredis.ri.alphazero.JRedisSupport#expire(java.lang.String, int)}.
+	 * <li>Test method for {@link org.jredis.ri.alphazero.JRedisSupport#ttl (java.lang.String)}.
 	 */
 	@Test
-	public void testExistsAndExpire() {
-		test = Command.EXISTS.code + " | " + Command.EXPIRE.code;
+	public void testExists_Expire_TTL() {
+		test = Command.EXISTS.code + " | " + Command.EXPIRE.code + " | " + Command.TTL.code;
 		Log.log("TEST: %s command(s)", test);
 		try {
 			jredis.select (db1).flushdb();
 			assertTrue(jredis.dbsize() == 0);
 			
-			key = "expire-me";
+			String keyToExpire = "expire-me";
+			String keyToKeep = "keep-me";
 			
-			jredis.set(key, System.currentTimeMillis());
-			assertTrue (jredis.exists(key));
+			jredis.set(keyToKeep, "master");
+			jredis.set(keyToExpire, System.currentTimeMillis());
+			assertTrue (jredis.exists(keyToExpire));
 			
-			jredis.expire(key, expire_secs);
-			assertTrue (jredis.exists(key));
+			jredis.expire(keyToExpire, expire_secs);
+			assertTrue (jredis.exists(keyToExpire));
 			
-			// IT SIMPLY WON'T WORK WITHOUT GIVING REDIS A CHANCE
+			assertTrue (jredis.ttl(keyToExpire) > 0, "key to expire ttl is less than zero");
+			
+			// NOTE: IT SIMPLY WON'T WORK WITHOUT GIVING REDIS A CHANCE
 			// could be network latency, or whatever, but the expire command is NOT
 			// that precise
 			
 			Thread.sleep(500);
-			assertTrue (jredis.exists(key));
+			assertTrue (jredis.exists(keyToExpire));
 			
 			Thread.sleep(this.expire_wait_millisecs);
-			assertFalse (jredis.exists(key));
+			assertFalse (jredis.exists(keyToExpire));
+			assertTrue (jredis.ttl(keyToExpire) == -1, "expired key ttl is not -1");
+			assertTrue (jredis.ttl(keyToKeep) == -1, "key to keep ttl is not -1");
+			
+			
 		} 
 		catch (RedisException e) {
 			fail(test + " with password: " + password, e);
@@ -1830,6 +1842,45 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
 
+
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#sdiff(java.lang.String, java.lang.String[])}.
+	 */
+	@Test
+	public void testSdiff() {
+		test = Command.SDIFF.code;
+		Log.log("TEST: %s command", test);
+		try {
+			jredis.select(db1).flushdb();
+			
+			String setkey1 = keys.get(0);
+			String setkey2 = keys.get(1);
+			String setkey3 = keys.get(2);
+			String setexpectedkey = keys.get(3);
+//			
+			// - per the redis doc -- 
+			// note that basically, SDIFF k, k1, ..., kn is a diff between k and union (k1, .., kn)
+			//
+			jredis.sadd(setkey1, "x");
+			jredis.sadd(setkey1, "a");
+			jredis.sadd(setkey1, "b");
+			jredis.sadd(setkey1, "c");
+			
+			jredis.sadd(setkey2, "c");
+
+			jredis.sadd(setkey3, "a");
+			jredis.sadd(setkey3, "d");
+			
+			jredis.sadd(setexpectedkey, "x");
+			jredis.sadd(setexpectedkey, "b");
+			
+			List<String> sdiffResults = DefaultCodec.toStr(jredis.sdiff(setkey1, setkey2, setkey3));
+			assertEquals(jredis.scard(setexpectedkey), sdiffResults.size(), "sdiff result and expected set should have same cardinality");
+			for(String s : sdiffResults)
+				assertTrue(jredis.sismember(setexpectedkey, s), s + " should be a member of the expected result set");
+		} 
+		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
 
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#srem(java.lang.String, byte[])}.
