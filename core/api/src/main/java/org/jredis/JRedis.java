@@ -71,6 +71,7 @@ public interface JRedis {
 	 * @throws RedisException if the server is in secure more and the 
 	 * authorization provided 
 	 */
+	@Deprecated
 	public JRedis auth (String authorization) throws RedisException;
 	
 	// ------------------------------------------------------------------------
@@ -234,6 +235,7 @@ public interface JRedis {
 	// Multiple databases handling commands
 	// ------------------------------------------------------------------------
 	
+	@Deprecated
 	public JRedis select (int index) throws RedisException;
 
 	public JRedis flushdb () throws RedisException;
@@ -283,6 +285,7 @@ public interface JRedis {
 
 	public long lastsave () throws RedisException;
 
+	@Deprecated
 	public void shutdown () throws RedisException;
 
 // ------------------------------------------------------------------------

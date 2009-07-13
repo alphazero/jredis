@@ -1883,6 +1883,42 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 	}
 
 	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#sdiff(java.lang.String, java.lang.String[])}.
+	 */
+	@Test
+	public void testSdiffstore() {
+		test = Command.SDIFFSTORE.code;
+		Log.log("TEST: %s command", test);
+		try {
+			jredis.select(db1).flushdb();
+			
+			String setkey1 = keys.get(0);
+			String setkey2 = keys.get(1);
+			String setkey3 = keys.get(2);
+			String setdiffreskey = keys.get(3);
+//			
+			// - per the redis doc -- 
+			// note that basically, SDIFF k, k1, ..., kn is a diff between k and union (k1, .., kn)
+			//
+			jredis.sadd(setkey1, "x");
+			jredis.sadd(setkey1, "a");
+			jredis.sadd(setkey1, "b");
+			jredis.sadd(setkey1, "c");
+			
+			jredis.sadd(setkey2, "c");
+
+			jredis.sadd(setkey3, "a");
+			jredis.sadd(setkey3, "d");
+						
+			jredis.sdiffstore (setdiffreskey, setkey1, setkey2, setkey3);
+			assertEquals(jredis.scard(setdiffreskey), jredis.sdiff(setkey1, setkey2, setkey3).size(), "sdiff result and sdiffstore dest set should have same cardinality");
+			assertTrue(jredis.sismember(setdiffreskey, "x"), "x should be a member of the expected result set");
+			assertTrue(jredis.sismember(setdiffreskey, "b"), "b should be a member of the expected result set");
+		} 
+		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+
+	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#srem(java.lang.String, byte[])}.
 	 */
 	@Test
