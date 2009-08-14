@@ -24,14 +24,12 @@ import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_RCVBUF;
 import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_SNDBUF;
 import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_TIMEOUT;
 import static org.jredis.ri.alphazero.support.Assert.notNull;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-
 import org.jredis.ClientRuntimeException;
 import org.jredis.Command;
 import org.jredis.NotSupportedException;
@@ -43,7 +41,6 @@ import org.jredis.connector.Protocol;
 import org.jredis.connector.RequestListener;
 import org.jredis.connector.Response;
 import org.jredis.ri.alphazero.support.Assert;
-import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.Log;
 
 /**
@@ -160,13 +157,7 @@ public abstract class ConnectionBase implements Connection {
 		}
 	}
 	
-//	@Deprecated
-//	protected void setCredentials (byte[] credentials) {
-//		this.credentials = credentials;
-//	}
-
 	protected byte[]  getCredentials () {
-//		return credentials;
 		return this.spec.getCredentials();
 	}
 	
@@ -196,9 +187,23 @@ public abstract class ConnectionBase implements Connection {
 	 * @throws IllegalStateException if not (logically) connected.
 	 */
 	protected final void reconnect () {
-//		Log.log("RedisConnection - reconnecting");
-		disconnect();
-		connect ();
+		Log.log("RedisConnection - reconnecting");
+		int attempts = 0;
+
+		while(true){
+			try {
+				disconnect();
+				connect ();
+				break;
+			}
+			catch (RuntimeException e){
+				Log.error("while attempting reconnect: " + e.getMessage());
+				if(++attempts == spec.getReconnectCnt()) {
+					Log.problem("Retry limit exceeded attempting reconnect.");
+					throw new ClientRuntimeException ("Failed to reconnect to the server.");
+				}
+			}
+		}
 	}
 	/**
 	 * @throws IOException
@@ -229,6 +234,7 @@ public abstract class ConnectionBase implements Connection {
 		}
 		
 		isConnected = true;
+		Log.log("RedisConnection - connected");
 
 	}
 
@@ -241,7 +247,7 @@ public abstract class ConnectionBase implements Connection {
 		socketClose();
 		isConnected = false;
 
-//		Log.log("RedisConnection - disconnected");
+		Log.log("RedisConnection - disconnected");
 	}
 	
 	/**
@@ -387,7 +393,7 @@ public abstract class ConnectionBase implements Connection {
 	 * @since   alpha.0
 	 * 
 	 */
-	public static final class DefaultConnectionSpec implements ConnectionSpec {
+	public static class DefaultConnectionSpec implements ConnectionSpec {
 
 		// ------------------------------------------------------------------------
 		// Consts

@@ -18,6 +18,7 @@ package org.jredis.connector;
 
 import java.net.InetAddress;
 import java.net.Socket;
+import org.jredis.Command;
 
 
 /**
@@ -30,14 +31,50 @@ import java.net.Socket;
  */
 public interface ConnectionSpec {
 	
-	public int	getReconnectCnt ();
+	/**
+	 * @return
+	 */
 	public InetAddress getAddress();
+	/**
+	 * @return the port number for the connection
+	 */
 	public int getPort ();
+	/**
+	 * @return the password (if any) for the connection.  Used on (re-)connect to authenticate 
+	 * the client after connectivity has been established
+	 * @Redis AUTH  
+	 * @see Command#AUTH
+	 */
 	public byte[] getCredentials();
+	/**
+	 * @return the database selected for the connection.  Used on (re-)connect to select the db 
+	 * after network connectivity has been established.
+	 * @Redis SELECT
+	 * @see Command#SELECT
+	 */
 	public int getDatabase ();
+	/**
+	 * @param flag
+	 * @return the specified TCP socket flag used for the connection.
+	 * @see SocketFlag
+	 */
 	public boolean getSocketFlag (ConnectionSpec.SocketFlag flag);
+	/**
+	 * @param property
+	 * @return the specified socket property used for the connection.
+	 * @see SocketFlag
+	 */
 	public Integer getSocketProperty (ConnectionSpec.SocketProperty property);
 
+	/**
+	 * @return
+	 */
+	public int	getReconnectCnt ();
+
+	// ------------------------------------------------------------------------
+	// Associated (inner) types
+	// ------------------------------------------------------------------------
+	
 	/**
 	 * Flag keys for SocketFlag settings of the connection specification.
 	 * @see ConnectionSpec#getSocketFlag(SocketFlag)

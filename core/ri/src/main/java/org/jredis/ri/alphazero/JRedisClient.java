@@ -86,6 +86,15 @@ public class JRedisClient extends SynchJRedisBase  {
 	// ------------------------------------------------------------------------
 
 	/**
+	 * Connects to the localhost:6379 redis server using the password.
+	 * Will select db 0.
+     * @param password used for AUTH
+     */
+    public JRedisClient (String password) {
+		this ("localhost", 6379, password, 0);
+    }
+
+	/**
 	 * New RedisClient for the default protocol version {@link RedisVersion} 
 	 * obtained from the {@link ProtocolManager}
 	 * and using localhost:6379 as its network addressing parameters. 

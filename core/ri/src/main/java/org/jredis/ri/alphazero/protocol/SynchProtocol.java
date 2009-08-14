@@ -55,7 +55,7 @@ public class SynchProtocol extends ProtocolBase {
 	// ------------------------------------------------------------------------
 
 	/** Preferred size of request data buffer */
-	protected static final int			PREFERRED_REQUEST_BUFFER_SIZE	= 1024;
+	protected static final int			PREFERRED_REQUEST_BUFFER_SIZE	= 1024 * 48;
 	
 	/** Initial size of the shared line buffer */
 	protected static final int			PREFERRED_LINE_BUFFER_SIZE = 128;
@@ -346,7 +346,8 @@ public class SynchProtocol extends ProtocolBase {
 		public final byte[] readBulkData (InputStream in, int length)
 			throws IOException, RuntimeException
 		{
-			byte[] data = new byte[length];
+			byte[] data = new byte[length]; // TODO: optimize me
+			Log.log("allocated %s bytes ..." + length);
 			byte[] term = new byte[CRLF.length];
 			
 			int readcnt = -1;

@@ -44,11 +44,7 @@ import org.jredis.ri.alphazero.support.Log;
  * @since   alpha.0
  * 
  */
-//public class SynchConnection extends SocketConnection implements Connection {
 public class SynchConnection extends ConnectionBase implements Connection {
-
-//	// TODO: move to ConnectionSpec properties
-//	private static final int MAX_RECONNECTS = 3;
 
 	// ------------------------------------------------------------------------
 	// Properties
@@ -111,25 +107,6 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		setProtocolHandler(protocolHdlr);
 	}
 	
-//	/**
-//	 * Creates a connection instance to the redis server at the specified address and port
-//	 * using the default {@link RedisVersion#current_revision} protocol handler and a
-//	 * default {@link ConnectionSpec}.
-//	 * 
-//	 * @param address
-//	 * @param port
-//	 * @param redisversion
-//	 * @throws ClientRuntimeException
-//	 * @throws ProviderException
-//	 */
-//	public SynchConnection (
-//			InetAddress 	address, 
-//			int 			port
-//		) 
-//		throws ClientRuntimeException, ProviderException 
-//	{
-//		this(address, port, RedisVersion.current_revision);
-//	}
 	/**
 	 * Creates a connection instance to the redis server at the specified address and port
 	 * using the specified {@link RedisVersion} protocol handler (if available) and a
@@ -158,7 +135,7 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	// ======================================================= ProtocolHandler
 	// ------------------------------------------------------------------------
 	
-//	@Override
+	@Override
 	public final Modality getModality() {
 		return Connection.Modality.Synchronous;
 	}
@@ -166,71 +143,52 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	public Response serviceRequest (Command cmd, byte[]... args) 
 		throws RedisException
 	{
-		return serviceRequest(false, cmd, args);
-	}
-	private Response serviceRequest (boolean internal, Command cmd, byte[]...args)
-		throws RedisException
-	{
 		
-//	public Response serviceRequest (Command cmd, byte[]... args) 
-//		throws RedisException
-//	{
 		if(!isConnected()) throw new NotConnectedException ("Not connected!");
-//		if(cmd == Command.AUTH) setCredentials (args[0]);
-
 		
 		Request  		request = null;
 		Response		response = null;
 		ResponseStatus  status = null;
 		
-		int		reconnectTries = 0;
-		while(reconnectTries < spec.getReconnectCnt() ){
-			try {
-				// 1 - Request
-//				Log.log("RedisConnection - requesting ..." + cmd.code);
-				request = Assert.notNull(protocol.createRequest (cmd, args), "request object from handler", ProviderException.class);
-				request.write(super.getOutputStream());
-				
-				// 2 - response
-//				Log.log("RedisConnection - read response ..." + cmd.code);
-				response = Assert.notNull(protocol.createResponse(cmd), "response object from handler", ProviderException.class);
-				response.read(super.getInputStream());
-				
-				break;
-			}
-			catch (ProviderException bug){
-				Log.bug ("serviceRequest() -- ProviderException: " + bug.getLocalizedMessage());
-				Log.log ("serviceRequest() -- closing connection ...");
-				disconnect();
-				throw bug;
-			}
-			catch (ClientRuntimeException cre) {
-				Log.error("serviceRequest() -- ClientRuntimeException  => " + cre.getLocalizedMessage());
-				Log.log ("serviceRequest() -- Attempting reconnect.  Tries: " + reconnectTries);
-				reconnect();
-//				protocol.createRequest(Command.AUTH, spec.getCredentials());
-//				protocol.createRequest(Command.SELECT, Convert.toBytes(spec.getDatabase()));
-//				 spec.getCredentials()
-				if(!internal) {
-					if(null!=getCredentials()) {
-						this.serviceRequest(true, Command.AUTH, getCredentials());
-					}
-					if(getDatabase() != 0) {
-						this.serviceRequest(true, Command.SELECT, Convert.toBytes(getDatabase()));
-					}
-					reconnectTries++;
-				}
-			}
-			catch (RuntimeException e){
-				e.printStackTrace();
-				Log.bug ("serviceRequest() -- *unexpected* RuntimeException: " + e.getLocalizedMessage());
+		try {
+			// 1 - Request
+			//				Log.log("RedisConnection - requesting ..." + cmd.code);
+			request = Assert.notNull(protocol.createRequest (cmd, args), "request object from handler", ProviderException.class);
+			request.write(super.getOutputStream());
 
-				Log.log ("serviceRequest() -- closing connection ...");
-				disconnect();
-				
-				throw new ClientRuntimeException("unexpected runtime exeption: " + e.getLocalizedMessage(), e);
+			// 2 - response
+			//				Log.log("RedisConnection - read response ..." + cmd.code);
+			response = Assert.notNull(protocol.createResponse(cmd), "response object from handler", ProviderException.class);
+			response.read(super.getInputStream());
+
+			//				break;
+		}
+		catch (ProviderException bug){
+			Log.bug ("serviceRequest() -- ProviderException: " + bug.getLocalizedMessage());
+			Log.log ("serviceRequest() -- closing connection ...");
+			disconnect();
+			throw bug;
+		}
+		catch (ClientRuntimeException cre) {
+			Log.problem ("serviceRequest() -- ClientRuntimeException  => " + cre.getLocalizedMessage());
+			reconnect();
+			//							break;
+			if(null!=getCredentials()) {
+				this.serviceRequest(Command.AUTH, getCredentials());
 			}
-		}		
+			if(getDatabase() != 0) {
+				this.serviceRequest(Command.SELECT, Convert.toBytes(getDatabase()));
+			}
+		}
+		catch (RuntimeException e){
+			e.printStackTrace();
+			Log.bug ("serviceRequest() -- *unexpected* RuntimeException: " + e.getLocalizedMessage());
+
+			Log.log ("serviceRequest() -- closing connection ...");
+			disconnect();
+
+			throw new ClientRuntimeException("unexpected runtime exeption: " + e.getLocalizedMessage(), e);
+		}
 		
 		// 3 - Status
 		//
