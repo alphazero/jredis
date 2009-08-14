@@ -33,7 +33,7 @@ import org.jredis.ri.alphazero.JRedisClient;
 public class JRedisClientJProfileSubject extends JRedisJProfileSubject{
 
 	public static void main(String[] args) throws RedisException {
-		JRedis	jredis = new JRedisClient();
+		JRedis	jredis = new JRedisClient("localhost", 6379, "jredis", 0);
 		new JRedisJProfileSubject (jredis).run();
 	}
 }

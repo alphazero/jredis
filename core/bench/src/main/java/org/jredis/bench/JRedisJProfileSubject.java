@@ -47,7 +47,7 @@ public class JRedisJProfileSubject {
 	 */
 	public void run () throws RedisException {
 		Log.log("***** JProfileTestCase ****");
-		jredis.auth("jredis").ping().flushall();
+//		jredis.auth("jredis").ping().flushall();
 		
 		int iter = 100000;
 		String key = "foostring";

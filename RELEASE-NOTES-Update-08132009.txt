@@ -1,0 +1,41 @@
+This update includes changes to the JRedis interface, as previously announced.
+
+API CHANGES:
+
+As of this release update, you will need to specify the password and/or db on connect time.
+You will no longer be able to change the selected db for a connection.
+The default db selected on connect is db 0.  
+
+The test suites are all positive on these changes.  (Fairly substantial changes in the internal
+connector packages.)  That said, I have not had the time to conduct exhaustive testing beyond
+the test suites.  If you find a bug, please report it under issues in github.  If you post to 
+the Redis newsgroup, please indicate JRedis in the subject line as I usually just skim the 
+list's subjects and may miss your feedback.  
+
+BUG FIX:
+
+Previous releases had a bug that reconnected to db 0 on timed out connections.  Per the changes
+in this release, the automatic reconnect will connect to the Redis server using the authorization
+credentials (if any), and, the db you specified, on the initial connection (using new JRedisClient()).
+
+
+ROAD MAP:
+
+Now that we have the db select issue out of the way, the way is clear for connection pooling and 
+thread safe connections. 
+
+Also, the ConnectionFactory interface of the specification may be finally brought into use to allow
+for complete user control over the Redis and TCP connection characteristics.  (Current implementation
+relies on a default ConnectionSpec to create its connection.)  This will potentially of use to domains
+that require specialized settings for the buffer sizes, tcp preferences, etc.
+
+Pipe-lining is also an upcoming addtion.  Frankly its been held back for no better reason other than
+my laziness and/or other pressing issues occupying my time.  A rough implementation has been played
+with and the performance characteristic increases are in the order of magnitude. (100,000 ops/sec vs
+30,000 for the synch clients on my machine).  Of course these are throughput measures, and not latency.
+
+/enjoy
+
+08-13-2009
+NoVA
+

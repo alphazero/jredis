@@ -70,17 +70,19 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 	 * [TODO: this method should be using connection spec!]
 	 * @param host
 	 * @param port
+	 * @param credentials 
+	 * @param database 
 	 * @param redisVersion
 	 * @return
 	 */
-	protected Connection createSynchConnection (String host, int port, RedisVersion redisVersion) 
+	protected Connection createSynchConnection (String host, int port, int database, byte[] credentials, RedisVersion redisVersion) 
 	{
 		InetAddress 	address = null;
 		Connection 		synchConnection = null;
 		try {
 			
 			address = InetAddress.getByName(host);
-			synchConnection = new SynchConnection(address, port, redisVersion);
+			synchConnection = new SynchConnection(address, port, database, credentials, redisVersion);
 			Assert.notNull(synchConnection, "connection delegate", ClientRuntimeException.class);
 		}
 		catch (NotSupportedException e) {

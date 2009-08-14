@@ -33,6 +33,8 @@ public interface ConnectionSpec {
 	public int	getReconnectCnt ();
 	public InetAddress getAddress();
 	public int getPort ();
+	public byte[] getCredentials();
+	public int getDatabase ();
 	public boolean getSocketFlag (ConnectionSpec.SocketFlag flag);
 	public Integer getSocketProperty (ConnectionSpec.SocketProperty property);
 

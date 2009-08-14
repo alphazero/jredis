@@ -32,6 +32,7 @@ import org.jredis.connector.ResponseStatus;
 import org.jredis.ri.alphazero.RedisVersion;
 import org.jredis.ri.alphazero.protocol.SynchProtocol;
 import org.jredis.ri.alphazero.support.Assert;
+import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.Log;
 
 
@@ -110,25 +111,25 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		setProtocolHandler(protocolHdlr);
 	}
 	
-	/**
-	 * Creates a connection instance to the redis server at the specified address and port
-	 * using the default {@link RedisVersion#current_revision} protocol handler and a
-	 * default {@link ConnectionSpec}.
-	 * 
-	 * @param address
-	 * @param port
-	 * @param redisversion
-	 * @throws ClientRuntimeException
-	 * @throws ProviderException
-	 */
-	public SynchConnection (
-			InetAddress 	address, 
-			int 			port
-		) 
-		throws ClientRuntimeException, ProviderException 
-	{
-		this(address, port, RedisVersion.current_revision);
-	}
+//	/**
+//	 * Creates a connection instance to the redis server at the specified address and port
+//	 * using the default {@link RedisVersion#current_revision} protocol handler and a
+//	 * default {@link ConnectionSpec}.
+//	 * 
+//	 * @param address
+//	 * @param port
+//	 * @param redisversion
+//	 * @throws ClientRuntimeException
+//	 * @throws ProviderException
+//	 */
+//	public SynchConnection (
+//			InetAddress 	address, 
+//			int 			port
+//		) 
+//		throws ClientRuntimeException, ProviderException 
+//	{
+//		this(address, port, RedisVersion.current_revision);
+//	}
 	/**
 	 * Creates a connection instance to the redis server at the specified address and port
 	 * using the specified {@link RedisVersion} protocol handler (if available) and a
@@ -136,6 +137,8 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	 * 
 	 * @param address
 	 * @param port
+	 * @param credentials 
+	 * @param database 
 	 * @param redisversion
 	 * @throws ClientRuntimeException
 	 * @throws ProviderException if the redisVersion specified is not supported.
@@ -143,11 +146,11 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	public SynchConnection (
 			InetAddress 	address, 
 			int 			port, 
-			RedisVersion 	redisversion
+			int database, byte[] credentials, RedisVersion 	redisversion
 		) 
 		throws ClientRuntimeException, ProviderException 
 	{
-		this(new DefaultConnectionSpec(address, port), redisversion);
+		this(new DefaultConnectionSpec(address, port, database, credentials), redisversion);
 	}
 
 	// ------------------------------------------------------------------------
@@ -163,8 +166,17 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	public Response serviceRequest (Command cmd, byte[]... args) 
 		throws RedisException
 	{
+		return serviceRequest(false, cmd, args);
+	}
+	private Response serviceRequest (boolean internal, Command cmd, byte[]...args)
+		throws RedisException
+	{
+		
+//	public Response serviceRequest (Command cmd, byte[]... args) 
+//		throws RedisException
+//	{
 		if(!isConnected()) throw new NotConnectedException ("Not connected!");
-		if(cmd == Command.AUTH) setCredentials (args[0]);
+//		if(cmd == Command.AUTH) setCredentials (args[0]);
 
 		
 		Request  		request = null;
@@ -196,10 +208,18 @@ public class SynchConnection extends ConnectionBase implements Connection {
 				Log.error("serviceRequest() -- ClientRuntimeException  => " + cre.getLocalizedMessage());
 				Log.log ("serviceRequest() -- Attempting reconnect.  Tries: " + reconnectTries);
 				reconnect();
-				if(null!=getCredentials()) {
-					this.serviceRequest(Command.AUTH, getCredentials());
+//				protocol.createRequest(Command.AUTH, spec.getCredentials());
+//				protocol.createRequest(Command.SELECT, Convert.toBytes(spec.getDatabase()));
+//				 spec.getCredentials()
+				if(!internal) {
+					if(null!=getCredentials()) {
+						this.serviceRequest(true, Command.AUTH, getCredentials());
+					}
+					if(getDatabase() != 0) {
+						this.serviceRequest(true, Command.SELECT, Convert.toBytes(getDatabase()));
+					}
+					reconnectTries++;
 				}
-				reconnectTries++;
 			}
 			catch (RuntimeException e){
 				e.printStackTrace();

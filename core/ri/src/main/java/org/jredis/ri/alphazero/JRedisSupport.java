@@ -120,15 +120,15 @@ public abstract class JRedisSupport implements JRedis {
 	// ------------------------------------------------------------------------
 
 
-//	@Override
-	public JRedis auth(String key) throws RedisException {
-		byte[] keydata = null;
-		if((keydata = getKeyBytes(key)) == null) 
-			throw new IllegalArgumentException ("invalid key => ["+key+"]");
-
-		this.serviceRequest(Command.AUTH, keydata);
-		return this;
-	}
+////	@Override
+//	public JRedis auth(String key) throws RedisException {
+//		byte[] keydata = null;
+//		if((keydata = getKeyBytes(key)) == null) 
+//			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+//
+//		this.serviceRequest(Command.AUTH, keydata);
+//		return this;
+//	}
 //	@Override
 	public void bgsave() throws RedisException {
 		this.serviceRequest(Command.BGSAVE);
@@ -149,11 +149,11 @@ public abstract class JRedisSupport implements JRedis {
 		this.serviceRequest(Command.FLUSHDB).getStatus();
 		return this;
 	}
-//	@Override
-	public JRedis select(int index) throws RedisException {
-		this.serviceRequest(Command.SELECT, Convert.toBytes(index));
-		return this;
-	}
+////	@Override
+//	public JRedis select(int index) throws RedisException {
+//		this.serviceRequest(Command.SELECT, Convert.toBytes(index));
+//		return this;
+//	}
 //	@Override
 	public void rename(String oldkey, String newkey) throws RedisException {
 		byte[] oldkeydata = null;
@@ -801,17 +801,17 @@ public abstract class JRedisSupport implements JRedis {
 		}
 //		return true;
 	}
-//	@Override
-	public void shutdown() {
-		try {
-			this.serviceRequest(Command.SHUTDOWN);
-		}
-		catch (RedisException e) { /* NotConnectedException is OK */
-			e.printStackTrace();
-			throw new ProviderException ("Shutdown raised an unexpected RedisException -- Bug");
-		}
-//		return true;
-	}
+////	@Override
+//	public void shutdown() {
+//		try {
+//			this.serviceRequest(Command.SHUTDOWN);
+//		}
+//		catch (RedisException e) { /* NotConnectedException is OK */
+//			e.printStackTrace();
+//			throw new ProviderException ("Shutdown raised an unexpected RedisException -- Bug");
+//		}
+////		return true;
+//	}
 //	@Override
 	public List<byte[]> sinter(String set1, String... sets) throws RedisException {
 		byte[] keydata = null;

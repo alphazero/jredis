@@ -75,7 +75,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.AUTH.code;
 		Log.log("TEST: Elicit errors", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String key = keys.get(0);
 			jredis.set(key, smallData);
@@ -123,20 +123,20 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
 	
-	/**
-	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#auth(java.lang.String)}.
-	 */
-	@Test
-	public void testAuth() {
-		test = Command.AUTH.code;
-		Log.log("TEST: %s command", test);
-		try {
-			jredis.auth(password);
-		} 
-		catch (RedisException e) {
-			fail(test + " with password: " + password, e);
-		}
-	}
+//	/**
+//	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#auth(java.lang.String)}.
+//	 */
+//	@Test
+//	public void testAuth() {
+//		test = Command.AUTH.code;
+//		Log.log("TEST: %s command", test);
+//		try {
+//			jredis.auth(password);
+//		} 
+//		catch (RedisException e) {
+//			fail(test + " with password: " + password, e);
+//		}
+//	}
 	
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#ping()}.
@@ -161,7 +161,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.EXISTS.code + " | " + Command.EXPIRE.code + " | " + Command.TTL.code;
 		Log.log("TEST: %s command(s)", test);
 		try {
-			jredis.select (db1).flushdb();
+			jredis.flushdb();
 			assertTrue(jredis.dbsize() == 0);
 			
 			String keyToExpire = "expire-me";
@@ -224,7 +224,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		Log.log("TEST: %s commands", test);
 		try {
 			key = "woof";
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			jredis.set(key, "meow");
 			assertTrue (jredis.exists(key));
 			jredis.flushdb();
@@ -241,7 +241,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.RENAME.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String newkey = null;
 			byte[] value = dataList.get(0);
@@ -264,7 +264,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.RENAMENX.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			jredis.set (keys.get(0), dataList.get(0));
 			assertEquals(dataList.get(0), jredis.get(keys.get(0)));
@@ -299,7 +299,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SAVE.code + " | " + Command.LASTSAVE;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			jredis.save();
 			long when = jredis.lastsave();
@@ -321,7 +321,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.BGSAVE.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			// TODO: what's a meaningful test for this besides asserting command works?
 			jredis.bgsave();
@@ -337,7 +337,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SET.code + " | " + Command.SETNX.code + " byte[] | " + Command.GET;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			jredis.set(keys.get(0), dataList.get(0));
 			assertEquals(dataList.get(0), jredis.get(keys.get(0)), "data and get results");
@@ -357,7 +357,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SET.code + " | " + Command.SETNX.code + " String | " + Command.GET;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			jredis.set(keys.get(0), stringList.get(0));
 			assertEquals(stringList.get(0), toStr(jredis.get(keys.get(0))), "string and get results");
@@ -377,7 +377,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SET.code + " | " + Command.SETNX.code + " Long | " + Command.GET;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			jredis.set(keys.get(0), longList.get(0));
 			assertTrue(longList.get(0).equals(toLong(jredis.get(keys.get(0)))), "long and get results");
@@ -397,7 +397,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SET.code + " | " + Command.SETNX.code + " Java Object | " + Command.GET;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			jredis.set(keys.get(0), objectList.get(0));
 			assertTrue(objectList.get(0).equals(decode(jredis.get(keys.get(0)))), "object and get results");
@@ -419,7 +419,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SET.code + " | " + Command.GETSET.code + " byte[] ";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			jredis.set(keys.get(0), dataList.get(0));
 			assertEquals(dataList.get(0), jredis.get(keys.get(0)), "data and get results");
@@ -440,7 +440,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 //		test = Command.SET.code + " | " + Command.GETSET.code + " String ";
 //		Log.log("TEST: %s command", test);
 //		try {
-//			jredis.select(db1).flushdb();
+//			jredis.flushdb();
 //			
 //			jredis.set(keys.get(0), stringList.get(0));
 //			assertEquals(stringList.get(0), toStr(jredis.get(keys.get(0))), "string and get results");
@@ -460,7 +460,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 //		test = Command.SET.code + " | " + Command.GETSET.code + " Number ";
 //		Log.log("TEST: %s command", test);
 //		try {
-//			jredis.select(db1).flushdb();
+//			jredis.flushdb();
 //			
 //			jredis.set(keys.get(0), longList.get(0));
 //			assertTrue(longList.get(0).equals(toLong(jredis.get(keys.get(0)))), "long and get results");
@@ -480,7 +480,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 //		test = Command.SET.code + " | " + Command.GETSET.code + " Java Object ";
 //		Log.log("TEST: %s command", test);
 //		try {
-//			jredis.select(db1).flushdb();
+//			jredis.flushdb();
 //			
 //			jredis.set(keys.get(0), objectList.get(0));
 //			assertTrue(objectList.get(0).equals(decode(jredis.get(keys.get(0)))), "object and get results");
@@ -503,7 +503,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.INCR.code + " | " + Command.DECR.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			long cntr = 0;
 			String cntr_key = keys.get(0);
@@ -529,7 +529,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.INCRBY.code + " |" + Command.DECRBY.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			long cntr = 0;
 			String cntr_key = keys.get(0);
@@ -557,7 +557,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.DEL.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String key = this.keys.get(0);
 			jredis.set (key, dataList.get(0));
@@ -576,7 +576,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.MGET.code ;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			for(int i=0; i<SMALL_CNT; i++){
 				jredis.set (keys.get(i), dataList.get(i));
@@ -618,7 +618,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.RPUSH.code + " byte[] | " + Command.LLEN + " | " + Command.LRANGE;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
@@ -644,7 +644,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LPUSH.code + " byte[] | " + Command.LLEN + " | " + Command.LRANGE;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
@@ -673,7 +673,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.RPUSH.code + " String | " + Command.LLEN + " | " + Command.LRANGE;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
@@ -703,7 +703,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LPUSH.code + " String | " + Command.LLEN + " | " + Command.LRANGE;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
@@ -736,7 +736,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.RPUSH.code + " Number | " + Command.LLEN + " | " + Command.LRANGE;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
@@ -767,7 +767,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LPUSH.code + " Number | " + Command.LLEN + " | " + Command.LRANGE;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
@@ -801,7 +801,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.RPUSH.code + " Java Object | " + Command.LLEN + " | " + Command.LRANGE;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
@@ -832,7 +832,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LPUSH.code + " Java Object | " + Command.LLEN + " | " + Command.LRANGE;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
@@ -867,7 +867,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LTRIM.code + " | " + Command.LLEN.code + " | " + Command.LRANGE.code ;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			// prep a small list
 			String listkey = keys.get(0);
@@ -910,7 +910,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LINDEX.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			// prep a small list
 			String listkey = keys.get(0);
@@ -939,7 +939,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LPOP.code ;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			// prep a small list
 			String listkey = keys.get(0);
@@ -966,7 +966,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.RPOP.code ;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			// prep a small list
 			String listkey = keys.get(0);
@@ -993,7 +993,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LRANGE.code ;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			// prep a MEDIUM list
 			String listkey = keys.get(0);
@@ -1023,7 +1023,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LREM.code + " byte[] | " + Command.LLEN;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			// we'll make a list of unique items first
@@ -1067,7 +1067,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LREM.code + " String | " + Command.LLEN;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			// we'll make a list of unique items first
@@ -1100,7 +1100,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LREM.code + " Number | " + Command.LLEN;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			// we'll make a list of unique items first
@@ -1133,7 +1133,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LREM.code + " Java Object | " + Command.LLEN;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			// we'll make a list of unique items first
@@ -1166,7 +1166,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LSET.code + " byte[] | " + Command.LLEN;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			// we'll make a list of unique items first
@@ -1216,7 +1216,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LSET.code + " String | " + Command.LLEN;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			// we'll make a list of unique items first
@@ -1259,7 +1259,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LSET.code + " Number | " + Command.LLEN;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			// we'll make a list of unique items first
@@ -1302,7 +1302,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.LSET.code + " Java Object | " + Command.LLEN;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			String listkey = this.keys.get(0);
 			// we'll make a list of unique items first
@@ -1352,7 +1352,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SORT.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = "set-key";
 			String listkey = "list-key";
@@ -1389,7 +1389,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SADD.code + " byte[]";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1409,7 +1409,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SADD.code + " String";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1429,7 +1429,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SADD.code + " Number";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1449,7 +1449,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SADD.code + " Java Object";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1469,7 +1469,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SMEMBERS.code + " byte[] ";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1496,7 +1496,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SMEMBERS.code + " String ";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1523,7 +1523,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SMEMBERS.code + " Number ";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1550,7 +1550,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SMEMBERS.code + " Java Object ";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1583,7 +1583,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SMOVE.code + " byte[]";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String srckey = keys.get(0);
 			String destkey = keys.get(1);
@@ -1647,7 +1647,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SISMEMBER.code + " byte[]";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1667,7 +1667,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SISMEMBER.code + " String";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1687,7 +1687,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SISMEMBER.code + " Number";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1707,7 +1707,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SISMEMBER.code + " Java Object";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1728,7 +1728,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SCARD.code + " Java Object";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
@@ -1747,7 +1747,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SINTER.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey1 = keys.get(0);
 			String setkey2 = keys.get(1);
@@ -1771,7 +1771,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SINTERSTORE.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey1 = keys.get(0);
 			String setkey2 = keys.get(1);
@@ -1799,7 +1799,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SUNION.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey1 = keys.get(0);
 			String setkey2 = keys.get(1);
@@ -1823,7 +1823,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SUNIONSTORE.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey1 = keys.get(0);
 			String setkey2 = keys.get(1);
@@ -1851,7 +1851,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SDIFF.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey1 = keys.get(0);
 			String setkey2 = keys.get(1);
@@ -1890,7 +1890,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SDIFFSTORE.code;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey1 = keys.get(0);
 			String setkey2 = keys.get(1);
@@ -1926,7 +1926,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SISMEMBER.code + " byte[]";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++) 
@@ -1947,7 +1947,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SISMEMBER.code + " String";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++) 
@@ -1968,7 +1968,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SISMEMBER.code + " Number";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++) 
@@ -1989,7 +1989,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.SISMEMBER.code + " Java Object";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++) 
@@ -2012,7 +2012,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.DBSIZE.code ;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			jredis.flushdb();
 			assertTrue (jredis.dbsize() == 0);
@@ -2033,7 +2033,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.RANDOMKEY.code ;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			assertTrue (jredis.dbsize() == 0);
 			
@@ -2050,31 +2050,31 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		} 
 		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
-	/**
-	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#move(java.lang.String, int)}.
-	 */
-	@Test
-	public void testMove() {
-		test = Command.MOVE.code ;
-		Log.log("TEST: %s command", test);
-		try {
-			jredis.select(db1).flushdb();
-			assertTrue (jredis.dbsize() == 0, "db1 should be empty");
-			
-			jredis.select(db2).flushdb();
-			assertTrue (jredis.dbsize() == 0, "db2 should be empty");
-			
-			jredis.set(keys.get(0), dataList.get(0));
-			assertTrue (jredis.dbsize() == 1, "db2 should have 1 key at this point");
-			
-			jredis.move(keys.get(0), db1);
-			assertTrue (jredis.dbsize() == 0, "db2 should be empty again");
-			jredis.select(db1);
-			assertTrue (jredis.dbsize() == 1, "db1 should have 1 key at this point");
-			
-		} 
-		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
-	}
+//	/**
+//	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#move(java.lang.String, int)}.
+//	 */
+//	@Test
+//	public void testMove() {
+//		test = Command.MOVE.code ;
+//		Log.log("TEST: %s command", test);
+//		try {
+//			jredis.flushdb();
+//			assertTrue (jredis.dbsize() == 0, "db1 should be empty");
+//			
+//			jredis.select(db2).flushdb();
+//			assertTrue (jredis.dbsize() == 0, "db2 should be empty");
+//			
+//			jredis.set(keys.get(0), dataList.get(0));
+//			assertTrue (jredis.dbsize() == 1, "db2 should have 1 key at this point");
+//			
+//			jredis.move(keys.get(0), db1);
+//			assertTrue (jredis.dbsize() == 0, "db2 should be empty again");
+//			jredis.select(db1);
+//			assertTrue (jredis.dbsize() == 1, "db1 should have 1 key at this point");
+//			
+//		} 
+//		catch (RedisException e) { fail(test + " ERROR => " + e.getLocalizedMessage(), e); }
+//	}
 
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#type(java.lang.String)}.
@@ -2084,7 +2084,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.TYPE.code ;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			jredis.set(keys.get(0), dataList.get(0));
 			jredis.sadd(keys.get(1), dataList.get(1));
@@ -2105,7 +2105,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.INFO.code ;
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 
 			Map<String, String> infoMap =  jredis.info();
 			for (RedisInfo info : RedisInfo.values()){
@@ -2124,7 +2124,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.KEYS.code + " (*)";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			for (int i=0; i<SMALL_CNT; i++)
 				jredis.set(keys.get(i), dataList.get(i));
@@ -2145,7 +2145,7 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		test = Command.KEYS.code + " (using patterns)";
 		Log.log("TEST: %s command", test);
 		try {
-			jredis.select(db1).flushdb();
+			jredis.flushdb();
 			
 			for (int i=0; i<SMALL_CNT; i++)
 				jredis.set(patternList.get(i), dataList.get(i));
@@ -2334,22 +2334,22 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 	 * 
 	 */
 	protected final void prepTestDBs() {
-		try {
-			jredis.auth(password);
-			Log.log("TEST-PREP: AUTH with password %s" + password);
-		} 
-		catch (RedisException e) {
-			Log.error("AUTH with password " + password + " => " + e.getLocalizedMessage());
-			fail("AUTH with password: " + password, e);
-		}
-		try {
-			jredis.select(db1).flushdb().select(db2).flushdb().select(db1);
-			Log.log("TEST-PREP: %s:%d Redis server DB %d & %d flushed", host, port, db1, db2);
-		} 
-		catch (RedisException e) {
-			Log.error("SELECT/FLUSHDB for test prep" + password);
-			fail("SELECT/FLUSHDB for test prep", e);
-		}
+//		try {
+//			jredis.auth(password);
+//			Log.log("TEST-PREP: AUTH with password %s" + password);
+//		} 
+//		catch (RedisException e) {
+//			Log.error("AUTH with password " + password + " => " + e.getLocalizedMessage());
+//			fail("AUTH with password: " + password, e);
+//		}
+//		try {
+//			jredis.select(db1).flushdb().select(db2).flushdb().select(db1);
+//			Log.log("TEST-PREP: %s:%d Redis server DB %d & %d flushed", host, port, db1, db2);
+//		} 
+//		catch (RedisException e) {
+//			Log.error("SELECT/FLUSHDB for test prep" + password);
+//			fail("SELECT/FLUSHDB for test prep", e);
+//		}
 	}
 	/**
 	 * Creates a random ascii string

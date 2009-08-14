@@ -43,7 +43,7 @@ public class JRedisClientNGTest extends JRedisProviderTestNGBase {
 	 */
 	@BeforeTest
 	public void setJRedisProvider () {
-		super.setJRedisProviderInstance(new JRedisClient (this.host, this.port));
+		super.setJRedisProviderInstance(new JRedisClient (this.host, this.port, this.password, this.db1));
 
 		Log.log("JRedisClientNGTest.setJRedisProvider");
 		// For JRedisClient, if we're here, we're connected

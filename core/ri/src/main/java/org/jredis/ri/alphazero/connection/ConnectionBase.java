@@ -43,6 +43,7 @@ import org.jredis.connector.Protocol;
 import org.jredis.connector.RequestListener;
 import org.jredis.connector.Response;
 import org.jredis.ri.alphazero.support.Assert;
+import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.Log;
 
 /**
@@ -79,7 +80,7 @@ public abstract class ConnectionBase implements Connection {
 	private boolean 			isConnected = false;
 	
 	// TODO: not quite right ... in connection spec perhaps?
-	private byte[] 				credentials = null;
+//	private byte[] 				credentials = null;
 
 	// ------------------------------------------------------------------------
 	// Internal use fields
@@ -159,12 +160,18 @@ public abstract class ConnectionBase implements Connection {
 		}
 	}
 	
-	protected void setCredentials (byte[] credentials) {
-		this.credentials = credentials;
-	}
+//	@Deprecated
+//	protected void setCredentials (byte[] credentials) {
+//		this.credentials = credentials;
+//	}
 
 	protected byte[]  getCredentials () {
-		return credentials;
+//		return credentials;
+		return this.spec.getCredentials();
+	}
+	
+	protected int	getDatabase () {
+		return this.spec.getDatabase();
 	}
 
 	// ------------------------------------------------------------------------
@@ -223,7 +230,6 @@ public abstract class ConnectionBase implements Connection {
 		
 		isConnected = true;
 
-//		Log.log("RedisConnection - connected.");
 	}
 
 	/**
@@ -389,9 +395,9 @@ public abstract class ConnectionBase implements Connection {
 		/**  */
 		private static final int DEFAULT_RECONNECT_CNT = 3;
 		/**  */
-		private static final int DEFAULT_RCV_BUFF_SIZE = 1024;
+		private static final int DEFAULT_RCV_BUFF_SIZE = 1024 * 48;
 		/**  */
-		private static final int DEFAULT_SND_BUFF_SIZE = 1024;
+		private static final int DEFAULT_SND_BUFF_SIZE = 1024 * 48;
 		/**  */
 		private static final int DEFAULT_READ_TIMEOUT_MSEC = 5000;
 		
@@ -402,6 +408,11 @@ public abstract class ConnectionBase implements Connection {
 		final InetAddress  	address;
 		/**  */
 		final int			port;
+		/** */
+		final byte[]		credentials;
+		/** */
+		final int			database;
+		
 		
 		// ------------------------------------------------------------------------
 		// Constructors
@@ -413,8 +424,22 @@ public abstract class ConnectionBase implements Connection {
 		 * @throws ClientRuntimeException for invalid port, or null address values
 		 */
 		public DefaultConnectionSpec (InetAddress address, int port) throws ClientRuntimeException {
+			this (address, port, 0, null);
+		}
+		
+		/**
+		 * Instantiates a default connection spec for the given host and port.
+		 * @param address
+		 * @param port
+		 * @param database
+		 * @param credentials
+		 * @throws ClientRuntimeException for invalid port, or null address values
+		 */
+		public DefaultConnectionSpec (InetAddress address, int port, int database, byte[] credentials) throws ClientRuntimeException {
 			this.port = Assert.inRange (port, 1, 65534, "port init parameter for DefaultConnectionSpec", ClientRuntimeException.class);
 			this.address = Assert.notNull(address, "address init parameter for DefaultConnectionSpec", ClientRuntimeException.class);
+			this.database = database;
+			this.credentials = credentials;
 		}
 		
 		// ------------------------------------------------------------------------
@@ -429,6 +454,12 @@ public abstract class ConnectionBase implements Connection {
 		@Override
 		public int getPort() { return port;}
 
+		@Override
+		public int getDatabase() { return database; }
+		
+		@Override
+		public byte[] getCredentials () { return credentials; }
+		
 		@Override
 		public boolean getSocketFlag(SocketFlag flag) {
 			boolean value = false;

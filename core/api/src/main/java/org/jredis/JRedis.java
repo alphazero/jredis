@@ -62,17 +62,17 @@ public interface JRedis {
 	// Security and User Management
 	// ------------------------------------------------------------------------
 
-	/**
-	 * Required for authorizing access to the server.  This method implements
-	 * the AUTH command.  It may be used with a non-secured server without
-	 * any side effect.
-	 * 
-	 * @param authorization key as defined in the server.
-	 * @throws RedisException if the server is in secure more and the 
-	 * authorization provided 
-	 */
-	@Deprecated
-	public JRedis auth (String authorization) throws RedisException;
+//	/**
+//	 * Required for authorizing access to the server.  This method implements
+//	 * the AUTH command.  It may be used with a non-secured server without
+//	 * any side effect.
+//	 * 
+//	 * @param authorization key as defined in the server.
+//	 * @throws RedisException if the server is in secure more and the 
+//	 * authorization provided 
+//	 */
+//	@Deprecated
+//	public JRedis auth (String authorization) throws RedisException;
 	
 	// ------------------------------------------------------------------------
 	// "Connection Handling"
@@ -235,8 +235,8 @@ public interface JRedis {
 	// Multiple databases handling commands
 	// ------------------------------------------------------------------------
 	
-	@Deprecated
-	public JRedis select (int index) throws RedisException;
+//	@Deprecated
+//	public JRedis select (int index) throws RedisException;
 
 	public JRedis flushdb () throws RedisException;
 
@@ -285,8 +285,8 @@ public interface JRedis {
 
 	public long lastsave () throws RedisException;
 
-	@Deprecated
-	public void shutdown () throws RedisException;
+//	@Deprecated
+//	public void shutdown () throws RedisException;
 
 // ------------------------------------------------------------------------
 // Remote server control commands

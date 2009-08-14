@@ -61,8 +61,8 @@ public class JRedisClientBenchmark extends JRedisBenchmark {
 	}
 	
 	@Override
-	protected final JRedis newConnection(String host, int port) {
-		return new JRedisClient(host, port);
+	protected final JRedis newConnection(String host, int port, int db, String password) {
+		return new JRedisClient(host, port, password, db);
 	}
 	@Override
 	protected final Class<? extends JRedis> getImplementationClass() {

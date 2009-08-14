@@ -25,8 +25,8 @@ import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.Protocol;
 import org.jredis.connector.Response;
-//import org.jredis.ri.alphazero.connection.SocketConnection;
 import org.jredis.ri.alphazero.support.Assert;
+import org.jredis.ri.alphazero.support.Convert;
 
 
 /**
@@ -56,6 +56,22 @@ import org.jredis.ri.alphazero.support.Assert;
  * @since   alpha.0
  * 
  */
+/**
+ * [TODO: document me!]
+ *
+ * @author  Joubin Houshyar (alphazero@sensesay.net)
+ * @version alpha.0, Aug 13, 2009
+ * @since   alpha.0
+ * 
+ */
+/**
+ * [TODO: document me!]
+ *
+ * @author  Joubin Houshyar (alphazero@sensesay.net)
+ * @version alpha.0, Aug 13, 2009
+ * @since   alpha.0
+ * 
+ */
 @Redis(versions={"0.09"})
 public class JRedisClient extends SynchJRedisBase  {
 	
@@ -73,22 +89,36 @@ public class JRedisClient extends SynchJRedisBase  {
 	 * New RedisClient for the default protocol version {@link RedisVersion} 
 	 * obtained from the {@link ProtocolManager}
 	 * and using localhost:6379 as its network addressing parameters. 
-	 * 
-	 * @see JRedisClient#RedisClient(String, int, String)
+	 * Database will be selected to db 0
+	 * Assumes no password required.
 	 */
 	public JRedisClient ( ){
-		this ("localhost", 6379, RedisVersion.current_revision);
+		this ("localhost", 6379, null, 0, RedisVersion.current_revision);
 	}
 	/**
 	 * New RedisClient for the default protocol version {@link RedisVersion} 
 	 * obtained from the {@link ProtocolManager}
 	 * 
-	 * @see JRedisClient#RedisClient(String, int, String)
 	 * @param host
 	 * @param port
 	 */
 	public JRedisClient(String host, int port) {
-		this(host, port, RedisVersion.current_revision);
+		this(host, port, null, 0, RedisVersion.current_revision);
+	}
+	
+	
+	/**
+	 * New JRedisClient for the default protocol version {@link RedisVersion}
+	 * @param host redis server's host
+	 * @param port redis server's port
+	 * @param password to use for AUTHentication (can be null)
+	 * @param database database to select on connect
+	 * @throws ClientRuntimeException
+	 */
+	public JRedisClient (String host, int port, String password, int database) 
+	throws ClientRuntimeException
+	{
+		this(host, port, (null != password ? password.getBytes() : null), database, RedisVersion.current_revision);
 	}
 
 	/**
@@ -106,14 +136,25 @@ public class JRedisClient extends SynchJRedisBase  {
 	 * @param redisVersion
 	 * @throws ClientRuntimeException
 	 */
-	public JRedisClient (String host, int port, RedisVersion redisVersion) 
+	protected JRedisClient (String host, int port, byte[] credentials, int database, RedisVersion redisVersion) 
 	throws ClientRuntimeException
 	{
 		Assert.notNull(host, "host parameter", IllegalArgumentException.class);
 		Assert.notNull(redisVersion, "redisVersion paramter", IllegalArgumentException.class);
 		
-		Connection synchConnection = createSynchConnection (host, port, redisVersion);
+		Connection synchConnection = createSynchConnection (host, port, database, credentials, redisVersion);
 		setConnection (synchConnection);
+		
+		try {
+			if(null != credentials)
+				this.serviceRequest(Command.AUTH, credentials);
+			
+			this.serviceRequest(Command.SELECT, Convert.toBytes(database));
+		} 
+		catch (RedisException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 	}
 	
 	// ------------------------------------------------------------------------

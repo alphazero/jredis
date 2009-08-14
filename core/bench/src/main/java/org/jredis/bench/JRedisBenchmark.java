@@ -75,7 +75,7 @@ public abstract class JRedisBenchmark {
 	 * @param port
 	 * @return
 	 */
-	protected abstract JRedis newConnection(String host, int port);
+	protected abstract JRedis newConnection(String host, int port, int db, String password);
 
 	/**
 	 * Runs a set of command primitives test runs using concurrent clients. [TODO: add all commands - this is a sampling of a few.]
@@ -674,9 +674,10 @@ public abstract class JRedisBenchmark {
 		public void run() {
 			try {
 
-				jredis = newConnection (host, 6379);
+				jredis = newConnection (host, 6379, db, password);
 				try {
-					jredis.auth (password).select(db).flushdb();
+//					jredis.auth (password).select(db).flushdb();
+					jredis.flushdb();
 				}
 				catch (RedisException e) {				
 					System.err.format("BENCHMARK::REDIS %s ERROR => %s\nWorker will stop.\n", e.getCommand(), e.getLocalizedMessage());
