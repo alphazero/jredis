@@ -347,7 +347,7 @@ public class SynchProtocol extends ProtocolBase {
 			throws IOException, RuntimeException
 		{
 			byte[] data = new byte[length]; // TODO: optimize me
-			Log.log("allocated %s bytes ..." + length);
+//			Log.log("allocated %s bytes ..." + length);
 			byte[] term = new byte[CRLF.length];
 			
 			int readcnt = -1;
