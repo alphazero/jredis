@@ -17,9 +17,10 @@
 package org.jredis.ri.alphazero.support;
 
 /**
+ * TODO: deprecate this and use a standard logger (jdk or log4j ...)
+ * 
  * yes -- yet another logger.  This is to keep down the dependencies
  * you can add your own later ... 
- * [TODO: document me!]
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Apr 02, 2009
@@ -29,7 +30,7 @@ package org.jredis.ri.alphazero.support;
 public class Log {
 	public enum Category { INFO, ERROR, PROBLEM, BUG }
 	
-	public static final void log (String msg)   { _log (Category.INFO, msg); }
+	public static final void log (String msg)   { _loginfo (msg); }
 	public static final void error (String msg)   { _log (Category.ERROR, msg); }
 	public static final void problem (String msg) { _log (Category.PROBLEM, msg); }
 	public static final void bug (String msg)     { _log (Category.BUG, msg); }
