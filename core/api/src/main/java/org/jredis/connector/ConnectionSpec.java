@@ -38,9 +38,20 @@ public interface ConnectionSpec {
 	 */
 	public InetAddress getAddress();
 	/**
+	 * @param address
+	 * @return
+	 */
+	public ConnectionSpec setAddress(InetAddress address);
+	/**
 	 * @return the port number for the connection
 	 */
 	public int getPort ();
+	/**
+	 * @param port
+	 * @return
+	 */
+	public ConnectionSpec setPort(int port);
+	
 	/**
 	 * @return the password (if any) for the connection.  Used on (re-)connect to authenticate 
 	 * the client after connectivity has been established
@@ -49,6 +60,12 @@ public interface ConnectionSpec {
 	 */
 	public byte[] getCredentials();
 	/**
+	 * @param credentials
+	 * @return
+	 */
+	public ConnectionSpec setCredentials(byte[] credentials);
+	
+	/**
 	 * @return the database selected for the connection.  Used on (re-)connect to select the db 
 	 * after network connectivity has been established.
 	 * @Redis SELECT
@@ -56,22 +73,44 @@ public interface ConnectionSpec {
 	 */
 	public int getDatabase ();
 	/**
+	 * @param database
+	 * @return
+	 */
+	public ConnectionSpec setDatabase(int database);
+	/**
 	 * @param flag
 	 * @return the specified TCP socket flag used for the connection.
 	 * @see SocketFlag
 	 */
 	public boolean getSocketFlag (ConnectionSpec.SocketFlag flag);
 	/**
+	 * @param flag
+	 * @param value
+	 * @return
+	 */
+	public ConnectionSpec setSocketFlag(ConnectionSpec.SocketFlag flag, Boolean value);
+	/**
 	 * @param property
 	 * @return the specified socket property used for the connection.
 	 * @see SocketFlag
 	 */
 	public Integer getSocketProperty (ConnectionSpec.SocketProperty property);
+	/**
+	 * @param property
+	 * @param value
+	 * @return
+	 */
+	public ConnectionSpec setSocketProperty(ConnectionSpec.SocketProperty property, Integer value);
 
 	/**
 	 * @return
 	 */
 	public int	getReconnectCnt ();
+	/**
+	 * @param cnt
+	 * @return
+	 */
+	public ConnectionSpec setReconnectCnt(int cnt);
 
 	// ------------------------------------------------------------------------
 	// Associated (inner) types
@@ -264,30 +303,35 @@ public interface ConnectionSpec {
 		// Property Setters
 		// ------------------------------------------------------------------------
 		/**  @param address the address to set */
+		@Override
         public ConnectionSpec setAddress (InetAddress address) {
         	this.address = address;
         	return this;
         }
 
 		/**  @param port the port to set */
+        @Override
         public ConnectionSpec setPort (int port) {
         	this.port = port;
         	return this;
         }
 
 		/**  @param credentials the credentials to set */
+        @Override
         public ConnectionSpec setCredentials (byte[] credentials) {
         	this.credentials = credentials;
         	return this;
         }
 
 		/**  @param database the database to set */
+        @Override
         public ConnectionSpec setDatabase (int database) {
         	this.database = database;
         	return this;
         }
 
 		/**  @param reconnectCnt the reconnectCnt to set */
+        @Override
         public ConnectionSpec setReconnectCnt (int reconnectCnt) {
         	this.reconnectCnt = reconnectCnt;
         	return this;
@@ -299,6 +343,7 @@ public interface ConnectionSpec {
 		 * @param value
 		 * @return {@link ConnectionSpec} this
 		 */
+        @Override
 		public ConnectionSpec setSocketFlag(SocketFlag flag, Boolean value){
 			socketFlags.put(flag, value);
 			return this;
@@ -309,6 +354,7 @@ public interface ConnectionSpec {
 		 * @param value
 		 * @return the previous value (if any).  Null if none existed, per {@link Map#put(Object, Object)} semantics.
 		 */
+        @Override
 		public ConnectionSpec setSocketProperty(SocketProperty property, Integer value){
 			socketProperties.put(property, value);
 			return this;
