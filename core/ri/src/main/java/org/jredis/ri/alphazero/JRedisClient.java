@@ -16,6 +16,8 @@
 
 package org.jredis.ri.alphazero;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import org.jredis.ClientRuntimeException;
 import org.jredis.Command;
 import org.jredis.JRedis;
@@ -26,6 +28,7 @@ import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.Protocol;
 import org.jredis.connector.Response;
+import org.jredis.ri.alphazero.connection.SynchConnection;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
 
@@ -144,7 +147,8 @@ public class JRedisClient extends SynchJRedisBase  {
 	public JRedisClient (String host, int port, String password, int database) 
 	throws ClientRuntimeException
 	{
-		this(host, port, (null != password ? password.getBytes() : null), database, RedisVersion.current_revision);
+//		this(host, port, (null != password ? password.getBytes() : null), database, RedisVersion.current_revision);
+		this(host, port, getCredentialBytes(password), database, RedisVersion.current_revision);
 	}
 
 	/**
@@ -233,4 +237,41 @@ public class JRedisClient extends SynchJRedisBase  {
 	public JRedis getInterface() {
 		return this;
 	}
+	// ------------------------------------------------------------------------
+	// Static Utils
+	// ------------------------------------------------------------------------
+	/**
+	 * Internal use only - 
+	 * @param password
+	 * @return the bytes of password or null if none spec'd
+	 */
+	private static byte[] getCredentialBytes (String password){
+		return (null != password ? password.getBytes() : null);
+	}
+	
+	/**
+	 * @return the {@link ConnectionSpec} used by default by this {@link JRedisClient}
+	 */
+	ConnectionSpec getDefaultConnectionSpec () {
+        ConnectionSpec defaultConnectionSpec = null;
+		try {
+			defaultConnectionSpec = getDefaultConnectionSpec("localhost", 6379, null, 0);
+        }
+        catch (UnknownHostException e) {
+	        e.printStackTrace(); // since when is localhost unknown?  never ..
+        }
+        return defaultConnectionSpec;
+	}
+    /**
+     * @param host redis server host name 
+     * @param port redis server port
+     * @param password for the Redis server per redis.conf
+     * @param database the selected databse
+	 * @return the {@link ConnectionSpec} used by default by this {@link JRedisClient} for the given params.
+     * @throws UnknownHostException
+     */
+    private ConnectionSpec getDefaultConnectionSpec (String host, int port, String password, int database) throws UnknownHostException {
+    	InetAddress address = InetAddress.getByName(host);
+	    return SynchConnection.getDefaultConnectionSpec(address, port, database, getCredentialBytes(password));
+    }
 }
