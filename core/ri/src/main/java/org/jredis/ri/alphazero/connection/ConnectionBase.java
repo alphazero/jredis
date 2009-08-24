@@ -367,6 +367,8 @@ public abstract class ConnectionBase implements Connection {
 	// ================================================ Default ConnectionSpec
 	// ------------------------------------------------------------------------
 	
+	// TODO: refactor to extend a ConnectionSpec.ReflImpl
+	
 	/**
 	 * Default connection spec provides the following default values for a connection.  See
 	 * {@link ConnectionSpec} for details of these properties and flags.

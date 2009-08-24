@@ -18,6 +18,8 @@ package org.jredis.connector;
 
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import org.jredis.Command;
 
 
@@ -156,5 +158,121 @@ public interface ConnectionSpec {
 //	 * of no effect.
 //	 */
 //	public Map<SocketProperty, Integer> getSocketProperties();
-	
+	// ------------------------------------------------------------------------
+	// Reference Implementation 
+	// ------------------------------------------------------------------------
+
+	/**
+	 * [TODO: document me!]
+	 *
+	 * @author  Joubin Houshyar (alphazero@sensesay.net)
+	 * @version alpha.0, Aug 23, 2009
+	 * @since   alpha.0
+	 * 
+	 */
+	public static class RefImpl implements ConnectionSpec {
+
+		// ------------------------------------------------------------------------
+		// Attrs
+		// ------------------------------------------------------------------------
+		/** redis server address */
+		InetAddress  	address;
+		/** redis server port */
+		int			port;
+		/** authorization password */
+		byte[]		credentials;
+		/** selected database */
+		int			database;
+		
+		/** retry count for reconnects */
+		int 	reconnectCnt;
+		
+		Map<SocketFlag, Boolean> socketFlags = new HashMap<SocketFlag, Boolean>();
+		
+		Map<SocketProperty, Integer> socketProperties = new HashMap<SocketProperty, Integer>();
+		
+		// ------------------------------------------------------------------------
+		// Constructor(s)
+		// ------------------------------------------------------------------------
+		
+		// ------------------------------------------------------------------------
+		// Interface
+		// ------------------------------------------------------------------------
+		@Override
+		public InetAddress getAddress () {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.jredis.connector.ConnectionSpec#getCredentials()
+		 */
+		@Override
+		public byte[] getCredentials () {
+			// TODO Auto-generated method stub
+			return credentials;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.jredis.connector.ConnectionSpec#getDatabase()
+		 */
+		@Override
+		public int getDatabase () {
+			// TODO Auto-generated method stub
+			return database;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.jredis.connector.ConnectionSpec#getPort()
+		 */
+		@Override
+		public int getPort () {
+			// TODO Auto-generated method stub
+			return port;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.jredis.connector.ConnectionSpec#getReconnectCnt()
+		 */
+		@Override
+		public int getReconnectCnt () {
+			// TODO Auto-generated method stub
+			return this.reconnectCnt;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.jredis.connector.ConnectionSpec#getSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag)
+		 */
+		@Override
+		public boolean getSocketFlag (SocketFlag flag) {
+			return socketFlags.get(flag);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.jredis.connector.ConnectionSpec#getSocketProperty(org.jredis.connector.ConnectionSpec.SocketProperty)
+		 */
+		@Override
+		public Integer getSocketProperty (SocketProperty property) {
+			return socketProperties.get(property);
+		}
+		
+		/**
+		 * Set the {@link SocketFlag} for the {@link ConnectionSpec}
+		 * @param flag
+		 * @param value
+		 * @return the previous value (if any).  Null if none existed, per {@link Map#put(Object, Object)} semantics.
+		 */
+		public Boolean setSocketFlag(SocketFlag flag, Boolean value){
+			return socketFlags.put(flag, value);
+		}
+		/**
+		 * Set the {@link SocketProperty} for the {@link ConnectionSpec}.
+		 * @param property
+		 * @param value
+		 * @return the previous value (if any).  Null if none existed, per {@link Map#put(Object, Object)} semantics.
+		 */
+		public Integer setSocketProperty(SocketProperty property, Integer value){
+			return socketProperties.put(property, value);
+		}
+	}
 }
