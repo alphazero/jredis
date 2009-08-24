@@ -252,7 +252,7 @@ public class JRedisClient extends SynchJRedisBase  {
 	/**
 	 * @return the {@link ConnectionSpec} used by default by this {@link JRedisClient}
 	 */
-	public ConnectionSpec getDefaultConnectionSpec () {
+	public static ConnectionSpec getDefaultConnectionSpec () {
         ConnectionSpec defaultConnectionSpec = null;
 		try {
 			defaultConnectionSpec = getDefaultConnectionSpec("localhost", 6379, null, 0);
@@ -270,7 +270,7 @@ public class JRedisClient extends SynchJRedisBase  {
 	 * @return the {@link ConnectionSpec} used by default by this {@link JRedisClient} for the given params.
      * @throws UnknownHostException
      */
-    public ConnectionSpec getDefaultConnectionSpec (String host, int port, String password, int database) throws UnknownHostException {
+    public static ConnectionSpec getDefaultConnectionSpec (String host, int port, String password, int database) throws UnknownHostException {
     	InetAddress address = InetAddress.getByName(host);
 	    return SynchConnection.getDefaultConnectionSpec(address, port, database, getCredentialBytes(password));
     }
