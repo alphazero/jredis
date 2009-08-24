@@ -27,26 +27,4 @@ public class GZipCompressedStringCodec extends DefaultStringCodec {
     public byte[] encode (String value) {
         return compress(super.encode(value));
     }
-    
-//    // ------------------------------------------------------------------------
-//    // Test nazis be damned -- here's the test of the GZip methods.
-//    // ------------------------------------------------------------------------
-//    
-//    /**
-//     * TODO: TestNG this thing.
-//     * Test it.
-//     * @param args
-//     */
-//    public static final void main (String [] args){
-//    	int cnt = 1000;
-//    	int size = 1024 * 24;
-//    	for(int i=0; i<cnt; i++){
-//    		String randomString = Util.getRandomString(size);
-//    		byte[] stringBytes = randomString.getBytes(DEFAULT_CHARSET);
-//    		byte[] compressed = compress(stringBytes);
-//    		byte[] decompressed = decompress(compressed);
-//    		Assert.assertEquals(decompressed, stringBytes);
-//    	}
-//    	Log.log("GZIP Compression tests a OK!");
-//    }
 }
