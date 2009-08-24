@@ -165,7 +165,7 @@ public interface ConnectionSpec {
 	/**
 	 * [TODO: document me!]
 	 *
-	 * @author  Joubin Houshyar (alphazero@sensesay.net)
+	 * @author  joubin (alphazero@sensesay.net)
 	 * @version alpha.0, Aug 23, 2009
 	 * @since   alpha.0
 	 * 
@@ -177,18 +177,22 @@ public interface ConnectionSpec {
 		// ------------------------------------------------------------------------
 		/** redis server address */
 		InetAddress  	address;
-		/** redis server port */
+        /** redis server port */
 		int			port;
+
 		/** authorization password */
 		byte[]		credentials;
+
 		/** selected database */
 		int			database;
 		
 		/** retry count for reconnects */
 		int 	reconnectCnt;
 		
+		/** {@link Map} of the {@link SocketFlag}s of the {@link ConnectionSpec} */
 		Map<SocketFlag, Boolean> socketFlags = new HashMap<SocketFlag, Boolean>();
 		
+		/** {@link Map} of the {@link SocketProperty}s of the {@link ConnectionSpec} */
 		Map<SocketProperty, Integer> socketProperties = new HashMap<SocketProperty, Integer>();
 		
 		// ------------------------------------------------------------------------
@@ -256,6 +260,34 @@ public interface ConnectionSpec {
 			return socketProperties.get(property);
 		}
 		
+		// ------------------------------------------------------------------------
+		// Property Setters
+		// ------------------------------------------------------------------------
+		/**  @param address the address to set */
+        public void setAddress (InetAddress address) {
+        	this.address = address;
+        }
+
+		/**  @param port the port to set */
+        public void setPort (int port) {
+        	this.port = port;
+        }
+
+		/**  @param credentials the credentials to set */
+        public void setCredentials (byte[] credentials) {
+        	this.credentials = credentials;
+        }
+
+		/**  @param database the database to set */
+        public void setDatabase (int database) {
+        	this.database = database;
+        }
+
+		/**  @param reconnectCnt the reconnectCnt to set */
+        public void setReconnectCnt (int reconnectCnt) {
+        	this.reconnectCnt = reconnectCnt;
+        }
+
 		/**
 		 * Set the {@link SocketFlag} for the {@link ConnectionSpec}
 		 * @param flag
