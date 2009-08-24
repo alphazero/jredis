@@ -264,38 +264,44 @@ public interface ConnectionSpec {
 		// Property Setters
 		// ------------------------------------------------------------------------
 		/**  @param address the address to set */
-        public void setAddress (InetAddress address) {
+        public ConnectionSpec setAddress (InetAddress address) {
         	this.address = address;
+        	return this;
         }
 
 		/**  @param port the port to set */
-        public void setPort (int port) {
+        public ConnectionSpec setPort (int port) {
         	this.port = port;
+        	return this;
         }
 
 		/**  @param credentials the credentials to set */
-        public void setCredentials (byte[] credentials) {
+        public ConnectionSpec setCredentials (byte[] credentials) {
         	this.credentials = credentials;
+        	return this;
         }
 
 		/**  @param database the database to set */
-        public void setDatabase (int database) {
+        public ConnectionSpec setDatabase (int database) {
         	this.database = database;
+        	return this;
         }
 
 		/**  @param reconnectCnt the reconnectCnt to set */
-        public void setReconnectCnt (int reconnectCnt) {
+        public ConnectionSpec setReconnectCnt (int reconnectCnt) {
         	this.reconnectCnt = reconnectCnt;
+        	return this;
         }
 
 		/**
 		 * Set the {@link SocketFlag} for the {@link ConnectionSpec}
 		 * @param flag
 		 * @param value
-		 * @return the previous value (if any).  Null if none existed, per {@link Map#put(Object, Object)} semantics.
+		 * @return {@link ConnectionSpec} this
 		 */
-		public Boolean setSocketFlag(SocketFlag flag, Boolean value){
-			return socketFlags.put(flag, value);
+		public ConnectionSpec setSocketFlag(SocketFlag flag, Boolean value){
+			socketFlags.put(flag, value);
+			return this;
 		}
 		/**
 		 * Set the {@link SocketProperty} for the {@link ConnectionSpec}.
@@ -303,8 +309,9 @@ public interface ConnectionSpec {
 		 * @param value
 		 * @return the previous value (if any).  Null if none existed, per {@link Map#put(Object, Object)} semantics.
 		 */
-		public Integer setSocketProperty(SocketProperty property, Integer value){
-			return socketProperties.put(property, value);
+		public ConnectionSpec setSocketProperty(SocketProperty property, Integer value){
+			socketProperties.put(property, value);
+			return this;
 		}
 	}
 }
