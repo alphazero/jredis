@@ -372,54 +372,152 @@ public abstract class ConnectionBase implements Connection {
 	/**
 	 * Default connection spec provides the following default values for a connection.  See
 	 * {@link ConnectionSpec} for details of these properties and flags.
-	 *   
-	 * (You may extend the appropriate methods with your own sub=classes to provide different values. 
 	 * <p>
-	 * <b>Flags:</b>
-	 * <ul>SO_KEEP_ALIVE: true
-	 * <li>
-	 * </ul>
-	 *
-	 * <b>Properties:</b>
-	 * <ul>
-	 * <li>Timeout: 5000 (<i><b>Remember</b>: only affects blocked reads -- blocked socket writes never timeout ..</i>)
-	 * <li>Connection: 0
-	 * <li>Latency: 1
-	 * <li>Bandwidth: 2
-	 * <li>Receive buffer size: 2048
-	 * <li>Send buffer size: 2048
-	 * </ul>
-	 *
+	 * This {@link ConnectionSpec} is configured to prefer bandwidth and relatively large (48K)
+	 * buffers (which is probably less than your OS's default buffer sizes anyway, but you never know).
+	 * <p>
+	 * Connection Retry limit is {@link DefaultConnectionSpec#DEFAULT_RECONNECT_CNT}.
+	 * <p>
+	 * Connection is spec'd for Keep Alive.
+	 * <p>
+	 * Socket timeout is {@link DefaultConnectionSpec#DEFAULT_READ_TIMEOUT_MSEC}
+	 * <p>
+	 * No codecs and/or compression classes are defined.
+	 *   
 	 * @author  Joubin Houshyar (alphazero@sensesay.net)
 	 * @version alpha.0, Apr 20, 2009
 	 * @since   alpha.0
 	 * 
 	 */
-	public static class DefaultConnectionSpec implements ConnectionSpec {
-
+//	public static class DefaultConnectionSpec implements ConnectionSpec {
+//
+//		// ------------------------------------------------------------------------
+//		// Consts
+//		// ------------------------------------------------------------------------
+//		/**  */
+//		private static final int DEFAULT_RECONNECT_CNT = 3;
+//		/**  */
+//		private static final int DEFAULT_RCV_BUFF_SIZE = 1024 * 48;
+//		/**  */
+//		private static final int DEFAULT_SND_BUFF_SIZE = 1024 * 48;
+//		/**  */
+//		private static final int DEFAULT_READ_TIMEOUT_MSEC = 5000;
+//		
+//		// ------------------------------------------------------------------------
+//		// Attrs
+//		// ------------------------------------------------------------------------
+//		/**  */
+//		final InetAddress  	address;
+//		/**  */
+//		final int			port;
+//		/** */
+//		final byte[]		credentials;
+//		/** */
+//		final int			database;
+//		
+//		
+//		// ------------------------------------------------------------------------
+//		// Constructors
+//		// ------------------------------------------------------------------------
+//		/**
+//		 * Instantiates a default connection spec for the given host and port.
+//		 * @param address
+//		 * @param port
+//		 * @throws ClientRuntimeException for invalid port, or null address values
+//		 */
+//		public DefaultConnectionSpec (InetAddress address, int port) throws ClientRuntimeException {
+//			this (address, port, 0, null);
+//		}
+//		
+//		/**
+//		 * Instantiates a default connection spec for the given host and port.
+//		 * @param address
+//		 * @param port
+//		 * @param database
+//		 * @param credentials
+//		 * @throws ClientRuntimeException for invalid port, or null address values
+//		 */
+//		public DefaultConnectionSpec (InetAddress address, int port, int database, byte[] credentials) throws ClientRuntimeException {
+//			this.port = Assert.inRange (port, 1, 65534, "port init parameter for DefaultConnectionSpec", ClientRuntimeException.class);
+//			this.address = Assert.notNull(address, "address init parameter for DefaultConnectionSpec", ClientRuntimeException.class);
+//			this.database = database;
+//			this.credentials = credentials;
+//		}
+//		
+//		// ------------------------------------------------------------------------
+//		// Interface
+//		//	====================================================== ConnectionSpec
+//		// ------------------------------------------------------------------------
+//		@Override
+//		public int getReconnectCnt() { return DEFAULT_RECONNECT_CNT; }
+//		@Override
+//		public InetAddress getAddress() { return address;}
+//
+//		@Override
+//		public int getPort() { return port;}
+//
+//		@Override
+//		public int getDatabase() { return database; }
+//		
+//		@Override
+//		public byte[] getCredentials () { return credentials; }
+//		
+//		@Override
+//		public boolean getSocketFlag(SocketFlag flag) {
+//			boolean value = false;
+//			switch (flag){
+//				case SO_KEEP_ALIVE:
+//					value = true;
+//					break;
+//			}
+//			return value;
+//		}
+//
+//		@Override
+//		public Integer getSocketProperty(SocketProperty property) {
+//			int value = 0;
+//			switch (property){
+//				case SO_PREF_BANDWIDTH:
+//					value = 1;
+//					break;
+//				case SO_PREF_CONN_TIME:
+//					value = 2;
+//					break;
+//				case SO_PREF_LATENCY:
+//					value = 0;
+//					break;
+//				case SO_RCVBUF:
+//					value = DEFAULT_RCV_BUFF_SIZE;
+//					break;
+//				case SO_SNDBUF:
+//					value = DEFAULT_SND_BUFF_SIZE;
+//					break;
+//				case SO_TIMEOUT:
+//					value = DEFAULT_READ_TIMEOUT_MSEC;
+//					break;
+//			}
+//			return value;
+//		}
+//	}
+	public static class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 		// ------------------------------------------------------------------------
 		// Consts
 		// ------------------------------------------------------------------------
-		/**  */
+		/** defaults to 3 */
 		private static final int DEFAULT_RECONNECT_CNT = 3;
-		/**  */
+		/** defautls to 48KB */
 		private static final int DEFAULT_RCV_BUFF_SIZE = 1024 * 48;
-		/**  */
+		/** defaults to 48KB */
 		private static final int DEFAULT_SND_BUFF_SIZE = 1024 * 48;
-		/**  */
+		/** defaults to 5000 msecs */
 		private static final int DEFAULT_READ_TIMEOUT_MSEC = 5000;
 		
-		// ------------------------------------------------------------------------
-		// Attrs
-		// ------------------------------------------------------------------------
-		/**  */
-		final InetAddress  	address;
-		/**  */
-		final int			port;
-		/** */
-		final byte[]		credentials;
-		/** */
-		final int			database;
+		/** higher priority pref is bandwidth */
+		private static final int DEFAULT_SO_PREF_BANDWIDTH = 0;
+		/** second priority pref is latency */
+		private static final int DEFAULT_SO_PREF_LATENCY = 1;
+		/** thrid priority pref is connection time */
+		private static final int DEFAULT_SO_PREF_CONN_TIME = 2;
 		
 		
 		// ------------------------------------------------------------------------
@@ -434,7 +532,6 @@ public abstract class ConnectionBase implements Connection {
 		public DefaultConnectionSpec (InetAddress address, int port) throws ClientRuntimeException {
 			this (address, port, 0, null);
 		}
-		
 		/**
 		 * Instantiates a default connection spec for the given host and port.
 		 * @param address
@@ -444,65 +541,32 @@ public abstract class ConnectionBase implements Connection {
 		 * @throws ClientRuntimeException for invalid port, or null address values
 		 */
 		public DefaultConnectionSpec (InetAddress address, int port, int database, byte[] credentials) throws ClientRuntimeException {
-			this.port = Assert.inRange (port, 1, 65534, "port init parameter for DefaultConnectionSpec", ClientRuntimeException.class);
-			this.address = Assert.notNull(address, "address init parameter for DefaultConnectionSpec", ClientRuntimeException.class);
-			this.database = database;
-			this.credentials = credentials;
+			setPort(Assert.inRange (port, 1, 65534, "port init parameter for DefaultConnectionSpec", ClientRuntimeException.class));
+			setAddress(Assert.notNull(address, "address init parameter for DefaultConnectionSpec", ClientRuntimeException.class));
+			setDatabase(database);
+			setCredentials(credentials);
+			
+			setDefaultProperties();
 		}
-		
-		// ------------------------------------------------------------------------
-		// Interface
-		//	====================================================== ConnectionSpec
-		// ------------------------------------------------------------------------
-		@Override
-		public int getReconnectCnt() { return DEFAULT_RECONNECT_CNT; }
-		@Override
-		public InetAddress getAddress() { return address;}
-
-		@Override
-		public int getPort() { return port;}
-
-		@Override
-		public int getDatabase() { return database; }
-		
-		@Override
-		public byte[] getCredentials () { return credentials; }
-		
-		@Override
-		public boolean getSocketFlag(SocketFlag flag) {
-			boolean value = false;
-			switch (flag){
-				case SO_KEEP_ALIVE:
-					value = true;
-					break;
-			}
-			return value;
-		}
-
-		@Override
-		public Integer getSocketProperty(SocketProperty property) {
-			int value = 0;
-			switch (property){
-				case SO_PREF_BANDWIDTH:
-					value = 1;
-					break;
-				case SO_PREF_CONN_TIME:
-					value = 2;
-					break;
-				case SO_PREF_LATENCY:
-					value = 0;
-					break;
-				case SO_RCVBUF:
-					value = DEFAULT_RCV_BUFF_SIZE;
-					break;
-				case SO_SNDBUF:
-					value = DEFAULT_SND_BUFF_SIZE;
-					break;
-				case SO_TIMEOUT:
-					value = DEFAULT_READ_TIMEOUT_MSEC;
-					break;
-			}
-			return value;
-		}
+		/**
+         * Set the default values for the {@link SocketFlag}s and {@link SocketProperty}s and various
+         * other properties.
+         * @See {@link ConnectionSpec}
+         */
+        private void setDefaultProperties () {
+        	// reconnect try count
+        	setReconnectCnt(DEFAULT_RECONNECT_CNT);
+        	
+        	//  tcp socket flags
+        	setSocketFlag(SO_KEEP_ALIVE, true);
+        	
+        	// tcp socket flags
+        	setSocketProperty(SO_TIMEOUT, DEFAULT_READ_TIMEOUT_MSEC);
+        	setSocketProperty(SO_RCVBUF, DEFAULT_RCV_BUFF_SIZE);
+        	setSocketProperty(SO_SNDBUF, DEFAULT_SND_BUFF_SIZE);
+        	setSocketProperty(SO_PREF_BANDWIDTH, DEFAULT_SO_PREF_BANDWIDTH);
+        	setSocketProperty(SO_PREF_CONN_TIME, DEFAULT_SO_PREF_CONN_TIME);
+        	setSocketProperty(SO_PREF_LATENCY, DEFAULT_SO_PREF_LATENCY);
+        }
 	}
 }
