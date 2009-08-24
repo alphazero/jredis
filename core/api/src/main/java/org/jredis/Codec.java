@@ -17,6 +17,7 @@
 package org.jredis;
 
 
+
 /**
  * Defines the necessary methods for a Java type encoder-decoder.  Implementations of this
  * interface can be registered with a {@link CodecManager} used by a {@link JRedis} implementation
@@ -30,7 +31,19 @@ package org.jredis;
  */
 
 public interface Codec <T>  {
+	/**
+	 * @param bytes
+	 * @return an instance of type <code>T</code> corresponding to the value of decoded <code>bytes</code>
+	 */
 	public T decode (byte[] bytes);
+	/**
+	 * @param object
+	 * @return
+	 */
 	public byte[] encode (T object);
+	/**
+	 * @param type
+	 * @return whether this codec supports the (en/de)coding of the type <code>T</code>
+	 */
 	public boolean supports (Class<?> type);
 }

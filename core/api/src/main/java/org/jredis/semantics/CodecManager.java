@@ -16,6 +16,7 @@
 
 package org.jredis.semantics;
 
+import org.jredis.Codec;
 import org.jredis.JRedis;
 
 /**

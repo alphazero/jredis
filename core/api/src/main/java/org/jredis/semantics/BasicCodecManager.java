@@ -17,6 +17,7 @@
 package org.jredis.semantics;
 
 import java.util.Map;
+import org.jredis.Codec;
 
 // REFACTOR: this doesn't belong here
 //

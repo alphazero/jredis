@@ -19,6 +19,8 @@
 
 package org.jredis.semantics;
 
+import org.jredis.Codec;
+
 /**
  * Encoding and decoding keys is a significant (but not major) performance bottleneck.   
  * <p>

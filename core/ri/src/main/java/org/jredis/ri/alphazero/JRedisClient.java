@@ -101,6 +101,7 @@ public class JRedisClient extends SynchJRedisBase  {
 		} 
 		catch (RedisException e) {
 			// TODO Auto-generated catch block
+			// TODO: stop printing the stack trace ...
 			e.printStackTrace();
 		}		
 		
