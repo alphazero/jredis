@@ -43,21 +43,9 @@ public class HelloAgain {
 
 	private void run(String password) {
 		try {
-			// use explicit constructor params for example
-			// but localhost:6379 is the default setting
-			// password is required only if your server is using authentication
-			// (check redis.conf)
-			// db select is also now required for the client.
 			JRedis	jredis = new JRedisClient("localhost", 6379, "jredis", 0);
 			jredis.ping();
 
-// deprecated: now we must specify the password and db on connect time.  
-// And no more select!
-//
-//			if(!password.equals("")) 
-//				jredis.auth(password);
-//
-//			jredis.ping().select(13);
 			jredis.ping();
 			
 			if(!jredis.exists(key)) {
