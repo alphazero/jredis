@@ -25,6 +25,7 @@ import org.jredis.Command;
 import org.jredis.JRedis;
 import org.jredis.RedisException;
 
+import static org.jredis.bench.Util.*;
 
 
 /**
@@ -41,24 +42,27 @@ public abstract class JRedisBenchmark {
 	// ------------------------------------------------------------------------
 	// Helper methods
 	// ------------------------------------------------------------------------
-	static protected String getRandomString (int size) {
-		StringBuilder builder = new  StringBuilder(size);
-		for(int i = 0; i<size; i++){
-			char c = (char) (random.nextInt(126-33) + 33);
-			builder.append(c);
-		}
-		return builder.toString();
-	}
-	static protected byte[] getRandomBytes(int size) {
-		int len = size;
-		byte[]	bigstuff = new byte[len];
-		random.nextBytes(bigstuff);
-		return bigstuff;
-	}
+//	static 
+//	public String getRandomString (int size) {
+//		StringBuilder builder = new  StringBuilder(size);
+//		for(int i = 0; i<size; i++){
+//			char c = (char) (random.nextInt(126-33) + 33);
+//			builder.append(c);
+//		}
+//		return builder.toString();
+//	}
+//	static 
+//	public byte[] getRandomBytes(int size) {
+//		int len = size;
+//		byte[]	bigstuff = new byte[len];
+//		random.nextBytes(bigstuff);
+//		return bigstuff;
+//	}
 	// ------------------------------------------------------------------------
 	// For test data 
 	// ------------------------------------------------------------------------
-	static Random random = null;
+	final static Random 		random = new Random(System.currentTimeMillis());
+	
 	/**  */
 	static byte[] 			fixedbytes = null;
 	/**  */
@@ -96,7 +100,7 @@ public abstract class JRedisBenchmark {
 	
 	protected final void  runBenchmarks(String host, int port, int connectionCnt, int reqCnt, int size, int db)
 	{
-		random = new Random(System.currentTimeMillis());
+//		random = new Random(System.currentTimeMillis());
 		
 		fixedbytes = new byte[size];
 		random.nextBytes(fixedbytes);
