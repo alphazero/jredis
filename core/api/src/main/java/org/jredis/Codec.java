@@ -14,9 +14,7 @@
  *   limitations under the License.
  */
 
-package org.jredis.semantics;
-
-import org.jredis.JRedis;
+package org.jredis;
 
 
 /**
@@ -25,7 +23,7 @@ import org.jredis.JRedis;
  * (whether per instance or by other relations per JRedis provider implementation), and used
  * during the encoding of an semantic java type into {@link byte[]} and back.  
  *
- * @author  Joubin Houshyar (alphazero@sensesay.net)
+ * @author  Joubin (alphazero@sensesay.net)
  * @version alpha.0, Apr 14, 2009
  * @since   alpha.0
  * 
