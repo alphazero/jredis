@@ -23,6 +23,7 @@ import org.jredis.ProviderException;
 import org.jredis.Redis;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
+import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.Protocol;
 import org.jredis.connector.Response;
 import org.jredis.ri.alphazero.support.Assert;
@@ -85,6 +86,22 @@ public class JRedisClient extends SynchJRedisBase  {
 	// Construct and initialize
 	// ------------------------------------------------------------------------
 
+	public JRedisClient (ConnectionSpec connectionSpec){
+		Connection synchConnection = createSynchConnection (connectionSpec, RedisVersion.current_revision);
+		setConnection (synchConnection);
+		
+		try {
+			if(null != connectionSpec.getCredentials())
+				this.serviceRequest(Command.AUTH, connectionSpec.getCredentials());
+			
+			this.serviceRequest(Command.SELECT, Convert.toBytes(connectionSpec.getDatabase()));
+		} 
+		catch (RedisException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		
+	}
 	/**
 	 * Connects to the localhost:6379 redis server using the password.
 	 * Will select db 0.

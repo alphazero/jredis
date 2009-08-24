@@ -24,6 +24,7 @@ import org.jredis.JRedis;
 import org.jredis.NotSupportedException;
 import org.jredis.ProviderException;
 import org.jredis.connector.Connection;
+import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.FaultedConnection;
 import org.jredis.resource.Context;
 import org.jredis.resource.Resource;
@@ -82,7 +83,30 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 		try {
 			
 			address = InetAddress.getByName(host);
-			synchConnection = new SynchConnection(address, port, database, credentials, redisVersion);
+			ConnectionSpec spec = SynchConnection.getDefaultConnectionSpec(address, port, database, credentials);
+			synchConnection = createSynchConnection(spec, redisVersion);
+			Assert.notNull(synchConnection, "connection delegate", ClientRuntimeException.class);
+		}
+		catch (UnknownHostException e) {
+			String msg = "Couldn't obtain InetAddress for "+host;
+			Log.problem (msg+"  => " + e.getLocalizedMessage());
+			throw new ClientRuntimeException(msg, e);
+		}
+		return synchConnection;
+	}
+	
+	/**
+	 * Creates a {@link Connection} with {@link Connection.Modality#Synchronous} semantics
+	 * suitable for use by synchronous (blocking) JRedis clients.
+	 *  
+	 * @param connectionSpec connection's specification
+	 * @param redisVersion redis protocol compliance
+	 * @return
+	 */
+	protected Connection createSynchConnection(ConnectionSpec connectionSpec, RedisVersion redisVersion){
+		Connection 		synchConnection = null;
+		try {
+			synchConnection = new SynchConnection(connectionSpec, redisVersion);
 			Assert.notNull(synchConnection, "connection delegate", ClientRuntimeException.class);
 		}
 		catch (NotSupportedException e) {
@@ -98,14 +122,8 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 			Log.error ("Error creating connection -> " + e.getLocalizedMessage());
 			setConnection(new FaultedConnection(msg));
 		}
-		catch (UnknownHostException e) {
-			String msg = "Couldn't obtain InetAddress for "+host;
-			Log.problem (msg+"  => " + e.getLocalizedMessage());
-			throw new ClientRuntimeException(msg, e);
-		}
 		return synchConnection;
 	}
-	
 	// ------------------------------------------------------------------------
 	// Interface
 	// =========================================================== Resource<T>

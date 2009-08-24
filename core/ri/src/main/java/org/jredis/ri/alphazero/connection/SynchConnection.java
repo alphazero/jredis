@@ -127,9 +127,34 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		) 
 		throws ClientRuntimeException, ProviderException 
 	{
-		this(new DefaultConnectionSpec(address, port, database, credentials), redisversion);
+//		this(new DefaultConnectionSpec(address, port, database, credentials), redisversion);
+		this(getDefaultConnectionSpec(address, port, database, credentials), redisversion);
 	}
 
+	// ------------------------------------------------------------------------
+	// Static methods
+	// ------------------------------------------------------------------------
+	/**
+	 * Returns an instance of the {@link ConnectionSpec} used by this {@link Connection}
+	 * as default spec, for the provided params.
+	 * @param address
+	 * @param port
+	 * @param database
+	 * @param credentials
+	 * @param redisversion
+	 * @return
+	 * @throws ClientRuntimeException
+	 */
+	public static final ConnectionSpec getDefaultConnectionSpec (
+			InetAddress 	address, 
+			int 			port, 
+			int 			database, 
+			byte[] 			credentials
+		) 
+		throws ClientRuntimeException 
+	{
+		return new DefaultConnectionSpec(address, port, database, credentials);
+	}
 	// ------------------------------------------------------------------------
 	// Interface
 	// ======================================================= ProtocolHandler
