@@ -41,28 +41,7 @@ public class Convert {
 
 	private static final int	MAX_POSITIVE_32_BIT_DIGITS	= 10;
 	private static final int	MAX_POSITIVE_64_BIT_DIGITS	= 19;
-//	private static final int	MAX_NEGATIVE_INT_REP_BUFFER_SIZE	= MAX_POSITIVE_INT_REP_BUFFER_SIZE + 1;
-	private static final long [] TEN_TO_POWER = {
-		1L,				
-		10L,				
-		100L,			
-		1000L,
-		10000L,
-		100000L,
-		1000000L,
-		10000000L,
-		100000000L,    
-		1000000000L,			// 10^9 for Integer.MAX_VALUE @ 214748364
-		10000000000L,
-		100000000000L,
-		1000000000000L,
-		10000000000000L,
-		100000000000000L,
-		1000000000000000L,
-		10000000000000000L,
-		100000000000000000L,
-		1000000000000000000L 	// 10^18 for Long.MAX_VALUE @ 9223372036854775807
-	};
+	
 	/**
 	 * A few hundred Ks/classloader  Speed things up considerably in the long run as far
 	 * as int to byte[] conversions are concerned.  
@@ -158,7 +137,7 @@ public class Convert {
 		for(int p = 0; p < digitCnt; p++){
 			byte b = buff[offset+p];
 			if(b < BYTE_ZERO || b > BYTE_NINE) throw new IllegalArgumentException("That's not a number!  byte value: " + b);
-			value += (b-BYTE_ZERO) * Convert.TEN_TO_POWER[digitCnt-p-1];
+			value = value*10 + b - BYTE_ZERO;
 		}
 		if(negative) value = 0 - value;
 		
@@ -196,7 +175,7 @@ public class Convert {
 		for(int p = 0; p < digitCnt; p++){
 			byte b = buff[offset+p];
 			if(b < BYTE_ZERO || b > BYTE_NINE) throw new IllegalArgumentException("That's not a number!  byte value: " + b);
-			value += (b-BYTE_ZERO) * Convert.TEN_TO_POWER[digitCnt-p-1];
+			value = value*10 + b - BYTE_ZERO;
 		}
 		if(negative) value = 0 - value;
 		
