@@ -331,7 +331,7 @@ public class SynchProtocol extends ProtocolBase {
 				throw new ProviderException ("Bug?  Expecting status code for size");
 			}
 			status = ResponseStatus.STATUS_OK;
-			return Convert.getInt (buffer, 1, offset-3);
+			return Convert.toInt (buffer, 1, offset-3);
 		}
 		/**
 		 * Will read up expected bulkdata bytes from the input stream.  Routine will
@@ -603,7 +603,7 @@ public class SynchProtocol extends ProtocolBase {
 					booleanValue = buffer[1]==49?true:false;
 					break;
 				case NUMBER64:
-					longValue = Convert.getLong (buffer, 1, offset-3);
+					longValue = Convert.toLong (buffer, 1, offset-3);
 					break;
 				case STATUS:
 					break;

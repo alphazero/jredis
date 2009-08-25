@@ -117,7 +117,7 @@ public class Convert {
 	 * @return
 	 * @throw IllegalArgumentException if buffer contains anything other than values 48 to 57
 	 */
-	public static final int getInt(byte[] potentiallySignedAsciiBytes, int offset, int len) throws IllegalArgumentException
+	public static final int toInt(byte[] potentiallySignedAsciiBytes, int offset, int len) throws IllegalArgumentException
 	{
 		byte[] buff = potentiallySignedAsciiBytes; // lets use a sensible name ;)
 		if(null == buff) throw new IllegalArgumentException ("Null input");
@@ -146,7 +146,7 @@ public class Convert {
 	}
 	
 	/**
-	 * Its just like (really! :) {@link Convert#getInt(byte[], int, int)} but for {@link Long} values.  Max number of digits 
+	 * Its just like (really! :) {@link Convert#toInt(byte[], int, int)} but for {@link Long} values.  Max number of digits 
 	 * is now {@link Convert#MAX_POSITIVE_64_BIT_DIGITS}.  
 	 * 
 	 * @param potentiallySignedAsciiBytes
@@ -155,7 +155,7 @@ public class Convert {
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
-	public static final long getLong(byte[] potentiallySignedAsciiBytes, int offset, int len) throws IllegalArgumentException
+	public static final long toLong(byte[] potentiallySignedAsciiBytes, int offset, int len) throws IllegalArgumentException
 	{
 		byte[] buff = potentiallySignedAsciiBytes; // lets use a sensible name ;)
 		if(null == buff) throw new IllegalArgumentException ("Null input");
@@ -188,10 +188,10 @@ public class Convert {
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
-	public static final int getInt(byte[] potentiallySignedBytes) throws IllegalArgumentException
+	public static final int toInt(byte[] potentiallySignedBytes) throws IllegalArgumentException
 	{
 		if(null == potentiallySignedBytes) throw new IllegalArgumentException ("null input");
-		return getInt(potentiallySignedBytes, 0, potentiallySignedBytes.length);
+		return toInt(potentiallySignedBytes, 0, potentiallySignedBytes.length);
 	}
 	
 	/**
@@ -199,10 +199,10 @@ public class Convert {
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
-	public static final long getLong(byte[] potentiallySignedBytes) throws IllegalArgumentException
+	public static final long toLong(byte[] potentiallySignedBytes) throws IllegalArgumentException
 	{
 		if(null == potentiallySignedBytes) throw new IllegalArgumentException ("null input");
-		return getLong(potentiallySignedBytes, 0, potentiallySignedBytes.length);
+		return toLong(potentiallySignedBytes, 0, potentiallySignedBytes.length);
 	}
 	
 	// ------------------------------------------------------------------------
