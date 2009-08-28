@@ -339,6 +339,9 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		try {
 			jredis.flushdb();
 			
+			jredis.set(keys.get(keys.size()-1), emptyBytes);
+			assertEquals(jredis.get(keys.get(keys.size()-1)), emptyBytes, "set and get results for empty byte[]");
+			
 			jredis.set(keys.get(0), dataList.get(0));
 			assertEquals(dataList.get(0), jredis.get(keys.get(0)), "data and get results");
 			
@@ -358,6 +361,9 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 		Log.log("TEST: %s command", test);
 		try {
 			jredis.flushdb();
+			
+			jredis.set(keys.get(keys.size()-1), emptyString);
+			assertEquals(toStr(jredis.get(keys.get(keys.size()-1))), emptyString, "set and get results for empty String");
 			
 			jredis.set(keys.get(0), stringList.get(0));
 			assertEquals(stringList.get(0), toStr(jredis.get(keys.get(0))), "string and get results");
@@ -2194,6 +2200,8 @@ public abstract class JRedisProviderTestNGBase extends JRedisTestSuiteNGBase{
 	protected final Random random = new Random(System.currentTimeMillis());
 	
 	// we'll uses these for values 
+	protected final byte[]			emptyBytes = new byte[0];
+	protected final String			emptyString = "";
 	protected final List<byte[]>	dataList = new ArrayList<byte[]>();
 	protected final List<TestBean>	objectList = new ArrayList<TestBean>();
 	protected final List<String>	stringList = new ArrayList<String>();

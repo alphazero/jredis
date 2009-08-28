@@ -494,7 +494,7 @@ public class SynchProtocol extends ProtocolBase {
 				return;
 			}
 			
-			if(size > 0){
+			if(size >= 0){
 				try {
 					data = super.readBulkData(in, size);
 				}
@@ -508,7 +508,7 @@ public class SynchProtocol extends ProtocolBase {
 					throw new ProviderException ("Bug: reading the bulk data bytes.  expecting " + size + " bytes.", bug);
 				}
 			}
-			else if(size == 0) data = new byte[0];
+//			else if(size == 0) data = new byte[0];
 			didRead = true;
 			return;
 		}
