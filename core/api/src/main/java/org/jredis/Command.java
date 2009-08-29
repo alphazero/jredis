@@ -16,6 +16,12 @@
 
 package org.jredis;
 
+import org.jredis.connector.BulkResponse;
+import org.jredis.connector.MultiBulkResponse;
+import org.jredis.connector.Response;
+import org.jredis.connector.StatusResponse;
+import org.jredis.connector.ValueResponse;
+
 
 
 /**
@@ -32,44 +38,124 @@ package org.jredis;
 public enum Command {
 	
 	// security
-	AUTH,
+	AUTH 		(RequestType.KEY, 			ResponseType.STATUS),
 	
 	// connection handling
-	PING, QUIT, 
+	PING 		(RequestType.NO_ARG, 		ResponseType.STATUS), 
+	QUIT 		(RequestType.NO_ARG, 		ResponseType.VIRTUAL), 
 
 	// String values operations
-	SET, GET, GETSET, MGET, SETNX, INCR, INCRBY,  DECR , DECRBY, EXISTS , DEL, TYPE ,
+	SET 		(RequestType.KEY_VALUE, 	ResponseType.STATUS), 
+	GET 		(RequestType.KEY, 			ResponseType.BULK), 
+	GETSET		(RequestType.KEY_VALUE, 	ResponseType.BULK), 
+	MGET		(RequestType.MULTI_KEY, 	ResponseType.MULTI_BULK), 
+	SETNX		(RequestType.KEY_VALUE, 	ResponseType.BOOLEAN),
+	INCR		(RequestType.KEY, 			ResponseType.NUMBER), 
+	INCRBY		(RequestType.KEY_NUM,		ResponseType.NUMBER),  
+	DECR		(RequestType.KEY, 			ResponseType.NUMBER), 
+	DECRBY		(RequestType.KEY_NUM,		ResponseType.NUMBER),  
+	EXISTS		(RequestType.KEY, 			ResponseType.BOOLEAN), 
+	DEL			(RequestType.KEY, 			ResponseType.BOOLEAN), 
+	TYPE		(RequestType.KEY, 			ResponseType.STRING),
 
 	// "Commands operating on the key space"
-	KEYS, RANDOMKEY, RENAME, RENAMENX, DBSIZE, EXPIRE, TTL,
+	KEYS		(RequestType.KEY, 			ResponseType.BULK), 
+	RANDOMKEY	(RequestType.NO_ARG,		ResponseType.STRING),
+	RENAME		(RequestType.KEY_KEY, 		ResponseType.STATUS), 
+	RENAMENX	(RequestType.KEY_KEY, 		ResponseType.BOOLEAN), 
+	DBSIZE		(RequestType.NO_ARG,		ResponseType.NUMBER),
+	EXPIRE		(RequestType.KEY_NUM,		ResponseType.BOOLEAN), 
+	TTL			(RequestType.KEY,			ResponseType.NUMBER),
 	
 	// keys operating on lists
-	RPUSH, LPUSH, LLEN, LRANGE, LTRIM, LINDEX, LSET, LREM, LPOP, RPOP,
+	RPUSH		(RequestType.KEY_VALUE,		ResponseType.STATUS), 
+	LPUSH		(RequestType.KEY_VALUE,		ResponseType.STATUS),
+	LLEN		(RequestType.KEY,			ResponseType.NUMBER), 
+	LRANGE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK), 
+	LTRIM		(RequestType.KEY_NUM_NUM,	ResponseType.STATUS),
+	LINDEX		(RequestType.KEY_NUM,		ResponseType.BULK), 
+	LSET		(RequestType.KEY_IDX_VALUE,	ResponseType.STATUS), 
+	LREM		(RequestType.KEY_CNT_VALUE,	ResponseType.NUMBER),
+	LPOP		(RequestType.KEY,			ResponseType.BULK), 
+	RPOP		(RequestType.KEY,			ResponseType.BULK),
 	
 	// keys operating on sets
-	SADD, SREM, SCARD, SISMEMBER, SINTER, SINTERSTORE, SUNION, SUNIONSTORE, SDIFF, SDIFFSTORE, SMEMBERS, SMOVE,
+	SADD		(RequestType.KEY_VALUE,		ResponseType.BOOLEAN), 
+	SREM		(RequestType.KEY_VALUE,		ResponseType.BOOLEAN), 
+	SCARD		(RequestType.KEY,			ResponseType.NUMBER), 
+	SISMEMBER	(RequestType.KEY_VALUE,		ResponseType.BOOLEAN), 
+	SINTER		(RequestType.MULTI_KEY,		ResponseType.MULTI_BULK), 
+	SINTERSTORE (RequestType.MULTI_KEY,		ResponseType.STATUS),
+	SUNION		(RequestType.MULTI_KEY,		ResponseType.MULTI_BULK), 
+	SUNIONSTORE (RequestType.MULTI_KEY,		ResponseType.STATUS), 
+	SDIFF		(RequestType.MULTI_KEY,		ResponseType.MULTI_BULK), 
+	SDIFFSTORE  (RequestType.MULTI_KEY,		ResponseType.STATUS),
+	SMEMBERS	(RequestType.KEY,			ResponseType.MULTI_BULK), 
+	SMOVE		(RequestType.KEY_KEY_VALUE,	ResponseType.BOOLEAN),
 	
 	// "Multiple databases handling commands"
-	SELECT, FLUSHDB, FLUSHALL, MOVE,
+	SELECT		(RequestType.KEY,			ResponseType.STATUS),
+	FLUSHDB		(RequestType.NO_ARG,		ResponseType.STATUS), 
+	FLUSHALL	(RequestType.NO_ARG,		ResponseType.STATUS),
+	MOVE		(RequestType.KEY_NUM,		ResponseType.BOOLEAN),
 	
 	// Sorting
-	SORT, 
+	SORT		(RequestType.KEY_SPEC,		ResponseType.MULTI_BULK),
 	
 	// Persistence control commands
-	SAVE, BGSAVE, LASTSAVE, SHUTDOWN,
+	SAVE		(RequestType.NO_ARG,		ResponseType.STATUS), 
+	BGSAVE		(RequestType.NO_ARG,		ResponseType.STATUS), 
+	LASTSAVE	(RequestType.NO_ARG,		ResponseType.NUMBER),
+	SHUTDOWN	(RequestType.NO_ARG, 		ResponseType.VIRTUAL),
 	
 	// Remote server control commands
-	INFO;
+	INFO		(RequestType.NO_ARG, 		ResponseType.BULK);
 	
 	/** semantic sugar */
 	public final String code;
 	public final byte[] bytes;
 	public final int length;
-	public final int arg_cnt;
-	Command () { 
+//	public final int arg_cnt;
+	public final RequestType requestType;
+	public final ResponseType responseType;
+	Command (RequestType reqType, ResponseType respType) { 
 		this.code = this.name(); 
 		this.bytes = code.getBytes();
 		this.length = code.length();
-		this.arg_cnt = -1; // to raise exception -- make sure we don't miss any
+		this.requestType = reqType;
+		this.responseType = respType;
+//		this.arg_cnt = -1; // to raise exception -- make sure we don't miss any
 	}
+	
+	/**
+	 * can't think of a rigorous way of naming these.
+	 * But at least we can number them, for now.
+	 */
+    public enum RequestType {
+    	NO_ARG,
+    	KEY,
+    	KEY_KEY,
+    	KEY_NUM,
+    	KEY_SPEC,
+    	KEY_NUM_NUM,
+    	KEY_VALUE,
+    	KEY_KEY_VALUE,
+    	KEY_IDX_VALUE,
+    	KEY_CNT_VALUE,
+    	MULTI_KEY
+    }
+
+    public enum ResponseType {
+    	VIRTUAL (StatusResponse.class),
+    	STATUS (StatusResponse.class),
+    	STRING (ValueResponse.class),
+    	BOOLEAN (ValueResponse.class),
+    	NUMBER (ValueResponse.class),
+    	BULK (BulkResponse.class),
+    	MULTI_BULK (MultiBulkResponse.class);
+    	public Class<? extends Response> respClass;
+    	ResponseType (Class<? extends Response> respClass){
+    		this.respClass = respClass;
+    	}
+    }
 }
