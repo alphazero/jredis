@@ -14,7 +14,10 @@
  *   limitations under the License.
  */
 
-package org.jredis.connector;
+package org.jredis.protocol;
+
+import org.jredis.ProviderException;
+import org.jredis._specification;
 
 
 /**
@@ -25,10 +28,12 @@ package org.jredis.connector;
  * @since   alpha.0
  * 
  */
-public interface BulkResponse extends Response {
+public final class CommandNotImplemented extends ProviderException {
+	/**  */
+	private static final long serialVersionUID = _specification.Version.major;
 	
 	/**
-	 * @return
+	 * @param command
 	 */
-	public byte[] getBulkData ();
+	public CommandNotImplemented (Command command) { super(command.code + " is not supported!");}
 }

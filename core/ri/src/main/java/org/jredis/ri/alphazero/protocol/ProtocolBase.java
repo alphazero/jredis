@@ -23,12 +23,12 @@ import java.io.OutputStream;
 import java.net.SocketException;
 
 import org.jredis.ClientRuntimeException;
-import org.jredis.Command;
-import org.jredis.connector.Protocol;
 import org.jredis.ProviderException;
-import org.jredis.connector.Request;
-import org.jredis.connector.Response;
-import org.jredis.connector.ResponseStatus;
+import org.jredis.protocol.Command;
+import org.jredis.protocol.Protocol;
+import org.jredis.protocol.Request;
+import org.jredis.protocol.Response;
+import org.jredis.protocol.ResponseStatus;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.Log;
@@ -37,7 +37,7 @@ import org.jredis.ri.alphazero.support.Log;
 /**
  * [TODO: document me!]
  *
- * @author  Joubin Houshyar (alphazero@sensesay.net)
+ * @author  Joubin (alphazero@sensesay.net)
  * @version alpha.0, Apr 10, 2009
  * @since   alpha.0
  * 

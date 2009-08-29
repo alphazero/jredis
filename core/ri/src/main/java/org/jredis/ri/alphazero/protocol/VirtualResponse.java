@@ -21,8 +21,8 @@ import java.io.OutputStream;
 
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
-import org.jredis.connector.Response;
-import org.jredis.connector.ResponseStatus;
+import org.jredis.protocol.Response;
+import org.jredis.protocol.ResponseStatus;
 
 
 

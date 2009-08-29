@@ -15,7 +15,9 @@
  */
 
 /**
- * Native Client Interface Specification.
+ * Native Client Interface Specification.  
+ * <br>
+ * This package depends on the Protocol package.
  * [TODO: document me!]
  * <p>
  * <i>This is an optional package.</i>

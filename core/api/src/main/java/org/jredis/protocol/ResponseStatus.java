@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package org.jredis.connector;
+package org.jredis.protocol;
 
 /**
  * [TODO: document me!]

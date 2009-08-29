@@ -14,9 +14,8 @@
  *   limitations under the License.
  */
 
-package org.jredis.connector;
+package org.jredis.protocol;
 
-import org.jredis.Command;
 
 /**
  * Formally, redis only returns "integers" as values, but in fact, an operation such as

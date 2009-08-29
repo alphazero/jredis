@@ -30,7 +30,7 @@ import java.util.List;
  * 
  * <p>For example, to get a {@link Sort} instance, {@link JRedis} api specifies the required argument,  
  * (namely the <i>the key</i>) in the method signature for {@link JRedis#sort(String)}, and all the optional
- * elements of the {@link Command#SORT} command are provided for in the {@link Sort} interface:
+ * elements of the SORT command are provided for in the {@link Sort} interface:
  * <p>
  * <pre><code>
  * Sort    sort = redis.sort (key)

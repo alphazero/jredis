@@ -33,11 +33,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.jredis.Command;
 import org.jredis.JRedis;
 import org.jredis.RedisException;
 import org.jredis.RedisInfo;
 import org.jredis.RedisType;
+import org.jredis.protocol.Command;
 import org.jredis.ri.JRedisTestSuiteNGBase;
 import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.Log;

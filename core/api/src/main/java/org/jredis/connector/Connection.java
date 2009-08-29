@@ -17,9 +17,11 @@
 package org.jredis.connector;
 
 import org.jredis.ClientRuntimeException;
-import org.jredis.Command;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
+import org.jredis.protocol.Command;
+import org.jredis.protocol.Protocol;
+import org.jredis.protocol.Response;
 
 public interface Connection {
 

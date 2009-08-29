@@ -14,11 +14,11 @@
  *   limitations under the License.
  */
 
-package org.jredis.connector;
+package org.jredis.protocol;
 
 import org.jredis.ClientRuntimeException;
-import org.jredis.Command;
 import org.jredis.ProviderException;
+import org.jredis.connector.Message;
 
 
 /**

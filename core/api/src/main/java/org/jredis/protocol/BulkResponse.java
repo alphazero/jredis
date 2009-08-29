@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package org.jredis.connector;
+package org.jredis.protocol;
 
 
 /**
@@ -25,4 +25,10 @@ package org.jredis.connector;
  * @since   alpha.0
  * 
  */
-public interface Request extends Message {}
+public interface BulkResponse extends Response {
+	
+	/**
+	 * @return
+	 */
+	public byte[] getBulkData ();
+}

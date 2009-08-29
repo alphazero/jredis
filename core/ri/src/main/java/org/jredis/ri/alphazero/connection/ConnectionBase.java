@@ -31,15 +31,15 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import org.jredis.ClientRuntimeException;
-import org.jredis.Command;
 import org.jredis.NotSupportedException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.Protocol;
 import org.jredis.connector.RequestListener;
-import org.jredis.connector.Response;
+import org.jredis.protocol.Command;
+import org.jredis.protocol.Protocol;
+import org.jredis.protocol.Response;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Log;
 

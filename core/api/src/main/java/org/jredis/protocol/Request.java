@@ -14,7 +14,9 @@
  *   limitations under the License.
  */
 
-package org.jredis;
+package org.jredis.protocol;
+
+import org.jredis.connector.Message;
 
 
 /**
@@ -25,12 +27,4 @@ package org.jredis;
  * @since   alpha.0
  * 
  */
-public final class CommandNotImplemented extends ProviderException {
-	/**  */
-	private static final long serialVersionUID = _specification.Version.major;
-	
-	/**
-	 * @param command
-	 */
-	public CommandNotImplemented (Command command) { super(command.code + " is not supported!");}
-}
+public interface Request extends Message {}

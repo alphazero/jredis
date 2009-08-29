@@ -17,10 +17,10 @@
 package org.jredis.examples;
 
 import org.jredis.ClientRuntimeException;
-import org.jredis.Command;
 import org.jredis.JRedis;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
+import org.jredis.protocol.Command;
 import org.jredis.ri.alphazero.JRedisClient;
 import static org.jredis.ri.alphazero.support.DefaultCodec.*;
 

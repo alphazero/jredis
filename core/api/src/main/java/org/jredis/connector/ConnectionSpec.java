@@ -20,7 +20,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
-import org.jredis.Command;
+import org.jredis.protocol.Command;
 
 
 /**

@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-import org.jredis.Command;
 import org.jredis.JRedis;
 import org.jredis.RedisException;
+import org.jredis.protocol.Command;
 
 import static org.jredis.bench.Util.*;
 

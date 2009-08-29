@@ -16,6 +16,8 @@
 
 package org.jredis;
 
+import org.jredis.protocol.Command;
+
 //import org.jredis.connector.ProviderException;
 
 /**

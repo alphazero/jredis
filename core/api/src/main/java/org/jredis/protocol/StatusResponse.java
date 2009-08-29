@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package org.jredis.connector;
+package org.jredis.protocol;
 
 /**
  * This is just a marker interface.  All responses include an implied or explicit status.

@@ -16,6 +16,9 @@
 
 package org.jredis.connector;
 
+import org.jredis.protocol.Request;
+import org.jredis.protocol.Response;
+
 public interface RequestListener {
 	
 	public void onResponse (Request request, Response response);

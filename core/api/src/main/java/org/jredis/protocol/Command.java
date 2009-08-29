@@ -14,13 +14,8 @@
  *   limitations under the License.
  */
 
-package org.jredis;
+package org.jredis.protocol;
 
-import org.jredis.connector.BulkResponse;
-import org.jredis.connector.MultiBulkResponse;
-import org.jredis.connector.Response;
-import org.jredis.connector.StatusResponse;
-import org.jredis.connector.ValueResponse;
 
 
 

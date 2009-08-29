@@ -17,9 +17,10 @@
 package org.jredis.connector;
 
 import org.jredis.ClientRuntimeException;
-import org.jredis.Command;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
+import org.jredis.protocol.Command;
+import org.jredis.protocol.Response;
 
 /**
  * [TODO: document me!][NOTE: disabling @Override annotations for 1.5 compliance.]
