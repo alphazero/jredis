@@ -68,16 +68,16 @@ public abstract class ProtocolBase implements Protocol {
 	// ============================================================== Protocol
 	// ------------------------------------------------------------------------
 	
+	// TODO: lets just forget about this multi-version nonsense.  
+	// and get rid of version all together.
 //	@Override
 	public boolean isCompatibleWithVersion(String version) {
 		return version.equals("0.09");
 	}
 	
 //	@Override
-	/**
-	 * Performance note:  
-	 * <p>
-	 * 
+	/* (non-Javadoc)
+	 * @see org.jredis.connector.Protocol#createRequest(org.jredis.Command, byte[][])
 	 */
 	public Request createRequest(Command cmd, byte[]... args) throws ProviderException, IllegalArgumentException {
 		
@@ -85,47 +85,16 @@ public abstract class ProtocolBase implements Protocol {
 
 		try {
 			switch (cmd.requestType) {
-//			switch (cmd){
-			/* -------------------- no arg commands <CMD> */
-			/* -------------------- 1 CRLF line */
-//			case PING:
-//			case QUIT:
-//			case FLUSHALL:
-//			case FLUSHDB:
-//			case INFO:
-//			case RANDOMKEY:
-//			case SHUTDOWN:
-//			case DBSIZE:
-//			case BGSAVE:
-//			case SAVE:
-//			case LASTSAVE:
 			case NO_ARG:
 				// -------------------
-				// NO_ARG
 				buffer.write(cmd.bytes);
 				buffer.write(SPACE);
 				buffer.write(CRLF);
 				// -------------------
 				break;
 
-//			case AUTH:
-//			case SELECT:
-//			case KEYS:
-//			case TYPE:
-//			case INCR:
-//			case DECR:
-//			case GET:
-//			case DEL:
-//			case EXISTS:
-//			case SMEMBERS:
-//			case SCARD:
-//			case LLEN:
-//			case LPOP:
-//			case RPOP:
-//			case TTL:
 			case KEY:
 				// -------------------
-				// KEY
 				buffer.write(cmd.bytes);
 				buffer.write(SPACE);
 				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
@@ -133,21 +102,9 @@ public abstract class ProtocolBase implements Protocol {
 				// -------------------
 				break;
 
-//			case RENAME:	
-//			case RENAMENX:
-				// KEY_KEY
 			case KEY_KEY:
-				
-//			case INCRBY:  // 2nd key is actually a number o/c
-//			case DECRBY:  // 2nd key is actually a number o/c
-//			case LINDEX:  // 2nd key is actually a number o/c
-//			case MOVE:	  // 2nd key is actually a number o/c
-//			case EXPIRE:  // 2nd key is actually a number o/c
-				// KEY_NUM
 			case KEY_NUM:
-//			case SORT:
 			case KEY_SPEC:
-				// KEY_SPEC for SORT
 				// -------------------
 				buffer.write(cmd.bytes);
 				buffer.write(SPACE);
@@ -158,9 +115,6 @@ public abstract class ProtocolBase implements Protocol {
 				// -------------------
 				break;
 
-//			case LTRIM:
-//			case LRANGE:
-				// KEY_NUM_NUM
 			case KEY_NUM_NUM:
 				// -------------------
 				buffer.write(cmd.bytes);
@@ -174,15 +128,6 @@ public abstract class ProtocolBase implements Protocol {
 				// -------------------
 				break;
 
-//			case SET:
-//			case GETSET:
-//			case SETNX:
-//			case SADD:
-//			case SREM:
-//			case RPUSH:
-//			case LPUSH:
-//			case SISMEMBER:
-				// KEY_VALUE
 			case KEY_VALUE:
 			{
 				byte[] value = Assert.notNull(args[1], "value arg", ProviderException.class);
@@ -199,11 +144,7 @@ public abstract class ProtocolBase implements Protocol {
 			}
 			break;
 
-//			case LSET:
-				// KEY_IDX_VALUE
 			case KEY_IDX_VALUE:
-//			case SMOVE: // "index arg" is really "destKey" but identical to LSET effectively
-				// KEY_KEY_VALUE (FOR SMOVE)
 			case KEY_KEY_VALUE:
 			{
 				byte[] value = Assert.notNull(args[2], "value arg", ProviderException.class);
@@ -222,8 +163,6 @@ public abstract class ProtocolBase implements Protocol {
 			}
 			break;
 			
-//			case LREM:
-			// KEY_CNT_VALUE
 			case KEY_CNT_VALUE:
 			{
 				byte[] value = Assert.notNull(args[1], "value arg", ProviderException.class);
@@ -242,14 +181,6 @@ public abstract class ProtocolBase implements Protocol {
 			}
 			break;
 
-//			case SINTER: /* sinter key [key1 [key2 [...]]] */
-//			case SINTERSTORE:
-//			case SUNION: 
-//			case SUNIONSTORE:
-//			case SDIFF: 
-//			case SDIFFSTORE:
-//			case MGET:
-			// MULTI_KEY
 			case MULTI_KEY:
 			{
 				int keycnt = args.length;
@@ -273,6 +204,9 @@ public abstract class ProtocolBase implements Protocol {
 	}
 	
 //	@Override
+	/* (non-Javadoc)
+	 * @see org.jredis.connector.Protocol#createResponse(org.jredis.Command)
+	 */
 	public Response createResponse(Command cmd) throws ProviderException, ClientRuntimeException {
 
 		Response response = null;
@@ -300,92 +234,6 @@ public abstract class ProtocolBase implements Protocol {
 				break;
 		
 		}
-//		switch (cmd) {
-//		/* ---------------------------------- Commands that close the connection without response */
-//		case QUIT:     		// closes connection
-//		case SHUTDOWN:		// closes connection
-//			response = new VirtualResponse(ResponseStatus.STATUS_CIAO);
-//			break;
-//
-//			/* ------------------------------ Status   Responses ----------------------------------- */
-//		case PING:          
-//		case AUTH:			
-//		case RENAME:
-//		case SET:			
-//		case BGSAVE:
-//		case SAVE:
-//		case LPUSH:
-//		case RPUSH:
-//		case LSET:
-//		case LTRIM:
-//		case SINTERSTORE:
-//		case SUNIONSTORE:
-//		case SDIFFSTORE:
-//		case FLUSHALL: 		
-//		case FLUSHDB:		
-//		case SELECT:		
-//			response = createStatusResponse (cmd);
-//			break;
-//			/* ------------------------------ Value String    Responses ----------------------------------- */
-//		case RANDOMKEY:	    
-//		case TYPE:
-//			response = createStringResponse (cmd);
-//			break;
-//
-//			/* ------------------------------ Value Boolean    Responses ----------------------------------- */
-//		case SETNX:			
-//		case EXISTS:
-//		case DEL:			
-//		case RENAMENX:
-//		case SADD:			
-//		case SISMEMBER:
-//		case SREM:
-//		case EXPIRE:
-//		case MOVE:
-//		case SMOVE:
-//			response = createBooleanResponse(cmd);
-//			break;
-//
-//			/* ------------------------------ Value  64bit number    Responses ----------------------------------- */
-//			// -- moving all to long ..
-//		case INCR:	    	
-//		case INCRBY:	     
-//		case DECR:	    	 
-//		case DECRBY:	     
-//		case SCARD:	    	 
-//		case LLEN:	    	 
-//		case LREM:
-//		case TTL:
-//			// -- moving all to long ..
-//		case DBSIZE:
-//		case LASTSAVE:
-//			response = createNumberResponse (cmd /*, true*/);
-//			break;
-//
-//			/* ------------------------------ Bulk      Responses ----------------------------------- */
-//		case GET:
-//		case GETSET:
-//		case KEYS:
-//		case INFO:
-//		case LPOP:
-//		case RPOP:
-//		case LINDEX:
-//			response = createBulkResponse (cmd);
-//			break;
-//			/* ------------------------------ MultiBulk Responses ----------------------------------- */
-//		case MGET:
-//		case LRANGE:
-//		case SINTER:
-//		case SUNION:
-//		case SDIFF:
-//		case SMEMBERS:
-//		case SORT:
-//			response = createMultiBulkResponse (cmd);
-//			break;
-//
-//		default:
-//			throw new ProviderException ("createResponse() for Command " + cmd.code + " not yet implemented!");
-//		}
 
 		return response;
 	

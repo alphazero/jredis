@@ -28,9 +28,9 @@ import org.jredis.connector.ValueResponse;
  * Redis commands, verbatim. Each member of the Command enum maps to a 
  * corresponding (protocol level) command in Redis.  
  * 
- * <p><b>specification</b> <code>Redis 0.0.8</code>
+ * <p><b>specification</b> <code>Redis 1.00</code>
  * 
- * @author  Joubin Houshyar (alphazero@sensesay.net)
+ * @author  Joubin (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09
  * @since   alpha.0
  * 
@@ -118,6 +118,14 @@ public enum Command {
 //	public final int arg_cnt;
 	public final RequestType requestType;
 	public final ResponseType responseType;
+	
+	/**
+	 * Each enum member directly corresponds to a Redis command, per
+	 * specification.  Command semantics is specified by the element
+	 * constructor params.
+	 * @param reqType the {@link RequestType} of the Command
+	 * @param respType the {@link ResponseType} of the Command
+	 */
 	Command (RequestType reqType, ResponseType respType) { 
 		this.code = this.name(); 
 		this.bytes = code.getBytes();
@@ -126,34 +134,81 @@ public enum Command {
 		this.responseType = respType;
 //		this.arg_cnt = -1; // to raise exception -- make sure we don't miss any
 	}
-	
-	/**
-	 * can't think of a rigorous way of naming these.
-	 * But at least we can number them, for now.
-	 */
+
+	// ------------------------------------------------------------------------
+	// Inner Types
+	// ------------------------------------------------------------------------
+
+    /**
+     * Broad Request Type categorization of the Redis Command per the request's
+     * argument signature.  These categories are a more differentiated than the
+     * Redis specification itself to impart further information about the argument
+     * semantics.
+	 *
+     * @author  Joubin (alphazero@sensesay.net)
+     * @version alpha.0, Aug 29, 2009
+     * 
+     */
     public enum RequestType {
+    	/**  */
     	NO_ARG,
+    	/**  */
     	KEY,
+    	/**  */
     	KEY_KEY,
+    	/**  */
     	KEY_NUM,
+    	/**  */
     	KEY_SPEC,
+    	/**  */
     	KEY_NUM_NUM,
+    	/**  */
     	KEY_VALUE,
+    	/**  */
     	KEY_KEY_VALUE,
+    	/**  */
     	KEY_IDX_VALUE,
+    	/**  */
     	KEY_CNT_VALUE,
+    	/**  */
     	MULTI_KEY
     }
 
+    /**
+     * Broad Response Type categorization of the Redis Command responses.
+     * <p>
+     * As with {@link RequestType}, there is further differentiation of the
+     * Redis response types to further inform the semantics.
+     * <p>
+     * Beyond that, there is also linkage between the {@link ResponseType} and
+     * its associated {@link Response} interface extension.
+     * 
+     * @author  Joubin (alphazero@sensesay.net)
+     * @version alpha.0, Aug 29, 2009
+     * @see Response
+     */
     public enum ResponseType {
+    	/**  */
     	VIRTUAL (StatusResponse.class),
+    	/**  */
     	STATUS (StatusResponse.class),
+    	/**  */
     	STRING (ValueResponse.class),
+    	/**  */
     	BOOLEAN (ValueResponse.class),
+    	/**  */
     	NUMBER (ValueResponse.class),
+    	/**  */
     	BULK (BulkResponse.class),
+    	/**  */
     	MULTI_BULK (MultiBulkResponse.class);
     	public Class<? extends Response> respClass;
+    	
+    	/**
+    	 * For each {@link ResponseType} member, we specify the 
+    	 * corresponding {@link Response} extension interface.
+    	 * @param respClass
+    	 */
     	ResponseType (Class<? extends Response> respClass){
     		this.respClass = respClass;
     	}
