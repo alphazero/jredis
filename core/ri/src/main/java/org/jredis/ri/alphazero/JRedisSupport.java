@@ -54,24 +54,10 @@ public abstract class JRedisSupport implements JRedis {
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
-//	/** No setter or getters for this property - it is initialized at construct time. */
-//	private Connection	connection;
 
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
-//	/**
-//	 * @param connection
-//	 */
-//	protected final void setConnection (Connection connection) {
-//		this.connection = Assert.notNull(connection, "connection on setConnection()", ClientRuntimeException.class);
-//	}
-//	/**
-//	 * @return
-//	 */
-//	protected final Connection getConnection () {
-//		return this.connection;
-//	}
 	
 	// ------------------------------------------------------------------------
 	// Extension point(s)
