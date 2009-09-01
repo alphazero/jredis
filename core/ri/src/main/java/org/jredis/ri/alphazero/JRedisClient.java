@@ -16,7 +16,6 @@
 
 package org.jredis.ri.alphazero;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
@@ -26,9 +25,8 @@ import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.protocol.Command;
-import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Response;
-import org.jredis.ri.alphazero.connection.SynchConnection;
+import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
 
@@ -90,7 +88,8 @@ public class JRedisClient extends SynchJRedisBase  {
 	// ------------------------------------------------------------------------
 
 	public JRedisClient (ConnectionSpec connectionSpec){
-		Connection synchConnection = createSynchConnection (connectionSpec, RedisVersion.current_revision);
+		// note: using a non shared connection mod
+		Connection synchConnection = createSynchConnection (connectionSpec, false, RedisVersion.current_revision);
 		setConnection (synchConnection);
 		
 		try {
@@ -100,9 +99,9 @@ public class JRedisClient extends SynchJRedisBase  {
 			this.serviceRequest(Command.SELECT, Convert.toBytes(connectionSpec.getDatabase()));
 		} 
 		catch (RedisException e) {
-			// TODO Auto-generated catch block
-			// TODO: stop printing the stack trace ...
+			// TODO: remove this stacktrace
 			e.printStackTrace();
+			throw new ClientRuntimeException("Failed to create JRedisClient due to Redis Errors", e);
 		}		
 		
 	}
@@ -110,8 +109,10 @@ public class JRedisClient extends SynchJRedisBase  {
 	 * Connects to the localhost:6379 redis server using the password.
 	 * Will select db 0.
      * @param password used for AUTH
+	 * @throws UnknownHostException 
+	 * @throws ClientRuntimeException 
      */
-    public JRedisClient (String password) {
+    public JRedisClient (String password) throws ClientRuntimeException {
 		this ("localhost", 6379, password, 0);
     }
 
@@ -121,9 +122,11 @@ public class JRedisClient extends SynchJRedisBase  {
 	 * and using localhost:6379 as its network addressing parameters. 
 	 * Database will be selected to db 0
 	 * Assumes no password required.
+	 * @throws UnknownHostException 
+	 * @throws ClientRuntimeException 
 	 */
-	public JRedisClient ( ){
-		this ("localhost", 6379, null, 0, RedisVersion.current_revision);
+	public JRedisClient ( ) throws ClientRuntimeException {
+		this ("localhost", 6379, null, 0);
 	}
 	/**
 	 * New RedisClient for the default protocol version {@link RedisVersion} 
@@ -131,9 +134,12 @@ public class JRedisClient extends SynchJRedisBase  {
 	 * 
 	 * @param host
 	 * @param port
+	 * @throws UnknownHostException 
+	 * @throws ClientRuntimeException 
 	 */
-	public JRedisClient(String host, int port) {
-		this(host, port, null, 0, RedisVersion.current_revision);
+	public JRedisClient(String host, int port) throws ClientRuntimeException {
+//		this(host, port, null, 0, RedisVersion.current_revision);
+		this(host, port, null, 0);
 	}
 	
 	
@@ -144,48 +150,12 @@ public class JRedisClient extends SynchJRedisBase  {
 	 * @param password to use for AUTHentication (can be null)
 	 * @param database database to select on connect
 	 * @throws ClientRuntimeException
+	 * @throws UnknownHostException 
 	 */
 	public JRedisClient (String host, int port, String password, int database) 
 	throws ClientRuntimeException
 	{
-//		this(host, port, (null != password ? password.getBytes() : null), database, RedisVersion.current_revision);
-		this(host, port, getCredentialBytes(password), database, RedisVersion.current_revision);
-	}
-
-	/**
-	 * Creates a new instance of RedisClient, using the information provided.  
-	 * <p>
-	 * This constructor will delegate all {@link Protocol} issues to a
-	 * {@link SocketConnection} instance, for which it will obtain a {@link Protocol}
-	 * handler delegate from {@link ProtocolManager} for the user specified redis version 
-	 * <p>
-	 * All specifics regarding the implementation of the {@link JRedis} contract are handled by
-	 * the superclass  and you should consult that class's documentation for the detailss.
-	 *   
-	 * @param host
-	 * @param port
-	 * @param redisVersion
-	 * @throws ClientRuntimeException
-	 */
-	protected JRedisClient (String host, int port, byte[] credentials, int database, RedisVersion redisVersion) 
-	throws ClientRuntimeException
-	{
-		Assert.notNull(host, "host parameter", IllegalArgumentException.class);
-		Assert.notNull(redisVersion, "redisVersion paramter", IllegalArgumentException.class);
-		
-		Connection synchConnection = createSynchConnection (host, port, database, credentials, redisVersion);
-		setConnection (synchConnection);
-		
-		try {
-			if(null != credentials)
-				this.serviceRequest(Command.AUTH, credentials);
-			
-			this.serviceRequest(Command.SELECT, Convert.toBytes(database));
-		} 
-		catch (RedisException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
+		this(DefaultConnectionSpec.newSpec(host, port, database, getCredentialBytes(password)));
 	}
 	
 	// ------------------------------------------------------------------------
@@ -196,25 +166,8 @@ public class JRedisClient extends SynchJRedisBase  {
 			throws RedisException, ClientRuntimeException, ProviderException 
 	{
 		Response response = connection.serviceRequest(cmd, args);
-		// temp bench
-//		reqCnt ++;
-//		if(reqCnt == benchCnt) {
-//			if(start == -1) {
-//				start = System.currentTimeMillis();
-//			}
-//				else {
-//				long delta = System.currentTimeMillis() - start;
-//				float rate = (benchCnt * 1000)/delta;
-//				Log.log("JRedisService: served %d at %9.2f /sec in %d msecs\n", benchCnt, rate, delta);
-//				start = System.currentTimeMillis();
-//			}
-//			reqCnt = 0;
-//		}
 		return response;
 	}
-//	long reqCnt = 0;
-//	long start = -1;
-//	int benchCnt = 1000*1;
 	
 	
 	@Override
@@ -249,30 +202,4 @@ public class JRedisClient extends SynchJRedisBase  {
 	private static byte[] getCredentialBytes (String password){
 		return (null != password ? password.getBytes() : null);
 	}
-	
-	/**
-	 * @return the {@link ConnectionSpec} used by default by this {@link JRedisClient}
-	 */
-	public static ConnectionSpec getDefaultConnectionSpec () {
-        ConnectionSpec defaultConnectionSpec = null;
-		try {
-			defaultConnectionSpec = getDefaultConnectionSpec("localhost", 6379, null, 0);
-        }
-        catch (UnknownHostException e) {
-	        e.printStackTrace(); // since when is localhost unknown?  never ..
-        }
-        return defaultConnectionSpec;
-	}
-    /**
-     * @param host redis server host name 
-     * @param port redis server port
-     * @param password for the Redis server per redis.conf
-     * @param database the selected databse
-	 * @return the {@link ConnectionSpec} used by default by this {@link JRedisClient} for the given params.
-     * @throws UnknownHostException
-     */
-    public static ConnectionSpec getDefaultConnectionSpec (String host, int port, String password, int database) throws UnknownHostException {
-    	InetAddress address = InetAddress.getByName(host);
-	    return SynchConnection.getDefaultConnectionSpec(address, port, database, getCredentialBytes(password));
-    }
 }

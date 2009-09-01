@@ -89,5 +89,11 @@ public class Util {
         public float opsPerSecAtMark (long opCount) {
 	        return opCount*1000/(float)delta;
         }
+		/**
+         * @return
+         */
+        public long deltaAtMark () {
+	        return delta;
+        }
 	}
 }

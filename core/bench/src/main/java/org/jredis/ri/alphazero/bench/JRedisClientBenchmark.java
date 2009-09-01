@@ -16,6 +16,7 @@
 
 package org.jredis.ri.alphazero.bench;
 
+import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
 import org.jredis.bench.JRedisBenchmark;
 import org.jredis.ri.alphazero.JRedisClient;
@@ -61,7 +62,7 @@ public class JRedisClientBenchmark extends JRedisBenchmark {
 	}
 	
 	@Override
-	protected final JRedis newConnection(String host, int port, int db, String password) {
+	protected final JRedis newConnection(String host, int port, int db, String password) throws ClientRuntimeException {
 		return new JRedisClient(host, port, password, db);
 	}
 	@Override

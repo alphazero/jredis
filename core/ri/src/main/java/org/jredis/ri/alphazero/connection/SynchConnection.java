@@ -16,8 +16,6 @@
 
 package org.jredis.ri.alphazero.connection;
 
-import java.net.InetAddress;
-
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
@@ -30,6 +28,7 @@ import org.jredis.protocol.Request;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.ResponseStatus;
 import org.jredis.ri.alphazero.RedisVersion;
+import org.jredis.ri.alphazero.protocol.SharableSynchProtocol;
 import org.jredis.ri.alphazero.protocol.SynchProtocol;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
@@ -65,11 +64,12 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	 * @throws ProviderException
 	 */
 	public SynchConnection (
-			ConnectionSpec connectionSpec
+			ConnectionSpec connectionSpec,
+			boolean 	   isShared
 		)
 		throws ClientRuntimeException, ProviderException 
 	{
-		this(connectionSpec, RedisVersion.current_revision);
+		this(connectionSpec, isShared, RedisVersion.current_revision);
 	}
 	
 	/**
@@ -91,7 +91,8 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	 * @throws ProviderException if the version specified is not supported.
 	 */
 	public SynchConnection (
-			ConnectionSpec connectionSpec,
+			ConnectionSpec  connectionSpec,
+			boolean			isShared,
 			RedisVersion 	redisversion
 		)
 		throws ClientRuntimeException, ProviderException 
@@ -99,7 +100,8 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		super (connectionSpec);
 		// get new and set Protocol handler delegate
 		//
-		Protocol protocolHdlr = new SynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
+		
+		Protocol protocolHdlr = isShared? new SharableSynchProtocol() : new SynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
 //		Protocol protocolHdlr = new SharableSynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
 		Assert.notNull (protocolHdlr, "the delegate protocol handler", ClientRuntimeException.class);
 		Assert.isTrue(protocolHdlr.isCompatibleWithVersion(redisversion.id), "handler delegate supports redis version " + redisversion, ProviderException.class);
@@ -107,54 +109,93 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		setProtocolHandler(protocolHdlr);
 	}
 	
-	/**
-	 * Creates a connection instance to the redis server at the specified address and port
-	 * using the specified {@link RedisVersion} protocol handler (if available) and a
-	 * default {@link ConnectionSpec}.
-	 * 
-	 * @param address
-	 * @param port
-	 * @param credentials 
-	 * @param database 
-	 * @param redisversion
-	 * @throws ClientRuntimeException
-	 * @throws ProviderException if the redisVersion specified is not supported.
-	 */
-	public SynchConnection (
-			InetAddress 	address, 
-			int 			port, 
-			int database, byte[] credentials, RedisVersion 	redisversion
-		) 
-		throws ClientRuntimeException, ProviderException 
-	{
-//		this(new DefaultConnectionSpec(address, port, database, credentials), redisversion);
-		this(getDefaultConnectionSpec(address, port, database, credentials), redisversion);
-	}
+//	/**
+//	 * Creates a connection instance to the redis server at the specified address and port
+//	 * using the specified {@link RedisVersion} protocol handler (if available) and a
+//	 * default {@link ConnectionSpec}.
+//	 * 
+//	 * @param address
+//	 * @param port
+//	 * @param credentials 
+//	 * @param database 
+//	 * @param redisversion
+//	 * @throws ClientRuntimeException
+//	 * @throws ProviderException if the redisVersion specified is not supported.
+//	 */
+//	public SynchConnection (
+//			InetAddress 	address, 
+//			int 			port, 
+//			int database, byte[] credentials, RedisVersion 	redisversion
+//		) 
+//		throws ClientRuntimeException, ProviderException 
+//	{
+////		this(new DefaultConnectionSpec(address, port, database, credentials), redisversion);
+//		this(DefaultConnectionSpec.newSpec(address, port, database, credentials), redisversion);
+//	}
 
-	// ------------------------------------------------------------------------
-	// Static methods
-	// ------------------------------------------------------------------------
-	/**
-	 * Returns an instance of the {@link ConnectionSpec} used by this {@link Connection}
-	 * as default spec, for the provided params.
-	 * @param address
-	 * @param port
-	 * @param database
-	 * @param credentials
-	 * @param redisversion
-	 * @return
-	 * @throws ClientRuntimeException
-	 */
-	public static final ConnectionSpec getDefaultConnectionSpec (
-			InetAddress 	address, 
-			int 			port, 
-			int 			database, 
-			byte[] 			credentials
-		) 
-		throws ClientRuntimeException 
-	{
-		return new DefaultConnectionSpec(address, port, database, credentials);
-	}
+//	// ------------------------------------------------------------------------
+//	// Static methods
+//	// ------------------------------------------------------------------------
+//	/**
+//	 * @return
+//	 * @throws ClientRuntimeException
+//	 */
+//	public static final ConnectionSpec getDefaultConnectionSpec () 
+//		throws ClientRuntimeException 
+//	{
+//		return getDefaultConnectionSpec ("locathost", 6379, 0, null);
+//	}
+//
+//	/**
+//	 * Returns an instance of the {@link ConnectionSpec} used by this {@link Connection}
+//	 * as default spec, for the provided params.
+//	 * @param host
+//	 * @param port
+//	 * @param database
+//	 * @param credentials
+//	 * @param redisversion
+//	 * @return
+//	 * @throws ClientRuntimeException
+//	 */
+//	public static final ConnectionSpec getDefaultConnectionSpec (
+//			String 			host, 
+//			int 			port, 
+//			int 			database, 
+//			byte[] 			credentials
+//		) 
+//		throws ClientRuntimeException 
+//	{
+//    	InetAddress address;
+//        try {
+//	        address = InetAddress.getByName(host);
+//        }
+//        catch (UnknownHostException e) {
+//        	throw new ClientRuntimeException("unknown host: " + host, e);
+//        }
+//		
+//		return getDefaultConnectionSpec(address, port, database, credentials);
+//	}
+//	/**
+//	 * Returns an instance of the {@link ConnectionSpec} used by this {@link Connection}
+//	 * as default spec, for the provided params.
+//	 * @param address
+//	 * @param port
+//	 * @param database
+//	 * @param credentials
+//	 * @param redisversion
+//	 * @return
+//	 * @throws ClientRuntimeException
+//	 */
+//	public static final ConnectionSpec getDefaultConnectionSpec (
+//			InetAddress 	address, 
+//			int 			port, 
+//			int 			database, 
+//			byte[] 			credentials
+//		) 
+//		throws ClientRuntimeException 
+//	{
+//		return new DefaultConnectionSpec(address, port, database, credentials);
+//	}
 	// ------------------------------------------------------------------------
 	// Interface
 	// ======================================================= ProtocolHandler

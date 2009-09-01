@@ -37,7 +37,7 @@ public class Assert {
 	 * @param clazz
 	 */
 	public static final <E extends RuntimeException>
-	void identical (Byte[] a, byte[] b, Class<E> clazz) {
+	void identical (byte[] a, byte[] b, Class<E> clazz) {
 		notNull(a, "arg a", clazz);
 		notNull(b, "arg b", clazz);
 		if(a.length != b.length) { 

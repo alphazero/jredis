@@ -23,6 +23,7 @@ import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.ConnectionSpec.SocketFlag;
 import org.jredis.connector.ConnectionSpec.SocketProperty;
 import org.jredis.ri.alphazero.JRedisClient;
+import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 
 /**
@@ -53,7 +54,7 @@ public class UsingConnectionSpec {
 	    		
 	    		// 1 - get the default connection spec
 	    		//
-		    	ConnectionSpec connectionSpec = JRedisClient.getDefaultConnectionSpec();
+		    	ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec();
 		    	
 		    	// 2 - customize it
 		    	// here we're demonstrating the full set of parameters -- obviously you can just set what you need
@@ -122,7 +123,7 @@ public class UsingConnectionSpec {
     	{
     		// Note that if your localhost:6379 redis server expects a password
     		// this will fail
-	    	ConnectionSpec connectionSpec = JRedisClient.getDefaultConnectionSpec();
+	    	ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec();
 	    	JRedisClient jredis = new JRedisClient(connectionSpec);
 	    	try {
 		        jredis.ping();
@@ -140,7 +141,7 @@ public class UsingConnectionSpec {
     		// this will fail
     		String password = "jredis";
     		int database = 11;
-	    	ConnectionSpec connectionSpec = JRedisClient.getDefaultConnectionSpec();
+	    	ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec();
 	    	connectionSpec
 	    		.setCredentials(password.getBytes())
 	    		.setDatabase(database);
@@ -161,19 +162,13 @@ public class UsingConnectionSpec {
     		// this will fail
 	    	try {
 	    		String password = "jredis";
+	    		int	   port = 6379;
+	    		int	   database = 11;
 	    		InetAddress address = InetAddress.getLocalHost();
 	    		
-	    		// 1 - get the default connection spec
+	    		// 1 - get the default connection spec for the basic settings
 	    		//
-		    	ConnectionSpec connectionSpec = JRedisClient.getDefaultConnectionSpec();
-		    	
-		    	// 2 - customize it
-		    	//
-		    	connectionSpec
-		    		.setCredentials(password.getBytes())
-		    		.setDatabase(11)
-		    		.setAddress(address)
-		    		.setPort(6379);
+		    	ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec(address, port, database, password.getBytes());
 		    	
 		    	// finally - use it to create the JRedisClient instance
 		    	//

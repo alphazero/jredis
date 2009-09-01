@@ -243,8 +243,7 @@ public interface ConnectionSpec {
 		// ------------------------------------------------------------------------
 		@Override
 		public InetAddress getAddress () {
-			// TODO Auto-generated method stub
-			return null;
+			return address;
 		}
 
 		/* (non-Javadoc)
@@ -252,7 +251,6 @@ public interface ConnectionSpec {
 		 */
 		@Override
 		public byte[] getCredentials () {
-			// TODO Auto-generated method stub
 			return credentials;
 		}
 
@@ -261,7 +259,6 @@ public interface ConnectionSpec {
 		 */
 		@Override
 		public int getDatabase () {
-			// TODO Auto-generated method stub
 			return database;
 		}
 
@@ -270,7 +267,6 @@ public interface ConnectionSpec {
 		 */
 		@Override
 		public int getPort () {
-			// TODO Auto-generated method stub
 			return port;
 		}
 
@@ -279,7 +275,6 @@ public interface ConnectionSpec {
 		 */
 		@Override
 		public int getReconnectCnt () {
-			// TODO Auto-generated method stub
 			return this.reconnectCnt;
 		}
 

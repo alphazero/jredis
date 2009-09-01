@@ -29,6 +29,7 @@ import org.jredis.connector.FaultedConnection;
 import org.jredis.resource.Context;
 import org.jredis.resource.Resource;
 import org.jredis.resource.ResourceException;
+import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.connection.SynchConnection;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Log;
@@ -55,7 +56,7 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 	// ------------------------------------------------------------------------
 
 	/**
-	 * This extension point is reallly only necessary to allow this class to
+	 * This extension point is really only necessary to allow this class to
 	 * set the {@link FaultedConnection} when necessary, in course of the
 	 * {@link SynchJRedisBase#createSynchConnection(String, int, RedisVersion)}
 	 * method operation.  
@@ -76,15 +77,15 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 	 * @param redisVersion
 	 * @return
 	 */
-	protected Connection createSynchConnection (String host, int port, int database, byte[] credentials, RedisVersion redisVersion) 
+	protected Connection createSynchConnection (String host, int port, int database, byte[] credentials, boolean isShared, RedisVersion redisVersion) 
 	{
 		InetAddress 	address = null;
 		Connection 		synchConnection = null;
 		try {
 			
 			address = InetAddress.getByName(host);
-			ConnectionSpec spec = SynchConnection.getDefaultConnectionSpec(address, port, database, credentials);
-			synchConnection = createSynchConnection(spec, redisVersion);
+			ConnectionSpec spec = DefaultConnectionSpec.newSpec(address, port, database, credentials);
+			synchConnection = createSynchConnection(spec, isShared, redisVersion);
 			Assert.notNull(synchConnection, "connection delegate", ClientRuntimeException.class);
 		}
 		catch (UnknownHostException e) {
@@ -103,10 +104,10 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 	 * @param redisVersion redis protocol compliance
 	 * @return
 	 */
-	protected Connection createSynchConnection(ConnectionSpec connectionSpec, RedisVersion redisVersion){
+	protected Connection createSynchConnection(ConnectionSpec connectionSpec, boolean isShared, RedisVersion redisVersion){
 		Connection 		synchConnection = null;
 		try {
-			synchConnection = new SynchConnection(connectionSpec, redisVersion);
+			synchConnection = new SynchConnection(connectionSpec, isShared, redisVersion);
 			Assert.notNull(synchConnection, "connection delegate", ClientRuntimeException.class);
 		}
 		catch (NotSupportedException e) {

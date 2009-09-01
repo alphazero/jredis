@@ -17,14 +17,16 @@
 package org.jredis.ri.alphazero;
 
 import static org.testng.Assert.fail;
-
+import org.jredis.ClientRuntimeException;
+import org.jredis.JRedis;
+import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 
 /**
- * [TODO: document me!]
- *
+ * For testing the JRedis test suite for {@link JRedisClient} implementation.
+ * TODO: should also do a minimal test using {@link ConnectionSpec}.
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Apr 17, 2009
  * @since   alpha.0
@@ -43,12 +45,17 @@ public class JRedisClientNGTest extends JRedisProviderTestNGBase {
 	 */
 	@BeforeTest
 	public void setJRedisProvider () {
-		super.setJRedisProviderInstance(new JRedisClient (this.host, this.port, this.password, this.db1));
+		try {
+			JRedis jredis = new JRedisClient (this.host, this.port, this.password, this.db1);
 
-		Log.log("JRedisClientNGTest.setJRedisProvider");
-		// For JRedisClient, if we're here, we're connected
-		// so lets just authorize and flush the dbs
-		super.prepTestDBs();
+			setJRedisProviderInstance(jredis);
+			prepTestDBs();
+			
+			Log.log("JRedisClientNGTest.setJRedisProvider - done");
+        }
+        catch (ClientRuntimeException e) {
+        	Log.error(e.getLocalizedMessage());
+        }
 	}
 	
 	// ------------------------------------------------------------------------

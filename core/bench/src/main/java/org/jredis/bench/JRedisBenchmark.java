@@ -16,16 +16,16 @@
 
 package org.jredis.bench;
 
+import static org.jredis.bench.Util.getRandomString;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-
+import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
 import org.jredis.RedisException;
 import org.jredis.protocol.Command;
-
-import static org.jredis.bench.Util.*;
+import org.jredis.ri.alphazero.connection.SocketConnection;
 
 
 /**
@@ -79,7 +79,7 @@ public abstract class JRedisBenchmark {
 	 * @param port
 	 * @return
 	 */
-	protected abstract JRedis newConnection(String host, int port, int db, String password);
+	protected abstract JRedis newConnection(String host, int port, int db, String password) throws ClientRuntimeException;
 
 	/**
 	 * Runs a set of command primitives test runs using concurrent clients. [TODO: add all commands - this is a sampling of a few.]
