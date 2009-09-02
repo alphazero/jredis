@@ -28,7 +28,7 @@ import org.jredis.protocol.Request;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.ResponseStatus;
 import org.jredis.ri.alphazero.RedisVersion;
-import org.jredis.ri.alphazero.protocol.SharableSynchProtocol;
+import org.jredis.ri.alphazero.protocol.ThreadsafeSynchProtocol;
 import org.jredis.ri.alphazero.protocol.SynchProtocol;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
@@ -101,7 +101,7 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		// get new and set Protocol handler delegate
 		//
 		
-		Protocol protocolHdlr = isShared? new SharableSynchProtocol() : new SynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
+		Protocol protocolHdlr = isShared? new ThreadsafeSynchProtocol() : new SynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
 //		Protocol protocolHdlr = new SharableSynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
 		Assert.notNull (protocolHdlr, "the delegate protocol handler", ClientRuntimeException.class);
 		Assert.isTrue(protocolHdlr.isCompatibleWithVersion(redisversion.id), "handler delegate supports redis version " + redisversion, ProviderException.class);

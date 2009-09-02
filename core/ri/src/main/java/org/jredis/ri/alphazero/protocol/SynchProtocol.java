@@ -183,7 +183,7 @@ public class SynchProtocol extends ProtocolBase {
 	// ============================================================ Response(s)
 	// ------------------------------------------------------------------------
 	/**
-	 * Synchronous responses are guaranteed to be continigous chuncks (if the
+	 * Synchronous responses are guaranteed to be contiguous chunks (if the
 	 * client of this class is respecting its contract) -- meaning, it can go
 	 * ahead and read as much as it can in its first read without busy waiting
 	 * or reading one byte at a time.  After that initial read, specialized
@@ -204,7 +204,7 @@ public class SynchProtocol extends ProtocolBase {
 			this.buffer = buffer;
 			offset = 0;
 		}
-//		@Override
+
 		protected void reset (Command cmd, Type type) {
 			this.cmd = cmd;
 			this.type = type;
@@ -216,18 +216,9 @@ public class SynchProtocol extends ProtocolBase {
 		/**
 		 * Makes blocking calls to input stream until it gets crlf. Should not be
 		 * used for size/count lines.
-		 * <p>
-		 * This is a major bottleneck.  Its surprising how great a percentage of request/response 
-		 * (combined) processing time is spent here.  The issue is the Redis protocol, which is 
-		 * working against redis being a high performance system.  The protocol has conflicting goals
-		 * of being easy to develop for AND serve a high throughput system.  There should be a fixed
-		 * frame here indicating Status and number of bytes to follow.
-		 * <p>As it is, its either a status flag followed by a variable length textual representation of
-		 * a number delimited by crlf, or, an error message, or, a value, such as a number or key.
-		 * That means this protocol can't simply do a blocking call
 		 * @param in
 		 */
-		void readLine (InputStream in) {
+		void readSingleLineResponse (InputStream in) {
 			offset = 0;
 			int c = -1;
 			int available = buffer.length - offset;  // offset=0 now
@@ -264,11 +255,56 @@ public class SynchProtocol extends ProtocolBase {
 			}
 		}
 		/**
+		 * resets offset and reads bytes until it has a size line.
+		 * @param in
+		 * @return
+		 */
+		int readSize (InputStream in, boolean checkForError) {
+			return readControlLine(in, checkForError, SIZE_BYTE);
+		}
+		
+		/**
+		 * resets offset and reads bytes until it has a size line.
+		 * @param in
+		 * @return the count or -2 if control line was an error status
+		 */
+		int readCount (InputStream in, boolean checkForError) {
+			return readControlLine(in, checkForError, COUNT_BYTE);
+		}
+		
+		/* -------------- BULK AND MULTIBULKS ------------------------ */
+		
+		/**
+		 * @param in
+		 * @param checkForError
+		 * @param ctlByte
+		 * @return
+		 */
+		int readControlLine (InputStream in, boolean checkForError, byte ctlByte){
+			seekToCRLF(in);
+			if(checkForError && (this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) {
+				status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
+				didRead = true;  // we're done - error's are only one line
+				return -2;
+			}
+			if(buffer[0] != ctlByte) {
+				throw new ProviderException ("Bug?  Expecting status code for size");
+			}
+			status = ResponseStatus.STATUS_OK;
+			return Convert.toInt (buffer, 1, offset-3);
+		}
+		/**
 		 * Resets offset and reads bytes until CRLF is found.  Offset on find is the offset the subsequent
 		 * element after \n.  This is basically identical to readLine, except that it reads one byte at a time
 		 * (which is not so efficient).  Didn't wish to consolidate to one shared method as that would be
 		 * yet another method call and these methods get called all the time.  Regardless, both of these
 		 * methods are the bottle necks in this implementation.  
+		 * <p>
+		 * This is a major bottle neck for bulk and multibulk responses.  To keep the implementation relatively
+		 * simple, it runs into the non-binary nature of the redis wire protocol.  That can be addressed but will
+		 * significantly add to its complexity.
+		 * TODO: Do it.  Use and overflow buffer and read as much as possible.  Will require changes to readBulkData
+		 * so that it also uses the overflow.
 		 * @param in
 		 */
 		void seekToCRLF (InputStream in){
@@ -298,42 +334,6 @@ public class SynchProtocol extends ProtocolBase {
 			if(c==-1) throw new ClientRuntimeException ("in.read returned -1");
 		}
 		/**
-		 * resets offset and reads bytes until it has a size line.
-		 * @param in
-		 * @return
-		 */
-		int readSize (InputStream in, boolean checkForError) {
-			return readControlLine(in, checkForError, SIZE_BYTE);
-		}
-		
-		/**
-		 * resets offset and reads bytes until it has a size line.
-		 * @param in
-		 * @return the count or -2 if control line was an error status
-		 */
-		int readCount (InputStream in, boolean checkForError) {
-			return readControlLine(in, checkForError, COUNT_BYTE);
-		}
-		/**
-		 * @param in
-		 * @param checkForError
-		 * @param ctlByte
-		 * @return
-		 */
-		int readControlLine (InputStream in, boolean checkForError, byte ctlByte){
-			seekToCRLF(in);
-			if(checkForError && (this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) {
-				status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
-				didRead = true;  // we're done - error's are only one line
-				return -2;
-			}
-			if(buffer[0] != ctlByte) {
-				throw new ProviderException ("Bug?  Expecting status code for size");
-			}
-			status = ResponseStatus.STATUS_OK;
-			return Convert.toInt (buffer, 1, offset-3);
-		}
-		/**
 		 * Will read up expected bulkdata bytes from the input stream.  Routine will
 		 * also read in the last two bytes and will check that they are indeed CRLF.
 		 *  
@@ -347,7 +347,6 @@ public class SynchProtocol extends ProtocolBase {
 			throws IOException, RuntimeException
 		{
 			byte[] data = new byte[length]; // TODO: optimize me
-//			Log.log("allocated %s bytes ..." + length);
 			byte[] term = new byte[CRLF.length];
 			
 			int readcnt = -1;
@@ -363,157 +362,6 @@ public class SynchProtocol extends ProtocolBase {
 			return data;
 		}
 	}
-	
-	// ------------------------------------------------------------------------
-	// Inner Type
-	// ============================================================ Response(s)
-	// ------------------------------------------------------------------------
-	public class SynchMultiBulkResponse extends SynchResponseBase implements MultiBulkResponse {
-
-		/**  */
-		List<byte[]>   datalist;
-		
-		/**
-		 * @param cmd
-		 */
-		private SynchMultiBulkResponse(Command cmd) {
-//			super(sharedResponseBuffer, cmd, Type.MultiBulk);
-			this (sharedResponseBuffer, cmd);
-		}
-		/**
-		 * @param buff
-		 * @param cmd
-		 */
-		public SynchMultiBulkResponse(byte[] buff, Command cmd) {
-			super (buff, cmd, Type.MultiBulk);
-		}
-		/**
-		 * @param cmd
-		 */
-		protected void reset (Command cmd){
-			super.reset(cmd, Type.Bulk);
-			this.datalist = null;
-		}
-
-//		@Override
-		public List<byte[]> getMultiBulkData() throws ClientRuntimeException, ProviderException {
-			assertResponseRead();
-			return datalist;
-		}
-
-//		@Override
-		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
-			if(didRead) return;
-//			int count = super.readCount(in, true); // COUNT_BYTE
-			int count = super.readControlLine (in, true, COUNT_BYTE);
-			if(status.isError()) {
-				didRead = true;
-				return;
-			}
-//			if(count != -2){
-			if(count >= 0){
-				datalist = new ArrayList<byte[]>(count);
-				try {
-					int size = -1;
-					for(int i=0;i<count; i++){
-//						size = readSize(in, false);
-						size = readControlLine(in, false, SIZE_BYTE);
-
-						if(size > 0)
-							datalist.add (super.readBulkData(in, size));
-						else
-							datalist.add(null);
-					}
-				}
-				catch (IllegalArgumentException bug){ 
-					throw new ProviderException ("Bug: in converting the bulk data length bytes", bug);
-				}
-				catch (IOException problem) {
-					throw new ClientRuntimeException ("Problem: reading the bulk data bytes", problem);
-				}
-				catch (RuntimeException bug) {
-					throw new ProviderException ("Bug: reading the multibulk data bytes.", bug);
-				}
-			}
-			didRead = true;
-			return;
-
-		}
-		
-	}
-	// ------------------------------------------------------------------------
-	// Inner Type
-	// ============================================================ Response(s)
-	// ------------------------------------------------------------------------
-	/**
-	 *
-	 * @author  Joubin Houshyar (alphazero@sensesay.net)
-	 * @version alpha.0, 04/02/09
-	 * @since   alpha.0
-	 * 
-	 */
-	public class SynchBulkResponse extends SynchResponseBase implements BulkResponse {
-		/**  */
-		byte[] data = null;
-
-		/**
-		 * Uses the sharedResponseBuffer for reading of the response control line.
-		 * @param cmd
-		 */
-		private SynchBulkResponse(Command cmd) {
-//			super(sharedResponseBuffer, cmd, Type.Bulk);
-			this (sharedResponseBuffer, cmd);
-		}
-		/**
-		 * @param buff
-		 * @param cmd
-		 */
-		public SynchBulkResponse(byte[] buff, Command cmd) {
-			super (buff, cmd, Type.Bulk);
-		}
-		
-		protected void reset (Command cmd){
-			super.reset(cmd, Type.Bulk);
-			this.data = null;
-		}
-
-//		@Override
-		public byte[] getBulkData() {
-			assertResponseRead();
-			return data;
-		}
-//		@Override
-		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
-			if(didRead) return;
-
-//			int size = super.readSize(in, true);
-			int size = readControlLine(in, true, SIZE_BYTE);
-
-			if(status.isError()) {
-				didRead = true;
-				return;
-			}
-			
-			if(size >= 0){
-				try {
-					data = super.readBulkData(in, size);
-				}
-				catch (IllegalArgumentException bug){ 
-					throw new ProviderException ("Bug: in converting the bulk data length bytes", bug);
-				}
-				catch (IOException problem) {
-					throw new ClientRuntimeException ("Problem: reading the bulk data bytes", problem);
-				}
-				catch (RuntimeException bug) {
-					throw new ProviderException ("Bug: reading the bulk data bytes.  expecting " + size + " bytes.", bug);
-				}
-			}
-//			else if(size == 0) data = new byte[0];
-			didRead = true;
-			return;
-		}
-	}
-	
 	// ------------------------------------------------------------------------
 	// Inner Type
 	// ============================================================ Response(s)
@@ -527,20 +375,12 @@ public class SynchProtocol extends ProtocolBase {
 	 */
 	public class SynchLineResponse extends SynchResponseBase implements StatusResponse, ValueResponse {
 		private ValueType 	flavor;
-//		private int				intValue;
-		private String			stringValue;
-		private long	longValue;
-		private boolean	booleanValue;
+		private String		stringValue;
+		private long		longValue;
+		private boolean		booleanValue;
 		
-//		/** used for status responses */
-//		public SynchLineResponse(Command cmd) {
-//			super(cmd, Type.Status);
-//			flavor = ValueType.STATUS;
-//		}
 		private SynchLineResponse(Command cmd, ValueType flavor) {
 			this (sharedResponseBuffer, cmd, flavor);
-//			super(sharedResponseBuffer, cmd, Type.Value);
-//			this.flavor = flavor;
 		}
 		/**
 		 * @param bs
@@ -553,14 +393,10 @@ public class SynchProtocol extends ProtocolBase {
 		}
 		protected void reset (Command cmd){
 			super.reset(cmd, Type.Status);
-//			this.cmd = cmd;
-//			this.type = Type.Status;
 			this.flavor = ValueType.STATUS;
 		}
 		protected void reset (Command cmd, ValueType flavor){
 			super.reset(cmd, Type.Value);
-//			this.cmd = cmd;
-//			this.type = Type.Value;
 			this.flavor = flavor;
 		}
 
@@ -589,7 +425,7 @@ public class SynchProtocol extends ProtocolBase {
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
 			
-			super.readLine (in);
+			super.readSingleLineResponse (in);
 			
 			if(status.isError()) {
 				didRead = true;
@@ -613,6 +449,147 @@ public class SynchProtocol extends ProtocolBase {
 				}
 			}
 			didRead = true;
+		}
+	}	
+	// ------------------------------------------------------------------------
+	// Inner Type
+	// ============================================================ Response(s)
+	// ------------------------------------------------------------------------
+	/**
+	 *
+	 * @author  Joubin Houshyar (alphazero@sensesay.net)
+	 * @version alpha.0, 04/02/09
+	 * @since   alpha.0
+	 * 
+	 */
+	public class SynchBulkResponse extends SynchResponseBase implements BulkResponse {
+		/**  */
+		byte[] data = null;
+
+		/**
+		 * Uses the sharedResponseBuffer for reading of the response control line.
+		 * @param cmd
+		 */
+		private SynchBulkResponse(Command cmd) {
+			this (sharedResponseBuffer, cmd);
+		}
+		/**
+		 * @param buff
+		 * @param cmd
+		 */
+		public SynchBulkResponse(byte[] buff, Command cmd) {
+			super (buff, cmd, Type.Bulk);
+		}
+		
+		protected void reset (Command cmd){
+			super.reset(cmd, Type.Bulk);
+			this.data = null;
+		}
+
+//		@Override
+		public byte[] getBulkData() {
+			assertResponseRead();
+			return data;
+		}
+//		@Override
+		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
+			if(didRead) return;
+
+			int size = readControlLine(in, true, SIZE_BYTE);
+
+			if(status.isError()) {
+				didRead = true;
+				return;
+			}
+			
+			if(size >= 0){
+				try {
+					data = super.readBulkData(in, size);
+				}
+				catch (IllegalArgumentException bug){ 
+					throw new ProviderException ("Bug: in converting the bulk data length bytes", bug);
+				}
+				catch (IOException problem) {
+					throw new ClientRuntimeException ("Problem: reading the bulk data bytes", problem);
+				}
+				catch (RuntimeException bug) {
+					throw new ProviderException ("Bug: reading the bulk data bytes.  expecting " + size + " bytes.", bug);
+				}
+			}
+			didRead = true;
+			return;
+		}
+	}
+	// ------------------------------------------------------------------------
+	// Inner Type
+	// ============================================================ Response(s)
+	// ------------------------------------------------------------------------
+	public class SynchMultiBulkResponse extends SynchResponseBase implements MultiBulkResponse {
+
+		/**  */
+		List<byte[]>   datalist;
+		
+		/**
+		 * @param cmd
+		 */
+		private SynchMultiBulkResponse(Command cmd) {
+			this (sharedResponseBuffer, cmd);
+		}
+		/**
+		 * @param buff
+		 * @param cmd
+		 */
+		public SynchMultiBulkResponse(byte[] buff, Command cmd) {
+			super (buff, cmd, Type.MultiBulk);
+		}
+		/**
+		 * @param cmd
+		 */
+		protected void reset (Command cmd){
+			super.reset(cmd, Type.Bulk);
+			this.datalist = null;
+		}
+
+//		@Override
+		public List<byte[]> getMultiBulkData() throws ClientRuntimeException, ProviderException {
+			assertResponseRead();
+			return datalist;
+		}
+
+//		@Override
+		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
+			if(didRead) return;
+			int count = super.readControlLine (in, true, COUNT_BYTE);
+			if(status.isError()) {
+				didRead = true;
+				return;
+			}
+			if(count >= 0){
+				datalist = new ArrayList<byte[]>(count);
+				try {
+					int size = -1;
+					for(int i=0;i<count; i++){
+						size = readControlLine(in, false, SIZE_BYTE);
+
+						if(size > 0)
+							datalist.add (super.readBulkData(in, size));
+						else
+							datalist.add(null);
+					}
+				}
+				catch (IllegalArgumentException bug){ 
+					throw new ProviderException ("Bug: in converting the bulk data length bytes", bug);
+				}
+				catch (IOException problem) {
+					throw new ClientRuntimeException ("Problem: reading the bulk data bytes", problem);
+				}
+				catch (RuntimeException bug) {
+					throw new ProviderException ("Bug: reading the multibulk data bytes.", bug);
+				}
+			}
+			didRead = true;
+			return;
+
 		}
 	}
 }
