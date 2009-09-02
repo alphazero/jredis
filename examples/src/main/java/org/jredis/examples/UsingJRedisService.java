@@ -17,8 +17,6 @@
 package org.jredis.examples;
 
 import org.jredis.RedisException;
-import org.jredis.bench.Util;
-import org.jredis.bench.Util.Timer;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.JRedisService;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;

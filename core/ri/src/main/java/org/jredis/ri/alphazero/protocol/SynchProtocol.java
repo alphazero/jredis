@@ -62,7 +62,7 @@ public class SynchProtocol extends ProtocolBase {
 	
 	
 	/**  */
-	protected static final int			INPUT_STREAM_BUFFER_SIZE = 1024;
+	protected static final int			INPUT_STREAM_BUFFER_SIZE = 1024 * 128;
 	
 	// ------------------------------------------------------------------------
 	// SynchConnection's can use the same buffers again and again and ...
