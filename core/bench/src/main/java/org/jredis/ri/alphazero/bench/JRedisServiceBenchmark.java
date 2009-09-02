@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Mohammad Houshyar
+ *   Copyright 2009 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -19,34 +19,28 @@ package org.jredis.ri.alphazero.bench;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
 import org.jredis.bench.JRedisBenchmark;
-import org.jredis.ri.alphazero.JRedisClient;
-
+import org.jredis.connector.ConnectionSpec;
+import org.jredis.ri.alphazero.JRedisService;
+import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 
 /**
- * Not fully baked ... just a hack to get things going.
  * [TODO: document me!]
  *
- * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, 04/10/09
+ * @author  Joubin (alphazero@sensesay.net)
+ * @version alpha.0, Sep 2, 2009
  * @since   alpha.0
  * 
  */
-public class JRedisClientBenchmark extends JRedisBenchmark {
 
-	/**
-	 * Runs the benchmark tests.
-	 * [TODO: lets do proper usage here and clean this up.]
-	 * 
-	 * Currently, uses 50 concurrent connections and 5000 requests / each connection.
-	 * TODO: munch on some commandline args ...
-	 * @param args
-	 */
+public class JRedisServiceBenchmark extends JRedisBenchmark {
 	public static void main(String[] args) {
 //		host = "192.168.1.222";
 		String host = "127.0.0.1";
+		String password = "jredis";
 		int    port = 6379;
 		int	   size = 3;
-		int workerCnt = 14;
+		int workerCnt = 100;
+		int poolCnt = 5;
 		int reqCnt = 10000;
 		int	db = 13;
 		if(args.length > 0) db = Integer.valueOf (args[0]);
@@ -58,15 +52,22 @@ public class JRedisClientBenchmark extends JRedisBenchmark {
 		System.out.format("==> Usage: [db [conn [req [size [host]]]]\n");
 //		System.out.format("*** host: %s:%d (db: %d) | datasize: %d | connections: %d | request/conn: %d \n\n", host, port, db, size ,connectionCnt, reqCnt);
 		
-		new JRedisClientBenchmark().runBenchmarks (host, port, workerCnt, reqCnt, size, db);
+		new JRedisServiceBenchmark(poolCnt, host, port, db, password).runBenchmarks (host, port, workerCnt, reqCnt, size, db);
 	}
 	
+	final JRedis jredisService;
+    public JRedisServiceBenchmark (int poolCnt, String host, int port, int db, String password) {
+		ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec("localhost", 6379, db, "jredis".getBytes());
+		jredisService = new JRedisService(connectionSpec, poolCnt);
+		super.quitOnRunEnd(false);
+    }
 	@Override
-	protected final JRedis newConnection(String host, int port, int db, String password) throws ClientRuntimeException {
-		return new JRedisClient(host, port, password, db);
+	protected final JRedis newConnection (String host, int port, int db, String password) throws ClientRuntimeException {
+		return jredisService;
 	}
 	@Override
 	protected final Class<? extends JRedis> getImplementationClass() {
-		return JRedisClient.class;
+		return JRedisService.class;
 	}
+
 }

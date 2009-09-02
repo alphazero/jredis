@@ -68,6 +68,11 @@ public abstract class JRedisBenchmark {
 	/**  */
 	static List<String>		stringList = new ArrayList<String>();
 		
+	protected boolean quitOnRunEnd = true;
+	/**
+     * @param b
+     */
+    protected void quitOnRunEnd (boolean flag) { this.quitOnRunEnd = flag; }
 	// ------------------------------------------------------------------------
 	// Extension Points
 	// ------------------------------------------------------------------------
@@ -696,7 +701,8 @@ public abstract class JRedisBenchmark {
 				work();
 				deltas[id] = System.currentTimeMillis() - start;
 				
-				jredis.quit();
+				if(quitOnRunEnd)
+					jredis.quit();
 				completion.countDown();  // sig done
 			} 
 			catch (Exception e){

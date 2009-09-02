@@ -317,13 +317,6 @@ public abstract class ProtocolBase implements Protocol {
 		public void write(OutputStream out) throws ClientRuntimeException, ProviderException {
 			throw new RuntimeException ("Message.write not implemented! [Apr 10, 2009]");
 		}
-//		protected void reset(Command cmd2, Type type2) {
-//			cmd = cmd2;
-//			type = type2;
-//			didRead = false;
-//			status = null;
-//			isError = false;
-//		}
 	}
 	
 	// ------------------------------------------------------------------------

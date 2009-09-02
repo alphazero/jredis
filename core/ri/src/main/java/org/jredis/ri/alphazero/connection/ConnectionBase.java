@@ -233,7 +233,7 @@ public abstract class ConnectionBase implements Connection {
 		}
 		
 		isConnected = true;
-		Log.log("RedisConnection - connected");
+//		Log.log("RedisConnection - connected");
 
 	}
 
@@ -246,7 +246,7 @@ public abstract class ConnectionBase implements Connection {
 		socketClose();
 		isConnected = false;
 
-		Log.log("RedisConnection - disconnected");
+//		Log.log("RedisConnection - disconnected");
 	}
 	
 	/**

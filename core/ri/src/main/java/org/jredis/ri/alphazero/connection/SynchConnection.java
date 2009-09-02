@@ -108,104 +108,24 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		
 		setProtocolHandler(protocolHdlr);
 	}
-	
-//	/**
-//	 * Creates a connection instance to the redis server at the specified address and port
-//	 * using the specified {@link RedisVersion} protocol handler (if available) and a
-//	 * default {@link ConnectionSpec}.
-//	 * 
-//	 * @param address
-//	 * @param port
-//	 * @param credentials 
-//	 * @param database 
-//	 * @param redisversion
-//	 * @throws ClientRuntimeException
-//	 * @throws ProviderException if the redisVersion specified is not supported.
-//	 */
-//	public SynchConnection (
-//			InetAddress 	address, 
-//			int 			port, 
-//			int database, byte[] credentials, RedisVersion 	redisversion
-//		) 
-//		throws ClientRuntimeException, ProviderException 
-//	{
-////		this(new DefaultConnectionSpec(address, port, database, credentials), redisversion);
-//		this(DefaultConnectionSpec.newSpec(address, port, database, credentials), redisversion);
-//	}
 
-//	// ------------------------------------------------------------------------
-//	// Static methods
-//	// ------------------------------------------------------------------------
-//	/**
-//	 * @return
-//	 * @throws ClientRuntimeException
-//	 */
-//	public static final ConnectionSpec getDefaultConnectionSpec () 
-//		throws ClientRuntimeException 
-//	{
-//		return getDefaultConnectionSpec ("locathost", 6379, 0, null);
-//	}
-//
-//	/**
-//	 * Returns an instance of the {@link ConnectionSpec} used by this {@link Connection}
-//	 * as default spec, for the provided params.
-//	 * @param host
-//	 * @param port
-//	 * @param database
-//	 * @param credentials
-//	 * @param redisversion
-//	 * @return
-//	 * @throws ClientRuntimeException
-//	 */
-//	public static final ConnectionSpec getDefaultConnectionSpec (
-//			String 			host, 
-//			int 			port, 
-//			int 			database, 
-//			byte[] 			credentials
-//		) 
-//		throws ClientRuntimeException 
-//	{
-//    	InetAddress address;
-//        try {
-//	        address = InetAddress.getByName(host);
-//        }
-//        catch (UnknownHostException e) {
-//        	throw new ClientRuntimeException("unknown host: " + host, e);
-//        }
-//		
-//		return getDefaultConnectionSpec(address, port, database, credentials);
-//	}
-//	/**
-//	 * Returns an instance of the {@link ConnectionSpec} used by this {@link Connection}
-//	 * as default spec, for the provided params.
-//	 * @param address
-//	 * @param port
-//	 * @param database
-//	 * @param credentials
-//	 * @param redisversion
-//	 * @return
-//	 * @throws ClientRuntimeException
-//	 */
-//	public static final ConnectionSpec getDefaultConnectionSpec (
-//			InetAddress 	address, 
-//			int 			port, 
-//			int 			database, 
-//			byte[] 			credentials
-//		) 
-//		throws ClientRuntimeException 
-//	{
-//		return new DefaultConnectionSpec(address, port, database, credentials);
-//	}
+
 	// ------------------------------------------------------------------------
 	// Interface
 	// ======================================================= ProtocolHandler
 	// ------------------------------------------------------------------------
 	
+	/* (non-Javadoc)
+	 * @see org.jredis.connector.Connection#getModality()
+	 */
 	@Override
 	public final Modality getModality() {
 		return Connection.Modality.Synchronous;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.jredis.ri.alphazero.connection.ConnectionBase#serviceRequest(org.jredis.protocol.Command, byte[][])
+	 */
 	public Response serviceRequest (Command cmd, byte[]... args) 
 		throws RedisException
 	{
