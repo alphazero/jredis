@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.protocol.BulkResponse;
@@ -254,113 +253,113 @@ public class SynchProtocol extends ProtocolBase {
 				throw new ClientRuntimeException ("IOException in readLine.  Command: " + cmd.code, e);
 			}
 		}
-		/**
-		 * resets offset and reads bytes until it has a size line.
-		 * @param in
-		 * @return
-		 */
-		int readSize (InputStream in, boolean checkForError) {
-			return readControlLine(in, checkForError, SIZE_BYTE);
-		}
+//		/**
+//		 * resets offset and reads bytes until it has a size line.
+//		 * @param in
+//		 * @return
+//		 */
+//		int readSize (InputStream in, boolean checkForError) {
+//			return readControlLine(in, checkForError, SIZE_BYTE);
+//		}
+//		
+//		/**
+//		 * resets offset and reads bytes until it has a size line.
+//		 * @param in
+//		 * @return the count or -2 if control line was an error status
+//		 */
+//		int readCount (InputStream in, boolean checkForError) {
+//			return readControlLine(in, checkForError, COUNT_BYTE);
+//		}
 		
-		/**
-		 * resets offset and reads bytes until it has a size line.
-		 * @param in
-		 * @return the count or -2 if control line was an error status
-		 */
-		int readCount (InputStream in, boolean checkForError) {
-			return readControlLine(in, checkForError, COUNT_BYTE);
-		}
-		
-		/* -------------- BULK AND MULTIBULKS ------------------------ */
-		
-		/**
-		 * @param in
-		 * @param checkForError
-		 * @param ctlByte
-		 * @return
-		 */
-		int readControlLine (InputStream in, boolean checkForError, byte ctlByte){
-			seekToCRLF(in);
-			if(checkForError && (this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) {
-				status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
-				didRead = true;  // we're done - error's are only one line
-				return -2;
-			}
-			if(buffer[0] != ctlByte) {
-				throw new ProviderException ("Bug?  Expecting status code for size");
-			}
-			status = ResponseStatus.STATUS_OK;
-			return Convert.toInt (buffer, 1, offset-3);
-		}
-		/**
-		 * Resets offset and reads bytes until CRLF is found.  Offset on find is the offset the subsequent
-		 * element after \n.  This is basically identical to readLine, except that it reads one byte at a time
-		 * (which is not so efficient).  Didn't wish to consolidate to one shared method as that would be
-		 * yet another method call and these methods get called all the time.  Regardless, both of these
-		 * methods are the bottle necks in this implementation.  
-		 * <p>
-		 * This is a major bottle neck for bulk and multibulk responses.  To keep the implementation relatively
-		 * simple, it runs into the non-binary nature of the redis wire protocol.  That can be addressed but will
-		 * significantly add to its complexity.
-		 * TODO: Do it.  Use and overflow buffer and read as much as possible.  Will require changes to readBulkData
-		 * so that it also uses the overflow.
-		 * @param in
-		 */
-		void seekToCRLF (InputStream in){
-			offset = 0;
-			int c = -1;
-			int available = buffer.length - offset;
-			try {
-				while ((c = in.read(buffer, offset, 1)) != -1) {
-					offset ++;
-					available --;
-					if(offset > 2 && buffer[offset-2]==(byte)13 && buffer[offset-1]==(byte)10){
-						break;  // we're done
-					}
-					if(available == 0) {
-						byte[] newbuff = new byte[buffer.length * 2];
-						System.arraycopy(buffer, 0, newbuff, 0, buffer.length);
-						buffer = newbuff;
-						available = buffer.length - offset;
-					}
-				}
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-				throw new ClientRuntimeException ("IOEx while reading line for command " + cmd.code, e);
-			}
-			
-			if(c==-1) throw new ClientRuntimeException ("in.read returned -1");
-		}
-		/**
-		 * Will read up expected bulkdata bytes from the input stream.  Routine will
-		 * also read in the last two bytes and will check that they are indeed CRLF.
-		 *  
-		 * @param in the stream to read from.
-		 * @param length expected bulk data length (NOT including the trailing CRLF).  
-		 * @return a byte[] of length.
-		 * @throws IOException 
-		 * @throws IllegalArgumentException if could not read the bulk data
-		 */
-		public final byte[] readBulkData (InputStream in, int length)
-			throws IOException, RuntimeException
-		{
-			byte[] data = new byte[length]; // TODO: optimize me
-			byte[] term = new byte[CRLF.length];
-			
-			int readcnt = -1;
-			int offset = 0;
-
-			while(offset < length){
-				if((readcnt = in.read (data, offset, length-offset)) ==-1 ) throw new ClientRuntimeException("IO - read returned -1 -- problem");
-				offset += readcnt;
-			}
-			if((readcnt = in.read (term, 0, CRLF.length)) != CRLF.length) { 
-				throw new RuntimeException ("Only read " + readcnt + " bytes for CRLF!");
-			}
-			return data;
-		}
+//		/* -------------- BULK AND MULTIBULKS ------------------------ */
+//		
+//		/**
+//		 * @param in
+//		 * @param checkForError
+//		 * @param ctlByte
+//		 * @return
+//		 */
+//		int readControlLine (InputStream in, boolean checkForError, byte ctlByte){
+//			seekToCRLF(in);
+//			if(checkForError && (this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) {
+//				status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
+//				didRead = true;  // we're done - error's are only one line
+//				return -2;
+//			}
+//			if(buffer[0] != ctlByte) {
+//				throw new ProviderException ("Bug?  Expecting status code for size");
+//			}
+//			status = ResponseStatus.STATUS_OK;
+//			return Convert.toInt (buffer, 1, offset-3);
+//		}
+//		/**
+//		 * Resets offset and reads bytes until CRLF is found.  Offset on find is the offset the subsequent
+//		 * element after \n.  This is basically identical to readLine, except that it reads one byte at a time
+//		 * (which is not so efficient).  Didn't wish to consolidate to one shared method as that would be
+//		 * yet another method call and these methods get called all the time.  Regardless, both of these
+//		 * methods are the bottle necks in this implementation.  
+//		 * <p>
+//		 * This is a major bottle neck for bulk and multibulk responses.  To keep the implementation relatively
+//		 * simple, it runs into the non-binary nature of the redis wire protocol.  That can be addressed but will
+//		 * significantly add to its complexity.
+//		 * TODO: Do it.  Use and overflow buffer and read as much as possible.  Will require changes to readBulkData
+//		 * so that it also uses the overflow.
+//		 * @param in
+//		 */
+//		void seekToCRLF (InputStream in){
+//			offset = 0;
+//			int c = -1;
+//			int available = buffer.length - offset;
+//			try {
+//				while ((c = in.read(buffer, offset, 1)) != -1) {
+//					offset ++;
+//					available --;
+//					if(offset > 2 && buffer[offset-2]==(byte)13 && buffer[offset-1]==(byte)10){
+//						break;  // we're done
+//					}
+//					if(available == 0) {
+//						byte[] newbuff = new byte[buffer.length * 2];
+//						System.arraycopy(buffer, 0, newbuff, 0, buffer.length);
+//						buffer = newbuff;
+//						available = buffer.length - offset;
+//					}
+//				}
+//			}
+//			catch (IOException e) {
+//				e.printStackTrace();
+//				throw new ClientRuntimeException ("IOEx while reading line for command " + cmd.code, e);
+//			}
+//			
+//			if(c==-1) throw new ClientRuntimeException ("in.read returned -1");
+//		}
+//		/**
+//		 * Will read up expected bulkdata bytes from the input stream.  Routine will
+//		 * also read in the last two bytes and will check that they are indeed CRLF.
+//		 *  
+//		 * @param in the stream to read from.
+//		 * @param length expected bulk data length (NOT including the trailing CRLF).  
+//		 * @return a byte[] of length.
+//		 * @throws IOException 
+//		 * @throws IllegalArgumentException if could not read the bulk data
+//		 */
+//		public final byte[] readBulkData (InputStream in, int length)
+//			throws IOException, RuntimeException
+//		{
+//			byte[] data = new byte[length]; // TODO: optimize me
+//			byte[] term = new byte[CRLF.length];
+//			
+//			int readcnt = -1;
+//			int offset = 0;
+//
+//			while(offset < length){
+//				if((readcnt = in.read (data, offset, length-offset)) ==-1 ) throw new ClientRuntimeException("IO - read returned -1 -- problem");
+//				offset += readcnt;
+//			}
+//			if((readcnt = in.read (term, 0, CRLF.length)) != CRLF.length) { 
+//				throw new RuntimeException ("Only read " + readcnt + " bytes for CRLF!");
+//			}
+//			return data;
+//		}
 	}
 	// ------------------------------------------------------------------------
 	// Inner Type
@@ -456,13 +455,130 @@ public class SynchProtocol extends ProtocolBase {
 	// ============================================================ Response(s)
 	// ------------------------------------------------------------------------
 	/**
+	 * Abstract base for all multiline responses (as of now, Bulk and MultBulk).
 	 *
-	 * @author  Joubin Houshyar (alphazero@sensesay.net)
-	 * @version alpha.0, 04/02/09
+	 * @author  Joubin (alphazero@sensesay.net)
+	 * @version alpha.0, Sep 2, 2009
 	 * @since   alpha.0
-	 * 
+	 * TODO: Use overflow buffers to increase read efficiency.
 	 */
-	public class SynchBulkResponse extends SynchResponseBase implements BulkResponse {
+	public abstract class SynchMultiLineResponseBase extends SynchResponseBase {
+
+        protected SynchMultiLineResponseBase (byte[] buffer, Command cmd, Type type) {
+	        super(buffer, cmd, type);
+        }
+		
+		/**
+		 * @param in
+		 * @param checkForError
+		 * @param ctlByte
+		 * @return
+		 */
+		int readControlLine (InputStream in, boolean checkForError, byte ctlByte){
+			seekToCRLF(in);
+			if(checkForError && (this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) {
+				status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
+				didRead = true;  // we're done - error's are only one line
+				return -2;
+			}
+			if(buffer[0] != ctlByte) {
+				throw new ProviderException ("Bug?  Expecting status code for size");
+			}
+			status = ResponseStatus.STATUS_OK;
+			return Convert.toInt (buffer, 1, offset-3);
+		}
+		/**
+		 * Resets offset and reads bytes until CRLF is found.  Offset on find is the offset the subsequent
+		 * element after \n.  This is basically identical to readLine, except that it reads one byte at a time
+		 * (which is not so efficient).  Didn't wish to consolidate to one shared method as that would be
+		 * yet another method call and these methods get called all the time.  Regardless, both of these
+		 * methods are the bottle necks in this implementation.  
+		 * <p>
+		 * This is a major bottle neck for bulk and multibulk responses.  To keep the implementation relatively
+		 * simple, it runs into the non-binary nature of the redis wire protocol.  That can be addressed but will
+		 * significantly add to its complexity.
+		 * TODO: Do it.  Use and overflow buffer and read as much as possible.  Will require changes to readBulkData
+		 * so that it also uses the overflow.
+		 * @param in
+		 */
+		void seekToCRLF (InputStream in){
+			offset = 0;
+			int c = -1;
+			int available = buffer.length - offset;
+			try {
+				while ((c = in.read(buffer, offset, 1)) != -1) {
+					offset ++;
+					available --;
+					if(offset > 2 && buffer[offset-2]==(byte)13 && buffer[offset-1]==(byte)10){
+						break;  // we're done
+					}
+					if(available == 0) {
+						byte[] newbuff = new byte[buffer.length * 2];
+						System.arraycopy(buffer, 0, newbuff, 0, buffer.length);
+						buffer = newbuff;
+						available = buffer.length - offset;
+					}
+				}
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+				throw new ClientRuntimeException ("IOEx while reading line for command " + cmd.code, e);
+			}
+			
+			if(c==-1) throw new ClientRuntimeException ("in.read returned -1");
+		}
+		/**
+		 * resets offset and reads bytes until it has a size line.
+		 * @param in
+		 * @return
+		 */
+		int readSize (InputStream in, boolean checkForError) {
+			return readControlLine(in, checkForError, SIZE_BYTE);
+		}
+		
+		/**
+		 * resets offset and reads bytes until it has a size line.
+		 * @param in
+		 * @return the count or -2 if control line was an error status
+		 */
+		int readCount (InputStream in, boolean checkForError) {
+			return readControlLine(in, checkForError, COUNT_BYTE);
+		}
+		/**
+		 * Will read up expected bulkdata bytes from the input stream.  Routine will
+		 * also read in the last two bytes and will check that they are indeed CRLF.
+		 *  
+		 * @param in the stream to read from.
+		 * @param length expected bulk data length (NOT including the trailing CRLF).  
+		 * @return a byte[] of length.
+		 * @throws IOException 
+		 * @throws IllegalArgumentException if could not read the bulk data
+		 */
+		public final byte[] readBulkData (InputStream in, int length)
+			throws IOException, RuntimeException
+		{
+			byte[] data = new byte[length]; // TODO: optimize me
+			byte[] term = new byte[CRLF.length];
+			
+			int readcnt = -1;
+			int offset = 0;
+
+			while(offset < length){
+				if((readcnt = in.read (data, offset, length-offset)) ==-1 ) throw new ClientRuntimeException("IO - read returned -1 -- problem");
+				offset += readcnt;
+			}
+			if((readcnt = in.read (term, 0, CRLF.length)) != CRLF.length) { 
+				throw new RuntimeException ("Only read " + readcnt + " bytes for CRLF!");
+			}
+			return data;
+		}
+	}
+	// ------------------------------------------------------------------------
+	// Inner Type
+	// ============================================================ Response(s)
+	// ------------------------------------------------------------------------
+//	public class SynchBulkResponse extends SynchResponseBase implements BulkResponse {
+	public class SynchBulkResponse extends SynchMultiLineResponseBase implements BulkResponse {
 		/**  */
 		byte[] data = null;
 
@@ -524,7 +640,8 @@ public class SynchProtocol extends ProtocolBase {
 	// Inner Type
 	// ============================================================ Response(s)
 	// ------------------------------------------------------------------------
-	public class SynchMultiBulkResponse extends SynchResponseBase implements MultiBulkResponse {
+//	public class SynchMultiBulkResponse extends SynchResponseBase implements MultiBulkResponse {
+	public class SynchMultiBulkResponse extends SynchMultiLineResponseBase implements MultiBulkResponse {
 
 		/**  */
 		List<byte[]>   datalist;
