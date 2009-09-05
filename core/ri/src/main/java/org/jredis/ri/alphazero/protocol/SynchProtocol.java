@@ -201,18 +201,18 @@ public class SynchProtocol extends ProtocolBase {
 	public abstract class SynchResponseBase extends ResponseSupport {
 
 		byte[]		buffer;
-		int			readOffset;
+		int			offset;
 		
 		protected SynchResponseBase(byte[] buffer, Command cmd, Type type) {
 			super(cmd, type);
 			this.buffer = buffer;
-			readOffset = 0;
+			offset = 0;
 		}
 
 		protected void reset (Command cmd, Type type) {
 			this.cmd = cmd;
 			this.type = type;
-			readOffset = 0;
+			offset = 0;
 			didRead = false;
 			status = null;
 			isError = false;
@@ -223,21 +223,21 @@ public class SynchProtocol extends ProtocolBase {
 		 * @param in
 		 */
 		void readSingleLineResponse (InputStream in) {
-			readOffset = 0;
+			offset = 0;
 			int c = -1;
 			int available = buffer.length;
 			try {
-				while ((c = in.read(buffer, readOffset, available)) != -1) {
-					readOffset += c; 
+				while ((c = in.read(buffer, offset, available)) != -1) {
+					offset += c; 
 					available -= c;
-					if(readOffset > 2 && buffer[readOffset-2]==(byte)13 && buffer[readOffset-1]==(byte)10){
+					if(offset > 2 && buffer[offset-2]==(byte)13 && buffer[offset-1]==(byte)10){
 						break;  // we're done
 					}
 					if(available == 0) {
 						byte[] newbuff = new byte[buffer.length * 2];
 						System.arraycopy(buffer, 0, newbuff, 0, buffer.length);
 						buffer = newbuff;
-						available = buffer.length - readOffset;
+						available = buffer.length - offset;
 					}
 				}
 				if(c == -1) {
@@ -245,7 +245,7 @@ public class SynchProtocol extends ProtocolBase {
 					throw new UnexpectedEOFException ("Unexpected EOF (read -1) in readLine.  Command: " + cmd.code);
 				}
 				if((this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) 
-					status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, readOffset-3));
+					status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
 				else 
 					status = ResponseStatus.STATUS_OK;
 			}
@@ -323,29 +323,25 @@ public class SynchProtocol extends ProtocolBase {
 			if(didRead) return;
 			
 			super.readSingleLineResponse (in);
-			
-			if(status.isError()) {
-				didRead = true;
-				return;
-			}
+			didRead = true;
+
 			// TODO: not quite happy with the access to raw buffer here -- a method call would
 			// slow things done but this is fragile in light of possible future code re-factoring.
-			if(flavor != ValueType.STATUS){
+			if(!status.isError() && flavor != ValueType.STATUS){
 				switch (flavor){
 				case BOOLEAN:
 					booleanValue = buffer[1]==49?true:false;
 					break;
 				case NUMBER64:
-					longValue = Convert.toLong (buffer, 1, readOffset-3);
+					longValue = Convert.toLong (buffer, 1, offset-3);
 					break;
 				case STATUS:
 					break;
 				case STRING:
-					stringValue = new String (buffer, 1, readOffset-3);
+					stringValue = new String (buffer, 1, offset-3);
 					break;
 				}
 			}
-			didRead = true;
 		}
 	}	
 	// ------------------------------------------------------------------------
@@ -362,10 +358,6 @@ public class SynchProtocol extends ProtocolBase {
 	 */
 	public abstract class SynchMultiLineResponseBase extends SynchResponseBase {
 
-		byte[] 	overflow = null;
-//		int		overflowOffset = 0;
-//		int 	overflowLen = 0;
-		
         protected SynchMultiLineResponseBase (byte[] buffer, Command cmd, Type type) {
 	        super(buffer, cmd, type);
         }
@@ -379,24 +371,22 @@ public class SynchProtocol extends ProtocolBase {
 			 * until we get the first CRLF, but we may get some overflow and we need to 
 			 * save that.
 			 */
-			readOffset = 0;
-//			overflowOffset = 0;
-//			overflowLen = 0;
+			offset = 0;
 			
 			int c = -1;
 			int available = buffer.length;
 			try {
-				while ((c = in.read(buffer, readOffset, 1)) != -1) {
-					readOffset += c;
+				while ((c = in.read(buffer, offset, 1)) != -1) {
+					offset += c;
 					available -= c;
-					if(readOffset > 2 && buffer[readOffset-2]==(byte)13 && buffer[readOffset-1]==(byte)10){
+					if(offset > 2 && buffer[offset-2]==(byte)13 && buffer[offset-1]==(byte)10){
 						break;  // we're done
 					}
 					if(available == 0) {
 						byte[] newbuff = new byte[buffer.length * 2];
 						System.arraycopy(buffer, 0, newbuff, 0, buffer.length);
 						buffer = newbuff;
-						available = buffer.length - readOffset;
+						available = buffer.length - offset;
 					}
 				}
 			}
@@ -416,7 +406,7 @@ public class SynchProtocol extends ProtocolBase {
 		int readControlLine (BufferedInputStream in, boolean checkForError, byte ctlByte){
 			seekToCRLF(in);
 			if(checkForError && (this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) {
-				status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, readOffset-3));
+				status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
 				didRead = true;  // we're done - error's are only one line
 				return -2;
 			}
@@ -424,7 +414,7 @@ public class SynchProtocol extends ProtocolBase {
 				throw new ProviderException ("Bug?  Expecting status code for size");
 			}
 			status = ResponseStatus.STATUS_OK;
-			return Convert.toInt (buffer, 1, readOffset-3);
+			return Convert.toInt (buffer, 1, offset-3);
 		}
 
 		/**
@@ -471,10 +461,7 @@ public class SynchProtocol extends ProtocolBase {
 		private SynchBulkResponse(Command cmd) {
 			this (sharedResponseBuffer, cmd);
 		}
-		/**
-		 * @param buff
-		 * @param cmd
-		 */
+
 		public SynchBulkResponse(byte[] buff, Command cmd) {
 			super (buff, cmd, Type.Bulk);
 		}
@@ -489,20 +476,15 @@ public class SynchProtocol extends ProtocolBase {
 			assertResponseRead();
 			return data;
 		}
+
 //		@Override
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
 
 			BufferedInputStream bin = new BufferedInputStream(in, INPUT_STREAM_BUFFER_SIZE);
-//			int size = readControlLine (in, true, SIZE_BYTE);
 			int size = readControlLine (bin, true, SIZE_BYTE);
 
-			if(status.isError()) {
-				didRead = true;
-				return;
-			}
-			
-			if(size >= 0){
+			if(!status.isError() && size >= 0){
 				try {
 					data = super.readBulkData(bin, size);
 				}
@@ -535,16 +517,11 @@ public class SynchProtocol extends ProtocolBase {
 		private SynchMultiBulkResponse(Command cmd) {
 			this (sharedResponseBuffer, cmd);
 		}
-		/**
-		 * @param buff
-		 * @param cmd
-		 */
+
 		public SynchMultiBulkResponse(byte[] buff, Command cmd) {
 			super (buff, cmd, Type.MultiBulk);
 		}
-		/**
-		 * @param cmd
-		 */
+
 		protected void reset (Command cmd){
 			super.reset(cmd, Type.Bulk);
 			this.datalist = null;
@@ -559,14 +536,11 @@ public class SynchProtocol extends ProtocolBase {
 //		@Override
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
+			
 			BufferedInputStream bin = new BufferedInputStream(in, 1024);
-//			int count = super.readControlLine (in, true, COUNT_BYTE);
 			int count = super.readControlLine (bin, true, COUNT_BYTE);
-			if(status.isError()) {
-				didRead = true;
-				return;
-			}
-			if(count >= 0){
+			
+			if(!status.isError() && count >= 0){
 				datalist = new ArrayList<byte[]>(count);
 				try {
 					int size = -1;
@@ -591,7 +565,6 @@ public class SynchProtocol extends ProtocolBase {
 			}
 			didRead = true;
 			return;
-
 		}
 	}
 }
