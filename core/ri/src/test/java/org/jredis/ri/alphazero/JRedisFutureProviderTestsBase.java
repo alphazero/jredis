@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
  * 
  */
 
-public abstract class JRedisFutureTestSuiteBase extends JRedisTestSuiteBase<JRedisFuture> {
+public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<JRedisFuture> {
 
 	// ------------------------------------------------------------------------
 	// Properties
@@ -61,6 +61,10 @@ public abstract class JRedisFutureTestSuiteBase extends JRedisTestSuiteBase<JRed
 	 */
 	// ------------------------------------------------------------------------
 
+	/**
+	 * Asynchronous responses must provide reference to {@link RedisException}
+	 * through the {@link ExecutionException#getCause()} per {@link Future} semantics.
+	 */
 	@Test
 	public void testExecutionExceptionCauseType() {
 		boolean expectedError;
@@ -93,6 +97,27 @@ public abstract class JRedisFutureTestSuiteBase extends JRedisTestSuiteBase<JRed
 		}
 	}
 	
+	/**
+	 * Test {@link JRedisFuture#ping()}
+	 */
+	@Test
+	public void testPing () {
+		Future<ResponseStatus> frStatus = null;
+		cmd = Command.PING.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			frStatus = provider.ping();
+			ResponseStatus status = frStatus.get();
+			assertTrue(!status.isError(), "ping return status");
+		}
+        catch (InterruptedException e) {
+	        e.printStackTrace();
+        }
+        catch (ExecutionException e) {
+	        e.printStackTrace();
+	        fail(cmd + " FAULT: " + e.getCause().getLocalizedMessage(), e);
+        }
+	}
 	/**
 	 * Test {@link JRedisFuture#flushdb()}
 	 */

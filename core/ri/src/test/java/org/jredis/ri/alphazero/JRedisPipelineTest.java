@@ -35,7 +35,7 @@ import org.testng.annotations.Test;
  */
 @Test(sequential = true, suiteName="Pipeline-tests")
 
-public class JRedisPipelineTest extends JRedisFutureTestSuiteBase {
+public class JRedisPipelineTest extends JRedisFutureProviderTestsBase {
 
 	// ------------------------------------------------------------------------
 	// JRedisPipelineTest specific Test Suite Parameters
