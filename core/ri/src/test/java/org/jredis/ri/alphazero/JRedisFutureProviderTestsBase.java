@@ -17,6 +17,7 @@
 package org.jredis.ri.alphazero;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
@@ -65,6 +66,50 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	 */
 	// ------------------------------------------------------------------------
 
+//	@Test
+//	public void testTemplate() throws InterruptedException {
+//		cmd = Command.PING.code + " | " + Command.SETNX.code + " byte[] | " + Command.GET;
+//		Log.log("TEST: %s command", cmd);
+//		Future<ResponseStatus> reqResp = provider.ping();
+//		try {
+//			try {
+//				reqResp.get();
+//			}
+//			catch(ExecutionException e){
+//				Throwable cause = e.getCause();
+//				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+//			}
+//		} 
+//		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+//	}
+	
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, byte[])}.
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testSetStringByteArray() throws InterruptedException {
+		cmd = Command.SET.code + " | " + Command.SETNX.code + " byte[] | " + Command.GET;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			provider.set(keys.get(keys.size()-1), emptyBytes);
+			Future<byte[]> getResp = provider.get(keys.get(keys.size()-1));
+			Future<Boolean> setnxResp1 = provider.setnx(keys.get(1), dataList.get(1));
+			Future<Boolean> setnxResp2 = provider.setnx(keys.get(1), dataList.get(2));
+			
+			try {
+				assertEquals(getResp.get(), emptyBytes, "set and get results for empty byte[]");
+				assertTrue(setnxResp1.get());
+				assertFalse(setnxResp2.get());
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#rename(java.lang.String, java.lang.String)}.
 	 * @throws InterruptedException 
