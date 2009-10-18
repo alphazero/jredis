@@ -83,11 +83,35 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 //		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 //	}
 	@Test
+	public void testDel() throws InterruptedException {
+		cmd = Command.DEL.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String key = this.keys.get(0);
+			provider.set (key, dataList.get(0));
+			Future<Boolean> existsResp1 = provider.exists(key); 
+			provider.del(key);
+			Future<Boolean> existsResp2 = provider.exists(key); 
+			
+			try {
+				assertTrue (existsResp1.get(), "After set key should exist");
+				assertFalse (existsResp2.get(), "After del key should not exist");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
 	public void testIncrAndDecr() throws InterruptedException {
 		cmd = Command.INCR.code + " | " + Command.DECR.code;
 		Log.log("TEST: %s command", cmd);
 		try {
-			long cntr = 0;
 			String cntr_key = keys.get(0);
 
 			provider.flushdb();
@@ -104,6 +128,36 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			try {
 				assertEquals(incrResp.get().longValue(), MEDIUM_CNT, "INCR should have counted counter to MEDIUM_CNT");
 				assertEquals(decrResp.get().longValue(), 0, "DECR should have counted counter to zero");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
+	@Test
+	public void testIncrbyAndDecrby() throws InterruptedException {
+		cmd = Command.INCRBY.code + " |" + Command.DECRBY.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			String cntr_key = keys.get(0);
+
+			provider.flushdb();
+
+			Future<Long> incrbyResp = null;
+			for(int i = 0; i<MEDIUM_CNT; i++){
+				incrbyResp = provider.incrby(cntr_key, 10);
+			}
+			Future<Long> decrbyResp = null;
+			for(int i = 0; i<MEDIUM_CNT; i++){
+				decrbyResp = provider.decrby(cntr_key, 10);
+			}
+			
+			try {
+				assertEquals(incrbyResp.get().longValue(), MEDIUM_CNT*10, "INCRBY should have counted counter to MEDIUM_CNT*10");
+				assertEquals(decrbyResp.get().longValue(), 0, "DECRBY should have counted counter to zero");
 			}
 			catch(ExecutionException e){
 				Throwable cause = e.getCause();
