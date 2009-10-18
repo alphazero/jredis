@@ -82,7 +82,37 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 //		} 
 //		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 //	}
-	
+	@Test
+	public void testIncrAndDecr() throws InterruptedException {
+		cmd = Command.INCR.code + " | " + Command.DECR.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			long cntr = 0;
+			String cntr_key = keys.get(0);
+
+			provider.flushdb();
+
+			Future<Long> incrResp = null;
+			for(int i = 0; i<MEDIUM_CNT; i++){
+				incrResp = provider.incr(cntr_key);
+			}
+			Future<Long> decrResp = null;
+			for(int i = 0; i<MEDIUM_CNT; i++){
+				decrResp = provider.decr(cntr_key);
+			}
+			
+			try {
+				assertEquals(incrResp.get().longValue(), MEDIUM_CNT, "INCR should have counted counter to MEDIUM_CNT");
+				assertEquals(decrResp.get().longValue(), 0, "DECR should have counted counter to zero");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
 	@Test
 	public void testGetSetStringByteArray() throws InterruptedException {
 		cmd = Command.SET.code + " | " + Command.GETSET.code + " byte[] ";
