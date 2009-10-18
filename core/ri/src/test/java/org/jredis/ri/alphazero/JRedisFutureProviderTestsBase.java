@@ -16,6 +16,7 @@
 
 package org.jredis.ri.alphazero;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import java.util.List;
@@ -62,6 +63,43 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	 * 3 - MOVE and SELECT
 	 */
 	// ------------------------------------------------------------------------
+
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#rename(java.lang.String, java.lang.String)}.
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRename() throws InterruptedException {
+		cmd = Command.RENAME.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			
+			String newkey = null;
+			byte[] value = dataList.get(0);
+			key = getRandomAsciiString (random.nextInt(24)+2);
+			newkey = getRandomAsciiString (random.nextInt(24)+2);
+			
+			Future<ResponseStatus> 	flushResp = provider.flushdb();
+			Future<ResponseStatus> 	setResp = provider.set (key, value);
+			Future<byte[]> 			getOldResp = provider.get(key);
+			Future<ResponseStatus> 	reanmeResp = provider.rename (key, newkey);
+			Future<byte[]> 			getNewResp = provider.get(newkey);
+			
+			try {
+				flushResp.get();
+				setResp.get();
+				assertEquals(value, getOldResp.get());
+				reanmeResp.get();
+				assertEquals(value, getNewResp.get());
+			}
+			catch(ExecutionException e){
+				// errors in response 
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
 
 	/**
 	 * Test settting a key in a flushed db, and then checking
