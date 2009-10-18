@@ -212,9 +212,8 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#flushdb()}.
 	 */
 	@Test
-	public void testSelectAndFlushdb() {
+	public void testSetAndFlushdbAndExistsAndKeys() {
 		cmd = 
-			Command.SELECT.code + " | " + 
 			Command.FLUSHDB.code + " | " +
 			Command.SET.code + " | " +
 			Command.EXISTS.code + " | " +

@@ -64,6 +64,49 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	// ------------------------------------------------------------------------
 
 	/**
+	 * Test settting a key in a flushed db, and then checking
+	 * exists, flushing again, and finally keys().  
+	 * Will invoke commands asynchronously, and after 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testSetAndFlushdbAndExistsAndKeys() throws InterruptedException {
+		cmd = 
+			Command.FLUSHDB.code + " | " +
+			Command.SET.code + " | " +
+			Command.EXISTS.code + " | " +
+			Command.FLUSHDB.code + " | " +
+			Command.KEYS.code;
+			
+		Log.log("TEST: %s commands", cmd);
+		try {
+			key = "woof";
+			Future<ResponseStatus> flushResp = provider.flushdb();
+			Future<ResponseStatus> setResp = provider.set(key, "meow");
+			Future<Boolean> existsResp = provider.exists(key);
+			Future<ResponseStatus> flush2Resp = provider.flushdb();
+			Future<List<String>>  keysResp = provider.keys();
+			
+			try {
+				flushResp.get(); // no need to check status; if error exception is raised
+				setResp.get();
+				assertTrue(existsResp.get(), "key should exists at this point");
+				flush2Resp.get();
+				assertTrue(keysResp.get().size() == 0, "keys should have returned list of 0 items");
+			}
+			catch(ExecutionException e){
+				// errors in response 
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) { 
+			// errors in request time
+			fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e); 
+		}
+	}
+	
+	/**
 	 * Tests to force RedisExceptions against various response types.
 	 * First we queue the requests and then we get the responses for all.
 	 * This tests both the primary goal and the correct behaviour of asynch
