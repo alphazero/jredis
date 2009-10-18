@@ -31,8 +31,10 @@ import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Request;
 import org.jredis.protocol.Response;
 import org.jredis.ri.alphazero.protocol.ConcurrentSynchProtocol;
+import org.jredis.ri.alphazero.protocol.VirtualResponse;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.FastBufferedInputStream;
+import org.jredis.ri.alphazero.support.Log;
 
 /**
  * [TODO: document me!]
@@ -48,11 +50,24 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
+	/**  */
 	private ResponseHandler	    	respHandler;
+
+	/**  */
 	private Thread 					respHandlerThread;
+
+	/**  */
 	private BlockingQueue<PendingRequest>	pendingResponseQueue;
 
+	/** synchronization object used to serialize request queuing  */
 	private Object					serviceLock = new Object();
+	
+	/** 
+	 * flag (default false) indicates if a pending QUIT command is being processed.  
+	 * If true, any calls to queueRequests will result in a raise runtime exception
+	 */
+	private boolean					pendingQuit = false;
+	
 	// ------------------------------------------------------------------------
 	// Constructor(s)
 	// ------------------------------------------------------------------------
@@ -107,6 +122,16 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     // ------------------------------------------------------------------------
 	// Interface: Connection
 	// ------------------------------------------------------------------------
+    /**
+     * This is a pseudo asynchronous method.  The actual write to server does 
+     * occur in this method, so when this method returns, your request has been
+     * sent.  This simply defers the response read to the response handler.
+     * <p>
+     * Other item of note is that once a QUIT request has been queued, no further
+     * requests are accepted and a ClientRuntimeException is thrown.
+     * 
+     * @see org.jredis.ri.alphazero.connection.ConnectionBase#queueRequest(org.jredis.protocol.Command, byte[][])
+     */
     @Override
     public final Future<Response> queueRequest (Command cmd, byte[]... args) 
     	throws ClientRuntimeException, ProviderException 
@@ -115,10 +140,13 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
    
 		PendingRequest pendingResponse = null;
 		synchronized (serviceLock) {
+			if(pendingQuit) throw new ClientRuntimeException("Pipeline shutting down: Quit in progess; no further requests are accepted.");
+			
 			Request request = Assert.notNull(protocol.createRequest (cmd, args), "request object from handler", ProviderException.class);
 			request.write(getOutputStream());
 			pendingResponse = new PendingRequest(request, cmd);
 			pendingResponseQueue.add(pendingResponse);
+			pendingQuit = cmd == Command.QUIT;
 		}
 		return pendingResponse;
     }
@@ -127,14 +155,20 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	// Inner Class
 	// ------------------------------------------------------------------------
     
+    /**
+     * Provides the response processing logic as a {@link Runnable}.
+     * 
+     * @author  Joubin Houshyar (alphazero@sensesay.net)
+     * @version alpha.0, Oct 18, 2009
+     * @since   alpha.0
+     * 
+     */
     public final class ResponseHandler implements Runnable {
-    	private boolean keepWorking = true;
-    	void stop () {
-    		// TODO: 
-    	}
+
     	/**
     	 * Keeps processing the {@link PendingRequest}s in the pending {@link Queue}
-    	 * while {@link ResponseHandler#keepWorking} is <code>true</code>.
+		 * until a QUIT is encountered in the pending queue.  Thread will stop after
+		 * processing the QUIT response (which is expected to be a {@link VirtualResponse}.
     	 * <p>
     	 * TODO: not entirely clear what is the best way to handle exceptions.
     	 * <p>
@@ -144,8 +178,9 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	 */
 //        @Override
         public void run () {
+			Log.log("Pipeline thread <%s> started.", Thread.currentThread().getName());
         	PendingRequest pending = null;
-        	while(keepWorking){
+        	while(true){
         		Response response = null;
 				try {
 	                pending = pendingResponseQueue.take();
@@ -170,11 +205,17 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 						pending.setResponse(null);
 						break;
 					}
+					
+					// if we just processed a QUIT, then pipeline is closing and we'll stop running.
+					if(pending.cmd == Command.QUIT) {
+						break;
+					}
                 }
                 catch (InterruptedException e1) {
 	                e1.printStackTrace();
                 }
         	}
+			Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
         }
     }
 }

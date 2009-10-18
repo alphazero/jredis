@@ -21,6 +21,7 @@ import java.io.OutputStream;
 
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
+import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.ResponseStatus;
 
@@ -62,6 +63,14 @@ public final class VirtualResponse implements Response {
 	public boolean isError() { return false;}
 
 //	@Override
+	/**
+	 * The raison d'être for this class is to provide responses that are not actually read from
+	 * the server.  Typically this is for commands that closed the connection on the send, such
+	 * as QUIT.
+	 * @see Command#QUIT
+	 * @see Command#SHUTDOWN
+	 * @see org.jredis.connector.Message#read(java.io.InputStream)
+	 */
 	public void read(InputStream in) throws ClientRuntimeException, ProviderException { return;}
 
 //	@Override

@@ -20,7 +20,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.jredis.Codec;
 import org.jredis.JRedis;
 import org.jredis.JRedisFuture;
 import org.jredis.connector.ConnectionSpec;
@@ -196,6 +195,7 @@ public abstract class UsingJRedisFuture {
         	Log.problem("Interrupted while running the examples.");
 	        e.printStackTrace();
         }
+        jredis.quit();
 	}
 	
 	/**

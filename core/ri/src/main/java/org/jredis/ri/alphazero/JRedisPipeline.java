@@ -64,7 +64,9 @@ public class JRedisPipeline extends JRedisFutureSupport {
 	// ------------------------------------------------------------------------
 	// Super overrides
 	// ------------------------------------------------------------------------
-	/* (non-Javadoc)
+	/**
+	 * Requests to server are queued at this point.  Any requests after a {@link Command#QUIT} will
+	 * raise an exception indicating the pipeline is shutting down.  
 	 * @see org.jredis.ri.alphazero.JRedisFutureSupport#queueRequest(org.jredis.protocol.Command, byte[][])
 	 */
 	protected  Future<Response> queueRequest (Command cmd, byte[]...args) throws ClientRuntimeException, ProviderException {

@@ -45,18 +45,16 @@ public class HelloAgain {
 		try {
 			JRedis	jredis = new JRedisClient("localhost", 6379, "jredis", 0);
 			jredis.ping();
-
-			jredis.ping();
 			
 			if(!jredis.exists(key)) {
 				jredis.set(key, "Hello Again!");
 				System.out.format("Hello!  You should run me again!\n");
-				return;
 			}
-			
-			String msg = toStr ( jredis.get(key) );
-			
-			System.out.format("%s\n", msg);
+			else {
+				String msg = toStr ( jredis.get(key) );
+				System.out.format("%s\n", msg);
+			}
+			jredis.quit();
 		}
 		catch (RedisException e){
 			if (e.getCommand()==Command.PING){
