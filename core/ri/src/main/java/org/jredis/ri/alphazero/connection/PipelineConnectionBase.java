@@ -189,6 +189,10 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 						response.read(getInputStream());
 						pending.response = response;
 						pending.completion.signal();
+						if(response.getStatus().isError()) {
+							Log.error ("(Asynch) Error response for " + pending.cmd.code + " => " + response.getStatus().message());
+						}
+
 					}
 					catch (ProviderException bug){
 						bug.printStackTrace();

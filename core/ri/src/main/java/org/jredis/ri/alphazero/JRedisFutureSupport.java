@@ -32,7 +32,6 @@ import java.util.concurrent.TimeoutException;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.ProviderException;
-import org.jredis.RedisException;
 import org.jredis.RedisType;
 import org.jredis.Sort;
 import org.jredis.connector.Connection;
@@ -86,7 +85,6 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	 * @param cmd
 	 * @param args
 	 * @return
-	 * @throws RedisException
 	 * @throws ClientRuntimeException
 	 * @throws ProviderException
 	 */

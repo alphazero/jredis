@@ -72,7 +72,6 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	 */
 	@Test
 	public void testElicitErrors() {
-		cmd = Command.AUTH.code;
 		Log.log("TEST: Elicit errors");
 		try {
 			provider.flushdb();

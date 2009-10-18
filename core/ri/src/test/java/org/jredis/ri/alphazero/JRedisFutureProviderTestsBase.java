@@ -18,8 +18,10 @@ package org.jredis.ri.alphazero;
 
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.RedisException;
 import org.jredis.protocol.Command;
@@ -62,11 +64,79 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Asynchronous responses must provide reference to {@link RedisException}
-	 * through the {@link ExecutionException#getCause()} per {@link Future} semantics.
+	 * Tests to force RedisExceptions against various response types.
+	 * First we queue the requests and then we get the responses for all.
+	 * This tests both the primary goal and the correct behaviour of asynch
+	 * provider to queue the responses.
+	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testExecutionExceptionCauseType() {
+	public void testElicitErrors() throws InterruptedException {
+		Log.log("TEST: Elicit errors");
+		try {
+			provider.flushdb();
+			
+			String key = keys.get(0);
+			try {
+	            provider.set(key, smallData).get();
+            }
+            catch (ExecutionException e) {
+            	fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); 
+            }
+			
+            // queue a few commands -- all are expected to result in ExecutionExcetion on Future.get()
+            //
+			Future<Boolean>	fSaddResp = provider.sadd(key, dataList.get(0)); 
+			Future<Long>	fScardResp = provider.scard(key); 
+			Future<byte[]>  fLpopResp = provider.lpop(key); 
+			Future<List<byte[]>> fSmembersResp = provider.smembers(key); 
+			
+			boolean expectedError;
+			
+			expectedError = false;
+			try {
+				Log.log("1 - Expecting an operation against key holding the wrong kind of value ERROR for SADD..");
+				fSaddResp.get();
+			}
+			catch (ExecutionException e) { expectedError = true; }
+			assertTrue(expectedError, "should have raised an exception but did not");
+			
+			expectedError = false;
+			try {
+				Log.log("2 - Expecting an operation against key holding the wrong kind of value ERROR for SCARD..");
+				fScardResp.get();
+			}
+			catch (ExecutionException e) { expectedError = true; }
+			assertTrue(expectedError, "should have raised an exception but did not");
+			
+			expectedError = false;
+			try {
+				Log.log("3 - Expecting an operation against key holding the wrong kind of value ERROR for LPOP ..");
+				fLpopResp.get();
+			}
+			catch (ExecutionException e) { expectedError = true; }
+			assertTrue(expectedError, "should have raised an exception but did not");
+			
+			expectedError = false;
+			try {
+				Log.log("4 - Expecting an operation against key holding the wrong kind of value ERROR for SMEMBERS ..");
+				fSmembersResp.get();
+			}
+			catch (ExecutionException e) { expectedError = true; }
+			assertTrue(expectedError, "should have raised an exception but did not");
+			
+			
+		} 
+		catch (ClientRuntimeException e) { fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
+	/**
+	 * Asynchronous responses must provide reference to {@link RedisException}
+	 * through the {@link ExecutionException#getCause()} per {@link Future} semantics.
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testExecutionExceptionCauseType() throws InterruptedException {
 		boolean expectedError;
 		String key = keys.get(0);
 		try {
@@ -79,9 +149,6 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				@SuppressWarnings("unused")
                 boolean response = fBool.get(); // wait for response
 			}
-            catch (InterruptedException e) {
-	            e.printStackTrace();
-            }
             catch (ExecutionException e) {
             	expectedError = true;
             	Throwable cause = e.getCause();
@@ -99,9 +166,10 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	
 	/**
 	 * Test {@link JRedisFuture#ping()}
+	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testPing () {
+	public void testPing () throws InterruptedException {
 		Future<ResponseStatus> frStatus = null;
 		cmd = Command.PING.code;
 		Log.log("TEST: %s command", cmd);
@@ -110,9 +178,6 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			ResponseStatus status = frStatus.get();
 			assertTrue(!status.isError(), "ping return status");
 		}
-        catch (InterruptedException e) {
-	        e.printStackTrace();
-        }
         catch (ExecutionException e) {
 	        e.printStackTrace();
 	        fail(cmd + " FAULT: " + e.getCause().getLocalizedMessage(), e);
@@ -120,9 +185,10 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	}
 	/**
 	 * Test {@link JRedisFuture#flushdb()}
+	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testFlushDb () {
+	public void testFlushDb () throws InterruptedException {
 		Future<ResponseStatus> frStatus = null;
 		cmd = Command.FLUSHDB.code;
 		Log.log("TEST: %s command", cmd);
@@ -131,9 +197,6 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			ResponseStatus status = frStatus.get();
 			assertTrue(!status.isError(), "flushdb return status");
 		}
-        catch (InterruptedException e) {
-	        e.printStackTrace();
-        }
         catch (ExecutionException e) {
 	        e.printStackTrace();
 	        fail(cmd + " FAULT: " + e.getCause().getLocalizedMessage(), e);

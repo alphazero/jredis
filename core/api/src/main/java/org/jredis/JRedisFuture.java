@@ -99,7 +99,6 @@ public interface JRedisFuture {
 	 * @param key any UTF-8 {@link String}
 	 * @param value any bytes.  For current data size limitations, refer to
 	 * Redis documentation.
-	 * @throws RedisException on user error.
 	 * @throws ProviderException on un-documented features/bug
 	 * @throws ClientRuntimeException on errors due to operating environment (Redis or network)
 	 */
@@ -109,7 +108,6 @@ public interface JRedisFuture {
 	 * @Redis SET
 	 * @param key
 	 * @param stringValue
-	 * @throws RedisException
 	 * @see {@link JRedis#set(String, byte[])}
 	 */
 	public Future<ResponseStatus> set (String key, String stringValue);
@@ -118,7 +116,6 @@ public interface JRedisFuture {
 	 * @Redis SET
 	 * @param key
 	 * @param numberValue
-	 * @throws RedisException
 	 * @see {@link JRedis#set(String, byte[])}
 	 */
 	public Future<ResponseStatus> set (String key, Number numberValue);
@@ -130,7 +127,6 @@ public interface JRedisFuture {
 	 * @param <T>
 	 * @param key
 	 * @param object
-	 * @throws RedisException
 	 * @see {@link JRedis#set(String, byte[])}
 	 */
 	public <T extends Serializable> 
@@ -141,7 +137,6 @@ public interface JRedisFuture {
 	 * @param key
 	 * @param value
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Boolean> setnx (String key, byte[] value);
 	public Future<Boolean> setnx (String key, String stringValue);
@@ -153,7 +148,6 @@ public interface JRedisFuture {
 	 * @Redis GET
 	 * @param key
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<byte[]> get (String key) ;
 
@@ -169,7 +163,6 @@ public interface JRedisFuture {
 	 * @param key
 	 * @param moreKeys
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<List<byte[]>> mget(String key, String...moreKeys);
 
@@ -177,7 +170,6 @@ public interface JRedisFuture {
 	 * @Redis INCR
 	 * @param key
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Long> incr (String key);
 
@@ -186,7 +178,6 @@ public interface JRedisFuture {
 	 * @param key
 	 * @param delta
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Long> incrby (String key, int delta);
 
@@ -194,7 +185,6 @@ public interface JRedisFuture {
 	 * @Redis DECR
 	 * @param key
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Long> decr (String key);
 
@@ -203,7 +193,6 @@ public interface JRedisFuture {
 	 * @param key
 	 * @param delta
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Long> decrby (String key, int delta);
 
@@ -211,7 +200,6 @@ public interface JRedisFuture {
 	 * @Redis EXISTS
 	 * @param key
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Boolean> exists(String key);
 
@@ -219,7 +207,6 @@ public interface JRedisFuture {
 	 * @Redis DEL
 	 * @param key
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Boolean> del (String key);
 
@@ -227,7 +214,6 @@ public interface JRedisFuture {
 	 * @Redis TYPE
 	 * @param key
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<RedisType> type (String key);
 	
@@ -240,7 +226,6 @@ public interface JRedisFuture {
 	 * @Redis KEYS
 	 * @param pattern
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<List<String>> keys (String pattern);
 	
@@ -248,7 +233,6 @@ public interface JRedisFuture {
 	 * Convenience method.  Equivalent to calling <code>jredis.keys("*");</code>
 	 * @Redis KEYS
 	 * @return
-	 * @throws RedisException
 	 * @see {@link JRedis#keys(String)}
 	 */
 	public Future<List<String>> keys ();
@@ -256,7 +240,6 @@ public interface JRedisFuture {
 	/**
 	 * @Redis RANDOMKEY
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<String> randomkey();
 	
@@ -264,7 +247,6 @@ public interface JRedisFuture {
 	 * @Redis RENAME
 	 * @param oldkey
 	 * @param newkey
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> rename (String oldkey, String newkey);
 	
@@ -273,14 +255,12 @@ public interface JRedisFuture {
 	 * @param oldkey
 	 * @param brandnewkey
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Boolean> renamenx (String oldkey, String brandnewkey);
 	
 	/**
 	 * @Redis DBSIZE
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Long> dbsize ();
 	
@@ -289,7 +269,6 @@ public interface JRedisFuture {
 	 * @param key
 	 * @param ttlseconds
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Boolean> expire (String key, int ttlseconds); 
 	
@@ -297,7 +276,6 @@ public interface JRedisFuture {
 	 * @Redis TTL
 	 * @param key
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Long> ttl (String key);
 	
@@ -309,7 +287,6 @@ public interface JRedisFuture {
 	 * @Redis RPUSH
 	 * @param listkey
 	 * @param value
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> rpush (String listkey, byte[] value);
 	public Future<ResponseStatus> rpush (String listkey, String stringValue);
@@ -321,7 +298,6 @@ public interface JRedisFuture {
 	 * @Redis LPUSH
 	 * @param listkey
 	 * @param value
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> lpush (String listkey, byte[] value);
 	public Future<ResponseStatus> lpush (String listkey, String stringValue);
@@ -334,7 +310,6 @@ public interface JRedisFuture {
 	 * @param key
 	 * @param index
 	 * @param value
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> lset (String key, long index, byte[] value);
 	public Future<ResponseStatus> lset (String key, long index, String stringValue);
@@ -349,7 +324,6 @@ public interface JRedisFuture {
 	 * @param value
 	 * @param count
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Long> lrem (String listKey, byte[] value,       int count);
 	public Future<Long> lrem (String listKey, String stringValue, int count);
@@ -362,7 +336,6 @@ public interface JRedisFuture {
 	 * @Redis LLEN
 	 * @param listkey
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Long> llen (String listkey);
 	
@@ -372,7 +345,6 @@ public interface JRedisFuture {
 	 * @param from
 	 * @param to
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<List<byte[]>> lrange (String listkey, long from, long to); 
 
@@ -381,7 +353,6 @@ public interface JRedisFuture {
 	 * @param listkey
 	 * @param keepFrom
 	 * @param keepTo
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> ltrim (String listkey, long keepFrom, long keepTo);
 	
@@ -390,7 +361,6 @@ public interface JRedisFuture {
 	 * @param listkey
 	 * @param index
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<byte[]> lindex (String listkey, long index);
 	
@@ -398,7 +368,6 @@ public interface JRedisFuture {
 	 * @Redis LPOP
 	 * @param listKey
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<byte[]> lpop (String listKey);
 	
@@ -406,7 +375,6 @@ public interface JRedisFuture {
 	 * @Redis RPOP
 	 * @param listKey
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<byte[]> rpop (String listKey);
 
@@ -419,7 +387,6 @@ public interface JRedisFuture {
 	 * @param setkey
 	 * @param member
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Boolean> sadd (String setkey, byte[] member);
 	public Future<Boolean> sadd (String setkey, String stringValue);
@@ -432,7 +399,6 @@ public interface JRedisFuture {
 	 * @param setKey
 	 * @param member
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Boolean> srem (String setKey, byte[] member);
 	public Future<Boolean> srem (String setKey, String stringValue);
@@ -445,7 +411,6 @@ public interface JRedisFuture {
 	 * @param setKey
 	 * @param member
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Boolean> sismember (String setKey, byte[] member);
 	public Future<Boolean> sismember (String setKey, String stringValue);
@@ -459,7 +424,6 @@ public interface JRedisFuture {
 	 * @param destKey
 	 * @param member
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Boolean> smove (String srcKey, String destKey, byte[] member);
 	public Future<Boolean> smove (String srcKey, String destKey, String stringValue);
@@ -471,7 +435,6 @@ public interface JRedisFuture {
 	 * @Redis SCARD
 	 * @param setKey
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Long> scard (String setKey);	
 	
@@ -480,14 +443,12 @@ public interface JRedisFuture {
 	 * @param set1
 	 * @param sets
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<List<byte[]>> sinter (String set1, String...sets);
 	/**
 	 * @Redis SINTERSTORE
 	 * @param destSetKey
 	 * @param sets
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> sinterstore (String destSetKey, String...sets);
 
@@ -496,7 +457,6 @@ public interface JRedisFuture {
 	 * @param set1
 	 * @param sets
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<List<byte[]>> sunion (String set1, String...sets);
 	
@@ -504,7 +464,6 @@ public interface JRedisFuture {
 	 * @Redis SUNIONSTORE
 	 * @param destSetKey
 	 * @param sets
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> sunionstore (String destSetKey, String...sets);
 
@@ -513,7 +472,6 @@ public interface JRedisFuture {
 	 * @param set1
 	 * @param sets
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<List<byte[]>> sdiff (String set1, String...sets);
 	
@@ -521,7 +479,6 @@ public interface JRedisFuture {
 	 * @Redis SDIFFSTORE
 	 * @param destSetKey
 	 * @param sets
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> sdiffstore (String destSetKey, String...sets);
 
@@ -529,7 +486,6 @@ public interface JRedisFuture {
 	 * @Redis SMEMBERS
 	 * @param setkey
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<List<byte[]>> smembers (String setkey);
 	
@@ -546,7 +502,6 @@ public interface JRedisFuture {
 	 * that there is no roll-back.
 	 * @Redis FLUSHDB
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> flushdb ();
 
@@ -555,7 +510,6 @@ public interface JRedisFuture {
 	 * on connect time.  Remember that there is no rollback.
 	 * @Redis FLUSHALL
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> flushall ();
 
@@ -566,7 +520,6 @@ public interface JRedisFuture {
 	 * @param key
 	 * @param dbIndex
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Boolean> move (String key, int dbIndex);
 	
@@ -600,25 +553,20 @@ public interface JRedisFuture {
 
 	/**
 	 * @Redis SAVE
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> save();
 
 	/**
 	 * @Redis BGSAVE
-	 * @throws RedisException
 	 */
 	public Future<ResponseStatus> bgsave ();
 
 	/**
 	 * @Redis LASTSAVE
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Long> lastsave ();
 
-//	@Deprecated
-//	public Future<ResponseStatus> shutdown ();
 
 // ------------------------------------------------------------------------
 // Remote server control commands
@@ -627,12 +575,6 @@ public interface JRedisFuture {
 	/**
 	 * @Redis INFO
 	 * @return
-	 * @throws RedisException
 	 */
 	public Future<Map<String, String>>	info () ;
-	
-	
-//	public interface Future<ResponseStatus> extends Future<Boolean>{
-//		public boolean isOK();
-//	}
 }
