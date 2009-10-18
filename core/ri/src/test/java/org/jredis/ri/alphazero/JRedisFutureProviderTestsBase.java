@@ -18,6 +18,7 @@ package org.jredis.ri.alphazero;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -91,6 +92,45 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				assertEquals(value, getOldResp.get());
 				reanmeResp.get();
 				assertEquals(value, getNewResp.get());
+			}
+			catch(ExecutionException e){
+				// errors in response 
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#rename(java.lang.String, java.lang.String)}.
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRenamenx() throws InterruptedException {
+		cmd = Command.RENAMENX.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			// flush db and set a key
+			provider.flushdb();
+			provider.set (keys.get(0), dataList.get(0));
+			
+			// this should return true in future
+			Future<Boolean> 	reanmenxResp1 = provider.renamenx (keys.get(0), keys.get(2));
+
+			// flush db again and set 2 keys
+			provider.flushdb();
+			provider.set (keys.get(1), dataList.get(1));
+			provider.set (keys.get(2), dataList.get(2));
+			
+			// this should return false in future
+			Future<Boolean> 	reanmenxResp2 = provider.renamenx (keys.get(1), keys.get(2));
+			
+			try {
+				// note that we don't have to 'get' the future results for 
+				// commands we are not interested in.
+				assertTrue (reanmenxResp1.get(), "1st renamenx should have been true");
+				assertFalse (reanmenxResp2.get(), "2nd renamenx should have been false");
 			}
 			catch(ExecutionException e){
 				// errors in response 
