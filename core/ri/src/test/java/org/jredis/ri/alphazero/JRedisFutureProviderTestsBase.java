@@ -54,7 +54,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	// ------------------------------------------------------------------------
 	// The Tests
 	// ======================================================= JRedisFuture ===
-	/**
+	/*
 	 * We define and run provider agnostic tests here.  This means we run a set
 	 * of JRedisFuture interface method tests that every connected JRedisFuture
 	 * implementation should be able to support. 
@@ -82,6 +82,31 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 //		} 
 //		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 //	}
+	
+	@Test
+	public void testGetSetStringByteArray() throws InterruptedException {
+		cmd = Command.SET.code + " | " + Command.GETSET.code + " byte[] ";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			provider.set(keys.get(0), dataList.get(0));
+			Future<byte[]> getResp = provider.get(keys.get(0));
+			Future<byte[]> getsetResp1 = provider.getset(keys.get(0), dataList.get(1));
+			Future<byte[]> getsetResp2 = provider.getset(keys.get(1), dataList.get(2));
+			
+			try {
+				assertEquals(getResp.get(), dataList.get(0), "get results doesn't match the expected data");
+				assertEquals(getsetResp1.get(), dataList.get(0), "getset results doesn't match the expected data");
+				assertEquals(getsetResp2.get(), null, "getset result for new key should have been null");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
 	
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, byte[])}.
