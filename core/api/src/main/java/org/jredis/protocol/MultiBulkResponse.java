@@ -26,9 +26,6 @@ import org.jredis.ProviderException;
 
 /**
  * [TODO: document me!]
- * 
- * An object implementing this interface will return {@link Response.Type#MultiBulk} to the {@link Response#getType()}
- * method
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09

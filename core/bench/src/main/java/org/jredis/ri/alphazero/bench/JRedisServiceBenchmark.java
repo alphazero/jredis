@@ -40,7 +40,7 @@ public class JRedisServiceBenchmark extends JRedisBenchmark {
 		int    port = 6379;
 		int	   size = 3;
 		int workerCnt = 100;
-		int poolCnt = 5;
+		int poolCnt = 10;
 		int reqCnt = 10000;
 		int	db = 13;
 		if(args.length > 0) db = Integer.valueOf (args[0]);

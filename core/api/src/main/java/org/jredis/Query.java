@@ -17,6 +17,7 @@
 package org.jredis;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * Provides for specifying and chaining query predicates.  The results of the query directive are returned
@@ -58,5 +59,6 @@ public interface Query {
 	 * @throws RedisException
 	 */
 	// TODO: why illegal state?
-	public List <byte[]> exec () throws IllegalStateException, RedisException;	
+	public List<byte[]> exec () throws IllegalStateException, RedisException;	
+	public Future<List<byte[]>> execAsynch ();	
 }

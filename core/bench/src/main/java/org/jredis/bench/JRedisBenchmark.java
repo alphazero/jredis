@@ -21,9 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
 import org.jredis.RedisException;
+import org.jredis.bench.Util.Timer;
 import org.jredis.protocol.Command;
 import org.jredis.ri.alphazero.connection.SocketConnection;
 
@@ -42,22 +44,7 @@ public abstract class JRedisBenchmark {
 	// ------------------------------------------------------------------------
 	// Helper methods
 	// ------------------------------------------------------------------------
-//	static 
-//	public String getRandomString (int size) {
-//		StringBuilder builder = new  StringBuilder(size);
-//		for(int i = 0; i<size; i++){
-//			char c = (char) (random.nextInt(126-33) + 33);
-//			builder.append(c);
-//		}
-//		return builder.toString();
-//	}
-//	static 
-//	public byte[] getRandomBytes(int size) {
-//		int len = size;
-//		byte[]	bigstuff = new byte[len];
-//		random.nextBytes(bigstuff);
-//		return bigstuff;
-//	}
+
 	// ------------------------------------------------------------------------
 	// For test data 
 	// ------------------------------------------------------------------------
@@ -97,13 +84,13 @@ public abstract class JRedisBenchmark {
 	 * 
 	 * @param host
 	 * @param port
-	 * @param connectionCnt
+	 * @param threadCnt
 	 * @param reqCnt
 	 * @param size
 	 * @param db
 	 */
 	
-	protected final void  runBenchmarks(String host, int port, int connectionCnt, int reqCnt, int size, int db)
+	protected final void  runBenchmarks(String host, int port, int threadCnt, int reqCnt, int size, int db)
 	{
 //		random = new Random(System.currentTimeMillis());
 		
@@ -123,67 +110,67 @@ public abstract class JRedisBenchmark {
 //			intList.add(random.nextInt());
 //			longList.add(random.nextLong());
 		}
-		BenchmarkWorker[] workers = new BenchmarkWorker[connectionCnt];
+		BenchmarkWorker[] workers = new BenchmarkWorker[threadCnt];
 
 		System.out.println ();
 		System.out.println("-------------------------------------------------------------------- JREDIS ----");
 		System.out.println("---");
 		System.out.format ("--- Benchmarking JRedis provider: %s\n", getImplementationClass().getName());
-		System.out.format ("--- host:%s:%d (db:%d) | bytes:%d | conns:%d | reqs/conn:%d \n", host, port, db, size ,connectionCnt, reqCnt);
+		System.out.format ("--- host:%s:%d (db:%d) | bytes:%d | threads:%d | reqs/conn:%d \n", host, port, db, size ,threadCnt, reqCnt);
 		System.out.println("---");
 		System.out.println("--------------------------------------------------------------------------------\n\n");
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newPingWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.PING, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newPingWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.PING, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newDbsizeWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.DBSIZE, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newSetWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.SET, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newSetWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.SET, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newSetWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.GET, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newSetnxWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.SETNX, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newSetnxWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.SETNX, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newSetWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.GET, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newIncrWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.INCR, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newIncrWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.INCR, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newDecrWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.DECR, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newDecrWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.DECR, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newIncrbyWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.INCRBY, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newIncrbyWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.INCRBY, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newDecrbyWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.DECRBY, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newDecrbyWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.DECRBY, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newDbsizeWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.DBSIZE, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newLPushWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.LPUSH, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newLPushWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.LPUSH, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newRPushWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.RPUSH, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newRPushWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.RPUSH, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newLPopWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.LPOP, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newLPopWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.LPOP, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newRPopWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.RPOP, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newRPopWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.RPOP, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newLLenWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.LLEN, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newLLenWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.LLEN, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newScardWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.SCARD, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newScardWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.SCARD, reqCnt, threadCnt, workers);
 
 		
-		for(int i=0;i<connectionCnt;i++) workers[i] = newSaddWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.SADD, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newSaddWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.SADD, reqCnt, threadCnt, workers);
 
-		for(int i=0;i<connectionCnt;i++) workers[i] = newSremWorker (host, port, db);
-		Benchmarker.runBenchmark (Command.SREM, reqCnt, connectionCnt, workers);
+		for(int i=0;i<threadCnt;i++) workers[i] = newSremWorker (host, port, db);
+		Benchmarker.runBenchmark (Command.SREM, reqCnt, threadCnt, workers);
 
 		//		for(int i=0;i<connectionCnt;i++) workers[i] = newSmembersWorker();
 //		Benchmarker.runBenchmark (Command.SMEMBERS, reqCnt, connectionCnt, workers);
@@ -543,7 +530,7 @@ public abstract class JRedisBenchmark {
 	public  final BenchmarkWorker newSmembersWorker (String host, int port, int db) {
 		return new BenchmarkWorker (host, port, db){
 			List<String>  values = JRedisBenchmark.stringList;
-			String key = id + ":fixedbytes:set";
+			String key = id + ":stringList:set";
 			@Override
 			protected void prep() {
 				try {
@@ -605,26 +592,21 @@ public abstract class JRedisBenchmark {
 			
 			try {
 				/* run benchmark workers */ 
+				ready.await();										// ready
+				Timer timer = Timer.startNewTimer();				// set
+				mark.countDown();   								// go
 				
-				ready.await();
-				
-				Thread.sleep(1000); // we wait to line up our ponies as some tasks may have latency in setup
-				
-				long launcherStart = System.currentTimeMillis();	// mark
-				
-				mark.countDown();   								// signal go
 				System.out.print(" ...\n");
-				completion.await(); 								// blocks till all are done ...
+				completion.await(); 								// ... done
 
-				long launcherDelta = System.currentTimeMillis() - launcherStart; // delta
+				timer.mark();
 				
 				/* report */ 
-
 					// overall - this is throughput
 				System.out.format("===== %s =====\n",cmd.code);
 				System.out.format("%d concurrent clients (%d %ss each) [host: %s]\n", threadCnt, reqCnt, cmd.code, host);
-				System.out.format("  ==> %d total requests @ %f seconds\n", threadCnt*reqCnt, (float)launcherDelta/1000);
-				System.out.format("  ==> %f/second\n", ((float)threadCnt*reqCnt*1000)/(float)launcherDelta);
+				System.out.format("  ==> %d total requests @ %f seconds\n", threadCnt*reqCnt, (float)timer.deltaAtMark(TimeUnit.SECONDS));
+				System.out.format("  ==> %f/second\n", (float)timer.opsPerSecAtMark(threadCnt*reqCnt));
 				System.out.println();
 				
 					// report for each - this is response time

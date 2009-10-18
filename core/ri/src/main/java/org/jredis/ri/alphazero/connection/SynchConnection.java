@@ -28,10 +28,7 @@ import org.jredis.protocol.Request;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.ResponseStatus;
 import org.jredis.ri.alphazero.RedisVersion;
-import org.jredis.ri.alphazero.protocol.ThreadsafeSynchProtocol;
-import org.jredis.ri.alphazero.protocol.SynchProtocol;
 import org.jredis.ri.alphazero.support.Assert;
-import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.Log;
 
 
@@ -98,17 +95,7 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		throws ClientRuntimeException, ProviderException 
 	{
 		super (connectionSpec);
-		// get new and set Protocol handler delegate
-		//
-		
-		Protocol protocolHdlr = isShared? new ThreadsafeSynchProtocol() : new SynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
-//		Protocol protocolHdlr = new SharableSynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
-		Assert.notNull (protocolHdlr, "the delegate protocol handler", ClientRuntimeException.class);
-		Assert.isTrue(protocolHdlr.isCompatibleWithVersion(redisversion.id), "handler delegate supports redis version " + redisversion, ProviderException.class);
-		
-		setProtocolHandler(protocolHdlr);
 	}
-
 
 	// ------------------------------------------------------------------------
 	// Interface
@@ -118,7 +105,7 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	/* (non-Javadoc)
 	 * @see org.jredis.connector.Connection#getModality()
 	 */
-	@Override
+//	@Override
 	public final Modality getModality() {
 		return Connection.Modality.Synchronous;
 	}
@@ -137,8 +124,17 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		ResponseStatus  status = null;
 		
 		try {
+			// TODO:
+//			if(spec.isReliable()) {
+//				request = Assert.notNull(protocol.createRequest (Command.PING), "request object from handler", ProviderException.class);
+//				request.write(super.getOutputStream());
+//				response = Assert.notNull(protocol.createResponse(Command.PING), "response object from handler", ProviderException.class);
+//				response.read(super.getInputStream());
+//			}
+			
 			// 1 - Request
 			//				Log.log("RedisConnection - requesting ..." + cmd.code);
+			
 			request = Assert.notNull(protocol.createRequest (cmd, args), "request object from handler", ProviderException.class);
 			request.write(super.getOutputStream());
 
@@ -158,13 +154,14 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		catch (ClientRuntimeException cre) {
 			Log.problem ("serviceRequest() -- ClientRuntimeException  => " + cre.getLocalizedMessage());
 			reconnect();
-			//							break;
-			if(null!=getCredentials()) {
-				this.serviceRequest(Command.AUTH, getCredentials());
-			}
-			if(getDatabase() != 0) {
-				this.serviceRequest(Command.SELECT, Convert.toBytes(getDatabase()));
-			}
+			
+//			if(!spec.isReliable()) {
+				throw new ConnectionResetException ("Connection re-established but last request not processed:  " + cre.getCause().getLocalizedMessage());
+//			}
+//			else {
+//				// reliable ping check got us here -- we can retry the request
+//				// TODO:
+//			}
 		}
 		catch (RuntimeException e){
 			e.printStackTrace();

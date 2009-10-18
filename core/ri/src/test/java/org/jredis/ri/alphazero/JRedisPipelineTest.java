@@ -18,46 +18,48 @@ package org.jredis.ri.alphazero;
 
 import static org.testng.Assert.fail;
 import org.jredis.ClientRuntimeException;
-import org.jredis.JRedis;
+import org.jredis.JRedisFuture;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 /**
- * For testing the JRedis test suite for {@link JRedisClient} implementation.
- * TODO: should also do a minimal test using {@link ConnectionSpec}.
+ * [TODO: document me!]
+ *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, Apr 17, 2009
+ * @version alpha.0, Oct 10, 2009
  * @since   alpha.0
  * 
  */
+@Test(sequential = true, suiteName="Pipeline-tests")
 
-public class JRedisClientNGTest extends JRedisProviderTestNGBase {
+public class JRedisPipelineTest extends JRedisFutureTestSuiteBase {
 
+	// ------------------------------------------------------------------------
+	// JRedisPipelineTest specific Test Suite Parameters
+	// ------------------------------------------------------------------------
+	
 	// ------------------------------------------------------------------------
 	// TEST SETUP 
 	// ------------------------------------------------------------------------
-	/**
-	 * We're testing {@link JRedisClient} in this test class.  We'll use the 
-	 * {@link JRedisProviderTestNGBase#setJRedisProviderInstance(org.jredis.JRedis)}
-	 * here since we don't (yet) have the resource manager interface ironed out.  
+	
+	/* (non-Javadoc)
+	 * @see org.jredis.ri.ProviderTestBase#newProviderInstance()
 	 */
-	@BeforeTest
-	public void setJRedisProvider () {
+	@Override
+	protected JRedisFuture newProviderInstance () {
+		JRedisFuture provider = null;
 		try {
-			JRedis jredis = new JRedisClient (this.host, this.port, this.password, this.db1);
-
-			setJRedisProviderInstance(jredis);
-			prepTestDBs();
-			
-			Log.log("JRedisClientNGTest.setJRedisProvider - done");
+			ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec(this.host, this.port, this.db2, this.password.getBytes());
+			provider = new JRedisPipeline(connectionSpec);
         }
         catch (ClientRuntimeException e) {
         	Log.error(e.getLocalizedMessage());
         }
+        return provider;
 	}
-	
 	// ------------------------------------------------------------------------
 	// The Tests
 	// ========================================================= JRedisClient
@@ -70,14 +72,18 @@ public class JRedisClientNGTest extends JRedisProviderTestNGBase {
 	 * completed.
 	 */
 	// ------------------------------------------------------------------------
+
 	/**
-	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#auth(java.lang.String)}.
+	 * Pipeline quit.  
+	 * We first ping and await the response to insure pipeline has processed
+	 * all pending responses, and then issue the quit command.
 	 */
 	@AfterTest
 	public void testQuit() {
-		Log.log("TEST: QUIT command");
 		try {
-			jredis.quit ();
+			JRedisFuture pipeline = getProviderInstance();
+			pipeline.ping().get();
+			pipeline.quit ();
 		} 
 		catch (Exception e) {
 			fail("QUIT" + e);

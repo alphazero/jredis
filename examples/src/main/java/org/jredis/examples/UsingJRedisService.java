@@ -71,7 +71,7 @@ public class UsingJRedisService {
      */
     private static Thread getDummyUser (final int id, final int opsCnt) {
     	Thread user = new Thread(new Runnable() {
-			@Override
+//			@Override
             public void run () {
 				try {
 					String key = null;

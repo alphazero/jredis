@@ -17,6 +17,7 @@
 package org.jredis.ri.alphazero.support;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.jredis.ClientRuntimeException;
 import org.jredis.RedisException;
@@ -54,16 +55,29 @@ public abstract class SortSupport implements Sort {
 		limitSpec = LIMIT + from + " " + to;
 		return this;
 	}
-	public List<byte[]> exec() throws IllegalStateException, RedisException {
-		// SORT key by pattern limit from to get pattern desc alpha 
+	private final byte[] getSortSpec() {
 		StringBuilder spec = new StringBuilder()
 			.append(bySpec)
 			.append(limitSpec)
 			.append(getSpec)
 			.append(sortSpec)
 			.append(alphaSpec);
-		byte[] sortSpec = spec.toString().getBytes();
-		return execSort (keyBytes, sortSpec);
+		return spec.toString().getBytes();
+	}
+	public List<byte[]> exec() throws IllegalStateException, RedisException {
+		// SORT key by pattern limit from to get pattern desc alpha 
+//		StringBuilder spec = new StringBuilder()
+//			.append(bySpec)
+//			.append(limitSpec)
+//			.append(getSpec)
+//			.append(sortSpec)
+//			.append(alphaSpec);
+//		byte[] sortSpec = spec.toString().getBytes();
+		return execSort (keyBytes, getSortSpec());
+	}
+	public Future<List<byte[]>> execAsynch() {
+		return execAsynchSort (keyBytes, getSortSpec());
 	}
 	protected abstract List<byte[]> execSort (byte[] keyBytes, byte[] sortSpecBytes) throws IllegalStateException, RedisException;
+	protected abstract Future<List<byte[]>> execAsynchSort (byte[] keyBytes, byte[] sortSpecBytes);
 }

@@ -21,6 +21,6 @@ import org.jredis.protocol.Response;
 
 public interface RequestListener {
 	
-	public void onResponse (Request request, Response response);
+	public void onResponse (Object context, Request request, Response response);
 	
 }

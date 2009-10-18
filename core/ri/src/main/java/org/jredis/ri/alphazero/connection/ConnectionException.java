@@ -48,5 +48,6 @@ public class ConnectionException extends ClientRuntimeException{
 	 * @param msg
 	 */
 	public ConnectionException(String msg) {
+		super(msg);
 	}
 }

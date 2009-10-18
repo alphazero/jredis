@@ -27,7 +27,7 @@ import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Assert;
-import org.jredis.ri.alphazero.support.Convert;
+import org.jredis.ri.alphazero.support.Log;
 
 /**
  * This class utilizes a (configurable) number of {@link Connection}s in a pool
@@ -101,7 +101,10 @@ public class JRedisService extends SynchJRedisBase {
 	 */
 	public JRedisService (ConnectionSpec connectionSpec, int connectionCount) {
 		this.connectionSpec = connectionSpec;
+		// regardless of user spec, service has to assume shared connections
+		connectionSpec.isShared(true);
 		connCount = connectionCount;
+		
 		initialize();
 	}
 	
@@ -114,25 +117,15 @@ public class JRedisService extends SynchJRedisBase {
 		connInUse = new boolean [connCount];
 		Connection conn = null;
 		for(int i=0; i< connCount;i++) {
-			// note: using a shared connection mod
-			conn = Assert.notNull(createSynchConnection(connectionSpec, true, RedisVersion.current_revision), "Connection " + i, ClientRuntimeException.class);
 			try {
-				// do AUTH if password specified
-				if(null != connectionSpec.getCredentials())
-					conn.serviceRequest(Command.AUTH, connectionSpec.getCredentials());
-				
-				// select the database
-				conn.serviceRequest(Command.SELECT, Convert.toBytes(connectionSpec.getDatabase()));
-				
-				// if we're here, then the connection is ok
-				// add it to the pool
+				conn = Assert.notNull(createSynchConnection(connectionSpec, true, RedisVersion.current_revision), "Connection " + i, ClientRuntimeException.class);
 				conns[i] = conn;
 				connInUse[i] = false;
 			} 
-			catch (RedisException e) {
+			catch (Exception e) {
 				// TODO: remove this stacktrace
 				e.printStackTrace();
-				throw new ClientRuntimeException("Failed to create JRedisClient due to Redis Errors", e);
+				throw new ClientRuntimeException("Could not create connection for service", e);
 			}		
 		}
 	}
@@ -156,55 +149,54 @@ public class JRedisService extends SynchJRedisBase {
 	protected Response serviceRequest(Command cmd, byte[]... args)
 			throws RedisException, ClientRuntimeException, ProviderException 
 	{
-		/*
-		 * NOTE: 
-		 * This is broken, because of the implementation detail of SynchProtocol (!)
-		 * By the time this method returns (to its base JRedisSupport.xxx(...), 
-		 * the connection has been returned to the pool and may in fact be in process of 
-		 * doing something else.  Absolutely nothing can be done here to address the fact
-		 * that connection reuses the response buffers.
-		 */
 		Response response = null;
-		// temp bench
 		
 		try {
-			// BEGIN TODO: connection = pool.take();
-			
 			// we're using a counting semaphore to remain within
 			// bounds of the connection count
 			// if more than cnt requests are being serviced, we block here
 			connPoolAccess.acquire();
 			
-			// bare bones connection pool - mark the first available
-			// connection as inUse and then use it
-			// this is faster than using the synch collections of JDK
 			int i = 0;
-			synchronized(connInUse){
-				for(; i<connInUse.length;i++){
-					if(connInUse[i]==false) {
-						connInUse[i] = true;
-						break;
+			try {
+				// bare bones connection pool - mark the first available
+				// connection as inUse and then use it
+				// this is faster than using the synch collections of JDK and sufficient
+				synchronized(connInUse){	// Note: could use finer grained sync on conns[i] in loop instead ..
+					for(; i<connInUse.length;i++){
+						if(connInUse[i]==false) {
+							connInUse[i] = true;
+							break;
+						}
 					}
 				}
+				
+				// This shouldn't happen -- but lets make sure, hey?
+				if(i>=connCount) 
+					throw new ProviderException("BUG: JRedisService connection pool manager - index exceeds bounds!");
+				
+				response = conns[i].serviceRequest(cmd, args);
 			}
-			// END
-			
-			response = conns[i].serviceRequest(cmd, args);
-			
-			// BEGIN TODO: pool.return (connection);
-			// return the connection to the pool
-			synchronized(connInUse){
-				if(connInUse[i] != true) throw new RuntimeException("its broken ...");
-				connInUse[i] = false;
+			finally {
+				// return the connection to the pool
+				synchronized(connInUse){
+					if(connInUse[i] != true) 
+						throw new ProviderException("BUG: JRedisService connection pool manager - connection should have been marked in use!");
+					connInUse[i] = false;
+				}
+				
+				// release the bounds sem.
+				connPoolAccess.release();
 			}
-			// END -- cleansup the code but would be a bit slower ..
-			
-			// release the bounds sem.
-			connPoolAccess.release();
 		} 
 		catch (InterruptedException e) {
+			// TODO: need meaningful action here
+			// its not clear what can be done since the interrupt is occurring on the
+			// user (calling) thread and is not connection specific, and the situation
+			// is ambiguous.  We can note it for now.
 			e.printStackTrace();
-		}	
+			Log.log("Thread <%s> was interrupted in JRedisService.serviceRequest", Thread.currentThread().getName());
+		}
 		return response;
 	}
 	// ------------------------------------------------------------------------
@@ -220,7 +212,7 @@ public class JRedisService extends SynchJRedisBase {
 	/* (non-Javadoc)
 	 * @see org.jredis.resource.Resource#getInterface()
 	 */
-	@Override
+//	@Override
 	public JRedis getInterface() {
 		return this;
 	}

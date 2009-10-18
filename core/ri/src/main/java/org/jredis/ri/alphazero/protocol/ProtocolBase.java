@@ -255,72 +255,6 @@ public abstract class ProtocolBase implements Protocol {
 
 	// ------------------------------------------------------------------------
 	// Inner Type
-	// ============================================================ Response(s)
-	// ------------------------------------------------------------------------
-	/**
-	 * Base for all responses.  Responsible for reading and determining status.
-	 *
-	 * @author  Joubin Houshyar (alphazero@sensesay.net)
-	 * @version alpha.0, 04/02/09
-	 * @since   alpha.0
-	 * 
-	 */
-	public abstract static class ResponseSupport implements Response {
-
-		// ------------------------------------------------------------------------
-		// Properties and fields
-		// ------------------------------------------------------------------------
-		protected Type				type;
-		protected ResponseStatus	status;
-		protected Command 			cmd;
-		protected boolean 			didRead = false;
-		protected boolean 			isError = false;
-		
-		// ------------------------------------------------------------------------
-		// Constructor
-		// ------------------------------------------------------------------------
-		public ResponseSupport (Command cmd, Type type) {
-			this.type = type;
-			this.cmd = cmd;
-		}
-		// ------------------------------------------------------------------------
-		// Internal ops
-		// ------------------------------------------------------------------------
-		/** called by child classes to indicate if & when their read operation has completed */
-		protected final boolean didRead (boolean value) { return didRead = value;}
-		
-		/** a bit aggressive but to force out the little bugs .. */
-		protected final void assertResponseRead () {
-			if(!didRead) throw new ProviderException ("Response has not been read yet! -- whose bad?");
-		}
-		
-		// ------------------------------------------------------------------------
-		// Interface
-		// ------------------------------------------------------------------------
-		
-//		@Override
-		public boolean didRead() { return didRead;  }
-
-//		@Override
-		public ResponseStatus getStatus() {return status; }
-		
-//		@Override
-		public Type getType() { return type;}
-
-//		@Override
-		public boolean isError() {
-			assertResponseRead(); 
-			return isError; 
-		}
-
-//		@Override
-		public void write(OutputStream out) throws ClientRuntimeException, ProviderException {
-			throw new RuntimeException ("Message.write not implemented! [Apr 10, 2009]");
-		}
-	}
-	
-	// ------------------------------------------------------------------------
-	// Inner Type
 	// =============================================================== Request
 	// ------------------------------------------------------------------------
 	/**
@@ -367,8 +301,10 @@ public abstract class ProtocolBase implements Protocol {
 //		@Override
 		public void write(OutputStream out) throws ClientRuntimeException, ProviderException {
 			try {
-				buffer.writeTo (out); // regrettably this does NOT throw exceptions
-									  // if redis has disconnected .. 
+				// you would expect these to throw exceptions if the socket has been reset
+				// but they don't.  
+//				out.write(buffer.toByteArray());
+				buffer.writeTo(out);
 				out.flush();
 			}
 			catch (SocketException e){

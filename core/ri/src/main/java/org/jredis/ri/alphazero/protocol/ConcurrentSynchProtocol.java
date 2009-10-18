@@ -28,16 +28,26 @@ import org.jredis.protocol.Response;
  * 
  */
 
-public class ThreadsafeSynchProtocol extends SynchProtocol {
+public class ConcurrentSynchProtocol extends SynchProtocol {
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
 	/**  */
-	SynchLineResponse cache_synchLineResponse = null;
+//	SynchLineResponse cache_synchLineResponse = null;
 	
 	// ------------------------------------------------------------------------
 	// Super Extensions
 	// ------------------------------------------------------------------------
+
+//	@Override
+//	protected ByteArrayOutputStream createRequestBufffer(Command cmd) {
+//		return new ByteArrayOutputStream (PREFERRED_REQUEST_BUFFER_SIZE);
+//	}
+//	
+//	protected Request createRequest (ByteArrayOutputStream buffer) {
+////		sharedRequestObject.reset(buffer);
+//		return new StreamBufferRequest (buffer);	
+//	}
 
 	@Override
 	protected Response createStatusResponse(Command cmd) {
@@ -59,13 +69,13 @@ public class ThreadsafeSynchProtocol extends SynchProtocol {
 		return new SynchLineResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd, flavor);
 	}
 	
-	SynchBulkResponse  cache_synchBulkResponse = null;
+//	SynchBulkResponse  cache_synchBulkResponse = null;
 	@Override
 	protected Response createBulkResponse(Command cmd) {
 		return new SynchBulkResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd);
 	}
 	
-	SynchMultiBulkResponse  cache_synchMultiBulkResponse = null;
+//	SynchMultiBulkResponse  cache_synchMultiBulkResponse = null;
 	@Override
 	protected Response createMultiBulkResponse(Command cmd) {
 		return new SynchMultiBulkResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd);

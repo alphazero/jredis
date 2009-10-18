@@ -17,7 +17,8 @@ public class DefaultStringCodec implements Codec<String> {
 	/** Default supported character set is UTF-8  */
 	public final static Charset DEFAULT_CHARSET = Charset.forName ("UTF-8");
 	/**  */
-	private final Charset charSet;
+	@SuppressWarnings("unused")
+    private final Charset charSet; // java 1.6
 	/**
 	 * 
 	 */
@@ -34,23 +35,25 @@ public class DefaultStringCodec implements Codec<String> {
 	/* (non-Javadoc)
      * @see org.jredis.Codec#decode(byte[])
      */
-    @Override
+//    @Override
     public String decode (byte[] bytes) {
-        return new String(bytes, charSet);
+        return new String(bytes);
+//        return new String(bytes, charSet);  // java 1.6
     }
 
 	/* (non-Javadoc)
      * @see org.jredis.Codec#encode(java.lang.Object)
      */
-    @Override
+//    @Override
     public byte[] encode (String value) {
-		return value.getBytes(charSet);
+		return value.getBytes();
+//		return value.getBytes(charSet);
     }
 
 	/* (non-Javadoc)
      * @see org.jredis.Codec#supports(java.lang.Class)
      */
-    @Override
+//    @Override
     public boolean supports (Class<?> type) {
         return type.equals(String.class) ? true : false;
     }

@@ -34,29 +34,19 @@ package org.jredis.ri.alphazero.support;
 
 
 
-import junit.framework.TestCase;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 /**
  * @author Joubin Houshyar (alphazero@sensesay.net)
  * 
  */
-public class ConvertTest extends TestCase {
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+@Test(suiteName="support-tests")
+public class ConvertTest {
+	
+	@Test
 	public void testGetNaturalNumber() {
+		Log.log("Testing bytes to number conversion ...");
 		byte[] data = null;
 		
 		// test null
@@ -248,7 +238,9 @@ public class ConvertTest extends TestCase {
 	/**
 	 * Test method for {@link org.jredis.alphazero.util.util.S27.jredis_deprecated.client.util.Convert#toBytes(int, boolean)}.
 	 */
+	@Test
 	public void testToBytes() {
+		Log.log("Testing number to bytes conversion ...");
 		byte[] javadata = null;
 		byte[] data = null;
 
@@ -257,42 +249,42 @@ public class ConvertTest extends TestCase {
 		n=Integer.MIN_VALUE;
 		javadata = Integer.toString(n).getBytes();
 		data = Convert.toBytes(n);
-		assertEquals ("buffer length", javadata.length, data.length);
+		assertEquals (data.length, javadata.length, "buffer length");
 		for(int j=0; j<data.length;j++)
-			assertEquals("for <"+n+"> byte @ ["+j+"]", javadata[j], data[j]);
+			assertEquals(data[j], javadata[j], "for <"+n+"> byte @ ["+j+"]");
 
 		// test MAX
 		n=Integer.MAX_VALUE;
 		javadata = Integer.toString(n).getBytes();
 		data = Convert.toBytes(n);
-		assertEquals ("buffer length", javadata.length, data.length);
+		assertEquals (data.length, javadata.length, "buffer length");
 		for(int j=0; j<data.length;j++)
-			assertEquals("for <"+n+"> byte @ ["+j+"]", javadata[j], data[j]);
+			assertEquals(data[j], javadata[j], "for <"+n+"> byte @ ["+j+"]");
 
 		// test a bit smaller than Convert.INT_N_65535
 		n=Convert.INT_N_65535 - 444;
 		javadata = Integer.toString(n).getBytes();
 		data = Convert.toBytes(n);
-		assertEquals ("buffer length", javadata.length, data.length);
+		assertEquals (data.length, javadata.length, "buffer length");
 		for(int j=0; j<data.length;j++)
-			assertEquals("for <"+n+"> byte @ ["+j+"]", javadata[j], data[j]);
+			assertEquals(data[j], javadata[j], "for <"+n+"> byte @ ["+j+"]");
 
 		// test a bit larger than Convert.INT_P_65535
 		n=Convert.INT_P_65535 + 444;
 		javadata = Integer.toString(n).getBytes();
 		data = Convert.toBytes(n);
-		assertEquals ("buffer length", javadata.length, data.length);
+		assertEquals (javadata.length, data.length, "buffer length");
 		for(int j=0; j<data.length;j++)
-			assertEquals("for <"+n+"> byte @ ["+j+"]", javadata[j], data[j]);
+			assertEquals( data[j], javadata[j], "for <"+n+"> byte @ ["+j+"]");
 
 		// test the exact range range
 		for(int i=Convert.INT_N_65535; i<Convert.INT_P_65535; i++){
 			//		for(int i=Integer.MIN_VALUE; i<Integer.MAX_VALUE; i++){
 			javadata = Integer.toString(i).getBytes();
 			data = Convert.toBytes(i);
-			assertEquals ("buffer length", javadata.length, data.length);
+			assertEquals (data.length, javadata.length, "buffer length" );
 			for(int j=0; j<data.length;j++)
-				assertEquals("for <"+i+"> byte @ ["+j+"]", javadata[j], data[j]);
+				assertEquals( data[j], javadata[j], "for <"+i+"> byte @ ["+j+"]");
 		}		
 	}
 }

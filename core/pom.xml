@@ -35,13 +35,13 @@
             <!-- TestNG parameters -->
 
             <!-- redis tests | Test Server info -->
-            <property><name>jredis.host</name>     <value>localhost</value></property>
-            <property><name>jredis.port</name>     <value>6379</value></property>
-            <property><name>jredis.password</name> <value>jredis</value></property>
+            <property><name>jredis.test.host</name>     <value>localhost</value></property>
+            <property><name>jredis.test.port</name>     <value>6379</value></property>
+            <property><name>jredis.test.password</name> <value>jredis</value></property>
             <!-- redis tests | Test DBs info *NOTE* THESE WILL BE FLUSHED *NOTE* -->
-            <property><name>jredis.db.1</name>     <value>13</value></property>
-            <property><name>jredis.db.2</name>     <value>10</value></property>
-
+            <property><name>jredis.test.db.1</name>     <value>13</value></property>
+            <property><name>jredis.test.db.2</name>     <value>10</value></property>
+            
             <!-- redis core tests | test data sizes -->
             <property><name>jredis.test.datasize.small</name>   <value>128</value></property>
             <property><name>jredis.test.datasize.medium</name>  <value>2048</value></property>
@@ -56,7 +56,7 @@
             <property><name>jredis.test.expire.wait.millisecs</name>   <value>2000</value></property>
 
             <!-- redis core tests | Service params -->
-            <property><name>jredis.service.connection.cnt</name><value>2</value></property>
+            <property><name>jredis.service.connection.cnt</name><value>1</value></property>
 
           </systemProperties>
         </configuration>

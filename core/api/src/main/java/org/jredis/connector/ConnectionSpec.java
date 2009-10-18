@@ -112,6 +112,30 @@ public interface ConnectionSpec {
 	 */
 	public ConnectionSpec setReconnectCnt(int cnt);
 
+	/**
+     * @return
+     */
+    public boolean isReliable ();
+
+	/**
+     * @return
+     */
+    public void isReliable (boolean flag);
+    
+    /**
+     * @return
+     */
+    public boolean isShared ();
+    
+    /**
+     * @param flag
+     */
+    public void isShared(boolean flag);
+
+    public boolean isPipeline();
+    
+    public void isPipeline(boolean flag);
+    
 	// ------------------------------------------------------------------------
 	// Associated (inner) types
 	// ------------------------------------------------------------------------
@@ -234,6 +258,15 @@ public interface ConnectionSpec {
 		/** {@link Map} of the {@link SocketProperty}s of the {@link ConnectionSpec} */
 		Map<SocketProperty, Integer> socketProperties = new HashMap<SocketProperty, Integer>();
 		
+		/**  */
+		private boolean isReliable;
+		
+		/** */
+		private boolean isShared;
+		
+		/**  */
+		private boolean isPipeline;
+		
 		// ------------------------------------------------------------------------
 		// Constructor(s)
 		// ------------------------------------------------------------------------
@@ -241,7 +274,7 @@ public interface ConnectionSpec {
 		// ------------------------------------------------------------------------
 		// Interface
 		// ------------------------------------------------------------------------
-		@Override
+//		@Override
 		public InetAddress getAddress () {
 			return address;
 		}
@@ -249,7 +282,7 @@ public interface ConnectionSpec {
 		/* (non-Javadoc)
 		 * @see org.jredis.connector.ConnectionSpec#getCredentials()
 		 */
-		@Override
+//		@Override
 		public byte[] getCredentials () {
 			return credentials;
 		}
@@ -257,7 +290,7 @@ public interface ConnectionSpec {
 		/* (non-Javadoc)
 		 * @see org.jredis.connector.ConnectionSpec#getDatabase()
 		 */
-		@Override
+//		@Override
 		public int getDatabase () {
 			return database;
 		}
@@ -265,7 +298,7 @@ public interface ConnectionSpec {
 		/* (non-Javadoc)
 		 * @see org.jredis.connector.ConnectionSpec#getPort()
 		 */
-		@Override
+//		@Override
 		public int getPort () {
 			return port;
 		}
@@ -273,7 +306,7 @@ public interface ConnectionSpec {
 		/* (non-Javadoc)
 		 * @see org.jredis.connector.ConnectionSpec#getReconnectCnt()
 		 */
-		@Override
+//		@Override
 		public int getReconnectCnt () {
 			return this.reconnectCnt;
 		}
@@ -281,7 +314,7 @@ public interface ConnectionSpec {
 		/* (non-Javadoc)
 		 * @see org.jredis.connector.ConnectionSpec#getSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag)
 		 */
-		@Override
+//		@Override
 		public boolean getSocketFlag (SocketFlag flag) {
 			return socketFlags.get(flag);
 		}
@@ -289,7 +322,7 @@ public interface ConnectionSpec {
 		/* (non-Javadoc)
 		 * @see org.jredis.connector.ConnectionSpec#getSocketProperty(org.jredis.connector.ConnectionSpec.SocketProperty)
 		 */
-		@Override
+//		@Override
 		public Integer getSocketProperty (SocketProperty property) {
 			return socketProperties.get(property);
 		}
@@ -298,35 +331,35 @@ public interface ConnectionSpec {
 		// Property Setters
 		// ------------------------------------------------------------------------
 		/**  @param address the address to set */
-		@Override
+//		@Override
         public ConnectionSpec setAddress (InetAddress address) {
         	this.address = address;
         	return this;
         }
 
 		/**  @param port the port to set */
-        @Override
+//        @Override
         public ConnectionSpec setPort (int port) {
         	this.port = port;
         	return this;
         }
 
 		/**  @param credentials the credentials to set */
-        @Override
+//        @Override
         public ConnectionSpec setCredentials (byte[] credentials) {
         	this.credentials = credentials;
         	return this;
         }
 
 		/**  @param database the database to set */
-        @Override
+//        @Override
         public ConnectionSpec setDatabase (int database) {
         	this.database = database;
         	return this;
         }
 
 		/**  @param reconnectCnt the reconnectCnt to set */
-        @Override
+//        @Override
         public ConnectionSpec setReconnectCnt (int reconnectCnt) {
         	this.reconnectCnt = reconnectCnt;
         	return this;
@@ -338,7 +371,7 @@ public interface ConnectionSpec {
 		 * @param value
 		 * @return {@link ConnectionSpec} this
 		 */
-        @Override
+//        @Override
 		public ConnectionSpec setSocketFlag(SocketFlag flag, Boolean value){
 			socketFlags.put(flag, value);
 			return this;
@@ -349,10 +382,39 @@ public interface ConnectionSpec {
 		 * @param value
 		 * @return the previous value (if any).  Null if none existed, per {@link Map#put(Object, Object)} semantics.
 		 */
-        @Override
+//        @Override
 		public ConnectionSpec setSocketProperty(SocketProperty property, Integer value){
 			socketProperties.put(property, value);
 			return this;
 		}
+
+		/* (non-Javadoc)
+         * @see org.jredis.connector.ConnectionSpec#isReliable()
+         */
+        public boolean isReliable () {
+	        return isReliable;
+        }
+
+		/* (non-Javadoc)
+         * @see org.jredis.connector.ConnectionSpec#isReliable(boolean)
+         */
+        public void isReliable (boolean flag) {
+        	isReliable = flag;
+        }
+        
+        public boolean isShared () {
+        	return isShared;
+        }
+        
+        public void isShared(boolean flag){
+        	this.isShared = flag;
+        }
+        public boolean isPipeline() {
+        	return isPipeline;
+        }
+        
+        public void isPipeline(boolean flag) {
+        	isPipeline = flag;
+        }
 	}
 }

@@ -38,8 +38,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.0.2</version>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
         </configuration>
       </plugin>
       
@@ -71,13 +71,6 @@
         <scope>test</scope>
         <classifier>jdk15</classifier>
       </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-<!--        <version>3.8.1</version> -->
-        <version>4.1</version>
-        <scope>test</scope>
-      </dependency>
     </dependencies>
   </dependencyManagement>
   
@@ -88,7 +81,7 @@
       <name>Apache 2</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>all</distribution>
-      <comments>Copyright 2009 (c) Joubin Houshyar - All Right Resererved</comments>
+      <comments>Copyright 2009 (c) Joubin Houshyar - All Right Reserved</comments>
     </license>
   </licenses>
   <developers>

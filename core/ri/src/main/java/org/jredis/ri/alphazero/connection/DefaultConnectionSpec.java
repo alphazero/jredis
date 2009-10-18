@@ -54,6 +54,9 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	/** thrid priority pref is connection time */
 	private static final int DEFAULT_SO_PREF_CONN_TIME = 2;
 	
+	private static final boolean DEFAULT_IS_SHARED = true;
+	private static final boolean DEFAULT_IS_RELIABLE = false;
+	private static final boolean DEFAULT_IS_PIPELINE = false;
 	
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -102,6 +105,10 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
     	setSocketProperty(SO_PREF_BANDWIDTH, DEFAULT_SO_PREF_BANDWIDTH);
     	setSocketProperty(SO_PREF_CONN_TIME, DEFAULT_SO_PREF_CONN_TIME);
     	setSocketProperty(SO_PREF_LATENCY, DEFAULT_SO_PREF_LATENCY);
+    	
+    	isReliable(DEFAULT_IS_RELIABLE);
+    	isShared(DEFAULT_IS_SHARED);
+    	isPipeline(DEFAULT_IS_PIPELINE);
     }
 	// ------------------------------------------------------------------------
 	// Static methods

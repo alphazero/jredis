@@ -17,12 +17,14 @@
 package org.jredis.ri.alphazero;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
@@ -770,6 +772,11 @@ public abstract class JRedisSupport implements JRedis {
 				}
 				return multiBulkData;
 			}
+
+			@Override
+	        protected Future<List<byte[]>> execAsynchSort (byte[] keyBytes, byte[] sortSpecBytes) {
+				throw new IllegalStateException("JRedis does not support asynchronous sort.");
+	        }
 		};
 		return sortQuery;
 	}
@@ -1157,7 +1164,13 @@ public abstract class JRedisSupport implements JRedis {
 		if(JRedisSupport.CacheKeys == true)
 			bytes = keyByteCache.get(key);
 		if(null == bytes) {
-			bytes = key.getBytes(DefaultCodec.SUPPORTED_CHARSET);
+//			bytes = key.getBytes(DefaultCodec.SUPPORTED_CHARSET); // java 1.6
+			try {
+	            bytes = key.getBytes(DefaultCodec.SUPPORTED_CHARSET_NAME);
+            }
+            catch (UnsupportedEncodingException e) {
+	            e.printStackTrace();
+            }
 			for(byte b : bytes) {
 				if (b == (byte)32 || b == (byte)10 || b == (byte)13)
 					throw new IllegalArgumentException ("Key includes invalid byte value: " + (int)b);

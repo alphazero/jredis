@@ -37,7 +37,18 @@ public class Assert {
 	 * @param clazz
 	 */
 	public static final <E extends RuntimeException>
-	void identical (byte[] a, byte[] b, Class<E> clazz) {
+	void isEquivalent (byte[] a, byte[] b) {
+		isEquivalent(a, b, RuntimeException.class);
+	}
+	/**
+	 * assert identical based on content.
+	 * @param <E>
+	 * @param a
+	 * @param b
+	 * @param clazz
+	 */
+	public static final <E extends RuntimeException>
+	void isEquivalent (byte[] a, byte[] b, Class<E> clazz) {
 		notNull(a, "arg a", clazz);
 		notNull(b, "arg b", clazz);
 		if(a.length != b.length) { 

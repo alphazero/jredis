@@ -16,6 +16,7 @@
 
 package org.jredis.connector;
 
+import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
@@ -51,8 +52,8 @@ public class FaultedConnection implements Connection {
 	}
 
 //	@Override
-	public Response serviceRequest(RequestListener requestListener, Command cmd, byte[]... args)
-			throws RedisException, ClientRuntimeException, ProviderException 
+	public Future<Response> queueRequest(Command cmd, byte[]... args)
+			throws ClientRuntimeException, ProviderException 
 	{
 		throw new ClientRuntimeException (errorMsg);
 	}

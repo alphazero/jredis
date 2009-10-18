@@ -27,20 +27,24 @@ import static org.jredis.ri.alphazero.support.Assert.notNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
 import org.jredis.NotSupportedException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.RequestListener;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Response;
+import org.jredis.ri.alphazero.protocol.SynchProtocol;
+import org.jredis.ri.alphazero.protocol.ConcurrentSynchProtocol;
 import org.jredis.ri.alphazero.support.Assert;
+import org.jredis.ri.alphazero.support.Convert;
+import org.jredis.ri.alphazero.support.FastBufferedInputStream;
 import org.jredis.ri.alphazero.support.Log;
 
 /**
@@ -69,16 +73,14 @@ public abstract class ConnectionBase implements Connection {
 	protected Protocol 			protocol;
 	
 	/** Connection specs used to create this {@link Connection} */
-	protected final ConnectionSpec  spec;
+	final 
+	protected ConnectionSpec  	spec;
 	
-	private InputStream		    input_stream;
-	private OutputStream	    output_stream;
+	private InputStream		    instream;
+	private OutputStream	    outstream;
 
 	private boolean 			isConnected = false;
 	
-	// TODO: not quite right ... in connection spec perhaps?
-//	private byte[] 				credentials = null;
-
 	// ------------------------------------------------------------------------
 	// Internal use fields
 	// ------------------------------------------------------------------------
@@ -95,33 +97,13 @@ public abstract class ConnectionBase implements Connection {
 	// ------------------------------------------------------------------------
 	
 	/**
-	 * Will create a {@link DefaultConnectionSpec} and use that to instantiate.
-	 * @see DefaultConnectionSpec
-	 * @See {@link ConnectionSpec}
-	 * 
-	 * @param address
-	 * @param port
-	 * @param redisversion
-	 * @throws ClientRuntimeException for null address or invalid port input, or, if connection
-	 * attempt to specified host is not possible.
-	 */
-	public ConnectionBase (
-			InetAddress 	address, 
-			int 			port
-		) 
-		throws ClientRuntimeException
-	{
-		this (new DefaultConnectionSpec(address, port));
-	}
-	
-	/**
 	 * Will create and initialize a socket per the connection spec. Will connect immediately.
 	 * 
 	 * @See {@link ConnectionSpec}
 	 * @param spec
 	 * @throws ClientRuntimeException if connection attempt to specified host is not possible.
 	 */
-	public ConnectionBase (ConnectionSpec spec) 
+	protected ConnectionBase (ConnectionSpec spec) 
 		throws ClientRuntimeException
 	{
 		this(spec, true);
@@ -135,51 +117,105 @@ public abstract class ConnectionBase implements Connection {
 	 * @throws ClientRuntimeException if connection attempt to specified host is not possible and
 	 * connect immediate was requested.
 	 */
-	public ConnectionBase (ConnectionSpec spec, boolean connectImmediately) 
+	protected ConnectionBase (ConnectionSpec spec, boolean connectImmediately) 
 		throws ClientRuntimeException
 	{
 		try {
 			this.spec = notNull(spec, "ConnectionSpec init parameter", ClientRuntimeException.class);
 			socketAddress = new InetSocketAddress(spec.getAddress(), spec.getPort());
+			initializeComponents();
+			if(connectImmediately) {
+				connect ();
+			}
 		}
 		catch (IllegalArgumentException e) { 
 			throw new ClientRuntimeException 
-				("invalid connection spec parameters" + e.getLocalizedMessage(), e);
+				("invalid connection spec parameters: " + e.getLocalizedMessage(), e);
 		}
-		
-		if(connectImmediately) {
-			try {
-				connect (); // throws CRE ..
-			} 
-			catch (IllegalStateException e) {
-				throw new ProviderException("Unexpected error on initialize -- BUG", e);
-			} 
-		}
+		catch (Exception e) {
+			throw new ProviderException("Unexpected error on initialize -- BUG", e);
+		} 
 	}
 	
-	protected byte[]  getCredentials () {
-		return this.spec.getCredentials();
-	}
-	
-	protected int	getDatabase () {
-		return this.spec.getDatabase();
-	}
-
 	// ------------------------------------------------------------------------
-	// Inner ops
+	// Interface
+	// ============================================================ Connection
 	/*
-	 * Main responsibilities handled here are managing the socket instance, 
-	 * including the reconnect facility.
+	 * These are the extension points for the concrete connection classes.
 	 */
-	// ====================================================== socket management
 	// ------------------------------------------------------------------------
 
-	/**
-	 * @return
-	 */
-	protected final boolean isConnected () {
-		return isConnected;
+//	@Override
+	public Response serviceRequest(Command cmd, byte[]... args)
+			throws RedisException, ClientRuntimeException, ProviderException 
+	{
+		throw new NotSupportedException (
+				"Response.serviceRequest(Command cmd, " +
+				"byte[]...) is not supported.");
 	}
+
+//	@Override
+	public Future<Response> queueRequest(Command cmd, byte[]... args) 
+		throws ClientRuntimeException, ProviderException 
+	{
+		throw new NotSupportedException (
+				"Response.serviceRequest(RequestListener requestListener, " +
+				"Object , Command, byte[]...) is not supported.");
+	}
+	
+	// ------------------------------------------------------------------------
+	// Internal ops : Extension points
+	// ------------------------------------------------------------------------
+	/**
+     * Extension point: child classes may override for additional components:
+     * <pre>
+     * In the extended class:
+     * <code>
+     * protected void initializeComponents() {
+     *    super.initializeComponents();
+     *    // my components here ...
+     *    //
+     * }
+     * </code>
+     * </pre>
+     */
+    protected void initializeComponents () {
+    	// protocol handler
+    	//
+		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
+    }
+
+    /**
+     * Extension point:  child classes may override to return specific {@link Protocol} implementations per their requirements.
+     * @return
+     */
+    protected Protocol newProtocolHandler () {
+		return spec.isShared() ? new ConcurrentSynchProtocol() : new SynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
+    }
+    
+    /**
+     * Extension point: override to return stream per requirement.  Base implementation uses {@link FastBufferedInputStream} by default,
+     * with buffer size matching the SO_RCVBUF property of the {@link Connection}'s {@link ConnectionSpec}
+     * @param socketInputStream
+     * @return
+     */
+    protected InputStream newInputStream(InputStream socketInputStream) { 
+    	return  new FastBufferedInputStream(socketInputStream, spec.getSocketProperty(SO_RCVBUF));
+    }
+    
+    /**
+     * Extension point: override to return stream per requirement.  Base implementation simply returns the input param
+     * @param socketOutputStream
+     * @return
+     */
+    protected OutputStream newOutputStream(OutputStream socketOutputStream) { return socketOutputStream; }
+    
+	// ------------------------------------------------------------------------
+	// Inner ops: socket and connection management
+	// ------------------------------------------------------------------------
+
+	/** @return connected status*/
+	protected final boolean isConnected () { return isConnected; }
 	
 	
 	/**
@@ -233,6 +269,16 @@ public abstract class ConnectionBase implements Connection {
 		}
 		
 		isConnected = true;
+		
+		try {
+	        initializeConnection();
+        }
+        catch (RedisException e) {
+        	// either authorize or db select is using invalid parameters
+        	// which is user error
+        	throw new IllegalArgumentException("Failed to connect -- check credentials and/or database settings for the connection spec", e);
+        }
+		
 //		Log.log("RedisConnection - connected");
 
 	}
@@ -299,8 +345,8 @@ public abstract class ConnectionBase implements Connection {
 		}
 		finally {
 			socket = null;
-			input_stream = null;
-			output_stream = null;
+			instream = null;
+			outstream = null;
 		}
 	}
 	
@@ -308,37 +354,75 @@ public abstract class ConnectionBase implements Connection {
 	 * @throws IllegalStateException if socket is null
 	 * @throws IOException thrown by socket instance stream accessors
 	 */
-	private final void initializeSocketStreams() throws IllegalStateException, IOException {
-		input_stream = Assert.notNull(socket.getInputStream(), "input_stream", IllegalStateException.class);
-		output_stream = Assert.notNull(socket.getOutputStream(), "output_stream", IllegalStateException.class);
-
-//		Log.log("RedisConnection - initialized i/o streams ");
+	protected final void initializeSocketStreams() throws IllegalArgumentException, IOException {
+		instream = newInputStream (Assert.notNull(socket.getInputStream(), "socket input stream", IllegalArgumentException.class));
+		Assert.notNull(instream, "input stream provided by extended class", IllegalArgumentException.class);
+		outstream = newOutputStream (Assert.notNull(socket.getOutputStream(), "socket output stream", IllegalArgumentException.class));
 	}
-	// ------------------------------------------------------------------------
-	// Interface
-	// ============================================================ Connection
-	/*
-	 * These are the extension points for the concrete connection classes.
-	 */
-	// ------------------------------------------------------------------------
+	
+	/**
+	 * @throws RedisException 
+	 * @throws ClientRuntimeException 
+	 * @throws ProviderException 
+     * 
+     */
+    protected final void initializeConnection () throws ProviderException, ClientRuntimeException, RedisException{
+    	switch (getModality()){
+			case Asynchronous:
+				initializeAsynchConnection();
+				break;
+			case Synchronous:
+				initializeSynchConnection();
+				break;
+			default:
+				throw new ProviderException("Modality " + getModality().name() + " is not supported.");
+    	}
+    }
 
-	@Override
-	public Response serviceRequest(Command cmd, byte[]... args)
-			throws RedisException, ClientRuntimeException, ProviderException 
-	{
-		throw new NotSupportedException (
-				"Response.serviceRequest(Command cmd, " +
-				"byte[]... args) is not supported.");
-	}
-
-	@Override
-	public Response serviceRequest(RequestListener requestListener, Command cmd, byte[]... args) 
-		throws RedisException, ClientRuntimeException, ProviderException 
-	{
-		throw new NotSupportedException (
-				"Response.serviceRequest(RequestListener requestListener, " +
-				"Command cmd, byte[]... args) is not supported.");
-	}
+    /**
+     * @throws ProviderException
+     * @throws ClientRuntimeException
+     * @throws RedisException
+     */
+    protected final void initializeSynchConnection () throws ProviderException, ClientRuntimeException, RedisException{
+		if(null!=spec.getCredentials()) {
+			this.serviceRequest(Command.AUTH, spec.getCredentials());
+		}
+		if(spec.getDatabase() != 0) {
+			this.serviceRequest(Command.SELECT, Convert.toBytes(spec.getDatabase()));
+		}
+    }
+    /**
+     * @throws ProviderException
+     * @throws ClientRuntimeException
+     * @throws RedisException
+     */
+    protected final void initializeAsynchConnection () throws ProviderException, ClientRuntimeException, RedisException{
+    	try {
+    		if(null!=spec.getCredentials()) {
+    			this.queueRequest(Command.AUTH, spec.getCredentials()).get();
+    		}
+    		if(spec.getDatabase() != 0) {
+    			this.queueRequest(Command.SELECT, Convert.toBytes(spec.getDatabase())).get();
+    		}
+        }
+        catch (InterruptedException e) {
+	        e.printStackTrace();
+	        throw new ClientRuntimeException("Interrupted while initializing asynchronous connection", e);
+        }
+        catch (ExecutionException e) {
+	        e.printStackTrace();
+	        if(e.getCause() != null){
+	        	if(e.getCause() instanceof RedisException)
+	        		throw (RedisException) e.getCause();
+	        	else if(e.getCause() instanceof ProviderException)
+	        		throw (ProviderException) e.getCause();
+	        	else if(e.getCause() instanceof ClientRuntimeException)
+	        		throw (ClientRuntimeException) e.getCause();
+	        }
+	        throw new ProviderException("Exception while initializing asynchronous connection", e);
+        }
+    }
 	
 	// ------------------------------------------------------------------------
 	// Property accessors
@@ -352,11 +436,11 @@ public abstract class ConnectionBase implements Connection {
 		return notNull(protocol, "protocolHandler for ConnectionBase", ClientRuntimeException.class);
 	}
 
-	protected final OutputStream getOutputStream() {
-		return output_stream;
+	final protected OutputStream getOutputStream() {
+		return outstream;
 	}
 
-	protected final InputStream getInputStream() {
-		return input_stream;
+	final protected InputStream getInputStream() {
+		return instream;
 	}
 }

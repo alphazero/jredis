@@ -16,7 +16,7 @@
 
 package org.jredis.ri.alphazero.protocol;
 
-import java.io.BufferedInputStream;
+//import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,7 +59,6 @@ public class SynchProtocol extends ProtocolBase {
 	
 	/** Initial size of the shared line buffer */
 	protected static final int			PREFERRED_LINE_BUFFER_SIZE = 128;
-	
 	
 	/**  */
 	protected static final int			INPUT_STREAM_BUFFER_SIZE = 1024 * 128;
@@ -227,7 +226,7 @@ public class SynchProtocol extends ProtocolBase {
 			int c = -1;
 			int available = buffer.length;
 			try {
-				while ((c = in.read(buffer, offset, available)) != -1) {
+				while ((c = in.read(buffer, offset, 1)) != -1) {
 					offset += c; 
 					available -= c;
 					if(offset > 2 && buffer[offset-2]==(byte)13 && buffer[offset-1]==(byte)10){
@@ -322,6 +321,9 @@ public class SynchProtocol extends ProtocolBase {
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
 			
+//			BufferedInputStream bin = new BufferedInputStream(in, 1024 * 48);
+//			super.readSingleLineResponse (bin);
+
 			super.readSingleLineResponse (in);
 			didRead = true;
 
@@ -365,14 +367,8 @@ public class SynchProtocol extends ProtocolBase {
 		/**
 		 * @param in
 		 */
-		void seekToCRLF (BufferedInputStream in){
-			/*
-			 * We're guaranteed to be able to do blocking reads (as much as possible)
-			 * until we get the first CRLF, but we may get some overflow and we need to 
-			 * save that.
-			 */
+		void seekToCRLF (InputStream in){
 			offset = 0;
-			
 			int c = -1;
 			int available = buffer.length;
 			try {
@@ -403,7 +399,7 @@ public class SynchProtocol extends ProtocolBase {
 		 * @param ctlByte
 		 * @return
 		 */
-		int readControlLine (BufferedInputStream in, boolean checkForError, byte ctlByte){
+		int readControlLine (InputStream in, boolean checkForError, byte ctlByte){
 			seekToCRLF(in);
 			if(checkForError && (this.isError = buffer[0] == ProtocolBase.ERR_BYTE) == true) {
 				status = new ResponseStatus(ResponseStatus.Code.ERROR, new String(buffer, 1, offset-3));
@@ -411,7 +407,7 @@ public class SynchProtocol extends ProtocolBase {
 				return -2;
 			}
 			if(buffer[0] != ctlByte) {
-				throw new ProviderException ("Bug?  Expecting status code for size");
+				throw new ProviderException ("Bug?  Expecting status code for size/count");
 			}
 			status = ResponseStatus.STATUS_OK;
 			return Convert.toInt (buffer, 1, offset-3);
@@ -427,11 +423,11 @@ public class SynchProtocol extends ProtocolBase {
 		 * @throws IOException 
 		 * @throws IllegalArgumentException if could not read the bulk data
 		 */
-		public final byte[] readBulkData (BufferedInputStream in, int length)
+		public final byte[] readBulkData (InputStream in, int length)
 			throws IOException, RuntimeException
 		{
 			byte[] data = new byte[length]; // TODO: optimize me
-			byte[] term = new byte[CRLF.length];
+//			byte[] term = new byte[CRLF.length]; // FIX: http://github.com/alphazero/jredis/issues#issue/5 -- N/A
 			
 			int readcnt = -1;
 			int offset = 0;
@@ -440,9 +436,16 @@ public class SynchProtocol extends ProtocolBase {
 				if((readcnt = in.read (data, offset, length-offset)) ==-1 ) throw new ClientRuntimeException("IO - read returned -1 -- problem");
 				offset += readcnt;
 			}
-			if((readcnt = in.read (term, 0, CRLF.length)) != CRLF.length) { 
-				throw new RuntimeException ("Only read " + readcnt + " bytes for CRLF!");
+			// FIX: http://github.com/alphazero/jredis/issues#issue/5 -- BEGIN
+			for(int i=0; i<CRLF_LEN; i++){
+				if (in.read() == -1){
+					throw new RuntimeException ("read got EOF (-1) while consuming the " +(i+1)+ "-th byte of CRLF bytes!");
+				}
 			}
+//			if((readcnt = in.read (term, 0, CRLF.length)) != CRLF.length) { 
+//				throw new RuntimeException ("Only read " + readcnt + " bytes for CRLF!");
+//			}
+			// http://github.com/alphazero/jredis/issues#issue/5 -- END
 			return data;
 		}
 	}
@@ -481,12 +484,12 @@ public class SynchProtocol extends ProtocolBase {
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
 
-			BufferedInputStream bin = new BufferedInputStream(in, INPUT_STREAM_BUFFER_SIZE);
-			int size = readControlLine (bin, true, SIZE_BYTE);
+//			BufferedInputStream bin = new BufferedInputStream(in, INPUT_STREAM_BUFFER_SIZE);
+			int size = readControlLine (in, true, SIZE_BYTE);
 
 			if(!status.isError() && size >= 0){
 				try {
-					data = super.readBulkData(bin, size);
+					data = super.readBulkData(in, size);
 				}
 				catch (IllegalArgumentException bug){ 
 					throw new ProviderException ("Bug: in converting the bulk data length bytes", bug);
@@ -537,18 +540,18 @@ public class SynchProtocol extends ProtocolBase {
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
 			
-			BufferedInputStream bin = new BufferedInputStream(in, 1024);
-			int count = super.readControlLine (bin, true, COUNT_BYTE);
+//			BufferedInputStream bin = new BufferedInputStream(in, 1024);
+			int count = super.readControlLine (in, true, COUNT_BYTE);
 			
 			if(!status.isError() && count >= 0){
 				datalist = new ArrayList<byte[]>(count);
 				try {
 					int size = -1;
 					for(int i=0;i<count; i++){
-						size = readControlLine(bin, false, SIZE_BYTE);
+						size = readControlLine(in, false, SIZE_BYTE);
 
 						if(size > 0)
-							datalist.add (super.readBulkData(bin, size));
+							datalist.add (super.readBulkData(in, size));
 						else
 							datalist.add(null);
 					}

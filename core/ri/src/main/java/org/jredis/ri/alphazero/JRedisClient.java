@@ -28,7 +28,6 @@ import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Assert;
-import org.jredis.ri.alphazero.support.Convert;
 
 
 /**
@@ -74,7 +73,7 @@ import org.jredis.ri.alphazero.support.Convert;
  * @since   alpha.0
  * 
  */
-@Redis(versions={"0.09"})
+@Redis(versions={"1.00"})
 public class JRedisClient extends SynchJRedisBase  {
 	
 	// ------------------------------------------------------------------------
@@ -91,19 +90,6 @@ public class JRedisClient extends SynchJRedisBase  {
 		// note: using a non shared connection mod
 		Connection synchConnection = createSynchConnection (connectionSpec, false, RedisVersion.current_revision);
 		setConnection (synchConnection);
-		
-		try {
-			if(null != connectionSpec.getCredentials())
-				this.serviceRequest(Command.AUTH, connectionSpec.getCredentials());
-			
-			this.serviceRequest(Command.SELECT, Convert.toBytes(connectionSpec.getDatabase()));
-		} 
-		catch (RedisException e) {
-			// TODO: remove this stacktrace
-			e.printStackTrace();
-			throw new ClientRuntimeException("Failed to create JRedisClient due to Redis Errors", e);
-		}		
-		
 	}
 	/**
 	 * Connects to the localhost:6379 redis server using the password.
@@ -165,11 +151,11 @@ public class JRedisClient extends SynchJRedisBase  {
 	protected Response serviceRequest(Command cmd, byte[]... args)
 			throws RedisException, ClientRuntimeException, ProviderException 
 	{
-		Response response = connection.serviceRequest(cmd, args);
-		return response;
+		return connection.serviceRequest(cmd, args);
 	}
 	
-	
+
+	// TODO: what's the use of this?
 	@Override
 	protected final void setConnection (Connection connection)  {
 		this.connection = Assert.notNull(connection, "connection on setConnection()", ClientRuntimeException.class);
@@ -187,7 +173,7 @@ public class JRedisClient extends SynchJRedisBase  {
 	/* (non-Javadoc)
 	 * @see org.jredis.resource.Resource#getInterface()
 	 */
-	@Override
+//	@Override
 	public JRedis getInterface() {
 		return this;
 	}

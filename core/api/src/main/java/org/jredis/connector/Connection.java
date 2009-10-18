@@ -16,6 +16,8 @@
 
 package org.jredis.connector;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
@@ -64,22 +66,24 @@ public interface Connection {
 	
 	
 	/**
-	 * A <b>non-blocking call</b> to service the specified request.  This method will return immediately.
-	 * 
+	 * A <b>non-blocking call</b> to service the specified request at some point in the future.  
+	 * This method will return immediately with a {@link Future} object of parametric type {@link Response}
 	 * <p>
-	 * Upon the completion of the request response protocol with the connected redis server, the
-	 * {@link RequestListener} registered in this call will receive a notification.  Support for this
-	 * method is required for all {@link Modality#Asynchronous}
-	 * 
+	 * When the request is serviced, call to {@link Future#get()} will return the request response.
 	 * <p>{@link Modality#Synchronous} handlers must always throw a {@link ClientRuntimeException}
 	 * for <b>this method which violates the contract for</b> {@link Modality#Synchronous}  <b>handlers</b>.
-	 * 
+	 * <p>
+	 * If request resulted in a redis error ({@link RedisException}), the exception will be set as the cause of
+	 * the corresponding {@link ExecutionException} of the {@link Future} object returned.
 	 * @param cmd
 	 * @param args
-	 * @return
-	 * @throws RedisException
+	 * @return the {@link Future} {@link Response}.
 	 * @throws ClientRuntimeException
 	 * @throws ProviderException
+	 * @see Future
+	 * @see ExecutionException
 	 */
-	public Response serviceRequest (RequestListener requestListener,  Command cmd, byte[]...args) throws RedisException, ClientRuntimeException, ProviderException; 
+
+	public Future<Response> queueRequest (Command cmd,  byte[]...args) throws ClientRuntimeException, ProviderException;
+	
 }

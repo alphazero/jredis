@@ -16,14 +16,31 @@
 
 package org.jredis.ri.alphazero.connection;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.net.SocketException;
 
+import org.jredis.connector.Connection;
+import org.jredis.protocol.Command;
 import org.jredis.ri.alphazero._specification;
 
 /**
- * [TODO: document me!]
- *
- * @author  Joubin Houshyar (alphazero@sensesay.net)
+ * This exception is thrown by a {@link Connection} to indicate that the connection to redis was
+ * reset (typically due to timeout on Redis side).  
+ * <p>
+ * If the {@link Connection} is specified to use
+ * auto-reconnect, the connection has been re-established, but, the status of the request that
+ * gave rise to this exception is indeterminate, in the sense that while this exception certainly indicates
+ * that the response was not received from Redis, it is not clear whether the request itself was
+ * received by the server.  This is due to the fact that writing to the {@link OutputStream} of a {@link Socket}
+ * that has been closed by the remote peer does NOT raise an exception.  The exception is raised (reliably) only
+ * on the receive when reading from the {@link Socket}'s {@link InputStream}.
+ * <p>
+ * Depending on the application domain and the {@link Command} of the request, the user may retry 
+ * the request. 
+ * 
+ * @author  Joubin (alphazero@sensesay.net)
  * @version alpha.0, Apr 15, 2009
  * @since   alpha.0
  * 
@@ -41,5 +58,7 @@ public class ConnectionResetException extends ConnectionException {
 	public ConnectionResetException(String msg, SocketException e) {
 		super(msg, e);
 	}
-
+	public ConnectionResetException(String msg) {
+		super(msg);
+	}
 }

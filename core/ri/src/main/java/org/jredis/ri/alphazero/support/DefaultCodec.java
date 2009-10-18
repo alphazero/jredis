@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ import org.jredis.JRedis;
  * 
  */
 public class DefaultCodec {
+	public final static String SUPPORTED_CHARSET_NAME = "UTF-8";	// this is for jdk 1.5 compliance
 	public final static Charset SUPPORTED_CHARSET = Charset.forName ("UTF-8");
 	
 	/**
@@ -64,11 +66,29 @@ public class DefaultCodec {
 	 * @return
 	 */
 	public static final String toStr (byte[] bytes) { 
-		return new String(bytes, SUPPORTED_CHARSET);
+        String str = null;
+		try {
+			str = new String(bytes, SUPPORTED_CHARSET_NAME);
+        }
+        catch (UnsupportedEncodingException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+        return str;
+//		return new String(bytes, SUPPORTED_CHARSET); // Java 1.6 only
 	}
 	
 	public static final byte[] encode(String value) {
-		return value.getBytes(SUPPORTED_CHARSET);
+		byte[] bytes = null;
+		try {
+	        bytes = value.getBytes(SUPPORTED_CHARSET_NAME);
+        }
+        catch (UnsupportedEncodingException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+        return bytes;
+//		return value.getBytes(SUPPORTED_CHARSET);
 	}
 	
 	/**

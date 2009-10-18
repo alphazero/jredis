@@ -46,8 +46,8 @@ public class JRedisClientBenchmark extends JRedisBenchmark {
 		String host = "127.0.0.1";
 		int    port = 6379;
 		int	   size = 3;
-		int workerCnt = 14;
-		int reqCnt = 10000;
+		int workerCnt = 10;
+		int reqCnt = 200000;
 		int	db = 13;
 		if(args.length > 0) db = Integer.valueOf (args[0]);
 		if(args.length > 1) workerCnt = Integer.valueOf(args[1]);

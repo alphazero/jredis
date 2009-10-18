@@ -17,6 +17,7 @@
 package org.jredis.bench;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author  joubin 
@@ -66,13 +67,15 @@ public class Util {
 	// Inner types
 	// ------------------------------------------------------------------------
 	/**
-	 * 
+	 * A timer utility for benchmarking.  Internally uses {@link TimeUnit#MILLISECONDS}.
 	 */
 	public static final class Timer {
+		final static public TimeUnit UNIT = TimeUnit.MILLISECONDS;
 		final long startTime = System.currentTimeMillis();
 		private long markTime = startTime;
 		private long delta = 0;
 		private Timer () {}
+		
 		public static final Timer startNewTimer() {
 			return new Timer ();
 		}
@@ -86,14 +89,27 @@ public class Util {
          * @param keyCount
          * @return
          */
-        public float opsPerSecAtMark (long opCount) {
-	        return opCount*1000/(float)delta;
+        public float opsPerSecAtDelta (long opCount, long delta) {
+	        return (UNIT.convert(1, TimeUnit.SECONDS)*opCount)/(float)delta;
         }
+        
+        public float opsPerSecAtMark (long opCount) {
+        	return opsPerSecAtDelta(opCount, deltaAtMark());
+        }
+        
 		/**
-         * @return
+         * @return the elapsed time since call to {@link Timer#mark} in the timer's TimeUnit
          */
-        public long deltaAtMark () {
-	        return delta;
+        public long deltaAtMark () { return delta;}
+        
+        /**
+         * @param unit
+         * @return the elapsed time since call to {@link Timer#mark} in the specified unit.
+         * If the unit provided is finer than the timer's internal time unit, finer precision will
+         * naturally be irrelevant.
+         */
+        public long deltaAtMark (TimeUnit unit){
+        	return unit.convert(deltaAtMark(), UNIT);
         }
 	}
 }
