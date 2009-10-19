@@ -143,10 +143,13 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 			if(pendingQuit) throw new ClientRuntimeException("Pipeline shutting down: Quit in progess; no further requests are accepted.");
 			
 			Request request = Assert.notNull(protocol.createRequest (cmd, args), "request object from handler", ProviderException.class);
-			request.write(getOutputStream());
+			if(cmd != Command.QUIT)
+				request.write(getOutputStream());
+			else
+				pendingQuit = true;
+				
 			pendingResponse = new PendingRequest(request, cmd);
 			pendingResponseQueue.add(pendingResponse);
-			pendingQuit = cmd == Command.QUIT;
 		}
 		return pendingResponse;
     }
@@ -195,23 +198,28 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 
 					}
 					catch (ProviderException bug){
+						Log.error ("ProviderException: " + bug.getLocalizedMessage());
 						bug.printStackTrace();
 						pending.setCRE(bug);
 					}
 					catch (ClientRuntimeException cre) {
+						Log.error ("ClientRuntimeException: " + cre.getLocalizedMessage());
 						cre.printStackTrace();
 						pending.setCRE(cre);
 					}
 					catch (RuntimeException e){
+						Log.error ("Unexpected (and not handled) RuntimeException: " + e.getLocalizedMessage());
 						e.printStackTrace();
-						System.err.format("BUG -- unexpected RuntimeException '%s' (not handled) -- response handler will stop!", e.getLocalizedMessage());
 						pending.setCRE(new ProviderException("Unexpected runtime exception in response handler"));
 						pending.setResponse(null);
 						break;
 					}
 					
-					// if we just processed a QUIT, then pipeline is closing and we'll stop running.
+					// redis (1.00) simply shutsdown connection even if pending responses
+					// are expected, so quit is NOT sent.  we simply close connection on this
+					// end. 
 					if(pending.cmd == Command.QUIT) {
+						PipelineConnectionBase.this.disconnect();
 						break;
 					}
                 }
