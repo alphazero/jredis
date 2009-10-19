@@ -64,7 +64,7 @@ public final class VirtualResponse implements Response {
 
 //	@Override
 	/**
-	 * The raison d'être for this class is to provide responses that are not actually read from
+	 * The purpose of this class is to provide responses that are not actually read from
 	 * the server.  Typically this is for commands that closed the connection on the send, such
 	 * as QUIT.
 	 * @see Command#QUIT
