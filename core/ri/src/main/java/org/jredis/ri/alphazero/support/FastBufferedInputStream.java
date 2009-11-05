@@ -2,6 +2,7 @@ package org.jredis.ri.alphazero.support;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import org.jredis.ProviderException;
 
 /**
@@ -77,7 +78,6 @@ public final class FastBufferedInputStream extends java.io.InputStream {
 			else if(c > 0){
 				int bufflen = buffer.length - offset;
 				rlen+=c;
-//				byte[] newbuffer = new byte[buffer.length + c - offset];
 				byte[] newbuffer = new byte[bufflen + c];
 				System.arraycopy(buffer, offset, newbuffer, 0, bufflen);
 				System.arraycopy(iobuffer, 0, newbuffer, bufflen, c);
@@ -119,15 +119,12 @@ public final class FastBufferedInputStream extends java.io.InputStream {
 		if (off < 0 || off >= b.length || len < 0 || off + len > b.length) {
 			throw new ArrayIndexOutOfBoundsException();
 		}
-		if(len > buffer.length - offset) {
+		int available = buffer.length - offset;
+		if(len > available) {
 			int c = getMoreBytes (len);  // this is a potentially blocking call
 			if(c==-1) return -1;
-			else if(c < len) throw new ProviderException ("Bug: getMoreBytes() returned less bytes than requested.  c="+c+" len=" + len);
-//			if(c > maxRead){
-//				maxRead = c;
-//				System.out.format("<< max:%7d\n", maxRead);
-//			}
-//			System.out.format("<< %7d max:%7d\n", c, maxRead);
+			else if(c < len - available) 
+				throw new ProviderException ("Bug: getMoreBytes() returned less bytes than requested.  c="+c+" len=" + len + "available=" + available);
 		}
 
 		if(len == 1){

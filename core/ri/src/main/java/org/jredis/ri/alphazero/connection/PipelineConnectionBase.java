@@ -136,13 +136,16 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     public final Future<Response> queueRequest (Command cmd, byte[]... args) 
     	throws ClientRuntimeException, ProviderException 
     {
-		if(!isConnected()) throw new NotConnectedException ("Not connected!");
-   
+		if(!isConnected()) 
+			throw new NotConnectedException ("Not connected!");
+		
 		PendingRequest pendingResponse = null;
 		synchronized (serviceLock) {
-			if(pendingQuit) throw new ClientRuntimeException("Pipeline shutting down: Quit in progess; no further requests are accepted.");
+			if(pendingQuit) 
+				throw new ClientRuntimeException("Pipeline shutting down: Quit in progess; no further requests are accepted.");
 			
 			Request request = Assert.notNull(protocol.createRequest (cmd, args), "request object from handler", ProviderException.class);
+			
 			if(cmd != Command.QUIT)
 				request.write(getOutputStream());
 			else
