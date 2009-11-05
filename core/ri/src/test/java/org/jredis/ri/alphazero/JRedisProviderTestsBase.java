@@ -662,11 +662,11 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 				provider.lpush(listkey, dataList.get(i));
 			}
 			// use LLEN: size should be small count
-			assertTrue(provider.llen(listkey)==SMALL_CNT, "LLEN after RPUSH is wrong");
+			assertTrue(provider.llen(listkey)==SMALL_CNT, "LLEN after LPUSH is wrong");
 			
 			// use LRANGE 0 cnt: equal size and data should be same in order
 			List<byte[]>  range = provider.lrange(listkey, 0, SMALL_CNT);
-			assertTrue(range.size()==SMALL_CNT, "range size after RPUSH is wrong");
+			assertTrue(range.size()==SMALL_CNT, "range size after LPUSH is wrong");
 			for(int i=0; i<SMALL_CNT; i++){
 				int r = SMALL_CNT - i - 1;
 				assertEquals (dataList.get(i), range.get(r), "range and reference list differ at i: " + i);
