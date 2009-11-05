@@ -2,7 +2,6 @@ package org.jredis.ri.alphazero.support;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.SocketTimeoutException;
 import org.jredis.ProviderException;
 
 /**

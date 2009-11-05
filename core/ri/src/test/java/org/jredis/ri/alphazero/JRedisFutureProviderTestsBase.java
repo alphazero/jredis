@@ -16,11 +16,13 @@
 
 package org.jredis.ri.alphazero;
 
+import static org.jredis.ri.alphazero.support.DefaultCodec.toStr;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -66,14 +68,15 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	 */
 	// ------------------------------------------------------------------------
 
+
 //	@Test
 //	public void testTemplate() throws InterruptedException {
 //		cmd = Command.PING.code + " | " + Command.SETNX.code + " byte[] | " + Command.GET;
 //		Log.log("TEST: %s command", cmd);
 //		Future<ResponseStatus> reqResp = provider.ping();
 //		try {
+//			provider.flushdb();
 //			try {
-//				reqResp.get();
 //			}
 //			catch(ExecutionException e){
 //				Throwable cause = e.getCause();
@@ -82,6 +85,623 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 //		} 
 //		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 //	}
+
+
+	@Test
+	public void testSmoveStringByteArray() throws InterruptedException{
+		cmd = Command.SMOVE.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+
+		provider.flushdb();
+		
+		String srckey = keys.get(0);
+		String destkey = keys.get(1);
+		
+		List<Future<Boolean>> saddResponses = new ArrayList<Future<Boolean>>();
+		for(int i=0;i<MEDIUM_CNT; i++)
+			saddResponses.add (provider.sadd(srckey, dataList.get(i)));
+		
+		List<Future<Boolean>> smoveResponses = new ArrayList<Future<Boolean>>();
+		for(int i=0;i<MEDIUM_CNT; i++)
+			smoveResponses.add (provider.smove(srckey, destkey, dataList.get(i)));
+		
+		try {
+			try {
+				for(Future<Boolean> resp : saddResponses)
+					assertTrue (resp.get().booleanValue(), "sadd of random element should have been true");
+				
+				for(Future<Boolean> resp : smoveResponses)
+					assertTrue (resp.get().booleanValue(), "smove of element should have been true");
+				
+				for(int i=0;i<MEDIUM_CNT; i++){
+					assertTrue  (provider.sismember(destkey, dataList.get(i)).get(), "@ [" + i +"] should be a member of the dest after move");
+					assertFalse (provider.sismember(srckey, dataList.get(i)).get(), "@ [" + i +"] should NOT be a member of the src after move");
+				}
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
+	@Test
+	public void testScard() throws InterruptedException {
+		cmd = Command.SCARD.code + " Java Object";
+		Log.log("TEST: %s command", cmd);
+
+		provider.flushdb();
+		
+		String setkey = keys.get(0);
+	
+		List<Future<Boolean>> saddResponses = new ArrayList<Future<Boolean>>();
+		for(int i=0;i<MEDIUM_CNT; i++)
+			saddResponses.add (provider.sadd(setkey, objectList.get(i)));
+		
+		Future<Long> scardResp = provider.scard(setkey);
+		
+		try {
+			provider.flushdb();
+			try {
+				for(Future<Boolean> resp : saddResponses)
+					assertTrue (resp.get().booleanValue(), "sadd of random object should have been true");
+				
+				assertEquals (scardResp.get().longValue(), MEDIUM_CNT, "scard value should have been MEDIUM_CNT");
+				
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
+	@Test
+	public void testSismemberStringByteArray() throws InterruptedException {
+		cmd = Command.SISMEMBER.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+
+		String setkey = keys.get(0);
+		
+		List<Future<Boolean>> saddResponses = new ArrayList<Future<Boolean>>();
+		for(int i=0;i<SMALL_CNT; i++)
+			saddResponses.add (provider.sadd(setkey, dataList.get(i)));
+		
+		List<Future<Boolean>> sismemberResponses = new ArrayList<Future<Boolean>>();
+		for(int i=0;i<SMALL_CNT; i++)
+			saddResponses.add (provider.sismember(setkey, dataList.get(i)));
+		
+		
+		try {
+			provider.flushdb();
+			try {
+				for(Future<Boolean> resp : saddResponses)
+					assertTrue (resp.get().booleanValue(), "sadd of random element should have been true");
+				
+				for(Future<Boolean> resp : sismemberResponses)
+					assertTrue (resp.get().booleanValue(), "set membership test should have been true");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
+	public void testSmembers() throws InterruptedException{
+		cmd = Command.SMEMBERS.code + " byte[] | " + Command.SADD + "| " + Command.SCARD;
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			List<Future<Boolean>> saddResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				saddResponses.add (provider.sadd(setkey, dataList.get(i)));
+			
+			Future<Long> scardResp = provider.scard(setkey);
+			Future<List<byte[]>> smembersResp = provider.smembers(setkey);			
+
+			String setkey2 = keys.get(2);
+			provider.sadd(setkey2, dataList.get(0));
+			provider.srem(setkey2, dataList.get(0));
+			Future<Long> scardResp2 = provider.scard(setkey2);
+			Future<List<byte[]>> smembersResp2 = provider.smembers(setkey2);			
+			
+			
+			try {
+				for(Future<Boolean> resp : saddResponses)
+					assertTrue (resp.get().booleanValue(), "sadd of random element should have been true");
+				
+				List<byte[]> members = smembersResp.get();
+				assertTrue(members.size() == SMALL_CNT, "smembers should have returned a list of SMALL_CNT size");
+				assertTrue(members.size() == scardResp.get().longValue(), "smembers should have returned a list of scard size");
+				
+				List<byte[]> members2 = smembersResp2.get();
+				assertTrue(scardResp2.get().longValue() == 0, "setkey2 should be an empty set");
+				assertTrue(members2.size() == 0, "smembers should have returned an empty list");
+				assertTrue(members2.size() == scardResp2.get().longValue(), "smembers should have returned a list of scard size");
+				
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	@Test
+	public void testSaddStringByteArray() throws InterruptedException{
+		cmd = Command.SADD.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			String setkey = keys.get(0);
+			List<Future<Boolean>> expectedOKResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				expectedOKResponses.add (provider.sadd(setkey, dataList.get(i)));
+			
+			List<Future<Boolean>> expectedErrorResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				expectedErrorResponses.add (provider.sadd(setkey, dataList.get(i)));
+			
+
+			try {
+				for(Future<Boolean> resp : expectedOKResponses)
+					assertTrue (resp.get().booleanValue(), "sadd of random element should have been true");
+				
+				for(Future<Boolean> resp : expectedErrorResponses)
+					assertFalse (resp.get().booleanValue(), "sadd of existing element should have been false");
+				
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
+	public void testSort() throws InterruptedException{
+		cmd = Command.SORT.code;
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			
+			String setkey = "set-key";
+			String listkey = "list-key";
+			for(int i=0; i<MEDIUM_CNT; i++){
+				provider.sadd(setkey, stringList.get(i));
+				provider.lpush(listkey, stringList.get(i));
+			}
+			
+			Future<List<byte[]>> sortListResp = provider.sort(listkey).ALPHA().LIMIT(0, 555).DESC().execAsynch();
+			Future<List<byte[]>> sortSetResp = provider.sort(setkey).ALPHA().LIMIT(0, 555).DESC().execAsynch();
+			
+			try {
+				Log.log("TEST: SORTED LIST ");
+				for(String s : toStr(sortListResp.get()))
+					System.out.format("%s\n", s);
+				
+				Log.log("TEST: SORTED SET ");
+				for(String s : toStr(sortSetResp.get()))
+					System.out.format("%s\n", s);
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
+	public void testLsetStringIntByteArray() throws InterruptedException {
+		cmd = Command.LSET.code + " byte[] | " + Command.LLEN;
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			
+			// prep a MEDIUM list
+			String listkey = keys.get(0);
+			for(int i=0; i<SMALL_CNT; i++)
+				provider.rpush(listkey, dataList.get(i)); // use rpush (append) so ref list sequence order is preserved
+			Future<Long> llenResp = provider.llen(listkey);
+			
+			// now we'll change their values
+			for(int i=0; i<SMALL_CNT; i++)
+				provider.lset(listkey, i, dataList.get(SMALL_CNT+i));
+			Future<List<byte[]>>  lrangeResp1 = provider.lrange(listkey, 0, LARGE_CNT);
+			
+			// now we'll change their values using the negative index mode
+			int lim = SMALL_CNT*-1;
+			for(int i=-1; i>lim; i--)
+				provider.lset(listkey, i, dataList.get(i*-1));
+			Future<List<byte[]>>  lrangeResp2 = provider.lrange(listkey, 0, LARGE_CNT);
+
+			// test edge conditions
+			// out of range
+			Future<ResponseStatus> expectedErrorResp =  provider.lset(listkey, SMALL_CNT, dataList.get(0)); 
+
+			try {
+				assertTrue (llenResp.get().longValue() == SMALL_CNT, "list length should be SMALL_CNT");
+				
+				for(int i=0; i<SMALL_CNT; i++)
+					assertEquals (dataList.get(SMALL_CNT+i), lrangeResp1.get().get(i), "after LSET the expected and range item differ at idx: " + i);
+
+				for(int i=0; i<SMALL_CNT; i++)
+					assertEquals (dataList.get(SMALL_CNT-i), lrangeResp2.get().get(i), "after LSET the expected and range item differ at idx: " + i);
+				
+				boolean expectedError = false;
+				try {
+					Log.log("Expecting an out of range ERROR for LSET here..");
+	                expectedErrorResp.get(); // wait for response
+				}
+	            catch (ExecutionException e) {
+	            	expectedError = true;
+	            	Throwable cause = e.getCause();
+	            	if(cause instanceof RedisException)
+	            		Log.log("%s (as excepted)", cause);
+	            	else
+	            		fail("FAULT: the cause of ExecutionException was expected to be a RedisException");
+	            }
+				assertTrue(expectedError, "was expecting a Expecting an out of range ERROR for LSET here");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
+	public void testLremStringByteArrayInt() throws InterruptedException {
+		cmd = Command.LREM.code + " byte[] | " + Command.LLEN;
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			
+			// prep a MEDIUM list
+			String listkey = keys.get(0);
+			for(int i=0; i<MEDIUM_CNT; i++)
+				provider.rpush(listkey, dataList.get(i)); // use rpush (append) so ref list sequence order is preserved
+			
+			Future<Long> llenResp = provider.llen(listkey);
+			
+			// everysingle one of these should work and remove exactly 1 item
+			Future<Long> lremResp1 = provider.lrem(listkey, dataList.get(0), 0);
+			Future<Long> lremResp2 = provider.lrem(listkey, dataList.get(1), -1);
+			Future<Long> lremResp3 = provider.lrem(listkey, dataList.get(2), 1);
+			Future<Long> lremResp4 = provider.lrem(listkey, dataList.get(3), 2);
+			Future<Long> lremResp5 = provider.lrem(listkey, dataList.get(4), -2);
+			
+			// everysingle one of these should work and remove NOTHING
+			Future<Long> lremResp6 = provider.lrem(listkey, dataList.get(0), 0);
+			Future<Long> lremResp7 = provider.lrem(listkey, dataList.get(1), -1);
+			Future<Long> lremResp8 = provider.lrem(listkey, dataList.get(2), 1);
+			Future<Long> lremResp9 = provider.lrem(listkey, dataList.get(3), 2);
+			Future<Long> lremResp10 = provider.lrem(listkey, dataList.get(4), -2);
+			
+			try {
+				long listcnt = llenResp.get();
+				assertTrue (listcnt == MEDIUM_CNT, "list length should be MEDIUM_CNT");
+				
+				assertEquals(1, lremResp1.get().longValue());
+				assertEquals(1, lremResp2.get().longValue());
+				assertEquals(1, lremResp3.get().longValue());
+				assertEquals(1, lremResp4.get().longValue());
+				assertEquals(1, lremResp5.get().longValue());
+				assertEquals(0, lremResp6.get().longValue());
+				assertEquals(0, lremResp7.get().longValue());
+				assertEquals(0, lremResp8.get().longValue());
+				assertEquals(0, lremResp9.get().longValue());
+				assertEquals(0, lremResp10.get().longValue());
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
+	public void testLrange() throws InterruptedException {
+		cmd = Command.LRANGE.code ;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			// prep a MEDIUM list
+			String listkey = keys.get(0);
+			for(int i=0; i<MEDIUM_CNT; i++)
+				provider.rpush(listkey, dataList.get(i)); // use rpush (append) so ref list sequence order is preserved
+			
+			Future<Long> llenResp = provider.llen(listkey);
+			Future<List<byte[]>>  lrangeResp = provider.lrange(listkey, 0, MEDIUM_CNT-1);
+
+			try {
+//				provider.ping().get();
+				// sanity check
+				long listcnt = llenResp.get();
+				assertTrue (listcnt == MEDIUM_CNT, "list length should be MEDIUM_CNT");
+				
+				List<byte[]> items = lrangeResp.get();
+				assertEquals (items.size(), MEDIUM_CNT, "list range 0->MEDIUM_CNT length should be MEDIUM_CNT");
+				for(int i=0; i<MEDIUM_CNT; i++)
+					assertEquals(items.get(i), dataList.get(i), 
+							"nth items of range 0->CNT should be the same as nth dataitem, where n is " + i);
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
+	public void testRpop() throws InterruptedException {
+		cmd = Command.RPOP.code ;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+
+			// prep a small list
+			String listkey = keys.get(0);
+			for(int i=0; i<SMALL_CNT; i++)
+				provider.lpush(listkey, dataList.get(i)); 
+			
+			Future<Long> llenResp = provider.llen(listkey);
+			
+			List<Future<byte[]>>  rpops = new ArrayList<Future<byte[]>>();
+			for(int i=0; i<SMALL_CNT; i++)
+				rpops.add(provider.rpop(listkey)); 
+			
+			try {
+				long listcnt = llenResp.get();
+				// sanity check
+				assertTrue (listcnt == SMALL_CNT, "list length should be SMALL_CNT");
+				
+				for(int i=0; i<SMALL_CNT; i++)
+					assertEquals(rpops.get(i).get(), dataList.get(i), 
+							"nth popped tail should be the same as nth dataitem, where n is " + i);
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
+	public void testLpop() throws InterruptedException {
+		cmd = Command.LPOP.code ;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+
+			// prep a small list
+			String listkey = keys.get(0);
+			for(int i=0; i<SMALL_CNT; i++)
+				provider.rpush(listkey, dataList.get(i)); 
+			
+			Future<Long> llenResp = provider.llen(listkey);
+			List<Future<byte[]>>  lpops = new ArrayList<Future<byte[]>>();
+			for(int i=0; i<SMALL_CNT; i++)
+				lpops.add(provider.lpop(listkey)); 
+			
+			try {
+				long listcnt = llenResp.get();
+				// sanity check
+				assertTrue (listcnt == SMALL_CNT, "list length should be SMALL_CNT");
+				
+				for(int i=0; i<SMALL_CNT; i++)
+					assertEquals(lpops.get(i).get(), dataList.get(i), 
+							"nth popped head should be the same as nth dataitem, where n is " + i);
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
+	public void testLindex() throws InterruptedException {
+		cmd = Command.LINDEX.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+
+			// prep a small list
+			String listkey = keys.get(0);
+			for(int i=0; i<SMALL_CNT; i++)
+				provider.rpush(listkey, dataList.get(i)); 
+			
+			try {
+				for(int i=0; i<SMALL_CNT; i++)
+					assertEquals (provider.lindex(listkey, i).get(), dataList.get(i), "list items should match ref data");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
+	public void testLtrim() throws InterruptedException {
+		cmd = Command.LTRIM.code + " | " + Command.LLEN.code + " | " + Command.LRANGE.code ;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+
+			// prep a small list
+			String listkey = keys.get(0);
+			for(int i=0; i<SMALL_CNT; i++)
+				provider.rpush(listkey, dataList.get(i)); 
+			
+			Future<Long> llenResp = provider.llen(listkey);
+			try {
+				long listcnt = llenResp.get();
+				// sanity check
+				assertTrue (listcnt == SMALL_CNT, "list length should be SMALL_CNT");
+				
+				provider.ltrim(listkey, 0,listcnt-1);	// trim nothing
+				assertTrue (provider.llen(listkey).get() == listcnt, "trim from end to end - no delta expected");
+				
+				provider.ltrim(listkey, 1, listcnt-1); 	// remove the head
+				assertTrue (provider.llen(listkey).get() == listcnt-1, "trim head - len should be --1 expected");
+				
+				listcnt = provider.llen(listkey).get();
+				assertEquals(listcnt, SMALL_CNT - 1, "list length should be SMALL_CNT - 1");
+				for(int i=0; i<SMALL_CNT-1; i++)
+					assertEquals(provider.lindex(listkey, i).get(), dataList.get(i+1), "list items should match ref data shifted by 1 after removing head");
+				
+				provider.ltrim(listkey, -2, -1);
+				assertTrue (provider.llen(listkey).get() == 2, "list length should be 2");
+				
+				provider.ltrim(listkey, 0, 0);
+				assertTrue (provider.llen(listkey).get() == 1, "list length should be 1");
+
+				byte[] lastItem = provider.lpop(listkey).get();
+				assertNotNull(lastItem, "last item should not have been null");
+				assertTrue (provider.llen(listkey).get() == 0, "expecting empty list after trims and pop");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
+	public void testLpushStringByteArray() throws InterruptedException {
+		cmd = Command.LPUSH.code + " byte[] | " + Command.LLEN + " | " + Command.LRANGE;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			String listkey = this.keys.get(0);
+			for(int i=0; i<SMALL_CNT; i++){
+				provider.lpush(listkey, dataList.get(i));
+			}
+			Future<Long> llenResp = provider.llen(listkey);
+			Future<List<byte[]>> lrangeResp = provider.lrange(listkey, 0, SMALL_CNT);
+
+			try {
+				// use LLEN: size should be small count
+				assertTrue(llenResp.get()==SMALL_CNT, "LLEN after LPUSH is wrong");
+				
+				// use LRANGE 0 cnt: equal size and data should be same in order
+				List<byte[]> range = lrangeResp.get();
+				assertTrue(range.size()==SMALL_CNT, "range size after LPUSH is wrong");
+				for(int i=0; i<SMALL_CNT; i++){
+					int r = SMALL_CNT - i - 1;
+					assertEquals (dataList.get(i), range.get(r), "range and reference list differ at i: " + i);
+				}
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
+	public void testRpushStringByteArray() throws InterruptedException {
+		cmd = Command.RPUSH.code + " byte[] | " + Command.LLEN + " | " + Command.LRANGE;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+
+			String listkey = this.keys.get(0);
+			for(int i=0; i<SMALL_CNT; i++){
+				provider.rpush(listkey, dataList.get(i));
+			}
+			
+			Future<Long> llenResp = provider.llen(listkey);
+			Future<List<byte[]>> lrangeResp = provider.lrange(listkey, 0, SMALL_CNT);
+			
+			try {
+				// use LLEN: size should be small count
+				assertTrue(llenResp.get()==SMALL_CNT, "LLEN after RPUSH is wrong");
+				
+				// use LRANGE 0 cnt: equal size and data should be same in order
+				List<byte[]> range = lrangeResp.get();
+				assertTrue(range.size()==SMALL_CNT, "range size after RPUSH is wrong");
+				for(int i=0; i<SMALL_CNT; i++){
+					assertEquals (dataList.get(i), range.get(i), "range and reference list differ at i: " + i);
+				}
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	@Test
+	public void testMget() throws InterruptedException {
+		cmd = Command.MGET.code ;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			for(int i=0; i<SMALL_CNT; i++){
+				provider.set (keys.get(i), dataList.get(i));
+			}
+			Future<List<byte[]>> mgetResp1 = provider.mget(keys.get(0));
+			Future<List<byte[]>> mgetResp2 = provider.mget(keys.get(0), keys.get(1)); 
+			Future<List<byte[]>> mgetResp3 = provider.mget(keys.get(0), keys.get(1), keys.get(2));
+			Future<List<byte[]>> mgetResp4 = provider.mget("foo", "bar", "paz"); 
+			
+			try {
+				List<byte[]>  values = null;
+				
+				values = mgetResp1.get();
+				assertEquals(values.size(), 1, "one value expected");
+				for(int i=0; i<1; i++)
+					assertEquals(values.get(i), dataList.get(i));
+				
+				values = mgetResp2.get();
+				assertEquals(values.size(), 2, "2 values expected");
+				for(int i=0; i<2; i++)
+					assertEquals(values.get(i), dataList.get(i));
+				
+				values = mgetResp3.get();
+				assertEquals(values.size(), 3, "3 values expected");
+				for(int i=0; i<3; i++)
+					assertEquals(values.get(i), dataList.get(i));
+				
+				values = mgetResp4.get();
+				assertEquals(values.size(), 3, "3 values expected");
+				for(int i=0; i<3; i++)
+					assertEquals(values.get(i), null, "nonexistent key value in list should be null");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
 	@Test
 	public void testDel() throws InterruptedException {
 		cmd = Command.DEL.code;
