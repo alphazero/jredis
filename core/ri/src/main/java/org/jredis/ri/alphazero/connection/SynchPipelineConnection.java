@@ -85,8 +85,6 @@ public class SynchPipelineConnection extends PipelineConnectionBase {
         }
         catch (ExecutionException e) {
         	if(e.getCause() instanceof RedisException) {
-        		RedisException re = (RedisException) e.getCause();
-//    			Log.error ("Error response for " + cmd.code + " => " + re.getMessage());
         		throw (RedisException) e.getCause();
         	}
         	else {

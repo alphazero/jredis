@@ -29,18 +29,13 @@ import org.testng.annotations.Test;
  * [TODO: document me!]
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, Oct 10, 2009
+ * @version alpha.0, Nov 6, 2009
  * @since   alpha.0
  * 
  */
-@Test(sequential = true, suiteName="JRedisPipeline-tests")
+@Test(sequential = true, suiteName="JRedisAsynchClient-tests")
+public class JRedisAsynchClientTest extends JRedisFutureProviderTestsBase {
 
-public class JRedisPipelineTest extends JRedisFutureProviderTestsBase {
-
-	// ------------------------------------------------------------------------
-	// JRedisPipelineTest specific Test Suite Parameters
-	// ------------------------------------------------------------------------
-	
 	// ------------------------------------------------------------------------
 	// TEST SETUP 
 	// ------------------------------------------------------------------------
@@ -53,7 +48,7 @@ public class JRedisPipelineTest extends JRedisFutureProviderTestsBase {
 		JRedisFuture provider = null;
 		try {
 			ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec(this.host, this.port, this.db2, this.password.getBytes());
-			provider = new JRedisPipeline(connectionSpec);
+			provider = new JRedisAsynchClient(connectionSpec);
         }
         catch (ClientRuntimeException e) {
         	Log.error(e.getLocalizedMessage());

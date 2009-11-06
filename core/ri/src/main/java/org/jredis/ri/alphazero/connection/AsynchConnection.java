@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
+import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.NotConnectedException;
 import org.jredis.connector.ConnectionSpec.SocketProperty;
@@ -40,63 +41,52 @@ import org.jredis.ri.alphazero.support.Log;
  * [TODO: document me!]
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, Sep 7, 2009
+ * @version alpha.0, Nov 6, 2009
  * @since   alpha.0
  * 
  */
 
-public abstract class PipelineConnectionBase extends ConnectionBase {
-
+public class AsynchConnection extends ConnectionBase implements Connection {
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
-	/**  */
-	private ResponseHandler	    	respHandler;
-
-	/**  */
-	private Thread 					respHandlerThread;
-
-	/**  */
-	private BlockingQueue<PendingRequest>	pendingResponseQueue;
-
-	/** synchronization object used to serialize request queuing  */
-	private Object					serviceLock = new Object();
 	
-	/** 
-	 * flag (default false) indicates if a pending QUIT command is being processed.  
-	 * If true, any calls to queueRequests will result in a raise runtime exception
-	 */
-	private boolean					pendingQuit = false;
+	private RequestProcessor	   processor;
+	
+	/**  */
+	private Thread 					processerThread;
+
+	/**  */
+	private BlockingQueue<PendingRequest>	pendingQueue;
 	
 	// ------------------------------------------------------------------------
-	// Constructor(s)
+	// Constructors
 	// ------------------------------------------------------------------------
-	/**
-	 * @param spec
-	 * @throws ClientRuntimeException
-	 */
-	protected PipelineConnectionBase (ConnectionSpec spec) throws ClientRuntimeException {
-		super(spec, true);
+	public AsynchConnection (
+			ConnectionSpec connectionSpec,
+			boolean 	   isShared
+		)
+		throws ClientRuntimeException, ProviderException 
+	{
+		super (connectionSpec);
 	}
+
 	// ------------------------------------------------------------------------
 	// Extension
 	// ------------------------------------------------------------------------
 	/**
      * 
      */
-    @Override
     protected void initializeComponents () {
     	super.initializeComponents();
     	
-    	serviceLock = new Object();
+//    	serviceLock = new Object();
     	
-    	pendingResponseQueue = new LinkedBlockingQueue<PendingRequest>();
-    	respHandler = new ResponseHandler();
-    	respHandlerThread = new Thread(respHandler, "response-handler");
-    	respHandlerThread.start();
+    	pendingQueue = new LinkedBlockingQueue<PendingRequest>();
+    	processor = new RequestProcessor();
+    	processerThread = new Thread(processor, "request-processor");
+    	processerThread.start();
     }
-    
-   
     /**
      * Pipeline must use a concurrent protocol handler.
      *  
@@ -120,58 +110,38 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	}
     	return in;
     }
-
-    // ------------------------------------------------------------------------
-	// Interface: Connection
+    
 	// ------------------------------------------------------------------------
-    /**
-     * This is a pseudo asynchronous method.  The actual write to server does 
-     * occur in this method, so when this method returns, your request has been
-     * sent.  This simply defers the response read to the response handler.
-     * <p>
-     * Other item of note is that once a QUIT request has been queued, no further
-     * requests are accepted and a ClientRuntimeException is thrown.
-     * 
+	// Interface
+	// ======================================================= ProtocolHandler
+	// ------------------------------------------------------------------------
+	
+	/* (non-Javadoc)
+	 * @see org.jredis.connector.Connection#getModality()
+	 */
+	public final Modality getModality() {
+		return Connection.Modality.Asynchronous;
+	}
+	
+	/* (non-Javadoc)
      * @see org.jredis.ri.alphazero.connection.ConnectionBase#queueRequest(org.jredis.protocol.Command, byte[][])
      */
     @Override
-    public final Future<Response> queueRequest (Command cmd, byte[]... args) 
+    public Future<Response> queueRequest (Command cmd, byte[]... args)
     	throws ClientRuntimeException, ProviderException 
     {
 		if(!isConnected()) 
 			throw new NotConnectedException ("Not connected!");
 		
-		PendingRequest pendingResponse = null;
-		synchronized (serviceLock) {
-			if(pendingQuit) 
-				throw new ClientRuntimeException("Pipeline shutting down: Quit in progess; no further requests are accepted.");
-			
-			Request request = Assert.notNull(protocol.createRequest (cmd, args), "request object from handler", ProviderException.class);
-			
-			if(cmd != Command.QUIT)
-				request.write(getOutputStream());
-			else
-				pendingQuit = true;
-				
-			pendingResponse = new PendingRequest(request, cmd);
-			pendingResponseQueue.add(pendingResponse);
-		}
-		return pendingResponse;
+		PendingRequest pending = new PendingRequest(cmd, args);
+		pendingQueue.add(pending);
+		return pending;
     }
-
+    
 	// ------------------------------------------------------------------------
 	// Inner Class
 	// ------------------------------------------------------------------------
-    
-    /**
-     * Provides the response processing logic as a {@link Runnable}.
-     * 
-     * @author  Joubin Houshyar (alphazero@sensesay.net)
-     * @version alpha.0, Oct 18, 2009
-     * @since   alpha.0
-     * 
-     */
-    public final class ResponseHandler implements Runnable {
+    public final class RequestProcessor implements Runnable {
 
     	/**
     	 * Keeps processing the {@link PendingRequest}s in the pending {@link Queue}
@@ -184,21 +154,24 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	 * not even practically possible.  (e.g. request n is sent but pipe breaks on
     	 * some m (m!=n) response.  non trivial.
     	 */
-//        @Override
+
         public void run () {
-			Log.log("Pipeline thread <%s> started.", Thread.currentThread().getName());
+			Log.log("AsynchConnection processor thread <%s> started.", Thread.currentThread().getName());
         	PendingRequest pending = null;
         	while(true){
-        		Response response = null;
 				try {
-	                pending = pendingResponseQueue.take();
+	                pending = pendingQueue.take();
 					try {
-						response = protocol.createResponse(pending.cmd);
-						response.read(getInputStream());
-						pending.response = response;
+//						System.out.format("%s\n", pending.cmd.code);
+						Request request = Assert.notNull(protocol.createRequest (pending.cmd, pending.args), "request object from handler", ProviderException.class);
+						request.write(getOutputStream());
+						
+						pending.response = protocol.createResponse(pending.cmd);
+						pending.response.read(getInputStream());
+						
 						pending.completion.signal();
-						if(response.getStatus().isError()) {
-							Log.error ("(Asynch) Error response for " + pending.cmd.code + " => " + response.getStatus().message());
+						if(pending.response.getStatus().isError()) {
+							Log.error ("(Asynch) Error response for " + pending.cmd.code + " => " + pending.response.getStatus().message());
 						}
 
 					}
@@ -224,7 +197,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 					// are expected, so quit is NOT sent.  we simply close connection on this
 					// end. 
 					if(pending.cmd == Command.QUIT) {
-						PipelineConnectionBase.this.disconnect();
+						AsynchConnection.this.disconnect();
 						break;
 					}
                 }
@@ -232,7 +205,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	                e1.printStackTrace();
                 }
         	}
-			Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
+			Log.log("AsynchConnection processor thread <%s> stopped.", Thread.currentThread().getName());
         }
     }
 }

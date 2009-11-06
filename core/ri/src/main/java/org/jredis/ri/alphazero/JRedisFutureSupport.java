@@ -28,7 +28,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.ProviderException;
@@ -40,7 +39,6 @@ import org.jredis.protocol.Command;
 import org.jredis.protocol.MultiBulkResponse;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.ResponseStatus;
-import org.jredis.protocol.StatusResponse;
 import org.jredis.protocol.ValueResponse;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.DefaultCodec;
@@ -867,15 +865,17 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
         protected FutureStatus (Future<Response> pendingRequest) { super(pendingRequest); }
         public ResponseStatus get () throws InterruptedException, ExecutionException {
-        	StatusResponse statusResponse = (StatusResponse) pendingRequest.get();
-        	return statusResponse.getStatus();
+//        	StatusResponse statusResponse = (StatusResponse) pendingRequest.get();  // HANDLE VIRTUALS HERE
+//        	return statusResponse.getStatus();
+        	return pendingRequest.get().getStatus();
         }
 
         public ResponseStatus get (long timeout, TimeUnit unit)
         	throws InterruptedException, ExecutionException, TimeoutException 
         {
-        	StatusResponse statusResponse = (StatusResponse) pendingRequest.get(timeout, unit);
-        	return statusResponse.getStatus();
+//        	StatusResponse statusResponse = (StatusResponse) pendingRequest.get(timeout, unit);
+//        	return statusResponse.getStatus();
+        	return pendingRequest.get(timeout, unit).getStatus();
         }
         
 	}

@@ -33,8 +33,7 @@ public final class PendingRequest implements Future<Response> {
 	final Signal completion = new Signal();
 
 	/** the aysnchronous {@link Request} */
-	@SuppressWarnings("unused")
-    final private Request	request;
+    final Request	request;
 
 	/** awaited response */
 	Response response;
@@ -48,20 +47,21 @@ public final class PendingRequest implements Future<Response> {
 	/** if {@link PendingRequest#excepted} is true, this will be set to the cause. */
 	private ClientRuntimeException cre = null;
 	
-//	final byte[][] args;
+	final byte[][] args;
 	// ------------------------------------------------------------------------
 	// constructor(s)
 	// ------------------------------------------------------------------------
 	public PendingRequest(Request request, Command cmd){
 		this.request = request;
 		this.cmd = cmd;
+		this.args = null;
 	}
 	
-//	public PendingRequest(Command cmd, byte[]... args){
-//		this.request = null;
-//		this.cmd = cmd;
-//		this.args = args;
-//	}
+	public PendingRequest(Command cmd, byte[]... args){
+		this.request = null;
+		this.cmd = cmd;
+		this.args = args;
+	}
 	
 	// ------------------------------------------------------------------------
 	// package scoped methods used by request processors
