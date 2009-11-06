@@ -84,8 +84,15 @@ public class SynchPipelineConnection extends PipelineConnectionBase {
 	        throw new ClientRuntimeException("on pendingResponse.get()", e);
         }
         catch (ExecutionException e) {
-	        e.printStackTrace();
-	        throw new ProviderException("on pendingResponse.get()", e);
+        	if(e.getCause() instanceof RedisException) {
+        		RedisException re = (RedisException) e.getCause();
+//    			Log.error ("Error response for " + cmd.code + " => " + re.getMessage());
+        		throw (RedisException) e.getCause();
+        	}
+        	else {
+		        e.printStackTrace();
+		        throw new ProviderException("on pendingResponse.get()", e);
+        	}
         }
     	
         // check response status
@@ -95,10 +102,11 @@ public class SynchPipelineConnection extends PipelineConnectionBase {
 			Log.error ("Error response for " + cmd.code + " => " + status.message());
 			throw new RedisException(cmd, status.message());
 		}
-		else if(status.code() == ResponseStatus.Code.CIAO) {
-			// normal for quit and shutdown commands.  we disconnect too.
-			disconnect();
-		}
+		/* this is handled by the super class */
+//		else if(status.code() == ResponseStatus.Code.CIAO) {
+//			// normal for quit and shutdown commands.  we disconnect too.
+//			disconnect();
+//		}
 
 		return response;
     }

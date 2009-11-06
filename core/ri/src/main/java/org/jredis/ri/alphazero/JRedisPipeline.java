@@ -54,11 +54,11 @@ public class JRedisPipeline extends JRedisFutureSupport {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * @param coonectionSpec
+	 * @param connectionSpec
 	 */
-	public JRedisPipeline (ConnectionSpec coonectionSpec) {
+	public JRedisPipeline (ConnectionSpec connectionSpec) {
 		// note: using a non shared connection mod
-		connection = new AsynchPipelineConnection(coonectionSpec);
+		connection = new AsynchPipelineConnection(connectionSpec);
 	}
 	
 	// ------------------------------------------------------------------------

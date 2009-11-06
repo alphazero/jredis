@@ -303,7 +303,6 @@ public abstract class ProtocolBase implements Protocol {
 			try {
 				// you would expect these to throw exceptions if the socket has been reset
 				// but they don't.  
-//				out.write(buffer.toByteArray());
 				buffer.writeTo(out);
 				out.flush();
 			}

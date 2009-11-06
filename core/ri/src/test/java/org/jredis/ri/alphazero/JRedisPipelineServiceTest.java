@@ -18,7 +18,7 @@ package org.jredis.ri.alphazero;
 
 import static org.testng.Assert.fail;
 import org.jredis.ClientRuntimeException;
-import org.jredis.JRedisFuture;
+import org.jredis.JRedis;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
@@ -26,34 +26,33 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
 /**
- * [TODO: document me!]
+ * As of now, this class simply runs the same set of {@link JRedis} contract
+ * compliance using {@link JRedisService} as the provider.
+ * 
+ * TODO: figure out a good way to meaningfully test service (e.g. concurrent
+ * and random method usage ..)
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, Oct 10, 2009
+ * @version alpha.0, Nov 6, 2009
  * @since   alpha.0
  * 
  */
-@Test(sequential = true, suiteName="JRedisPipeline-tests")
 
-public class JRedisPipelineTest extends JRedisFutureProviderTestsBase {
+@Test(sequential = true, suiteName="JRedisPipelineService-tests")
+public class JRedisPipelineServiceTest extends JRedisProviderTestsBase {
 
-	// ------------------------------------------------------------------------
-	// JRedisPipelineTest specific Test Suite Parameters
-	// ------------------------------------------------------------------------
-	
 	// ------------------------------------------------------------------------
 	// TEST SETUP 
 	// ------------------------------------------------------------------------
-	
 	/* (non-Javadoc)
 	 * @see org.jredis.ri.ProviderTestBase#newProviderInstance()
 	 */
 	@Override
-	protected JRedisFuture newProviderInstance () {
-		JRedisFuture provider = null;
+	protected JRedis newProviderInstance () {
+		JRedis provider = null;
 		try {
 			ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec(this.host, this.port, this.db2, this.password.getBytes());
-			provider = new JRedisPipeline(connectionSpec);
+			provider = new JRedisPipelineService(connectionSpec);
         }
         catch (ClientRuntimeException e) {
         	Log.error(e.getLocalizedMessage());
@@ -72,18 +71,15 @@ public class JRedisPipelineTest extends JRedisFutureProviderTestsBase {
 	 * completed.
 	 */
 	// ------------------------------------------------------------------------
-
 	/**
-	 * Pipeline quit.  
-	 * We first ping and await the response to insure pipeline has processed
-	 * all pending responses, and then issue the quit command.
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#auth(java.lang.String)}.
 	 */
 	@AfterTest
 	public void testQuit() {
+		Log.log("TEST: QUIT command ");
 		try {
-			JRedisFuture pipeline = getProviderInstance();
-			pipeline.ping().get();
-			pipeline.quit ();
+			JRedis service = getProviderInstance();
+			service.quit ();
 		} 
 		catch (Exception e) {
 			fail("QUIT" + e);

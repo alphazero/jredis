@@ -35,7 +35,7 @@ import org.testng.annotations.Test;
 
 //TODO: get rid of NG in class name
 
-@Test(sequential = true, suiteName="client-tests")
+@Test(sequential = true, suiteName="JRedisClient-tests")
 public class JRedisClientTest extends JRedisProviderTestsBase {
 
 	// ------------------------------------------------------------------------

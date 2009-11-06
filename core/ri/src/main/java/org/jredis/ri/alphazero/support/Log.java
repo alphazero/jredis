@@ -46,7 +46,7 @@ public class Log {
 	private static final void _loginfo (String format, Object...args) {
 		System.out.format("-- JREDIS -- INFO: "+format+" \n", args).flush();
 	}
-	public static final String format(String format, Object...args){
+	private static final String format(String format, Object...args){
 		Formatter formatter = new Formatter();
 		formatter.format(format, args);
 		return formatter.toString();

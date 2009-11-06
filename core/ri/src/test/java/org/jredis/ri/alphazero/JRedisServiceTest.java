@@ -39,7 +39,7 @@ import org.testng.annotations.Test;
  * @since   alpha.0
  * 
  */
-@Test(sequential = true, suiteName="service-tests")
+@Test(sequential = true, suiteName="JRedisService-tests")
 public class JRedisServiceTest extends JRedisProviderTestsBase {
 	
 	// ------------------------------------------------------------------------
