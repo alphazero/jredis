@@ -56,7 +56,7 @@
             <property><name>jredis.test.expire.wait.millisecs</name>   <value>2000</value></property>
 
             <!-- redis core tests | Service params -->
-            <property><name>jredis.service.connection.cnt</name><value>1</value></property>
+            <property><name>jredis.service.connection.cnt</name><value>5</value></property>
 
           </systemProperties>
         </configuration>

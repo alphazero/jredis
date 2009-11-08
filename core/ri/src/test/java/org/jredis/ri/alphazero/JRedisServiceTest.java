@@ -40,7 +40,8 @@ import org.testng.annotations.Test;
  * 
  */
 @Test(sequential = true, suiteName="JRedisService-tests")
-public class JRedisServiceTest extends JRedisProviderTestsBase {
+//public class JRedisServiceTest extends JRedisProviderTestsBase {
+public class JRedisServiceTest extends ConcurrentJRedisProviderTestsBase {
 	
 	// ------------------------------------------------------------------------
 	// JRedisService specific Test Suite Parameters with default values

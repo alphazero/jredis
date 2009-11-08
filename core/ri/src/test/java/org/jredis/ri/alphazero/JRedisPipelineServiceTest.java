@@ -39,7 +39,8 @@ import org.testng.annotations.Test;
  */
 
 @Test(sequential = true, suiteName="JRedisPipelineService-tests")
-public class JRedisPipelineServiceTest extends JRedisProviderTestsBase {
+//public class JRedisPipelineServiceTest extends JRedisProviderTestsBase {
+public class JRedisPipelineServiceTest extends ConcurrentJRedisProviderTestsBase {
 
 	// ------------------------------------------------------------------------
 	// TEST SETUP 
@@ -71,6 +72,7 @@ public class JRedisPipelineServiceTest extends JRedisProviderTestsBase {
 	 * completed.
 	 */
 	// ------------------------------------------------------------------------
+	
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#auth(java.lang.String)}.
 	 */
