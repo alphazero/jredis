@@ -48,6 +48,7 @@ public class UsingJRedisPipeline extends UsingJRedisFuture {
 		int database = 11;
 		ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec("localhost", 6379, database, "jredis".getBytes());
 		
+		connectionSpec.setDatabase (13);
 	    new UsingJRedisPipeline (connectionSpec);
 	    
 	    exampleUseofSyncInPipeline(connectionSpec);
@@ -76,27 +77,36 @@ public class UsingJRedisPipeline extends UsingJRedisFuture {
     		long start = System.currentTimeMillis();
     		
 	        pipeline.ping();
-	        pipeline.flushall();
-	        String cntrKey = "my-cntr";
+	        pipeline.flushdb();
+
 	        Random rand = new Random();
 	        byte[] data = new byte[8];
-	        for(int i=0; i<100000; i++)
-	        	pipeline.incr(cntrKey);
+	        for(int i=0; i<100000; i++){
+	        	rand.nextBytes(data);
+	        	pipeline.lpush("my-list", data);
+	        }
+	        /* sync call */
+	        long llen = pipeline.sync().llen("my-list");
 	        
+	        String cntrKey = "my-cntr";
+	        for(int i=0; i<100000; i++) {
+	        	pipeline.incr(cntrKey);
+	        }
 	        /* sync call */
 	        long cntr = toLong (pipeline.sync().get(cntrKey));
 	        
 	        for(int i=0; i<100000; i++){
-	        	rand.nextBytes(data);
 	        	pipeline.set("random:"+i, "value:" + rand.nextInt());
 	        }
 	        /* sync call */
 	        String randomVal = toStr (pipeline.sync().get("random:"+999));
 	        
+	        pipeline.flushdb();
     		System.out.format ("end using sync() = %d msec\n", System.currentTimeMillis() - start);
 	        
 	        System.out.format("%s => %d\n", cntrKey, cntr);
 	        System.out.format("%s => %s\n", "random:"+999, randomVal);
+	        System.out.format("%s has %s items\n", "my-list", llen);
 	        
         }
         catch (RedisException e) {
