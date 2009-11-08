@@ -16,11 +16,16 @@
 
 package org.jredis.ri.alphazero;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.jredis.ClientRuntimeException;
+import org.jredis.JRedis;
 import org.jredis.JRedisFuture;
 import org.jredis.ProviderException;
 import org.jredis.Redis;
+import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.protocol.Command;
@@ -41,7 +46,7 @@ import org.jredis.ri.alphazero.connection.AsynchPipelineConnection;
 
 @Redis(versions={"1.00"})
 public class JRedisPipeline extends JRedisFutureSupport {
-
+	
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
@@ -71,5 +76,75 @@ public class JRedisPipeline extends JRedisFutureSupport {
 	 */
 	protected  Future<Response> queueRequest (Command cmd, byte[]...args) throws ClientRuntimeException, ProviderException {
 		return connection.queueRequest(cmd, args);
+	}
+	
+	// ------------------------------------------------------------------------
+	// public interface
+	// ------------------------------------------------------------------------
+	/**
+	 * Provides a synchronous semantics interface ({@link JRedis}) to this pipeline.
+	 * Note that this is <b>not a thread-safe mechanism</b>.  If you need a pipeline
+	 * connection with support for concurrent synchronous semantics, use a {@link JRedisPipelineService}.
+	 *  
+	 * @return the {@link JRedis} interface for this pipeline.
+	 */
+	public JRedis sync () {
+		return new JRedisSupport() {
+			@Override
+            protected Response serviceRequest (Command cmd, byte[]... args) throws RedisException, ClientRuntimeException, ProviderException {
+				Response response = null;
+				try {
+	                response = JRedisPipeline.this.queueRequest(cmd, args).get();
+                }
+                catch (InterruptedException e) {
+	                throw new ClientRuntimeException("Interrupted!", e);
+                }
+                catch (ExecutionException e) {
+                	Throwable cause = e.getCause();
+                	if(cause instanceof RedisException)
+                		throw (RedisException) cause;
+                	else if(cause instanceof ProviderException)
+                		throw (ProviderException) cause;
+                	else if(cause instanceof ClientRuntimeException) 
+                		throw (ClientRuntimeException)cause;
+                	else throw new ClientRuntimeException("Exception in pipeline exec of requested command", cause);
+                }
+                return response;
+            }
+		};
+	}
+	/**
+	 * 
+	 * @param timeout
+	 * @param unit
+	 * @return
+	 */
+	public JRedis sync (final long timeout, final TimeUnit unit) {
+		return new JRedisSupport() {
+			@Override
+            protected Response serviceRequest (Command cmd, byte[]... args) throws RedisException, ClientRuntimeException, ProviderException {
+				Response response = null;
+				try {
+	                response = JRedisPipeline.this.queueRequest(cmd, args).get(timeout, unit);
+                }
+                catch (InterruptedException e) {
+	                throw new ClientRuntimeException("Interrupted!", e);
+                }
+                catch (TimeoutException e) {
+	                throw new ClientRuntimeException("timedout waiting for response");
+                }
+                catch (ExecutionException e) {
+                	Throwable cause = e.getCause();
+                	if(cause instanceof RedisException)
+                		throw (RedisException) cause;
+                	else if(cause instanceof ProviderException)
+                		throw (ProviderException) cause;
+                	else if(cause instanceof ClientRuntimeException) 
+                		throw (ClientRuntimeException)cause;
+                	else throw new ClientRuntimeException("Exception in pipeline exec of requested command", cause);
+                }
+                return response;
+            }
+		};
 	}
 }
