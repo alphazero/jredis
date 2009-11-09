@@ -87,6 +87,7 @@ public enum Command {
 	SDIFFSTORE  (RequestType.MULTI_KEY,		ResponseType.STATUS),
 	SMEMBERS	(RequestType.KEY,			ResponseType.MULTI_BULK), 
 	SMOVE		(RequestType.KEY_KEY_VALUE,	ResponseType.BOOLEAN),
+	SRANDMEMBER (RequestType.KEY,  			ResponseType.BULK),
 	
 	// "Multiple databases handling commands"
 	SELECT		(RequestType.KEY,			ResponseType.STATUS),

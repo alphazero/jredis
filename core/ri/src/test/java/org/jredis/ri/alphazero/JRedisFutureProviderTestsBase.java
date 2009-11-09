@@ -86,6 +86,63 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 //		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 //	}
 
+	@Test
+	public void testSrandmember () throws InterruptedException {
+		cmd = Command.SRANDMEMBER.code + " String | " + Command.SMEMBERS;
+		Log.log("TEST: %s command", cmd);
+		Future<ResponseStatus> reqResp = provider.ping();
+		try {
+			provider.flushdb();
+			String setkey = keys.get(0);
+			
+			List<Future<Boolean>> saddResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				saddResponses.add (provider.sadd(setkey, stringList.get(i)));
+			
+			Future<List<byte[]>>  smembersResponse = provider.smembers(setkey);
+			Future<byte[]>	      srandmemberResponse = provider.srandmember(setkey);
+			
+			try {
+				
+				for(Future<Boolean> resp : saddResponses)
+					assertTrue (resp.get().booleanValue(), "sadd of random element should have been true");
+				
+				List<String>  members = toStr(smembersResponse.get());
+				assertEquals(members.size(), SMALL_CNT, "set members count should be SMALL_CNT");
+				
+				String randmember = toStr(srandmemberResponse.get());
+				
+				boolean found = false;
+				for(String m : members) {
+					if(m.equals(randmember)) {
+						found = true;
+						break;
+					}
+				}
+				assertTrue(found, "random member should have been part of the members list");
+
+				// edge cases
+				
+				// empty set
+				String emptyset = "empty-set";
+				provider.sadd(emptyset, "delete-me");
+				provider.srem(emptyset, "delete-me");
+				assertEquals (provider.smembers(emptyset).get().size(), 0, "size of empty set members should be zero");
+				assertEquals (provider.srandmember(emptyset).get(), null, "random member of empty set should be null");
+				
+				// non existent key
+				String nonsuch = "no-such-key";
+				assertEquals (provider.smembers(nonsuch).get(), null, "members of non existent key set should be null");
+				assertEquals (provider.srandmember(nonsuch).get(), null, "random member of non existent key set should be null");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
 
 	@Test
 	public void testSmoveStringByteArray() throws InterruptedException{

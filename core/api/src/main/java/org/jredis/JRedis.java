@@ -522,6 +522,8 @@ public interface JRedis {
 	 */
 	public List<byte[]> smembers (String setkey) throws RedisException;
 	
+	public byte[] srandmember (String setkey) throws RedisException;
+	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands
 	// ------------------------------------------------------------------------

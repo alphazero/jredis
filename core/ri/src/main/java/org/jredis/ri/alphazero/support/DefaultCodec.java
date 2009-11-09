@@ -63,16 +63,17 @@ public class DefaultCodec {
 	}
 	/**
 	 * @param bytes
-	 * @return
+	 * @return new {@link String#String(byte[])} or null if bytes is null. 
 	 */
 	public static final String toStr (byte[] bytes) { 
         String str = null;
-		try {
-			str = new String(bytes, SUPPORTED_CHARSET_NAME);
-        }
-        catch (UnsupportedEncodingException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
+        if(null != bytes) {
+			try {
+				str = new String(bytes, SUPPORTED_CHARSET_NAME);
+	        }
+	        catch (UnsupportedEncodingException e) {
+		        e.printStackTrace();
+	        }
         }
         return str;
 //		return new String(bytes, SUPPORTED_CHARSET); // Java 1.6 only
@@ -91,14 +92,14 @@ public class DefaultCodec {
 //		return value.getBytes(SUPPORTED_CHARSET);
 	}
 	
-	/**
-	 * @param bytes
-	 * @return
-	 */
-	@Deprecated
-	public static final Integer toInt (byte[]  bytes) {
-		return new Integer(toStr (bytes));
-	}
+//	/**
+//	 * @param bytes
+//	 * @return
+//	 */
+//	@Deprecated
+//	public static final Integer toInt (byte[]  bytes) {
+//		return new Integer(toStr (bytes));
+//	}
 
 	/**
 	 * This helper method will convert the byte[] to a {@link Long}.

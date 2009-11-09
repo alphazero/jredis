@@ -489,6 +489,13 @@ public interface JRedisFuture {
 	 */
 	public Future<List<byte[]>> smembers (String setkey);
 	
+	/**
+	 * @Redis SRANDMEMBER
+	 * @param setkey
+	 * @return
+	 */
+	public Future<byte[]> srandmember (String setkey);
+	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands
 	// ------------------------------------------------------------------------

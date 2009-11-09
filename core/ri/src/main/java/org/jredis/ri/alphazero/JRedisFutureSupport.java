@@ -385,6 +385,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.SCARD, keybytes);
 		return new FutureLong (futureResponse);
 	}
+	
+	public Future<byte[]> srandmember (String key) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.SRANDMEMBER, keybytes);
+		return new FutureByteArray (futureResponse);
+	}
 
 	/* ------------------------------- commands returning long value --------- */
 

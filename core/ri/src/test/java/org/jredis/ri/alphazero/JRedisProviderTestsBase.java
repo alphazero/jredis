@@ -1464,6 +1464,54 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
 
+	@Test
+	public void testSrandmember() {
+		cmd = Command.SRANDMEMBER.code + " String ";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			// add a small set
+			String setkey = keys.get(0);
+			for(int i=0;i<SMALL_CNT; i++)
+				assertTrue(provider.sadd(setkey, stringList.get(i)), "sadd of random element should be true");
+			
+			// get members
+			List<String> members = null;
+			members = toStr(provider.smembers(setkey));
+			assertTrue(members.size() == SMALL_CNT);
+			
+			// get random member
+			String randomMemeber = toStr(provider.srandmember(setkey));
+			
+			boolean found = false;
+			for(String m : members){
+				if(m.equals(randomMemeber)) {
+					found = true;
+					break;
+				}
+			}
+			assertTrue(found, "random set element should have been in the members list");
+
+			
+			// test edget conditions
+			byte[] membytes = null;
+
+			// empty set
+	        provider.sadd("empty", "delete-me");
+	        provider.srem("empty", "delete-me");
+	        membytes = provider.srandmember("empty");
+	        assertEquals(membytes, null, "empty set random member should be null");
+	        assertEquals(toStr(membytes), null, "empty set random member should be null");
+	        
+			// non-existent key
+	        membytes = provider.srandmember("no-such-key");
+	        assertEquals(membytes, null, "non-existent key/set random member should be null");
+	        assertEquals(toStr(membytes), null, "non-existent key/set random member should be null");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+		
+	}
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#smembers(java.lang.String)}.
 	 */
