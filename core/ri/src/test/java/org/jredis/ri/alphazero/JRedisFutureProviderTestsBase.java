@@ -293,6 +293,70 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
 	@Test
+	public void testZremStringByteArray() throws InterruptedException{
+		cmd = Command.ZADD.code + " byte[] | " + Command.ZREM.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			String setkey = keys.get(0);
+			List<Future<Boolean>> expectedOKResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				expectedOKResponses.add (provider.zadd(setkey, i, dataList.get(i)));
+			
+			List<Future<Boolean>> expectedOKRemResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				expectedOKRemResponses.add (provider.zrem(setkey, dataList.get(i)));
+			
+
+			try {
+				for(Future<Boolean> resp : expectedOKResponses)
+					assertTrue (resp.get().booleanValue(), "zadd of random element should have been true");
+				
+				for(Future<Boolean> resp : expectedOKRemResponses)
+					assertTrue (resp.get().booleanValue(), "zadd of existing element should have been false");
+				
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	@Test
+	public void testZaddStringByteArray() throws InterruptedException{
+		cmd = Command.SADD.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			String setkey = keys.get(0);
+			List<Future<Boolean>> expectedOKResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				expectedOKResponses.add (provider.zadd(setkey, i, dataList.get(i)));
+			
+			List<Future<Boolean>> expectedErrorResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				expectedErrorResponses.add (provider.zadd(setkey, i, dataList.get(i)));
+			
+
+			try {
+				for(Future<Boolean> resp : expectedOKResponses)
+					assertTrue (resp.get().booleanValue(), "zadd of random element should have been true");
+				
+				for(Future<Boolean> resp : expectedErrorResponses)
+					assertFalse (resp.get().booleanValue(), "zadd of existing element should have been false");
+				
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	@Test
 	public void testSaddStringByteArray() throws InterruptedException{
 		cmd = Command.SADD.code + " byte[]";
 		Log.log("TEST: %s command", cmd);

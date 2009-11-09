@@ -16,6 +16,8 @@
 
 package org.jredis.protocol;
 
+import org.jredis.Redis;
+
 
 
 
@@ -30,6 +32,7 @@ package org.jredis.protocol;
  * @since   alpha.0
  * 
  */
+@Redis(versions="1.1")
 public enum Command {
 	
 	// security
@@ -62,7 +65,7 @@ public enum Command {
 	EXPIRE		(RequestType.KEY_NUM,		ResponseType.BOOLEAN), 
 	TTL			(RequestType.KEY,			ResponseType.NUMBER),
 	
-	// keys operating on lists
+	// Commands operating on lists
 	RPUSH		(RequestType.KEY_VALUE,		ResponseType.STATUS), 
 	LPUSH		(RequestType.KEY_VALUE,		ResponseType.STATUS),
 	LLEN		(RequestType.KEY,			ResponseType.NUMBER), 
@@ -74,7 +77,7 @@ public enum Command {
 	LPOP		(RequestType.KEY,			ResponseType.BULK), 
 	RPOP		(RequestType.KEY,			ResponseType.BULK),
 	
-	// keys operating on sets
+	// Commands operating on sets
 	SADD		(RequestType.KEY_VALUE,		ResponseType.BOOLEAN), 
 	SREM		(RequestType.KEY_VALUE,		ResponseType.BOOLEAN), 
 	SCARD		(RequestType.KEY,			ResponseType.NUMBER), 
@@ -88,6 +91,10 @@ public enum Command {
 	SMEMBERS	(RequestType.KEY,			ResponseType.MULTI_BULK), 
 	SMOVE		(RequestType.KEY_KEY_VALUE,	ResponseType.BOOLEAN),
 	SRANDMEMBER (RequestType.KEY,  			ResponseType.BULK),
+	
+	// Commands operating on sorted sets
+	ZADD		(RequestType.KEY_IDX_VALUE,	ResponseType.BOOLEAN), 
+	ZREM		(RequestType.KEY_VALUE,		ResponseType.BOOLEAN), 
 	
 	// "Multiple databases handling commands"
 	SELECT		(RequestType.KEY,			ResponseType.STATUS),

@@ -199,6 +199,30 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
+	public Future<Boolean> zadd(String key, long score, byte[] member) 
+	{
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.ZADD, keybytes,  Convert.toBytes(score), member);
+		return new FutureBoolean(futureResponse);
+	}
+//	@Override
+	public Future<Boolean> zadd (String key, long score, String value) {
+		return zadd (key, score, DefaultCodec.encode(value));
+	}
+//	@Override
+	public Future<Boolean> zadd (String key, long score, Number value) {
+		return zadd (key, score, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> Future<Boolean> zadd (String key, long score, T value)
+	{
+		return zadd (key, score, DefaultCodec.encode(value));
+	}
+	
+//	@Override
 	public FutureStatus save() 
 	{
 		return new FutureStatus(this.queueRequest(Command.SAVE));
@@ -786,6 +810,29 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	public <T extends Serializable> Future<Boolean> srem (String key, T value)
 	{
 		return srem (key, DefaultCodec.encode(value));
+	}
+
+//	@Override
+	public Future<Boolean> zrem(String key, byte[] member) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.ZREM, keybytes, member);
+		return new FutureBoolean(futureResponse);
+	}
+//	@Override
+	public Future<Boolean> zrem (String key, String value) {
+		return zrem (key, DefaultCodec.encode(value));
+	}
+//	@Override
+	public Future<Boolean> zrem (String key, Number value) {
+		return zrem (key, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> Future<Boolean> zrem (String key, T value)
+	{
+		return zrem (key, DefaultCodec.encode(value));
 	}
 
 

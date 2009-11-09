@@ -235,6 +235,38 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
+	public boolean zadd(String key, long score, byte[] member) 
+	throws RedisException 
+	{
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+		/* boolean ValueRespose */
+		boolean res = false;
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.ZADD, keybytes, Convert.toBytes(score), member);
+			res = valResponse.getBooleanValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return res;
+	}
+//	@Override
+	public boolean zadd (String key, long score, String value) throws RedisException {
+		return zadd (key, score, DefaultCodec.encode(value));
+	}
+//	@Override
+	public boolean zadd (String key, long score, Number value) throws RedisException {
+		return zadd (key, score, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> boolean zadd (String key, long score, T value) throws RedisException
+	{
+		return zadd (key, score, DefaultCodec.encode(value));
+	}
+
+//	@Override
 	public void save() 
 	throws RedisException 
 	{
@@ -1116,6 +1148,36 @@ public abstract class JRedisSupport implements JRedis {
 	public <T extends Serializable> boolean srem (String key, T value) throws RedisException
 	{
 		return srem (key, DefaultCodec.encode(value));
+	}
+
+//	@Override
+	public boolean zrem(String key, byte[] member) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		boolean resvalue = false;
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.ZREM, keybytes, member);
+			resvalue = valResponse.getBooleanValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resvalue;
+	}
+//	@Override
+	public boolean zrem (String key, String value) throws RedisException {
+		return zrem (key, DefaultCodec.encode(value));
+	}
+//	@Override
+	public boolean zrem (String key, Number value) throws RedisException {
+		return zrem (key, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> boolean zrem (String key, T value) throws RedisException
+	{
+		return zrem (key, DefaultCodec.encode(value));
 	}
 
 

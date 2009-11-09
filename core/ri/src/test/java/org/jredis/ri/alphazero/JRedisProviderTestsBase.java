@@ -1383,6 +1383,39 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	}
 
 	
+	/**************** SORTED SET COMMANDS ******************************/
+	@Test
+	public void testZaddStringByteArray() {
+		cmd = Command.ZADD.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<SMALL_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+			
+			for(int i=0;i<SMALL_CNT; i++)
+				assertFalse(provider.zadd(setkey, i, dataList.get(i)), "sadd of existing element should be false");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	@Test
+	public void testZremStringByteArray() {
+		cmd = Command.ZADD.code + " byte[] | " + Command.ZREM.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<SMALL_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+			
+			for(int i=0;i<SMALL_CNT; i++)
+				assertTrue(provider.zrem(setkey, dataList.get(i)), "zrem of existing element should be true");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
 	/**************** SET COMMANDS ******************************/
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#sadd(java.lang.String, byte[])}.

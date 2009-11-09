@@ -525,6 +525,37 @@ public interface JRedis {
 	public byte[] srandmember (String setkey) throws RedisException;
 	
 	// ------------------------------------------------------------------------
+	// Commands operating on sets
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * @Redis ZADD
+	 * @param setkey
+	 * @param score
+	 * @param member
+	 * @return
+	 * @throws RedisException
+	 */
+	public boolean zadd (String setkey, long score, byte[] member) throws RedisException;
+	public boolean zadd (String setkey, long score, String stringValue) throws RedisException;
+	public boolean zadd (String setkey, long score, Number numberValue) throws RedisException;
+	public <T extends Serializable> 
+		   boolean zadd (String setkey, long score, T object) throws RedisException;
+
+	/**
+	 * @Redis ZREM
+	 * @param setKey
+	 * @param member
+	 * @return
+	 * @throws RedisException
+	 */
+	public boolean zrem (String setKey, byte[] member) throws RedisException;
+	public boolean zrem (String setKey, String stringValue) throws RedisException;
+	public boolean zrem (String setKey, Number numberValue) throws RedisException;
+	public <T extends Serializable> 
+		   boolean zrem (String setKey, T object) throws RedisException;
+	
+	// ------------------------------------------------------------------------
 	// Multiple databases handling commands
 	// ------------------------------------------------------------------------
 	

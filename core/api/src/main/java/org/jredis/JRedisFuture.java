@@ -495,6 +495,35 @@ public interface JRedisFuture {
 	 * @return
 	 */
 	public Future<byte[]> srandmember (String setkey);
+
+	// ------------------------------------------------------------------------
+	// Commands operating on sorted sets
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * @Redis SADD
+	 * @param setkey
+	 * @param member
+	 * @return
+	 */
+	public Future<Boolean> zadd (String setkey, long score, byte[] member);
+	public Future<Boolean> zadd (String setkey, long score, String stringValue);
+	public Future<Boolean> zadd (String setkey, long score, Number numberValue);
+	public <T extends Serializable> 
+		Future<Boolean> zadd (String setkey, long score, T object);
+
+	/**
+	 * @Redis ZREM
+	 * @param setKey
+	 * @param member
+	 * @return
+	 */
+	public Future<Boolean> zrem (String setKey, byte[] member);
+	public Future<Boolean> zrem (String setKey, String stringValue);
+	public Future<Boolean> zrem (String setKey, Number numberValue);
+	public <T extends Serializable> 
+		Future<Boolean> zrem (String setKey, T object);
+
 	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands
