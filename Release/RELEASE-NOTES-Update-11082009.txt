@@ -55,7 +55,7 @@ A couple of bugs were reported since that last update and have been fixed in thi
 Reconnect has proven to be a can of worms and given that it is *impossible* for JRedis to 
 guarantee a completely transparent reconnect without potentially resending commands without
 becoming excessively complex (and incurring computation costs for even those who do not require
-it) the clients will not simply reconnect but will NOT attempt to transparently resend your
+it) the clients will reconnect but will NOT attempt to transparently resend your
 command.  A ClientRuntimeException will be thrown after reconnect to alert the caller that
 a reconnect occured at some point during the execution of the request.  (Java sockets will
 NOT raise exceptions on write even in case of a disconnection so it is nearly impossible to
@@ -67,7 +67,7 @@ ROAD MAP:
 
 First up is the addtion of support for the new Redis commands, such as MSet, all the Z*s, etc.
 
-After that, we'll likely introduce a extensibel mechanism for the user applications to spec
+After that, we'll likely introduce a extensible mechanism for the user applications to spec
 a server selection/distribution mechanism, with a basic hashing implementation for sharding.
 
 /enjoy
