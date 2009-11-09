@@ -1,0 +1,77 @@
+This is a fairly substantial update release and the final release supporting Redis 1.000.
+
+This update includes changes to the JRedis interface, as previously announced.
+
+REQUIREMENTS CHANGES:
+
+Not so much a change but a strict conformance to Java 5.  For whatever reasons (me?) maven
+apparently had ignored the Java 1.5 directives in the build and I was blissfully unaware 
+that the project was, in fact, using Java 6 constructs (specificially the enhanced semantics
+of @Override).  Well, no more.  JRedis is now strictly 1.5.  
+
+
+API CHANGES:
+
+* Asynchronous semantics
+
+A new JRedisFuture interface has been introduced to provide asynchronous call interaction
+semantics with redis.  This is the very first try at this interface and I am not specially
+happy with the amount of angled bracket typing required to use Future<x> directly.  So 
+forewarned that JRedisFuture may change (for the better) and we'll introduce new types to 
+alleviate the angled bracket typing when using this interface. 
+ 
+* spec package reorg
+
+A few interfaces were shuffled around in course of refactorings and introduction of the
+asynch semantics.  Fairly minor stuff, but it could potentially break some of your import
+statements.
+
+
+NEW FEATURES:
+
+(See the examples project for usage details of new additions).
+
+* Pipelining
+Pipelines supporting both synchronous and asynchronous call semantics are provided.  
+New JRedisPipeline, JRedisPipelineService respectively provide Asynch and Synch access
+to redis.  Both are safe for concurrent use.
+
+Note that while this release is Redis 1.000 compliant, there was a rewrite of redis that
+changed how pipelining was implemented on server side, and the pipelining in this release
+has only passed unit test against Redis 1.050.
+
+* Asynchronous call semantics
+Besides the pipelines, the new JRedisAsynchClient also supports the JRedisFuture interface
+and (unlike pipelines) provides true fire and forget behaviour, with minimal latencies in
+call completion.  Please note that unlike the pipelines (which queue pending responses 
+AFTER writing the request to the remote server) the asynch client will queue your request.
+So you can fire and forget, but you MUST remember that memory is a constrained resource
+and you can not queue more requests that your JVM can handle <g>.
+
+BUG FIX:
+
+A couple of bugs were reported since that last update and have been fixed in this release.
+
+Reconnect has proven to be a can of worms and given that it is *impossible* for JRedis to 
+guarantee a completely transparent reconnect without potentially resending commands without
+becoming excessively complex (and incurring computation costs for even those who do not require
+it) the clients will not simply reconnect but will NOT attempt to transparently resend your
+command.  A ClientRuntimeException will be thrown after reconnect to alert the caller that
+a reconnect occured at some point during the execution of the request.  (Java sockets will
+NOT raise exceptions on write even in case of a disconnection so it is nearly impossible to
+guarantee transparent reconnect since it is unknown whether the command write actually went 
+through or not.)
+ 
+
+ROAD MAP:
+
+First up is the addtion of support for the new Redis commands, such as MSet, all the Z*s, etc.
+
+After that, we'll likely introduce a extensibel mechanism for the user applications to spec
+a server selection/distribution mechanism, with a basic hashing implementation for sharding.
+
+/enjoy
+
+11-08-2009
+NoVA
+
