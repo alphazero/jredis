@@ -102,17 +102,27 @@ public class DefaultCodec {
 //	}
 
 	/**
+	 * NOTE: Isn't this already in {@link Convert#toLong(byte[])}?
+	 * TODO: get rid of this method
 	 * This helper method will convert the byte[] to a {@link Long}.
 	 * @param bytes
 	 * @return
 	 */
+//	@Deprecated
 	public static final Long toLong (byte[]  bytes) {
-		return new Long (toStr (bytes));
+//		return new Long (toStr (bytes));
+		return Convert.toLong(bytes);
 	}
 	
 	public static final List<Long> toLong(List<byte[]> bytearray){
 		List<Long> list = new ArrayList<Long>(bytearray.size());
-		for(byte[] b : bytearray) list.add(toLong(b));
+		for(byte[] b : bytearray) list.add(Convert.toLong(b));
+		return list;
+	}
+
+	public static final List<Double> toDouble(List<byte[]> bytearray){
+		List<Double> list = new ArrayList<Double>(bytearray.size());
+		for(byte[] b : bytearray) list.add(Convert.toDouble(b));
 		return list;
 	}
 

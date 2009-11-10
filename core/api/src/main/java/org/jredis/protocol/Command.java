@@ -94,7 +94,13 @@ public enum Command {
 	
 	// Commands operating on sorted sets
 	ZADD		(RequestType.KEY_IDX_VALUE,	ResponseType.BOOLEAN), 
-	ZREM		(RequestType.KEY_VALUE,		ResponseType.BOOLEAN), 
+	ZREM		(RequestType.KEY_VALUE,		ResponseType.BOOLEAN),
+	ZCARD		(RequestType.KEY,			ResponseType.NUMBER), 
+	ZSCORE		(RequestType.KEY_VALUE,		ResponseType.BULK),
+	ZRANGE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
+	ZREVRANGE	(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
+	ZRANGEBYSCORE	(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
+		
 	
 	// "Multiple databases handling commands"
 	SELECT		(RequestType.KEY,			ResponseType.STATUS),

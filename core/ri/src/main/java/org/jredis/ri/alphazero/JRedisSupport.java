@@ -235,7 +235,7 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
-	public boolean zadd(String key, long score, byte[] member) 
+	public boolean zadd(String key, double score, byte[] member) 
 	throws RedisException 
 	{
 		byte[] keybytes = null;
@@ -253,15 +253,15 @@ public abstract class JRedisSupport implements JRedis {
 		return res;
 	}
 //	@Override
-	public boolean zadd (String key, long score, String value) throws RedisException {
+	public boolean zadd (String key, double score, String value) throws RedisException {
 		return zadd (key, score, DefaultCodec.encode(value));
 	}
 //	@Override
-	public boolean zadd (String key, long score, Number value) throws RedisException {
+	public boolean zadd (String key, double score, Number value) throws RedisException {
 		return zadd (key, score, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> boolean zadd (String key, long score, T value) throws RedisException
+	public <T extends Serializable> boolean zadd (String key, double score, T value) throws RedisException
 	{
 		return zadd (key, score, DefaultCodec.encode(value));
 	}
@@ -531,6 +531,22 @@ public abstract class JRedisSupport implements JRedis {
 		return value;
 	}
 	
+//	@Override
+	public long zcard(String key) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+		long value = Long.MIN_VALUE;
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.ZCARD, keybytes);
+			value = valResponse.getLongValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return value;
+	}
+	
 	public byte[] srandmember (String setkey) throws RedisException {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(setkey)) == null) 
@@ -789,6 +805,66 @@ public abstract class JRedisSupport implements JRedis {
 		List<byte[]> multiBulkData= null;
 		try {
 			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.LRANGE, keybytes, fromBytes, toBytes);
+			multiBulkData = MultiBulkResponse.getMultiBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return multiBulkData;
+	}
+
+//	@Override
+	public List<byte[]> zrangebyscore (String key, double minScore, double maxScore) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(minScore);
+		byte[] toBytes = Convert.toBytes(maxScore);
+
+		List<byte[]> multiBulkData= null;
+		try {
+			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.ZRANGEBYSCORE, keybytes, fromBytes, toBytes);
+			multiBulkData = MultiBulkResponse.getMultiBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return multiBulkData;
+	}
+
+//	@Override
+	public List<byte[]> zrange(String key, long from, long to) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(from);
+		byte[] toBytes = Convert.toBytes(to);
+
+		List<byte[]> multiBulkData= null;
+		try {
+			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.ZRANGE, keybytes, fromBytes, toBytes);
+			multiBulkData = MultiBulkResponse.getMultiBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return multiBulkData;
+	}
+
+//	@Override
+	public List<byte[]> zrevrange(String key, long from, long to) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(from);
+		byte[] toBytes = Convert.toBytes(to);
+
+		List<byte[]> multiBulkData= null;
+		try {
+			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.ZREVRANGE, keybytes, fromBytes, toBytes);
 			multiBulkData = MultiBulkResponse.getMultiBulkData();
 		}
 		catch (ClassCastException e){
@@ -1178,6 +1254,36 @@ public abstract class JRedisSupport implements JRedis {
 	public <T extends Serializable> boolean zrem (String key, T value) throws RedisException
 	{
 		return zrem (key, DefaultCodec.encode(value));
+	}
+
+//	@Override
+	public double zscore(String key, byte[] member) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		double resvalue = 0;
+		try {
+			BulkResponse bulkResponse = (BulkResponse) this.serviceRequest(Command.ZSCORE, keybytes, member);
+			resvalue = Convert.toDouble(bulkResponse.getBulkData());
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resvalue;
+	}
+//	@Override
+	public double zscore (String key, String value) throws RedisException {
+		return zscore (key, DefaultCodec.encode(value));
+	}
+//	@Override
+	public double zscore (String key, Number value) throws RedisException {
+		return zscore (key, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> double zscore (String key, T value) throws RedisException
+	{
+		return zscore (key, DefaultCodec.encode(value));
 	}
 
 

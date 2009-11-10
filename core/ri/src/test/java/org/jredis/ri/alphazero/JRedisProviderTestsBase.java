@@ -18,6 +18,7 @@ package org.jredis.ri.alphazero;
 
 import static org.jredis.ri.alphazero.support.DefaultCodec.decode;
 import static org.jredis.ri.alphazero.support.DefaultCodec.toLong;
+import static org.jredis.ri.alphazero.support.DefaultCodec.toDouble;
 import static org.jredis.ri.alphazero.support.DefaultCodec.toStr;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -1391,15 +1392,17 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		try {
 			provider.flushdb();
 			
+			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
-				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+				assertTrue(provider.zadd(setkey, random.nextDouble(), dataList.get(i)), "zadd of random element should be true");
 			
 			for(int i=0;i<SMALL_CNT; i++)
-				assertFalse(provider.zadd(setkey, i, dataList.get(i)), "sadd of existing element should be false");
+				assertFalse(provider.zadd(setkey, random.nextDouble(), dataList.get(i)), "sadd of existing element should be false");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
+	
 	@Test
 	public void testZremStringByteArray() {
 		cmd = Command.ZADD.code + " byte[] | " + Command.ZREM.code + " byte[]";
@@ -1409,10 +1412,51 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			
 			String setkey = keys.get(0);
 			for(int i=0;i<SMALL_CNT; i++)
-				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+				assertTrue(provider.zadd(setkey, random.nextDouble(), dataList.get(i)), "zadd of random element should be true");
 			
 			for(int i=0;i<SMALL_CNT; i++)
 				assertTrue(provider.zrem(setkey, dataList.get(i)), "zrem of existing element should be true");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
+	@Test
+	public void testZscoreStringByteArray() {
+		cmd = Command.ZSCORE.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<SMALL_CNT; i++)
+				assertTrue(provider.zadd(setkey, doubleList.get(i), dataList.get(i)), "zadd of random element should be true");
+			
+			for(int i=0;i<SMALL_CNT; i++)
+				assertEquals (provider.zscore(setkey, dataList.get(i)), doubleList.get(i), "zscore of element should be " + doubleList.get(i));
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
+	@Test
+	public void testZrangeStringByteArray() {
+		cmd = Command.ZRANGE.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<MEDIUM_CNT; i++)
+				assertTrue(provider.zadd(setkey, doubleList.get(i), dataList.get(i)), "zadd of random element should be true");
+			
+			List<byte[]>  range = provider.zrange(setkey, 0, SMALL_CNT);
+			for(int i=1;i<SMALL_CNT-1; i++){
+				assertTrue(provider.zscore(setkey, range.get(i)) <= provider.zscore(setkey, range.get(i+1)), "range member score should be smaller or equal to previous range member");
+				assertTrue(provider.zscore(setkey, range.get(i)) >= provider.zscore(setkey, range.get(i-1)), "range member score should be bigger or equal to previous range member");
+			}
+			
+			for(int i=0;i<SMALL_CNT; i++)
+				assertEquals (provider.zscore(setkey, dataList.get(i)), doubleList.get(i), "zscore of element should be " + doubleList.get(i));
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
@@ -1819,6 +1863,25 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 				assertTrue(provider.sadd(setkey, dataList.get(i)), "sadd of random element should be true");
 			
 			assertEquals (provider.scard (setkey), SMALL_CNT, "scard should be SMALL_CNT");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#scard(java.lang.String)}.
+	 */
+	@Test
+	public void testZcard() {
+		cmd = Command.ZADD.code + " Java Object | " + Command.ZCARD.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<SMALL_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+			
+			assertEquals (provider.zcard (setkey), SMALL_CNT, "zcard should be SMALL_CNT");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}

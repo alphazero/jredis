@@ -73,7 +73,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 //	public void testTemplate() throws InterruptedException {
 //		cmd = Command.PING.code + " | " + Command.SETNX.code + " byte[] | " + Command.GET;
 //		Log.log("TEST: %s command", cmd);
-//		Future<ResponseStatus> reqResp = provider.ping();
+//		
 //		try {
 //			provider.flushdb();
 //			try {
@@ -90,7 +90,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	public void testSrandmember () throws InterruptedException {
 		cmd = Command.SRANDMEMBER.code + " String | " + Command.SMEMBERS;
 		Log.log("TEST: %s command", cmd);
-		Future<ResponseStatus> reqResp = provider.ping();
+
 		try {
 			provider.flushdb();
 			String setkey = keys.get(0);
@@ -216,11 +216,45 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	}
 
 	@Test
+	public void testZcard() throws InterruptedException {
+		cmd = Command.ZCARD.code + " Java Object";
+		Log.log("TEST: %s command", cmd);
+
+		provider.flushdb();
+		
+		String setkey = keys.get(0);
+	
+		List<Future<Boolean>> zaddResponses = new ArrayList<Future<Boolean>>();
+		for(int i=0;i<MEDIUM_CNT; i++)
+			zaddResponses.add (provider.zadd(setkey, i, objectList.get(i)));
+		
+		Future<Long> zcardResp = provider.zcard(setkey);
+		
+		try {
+			provider.flushdb();
+			try {
+				for(Future<Boolean> resp : zaddResponses)
+					assertTrue (resp.get().booleanValue(), "zadd of random object should have been true");
+				
+				assertEquals (zcardResp.get().longValue(), MEDIUM_CNT, "zcard value should have been MEDIUM_CNT");
+				
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
+	@Test
 	public void testSismemberStringByteArray() throws InterruptedException {
 		cmd = Command.SISMEMBER.code + " byte[]";
 		Log.log("TEST: %s command", cmd);
 
 		String setkey = keys.get(0);
+		
+		provider.flushdb();
 		
 		List<Future<Boolean>> saddResponses = new ArrayList<Future<Boolean>>();
 		for(int i=0;i<SMALL_CNT; i++)
@@ -232,7 +266,6 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		
 		
 		try {
-			provider.flushdb();
 			try {
 				for(Future<Boolean> resp : saddResponses)
 					assertTrue (resp.get().booleanValue(), "sadd of random element should have been true");
@@ -326,7 +359,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	}
 	@Test
 	public void testZaddStringByteArray() throws InterruptedException{
-		cmd = Command.SADD.code + " byte[]";
+		cmd = Command.ZADD.code + " byte[]";
 		Log.log("TEST: %s command", cmd);
 
 		try {
@@ -334,11 +367,11 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			String setkey = keys.get(0);
 			List<Future<Boolean>> expectedOKResponses = new ArrayList<Future<Boolean>>();
 			for(int i=0;i<SMALL_CNT; i++)
-				expectedOKResponses.add (provider.zadd(setkey, i, dataList.get(i)));
+				expectedOKResponses.add (provider.zadd(setkey, random.nextDouble(), dataList.get(i)));
 			
 			List<Future<Boolean>> expectedErrorResponses = new ArrayList<Future<Boolean>>();
 			for(int i=0;i<SMALL_CNT; i++)
-				expectedErrorResponses.add (provider.zadd(setkey, i, dataList.get(i)));
+				expectedErrorResponses.add (provider.zadd(setkey, random.nextDouble(), dataList.get(i)));
 			
 
 			try {
@@ -356,6 +389,41 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		} 
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
+	@Test
+	public void testZscoreStringByteArray() throws InterruptedException{
+		cmd = Command.ZSCORE.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			String setkey = keys.get(0);
+			List<Future<Boolean>> expectedOKResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				expectedOKResponses.add (provider.zadd(setkey, doubleList.get(i), dataList.get(i)));
+			
+			List<Future<Double>> scores = new ArrayList<Future<Double>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				scores.add (provider.zscore(setkey, dataList.get(i)));
+			
+
+			try {
+				for(Future<Boolean> resp : expectedOKResponses)
+					assertTrue (resp.get().booleanValue(), "zadd of random element should have been true");
+				
+				int i=0;
+				for(Future<Double> score : scores){
+					assertEquals (score.get(), doubleList.get(i), "zscore of element should have been " + doubleList.get(i));
+					i++;
+				}	
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
 	@Test
 	public void testSaddStringByteArray() throws InterruptedException{
 		cmd = Command.SADD.code + " byte[]";

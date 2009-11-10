@@ -106,6 +106,10 @@ public class Convert {
 		
 		return Long.toString(lnum).getBytes();
 	}
+	
+	public static final byte[] toBytes(double dnum){
+		return Double.toString(dnum).getBytes();
+	}
 	/**
 	 * Converts the byte[]s of the ASCII representation of a decimal number to an int.  
 	 * 
@@ -203,6 +207,25 @@ public class Convert {
 	{
 		if(null == potentiallySignedBytes) throw new IllegalArgumentException ("null input");
 		return toLong(potentiallySignedBytes, 0, potentiallySignedBytes.length);
+	}
+	
+	/**
+	 * TODO: optimize.
+	 * @param potentiallySignedBytes
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	public static final double toDouble (byte[] stringRepOfDoublePrecisionBytes) throws IllegalArgumentException
+	{
+		double dnum = 0;
+		if(null == stringRepOfDoublePrecisionBytes) throw new IllegalArgumentException ("null input");
+		try {
+			dnum = Double.parseDouble(new String(stringRepOfDoublePrecisionBytes));
+		}
+		catch (Exception e){
+			throw new IllegalArgumentException("", e);
+		}
+		return dnum;
 	}
 	
 	// ------------------------------------------------------------------------

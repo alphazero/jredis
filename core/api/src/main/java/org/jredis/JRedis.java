@@ -536,11 +536,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean zadd (String setkey, long score, byte[] member) throws RedisException;
-	public boolean zadd (String setkey, long score, String stringValue) throws RedisException;
-	public boolean zadd (String setkey, long score, Number numberValue) throws RedisException;
+	public boolean zadd (String setkey, double score, byte[] member) throws RedisException;
+	public boolean zadd (String setkey, double score, String stringValue) throws RedisException;
+	public boolean zadd (String setkey, double score, Number numberValue) throws RedisException;
 	public <T extends Serializable> 
-		   boolean zadd (String setkey, long score, T object) throws RedisException;
+		   boolean zadd (String setkey, double score, T object) throws RedisException;
 
 	/**
 	 * @Redis ZREM
@@ -555,6 +555,58 @@ public interface JRedis {
 	public <T extends Serializable> 
 		   boolean zrem (String setKey, T object) throws RedisException;
 	
+	/**
+	 * @Redis ZCARD
+	 * @param setKey
+	 * @return
+	 * @throws RedisException
+	 */
+	public long zcard (String setKey) throws RedisException;	
+	
+	
+	/**
+	 * @Redis ZSCORE
+	 * @param setkey
+	 * @param member
+	 * @return
+	 * @throws RedisException
+	 */
+	public double zscore (String setkey, byte[] member) throws RedisException;
+	public double zscore (String setkey, String stringValue) throws RedisException;
+	public double zscore (String setkey, Number numberValue) throws RedisException;
+	public <T extends Serializable> 
+		double zscore (String setkey, T object) throws RedisException;
+
+	/**
+	 * @Redis ZRANGE
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws RedisException
+	 */
+	public List<byte[]> zrange (String setkey, long from, long to) throws RedisException; 
+
+	/**
+	 * @Redis ZREVRANGE
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws RedisException
+	 */
+	public List<byte[]> zrevrange (String setkey, long from, long to) throws RedisException; 
+
+	/**
+	 * @Redis ZRANGE
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws RedisException
+	 */
+	public List<byte[]> zrangebyscore (String setkey, double minScore, double maxScore) throws RedisException; 
+
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands
 	// ------------------------------------------------------------------------

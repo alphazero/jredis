@@ -501,16 +501,17 @@ public interface JRedisFuture {
 	// ------------------------------------------------------------------------
 	
 	/**
-	 * @Redis SADD
+	 * @Redis ZADD
 	 * @param setkey
+	 * @param score
 	 * @param member
 	 * @return
 	 */
-	public Future<Boolean> zadd (String setkey, long score, byte[] member);
-	public Future<Boolean> zadd (String setkey, long score, String stringValue);
-	public Future<Boolean> zadd (String setkey, long score, Number numberValue);
+	public Future<Boolean> zadd (String setkey, double score, byte[] member);
+	public Future<Boolean> zadd (String setkey, double score, String stringValue);
+	public Future<Boolean> zadd (String setkey, double score, Number numberValue);
 	public <T extends Serializable> 
-		Future<Boolean> zadd (String setkey, long score, T object);
+		Future<Boolean> zadd (String setkey, double score, T object);
 
 	/**
 	 * @Redis ZREM
@@ -523,6 +524,43 @@ public interface JRedisFuture {
 	public Future<Boolean> zrem (String setKey, Number numberValue);
 	public <T extends Serializable> 
 		Future<Boolean> zrem (String setKey, T object);
+
+	/**
+	 * @Redis ZCARD
+	 * @param setKey
+	 * @return
+	 */
+	public Future<Long> zcard (String setKey);	
+	
+	/**
+	 * @Redis ZSCORE
+	 * @param setkey
+	 * @param member
+	 * @return
+	 */
+	public Future<Double> zscore (String setkey, byte[] member);
+	public Future<Double> zscore (String setkey, String stringValue);
+	public Future<Double> zscore (String setkey, Number numberValue);
+	public <T extends Serializable> 
+		Future<Double> zscore (String setkey, T object);
+
+	/**
+	 * @Redis ZRANGE
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public Future<List<byte[]>> zrange (String setkey, long from, long to); 
+
+	/**
+	 * @Redis ZREVRANGE
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public Future<List<byte[]>> zrevrange (String setkey, long from, long to); 
 
 	
 	// ------------------------------------------------------------------------

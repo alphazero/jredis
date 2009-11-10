@@ -199,7 +199,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Boolean> zadd(String key, long score, byte[] member) 
+	public Future<Boolean> zadd(String key, double score, byte[] member) 
 	{
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
@@ -209,15 +209,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureBoolean(futureResponse);
 	}
 //	@Override
-	public Future<Boolean> zadd (String key, long score, String value) {
+	public Future<Boolean> zadd (String key, double score, String value) {
 		return zadd (key, score, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<Boolean> zadd (String key, long score, Number value) {
+	public Future<Boolean> zadd (String key, double score, Number value) {
 		return zadd (key, score, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> Future<Boolean> zadd (String key, long score, T value)
+	public <T extends Serializable> Future<Boolean> zadd (String key, double score, T value)
 	{
 		return zadd (key, score, DefaultCodec.encode(value));
 	}
@@ -410,6 +410,16 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong (futureResponse);
 	}
 	
+//	@Override
+	public Future<Long> zcard(String key) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.ZCARD, keybytes);
+		return new FutureLong (futureResponse);
+	}
+	
 	public Future<byte[]> srandmember (String key) {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
@@ -549,6 +559,42 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		byte[] toBytes = Convert.toBytes(to);
 
 		return new FutureByteArrayList(this.queueRequest(Command.LRANGE, keybytes, fromBytes, toBytes));
+	}
+
+//	@Override
+	public Future<List<byte[]>> zrange(String key, long from, long to) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(from);
+		byte[] toBytes = Convert.toBytes(to);
+
+		return new FutureByteArrayList(this.queueRequest(Command.ZRANGE, keybytes, fromBytes, toBytes));
+	}
+
+//	@Override
+	public Future<List<byte[]>> zrangebyscore(String key, double minScore, double maxScore) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] minScoreBytes = Convert.toBytes(minScore);
+		byte[] maxScoreBytes = Convert.toBytes(maxScore);
+
+		return new FutureByteArrayList(this.queueRequest(Command.ZRANGEBYSCORE, keybytes, minScoreBytes, maxScoreBytes));
+	}
+
+//	@Override
+	public Future<List<byte[]>> zrevrange(String key, long from, long to) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(from);
+		byte[] toBytes = Convert.toBytes(to);
+
+		return new FutureByteArrayList(this.queueRequest(Command.ZREVRANGE, keybytes, fromBytes, toBytes));
 	}
 
 	// TODO: NOTIMPLEMENTED:
@@ -837,6 +883,30 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 
 //	@Override
+	public Future<Double> zscore(String key, byte[] member) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.ZSCORE, keybytes, member);
+		return new FutureDouble(futureResponse);
+	}
+//	@Override
+	public Future<Double> zscore (String key, String value) {
+		return zscore (key, DefaultCodec.encode(value));
+	}
+//	@Override
+	public Future<Double> zscore (String key, Number value) {
+		return zscore (key, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> Future<Double> zscore (String key, T value)
+	{
+		return zscore (key, DefaultCodec.encode(value));
+	}
+
+
+//	@Override
 	public FutureStatus ltrim(String key, long keepFrom, long keepTo) {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
@@ -1001,6 +1071,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         {
         	ValueResponse valResp = (ValueResponse) pendingRequest.get(timeout, unit);
         	return valResp.getLongValue();
+        }
+	}
+	public static class FutureDouble extends FutureResultBase implements Future<Double>{
+
+        protected FutureDouble (Future<Response> pendingRequest) { super(pendingRequest); }
+
+        public Double get () throws InterruptedException, ExecutionException {
+        	BulkResponse bulkResp = (BulkResponse) pendingRequest.get();
+        	return Convert.toDouble(bulkResp.getBulkData());
+        }
+
+        public Double get (long timeout, TimeUnit unit)
+        	throws InterruptedException, ExecutionException, TimeoutException 
+        {
+        	BulkResponse bulkResp = (BulkResponse) pendingRequest.get(timeout, unit);
+        	return Convert.toDouble(bulkResp.getBulkData());
         }
 	}
 	public static class FutureByteArray extends FutureResultBase implements Future<byte[]>{

@@ -79,6 +79,7 @@ public abstract class JRedisTestSuiteBase<T> extends ProviderTestBase<T>{
 	protected final List<String>	patternList = new ArrayList<String>();
 	protected final List<Integer>	intList = new ArrayList<Integer>();
 	protected final List<Long>		longList= new ArrayList<Long>();
+	protected final List<Double>	doubleList= new ArrayList<Double>();
 
 	protected final Set<String>		uniqueSet = new HashSet<String> ();
 	protected final Set<String>		commonSet = new HashSet<String> ();
@@ -205,6 +206,7 @@ public abstract class JRedisTestSuiteBase<T> extends ProviderTestBase<T>{
 			objectList.add(new TestBean("testbean." + i));
 			intList.add(random.nextInt());
 			longList.add(random.nextLong());
+			doubleList.add(random.nextDouble());
 		}
 		for(String m : commonSet) {
 			set1.add(m);
