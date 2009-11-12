@@ -812,7 +812,45 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		} 
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
-	
+	@Test
+	public void testLpoppushStringByteArray() throws InterruptedException {
+		cmd = Command.LPOPPUSH.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+
+			String listkey = this.keys.get(0);
+			for(int i=0; i<SMALL_CNT; i++){
+				provider.lpush(listkey, dataList.get(i));
+			}
+			
+			Future<Long> llenRespBefore = provider.llen(listkey);
+			List<Future<byte[]>> poppushResponses = new ArrayList<Future<byte[]>>();
+			
+			for(int i=0; i<SMALL_CNT; i++){
+				poppushResponses.add(provider.lpoppush (listkey, listkey));
+			}
+			
+			Future<Long> llenRespAfter = provider.llen(listkey);
+			try {
+				// use LLEN: size should be small count
+				assertTrue(llenRespBefore.get()==SMALL_CNT, "LLEN after LPUSH is wrong");
+				
+				for(int i=0; i<SMALL_CNT; i++){
+					assertEquals (poppushResponses.get(i).get(), dataList.get(i), "lpoppush result and reference list differ at i: " + i);
+				}
+				
+				// use LLEN: size should be small count
+				assertTrue(llenRespAfter.get()==SMALL_CNT, "LLEN after LPOPPUSH is wrong");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
 	@Test
 	public void testRpushStringByteArray() throws InterruptedException {
 		cmd = Command.RPUSH.code + " byte[] | " + Command.LLEN + " | " + Command.LRANGE;

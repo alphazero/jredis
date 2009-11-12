@@ -378,6 +378,13 @@ public interface JRedisFuture {
 	 */
 	public Future<byte[]> rpop (String listKey);
 
+	/**
+	 * @Redis LPOPPUSH
+	 * @param srcList
+	 * @param destList
+	 * @return
+	 */
+	public Future<byte[]> lpoppush (String srcList, String destList);
 	// ------------------------------------------------------------------------
 	// Commands operating on sets
 	// ------------------------------------------------------------------------

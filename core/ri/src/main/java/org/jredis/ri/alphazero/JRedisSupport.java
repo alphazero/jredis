@@ -176,6 +176,27 @@ public abstract class JRedisSupport implements JRedis {
 		}
 		return value;
 	}
+//	@Override
+	public byte[] lpoppush(String srcList, String destList) 
+	throws RedisException 
+	{
+		byte[] srckeybytes = null;
+		if((srckeybytes = getKeyBytes(srcList)) == null) 
+			throw new IllegalArgumentException ("invalid src key => ["+srcList+"]");
+		byte[] destkeybytes = null;
+		if((destkeybytes = getKeyBytes(destList)) == null) 
+			throw new IllegalArgumentException ("invalid dest key => ["+destList+"]");
+		byte[] bulkData= null;
+		try {
+			BulkResponse response = (BulkResponse) this.serviceRequest(Command.LPOPPUSH, srckeybytes, destkeybytes);
+			bulkData = response.getBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return bulkData;
+		
+	}
 	
 //	@Override
 	public void rpush(String key, byte[] value) 

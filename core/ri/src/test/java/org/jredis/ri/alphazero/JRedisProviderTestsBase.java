@@ -676,6 +676,31 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
 
+	@Test
+	public void testLpoppushStringString() {
+		cmd = Command.LPOPPUSH.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+
+			String listkey = this.keys.get(0);
+			for(int i=0; i<SMALL_CNT; i++){
+				provider.lpush(listkey, stringList.get(i));
+			}
+			// use LLEN: size should be small count
+			assertTrue(provider.llen(listkey)==SMALL_CNT, "LLEN after LPUSH is wrong");
+			
+			String popped = null;
+			for(int i=0; i<SMALL_CNT; i++){
+				popped = toStr(provider.lpoppush(listkey, listkey));
+				assertEquals(popped, stringList.get(i), "lpoppush didn't work as expected");
+			}
+			
+			// use LLEN: size should still be small count
+			assertTrue(provider.llen(listkey)==SMALL_CNT, "LLEN after LPOPPUSH sequence is wrong");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
 
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#rpush(java.lang.String, java.lang.String)}.

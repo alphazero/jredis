@@ -150,14 +150,25 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.RENAMENX, oldkeydata, newkeydata);
 		return new FutureBoolean(futureResponse);
 	}
-	
-//	@Override
 	public FutureStatus rpush(String key, byte[] value)  {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 		
 		return new FutureStatus(this.queueRequest(Command.RPUSH, keybytes, value));
+	}
+	
+//	@Override
+	public FutureByteArray lpoppush (String srcList, String destList)  {
+		byte[] srckeybytes = null;
+		if((srckeybytes = getKeyBytes(srcList)) == null) 
+			throw new IllegalArgumentException ("invalid src key => ["+srcList+"]");
+		byte[] destkeybytes = null;
+		if((destkeybytes = getKeyBytes(destList)) == null) 
+			throw new IllegalArgumentException ("invalid dest key => ["+destList+"]");
+		
+		Future<Response> futureResponse = this.queueRequest(Command.LPOPPUSH, srckeybytes, destkeybytes);
+		return new FutureByteArray(futureResponse);
 	}
 //	@Override
 	public FutureStatus rpush(String key, String value) {

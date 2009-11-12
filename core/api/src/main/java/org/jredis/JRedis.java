@@ -399,6 +399,15 @@ public interface JRedis {
 	 */
 	public byte[] rpop (String listKey) throws RedisException;
 
+	/**
+	 * @Redis LPOPPUSH
+	 * @param srcList
+	 * @param destList
+	 * @return
+	 * @throws RedisException
+	 */
+	public byte[] lpoppush (String srcList, String destList) throws RedisException;
+
 	// ------------------------------------------------------------------------
 	// Commands operating on sets
 	// ------------------------------------------------------------------------
