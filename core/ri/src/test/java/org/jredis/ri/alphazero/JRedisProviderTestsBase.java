@@ -678,7 +678,7 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 
 	@Test
 	public void testLpoppushStringString() {
-		cmd = Command.LPOPPUSH.code;
+		cmd = Command.RPOPLPUSH.code;
 		Log.log("TEST: %s command", cmd);
 		try {
 			provider.flushdb();
@@ -692,12 +692,12 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			
 			String popped = null;
 			for(int i=0; i<SMALL_CNT; i++){
-				popped = toStr(provider.lpoppush(listkey, listkey));
-				assertEquals(popped, stringList.get(i), "lpoppush didn't work as expected");
+				popped = toStr(provider.rpoplpush(listkey, listkey));
+				assertEquals(popped, stringList.get(i), "RPOPLPUSH didn't work as expected");
 			}
 			
 			// use LLEN: size should still be small count
-			assertTrue(provider.llen(listkey)==SMALL_CNT, "LLEN after LPOPPUSH sequence is wrong");
+			assertTrue(provider.llen(listkey)==SMALL_CNT, "LLEN after RPOPLPUSH sequence is wrong");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}

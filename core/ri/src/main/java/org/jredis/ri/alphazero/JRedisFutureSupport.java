@@ -159,7 +159,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	
 //	@Override
-	public FutureByteArray lpoppush (String srcList, String destList)  {
+	public FutureByteArray rpoplpush (String srcList, String destList)  {
 		byte[] srckeybytes = null;
 		if((srckeybytes = getKeyBytes(srcList)) == null) 
 			throw new IllegalArgumentException ("invalid src key => ["+srcList+"]");
@@ -167,7 +167,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		if((destkeybytes = getKeyBytes(destList)) == null) 
 			throw new IllegalArgumentException ("invalid dest key => ["+destList+"]");
 		
-		Future<Response> futureResponse = this.queueRequest(Command.LPOPPUSH, srckeybytes, destkeybytes);
+		Future<Response> futureResponse = this.queueRequest(Command.RPOPLPUSH, srckeybytes, destkeybytes);
 		return new FutureByteArray(futureResponse);
 	}
 //	@Override

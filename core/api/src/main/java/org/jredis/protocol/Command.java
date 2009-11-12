@@ -76,7 +76,7 @@ public enum Command {
 	LREM		(RequestType.KEY_CNT_VALUE,	ResponseType.NUMBER),
 	LPOP		(RequestType.KEY,			ResponseType.BULK), 
 	RPOP		(RequestType.KEY,			ResponseType.BULK),
-	LPOPPUSH	(RequestType.KEY_VALUE,		ResponseType.BULK),
+	RPOPLPUSH	(RequestType.KEY_VALUE,		ResponseType.BULK),
 	
 	// Commands operating on sets
 	SADD		(RequestType.KEY_VALUE,		ResponseType.BOOLEAN), 
