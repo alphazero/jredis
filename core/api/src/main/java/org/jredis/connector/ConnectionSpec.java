@@ -128,6 +128,15 @@ public interface ConnectionSpec {
     public boolean isShared ();
     
     /**
+     * @return the heartbeat period in seconds
+     */
+    public int	getHeartbeat();
+    
+    /**
+     * @param seconds heartbeat period
+     */
+    public void setHeartbeat(int seconds);
+    /**
      * @param flag
      */
     public void isShared(boolean flag);
@@ -267,6 +276,8 @@ public interface ConnectionSpec {
 		/**  */
 		private boolean isPipeline;
 		
+		/** heartbeat period in milliseconds */
+		private int heartbeat;
 		// ------------------------------------------------------------------------
 		// Constructor(s)
 		// ------------------------------------------------------------------------
@@ -416,5 +427,20 @@ public interface ConnectionSpec {
         public void isPipeline(boolean flag) {
         	isPipeline = flag;
         }
+        
+        /**
+         * @return the heartbeat period in seconds
+         */
+        public int	getHeartbeat() {
+        	return heartbeat/1000;
+        }
+        
+        /**
+         * @param seconds heartbeat period
+         */
+        public void setHeartbeat(int seconds) {
+        	this.heartbeat = seconds * 1000;
+        }
+
 	}
 }

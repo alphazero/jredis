@@ -47,6 +47,9 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	/** defaults to 5000 msecs */
 	static final int DEFAULT_READ_TIMEOUT_MSEC = 5000;
 	
+	/** defaults to 1 second (the min on Redis) */
+	static final int DEFAULT_HEARTBEAT_SEC = 1;
+	
 	/** higher priority pref is bandwidth */
 	private static final int DEFAULT_SO_PREF_BANDWIDTH = 0;
 	/** second priority pref is latency */
@@ -109,6 +112,7 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
     	isReliable(DEFAULT_IS_RELIABLE);
     	isShared(DEFAULT_IS_SHARED);
     	isPipeline(DEFAULT_IS_PIPELINE);
+    	setHeartbeat(DEFAULT_HEARTBEAT_SEC);
     }
 	// ------------------------------------------------------------------------
 	// Static methods

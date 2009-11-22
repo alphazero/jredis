@@ -19,8 +19,10 @@ package org.jredis.ri.alphazero.connection;
 import java.io.InputStream;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.connector.ConnectionSpec;
@@ -57,6 +59,9 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	private Thread 					respHandlerThread;
 
 	/**  */
+	private Thread 					heartbeatThread;
+
+	/**  */
 	private BlockingQueue<PendingRequest>	pendingResponseQueue;
 
 	/** synchronization object used to serialize request queuing  */
@@ -67,6 +72,14 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	 * If true, any calls to queueRequests will result in a raise runtime exception
 	 */
 	private boolean					pendingQuit = false;
+	
+	/** used by the Pipeline to indicate its state.  Set to true on connect and false on Quit/Close */
+	private AtomicBoolean			isActive;
+	
+	/** counted down on notifyConnect */
+	private CountDownLatch		    connectionEstablished;
+	
+//	Concurrent
 	
 	// ------------------------------------------------------------------------
 	// Constructor(s)
@@ -89,13 +102,25 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	super.initializeComponents();
     	
     	serviceLock = new Object();
+    	isActive = new AtomicBoolean(false);
+    	connectionEstablished = new CountDownLatch(1);
     	
     	pendingResponseQueue = new LinkedBlockingQueue<PendingRequest>();
     	respHandler = new ResponseHandler();
     	respHandlerThread = new Thread(respHandler, "response-handler");
     	respHandlerThread.start();
+    	
+    	isActive.set(false);
+    	heartbeatThread = new Thread(new Heartbeat(), "heartbeat");
+    	heartbeatThread.start();
     }
     
+    @Override
+    protected void notifyConnected () {
+		Log.log("Pipeline <%s> connected", this);
+    	isActive.set(true);
+    	connectionEstablished.countDown();
+    }
    
     /**
      * Pipeline must use a concurrent protocol handler.
@@ -150,8 +175,10 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 			
 			if(cmd != Command.QUIT)
 				request.write(getOutputStream());
-			else
+			else {
 				pendingQuit = true;
+				isActive.set(false);
+			}
 				
 			pendingResponse = new PendingRequest(request, cmd);
 			pendingResponseQueue.add(pendingResponse);
@@ -162,7 +189,27 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	// ------------------------------------------------------------------------
 	// Inner Class
 	// ------------------------------------------------------------------------
-    
+    public final class Heartbeat implements Runnable {
+    	public void run () {
+    		try {
+	            PipelineConnectionBase.this.connectionEstablished.await();
+				Log.log("Pipeline thread <%s> started.", Thread.currentThread().getName());
+				while (PipelineConnectionBase.this.isActive.get()) {
+					try {
+						PipelineConnectionBase.this.queueRequest(Command.PING);
+			            Thread.sleep(1000);
+		            }
+		            catch (InterruptedException e) {
+			            e.printStackTrace();
+		            }
+				}
+				Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
+            }
+            catch (InterruptedException e1) {
+	            e1.printStackTrace();
+            }
+    	}
+    }
     /**
      * Provides the response processing logic as a {@link Runnable}.
      * 

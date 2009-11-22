@@ -126,6 +126,7 @@ public abstract class ConnectionBase implements Connection {
 			initializeComponents();
 			if(connectImmediately) {
 				connect ();
+				notifyConnected();
 			}
 		}
 		catch (IllegalArgumentException e) { 
@@ -185,6 +186,12 @@ public abstract class ConnectionBase implements Connection {
 		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
     }
 
+    /**
+     * Extension point -- callback on this method when {@link ConnectionBase} has connected to server.
+     */
+    protected void notifyConnected () {
+    	// no-op
+    }
     /**
      * Extension point:  child classes may override to return specific {@link Protocol} implementations per their requirements.
      * @return
