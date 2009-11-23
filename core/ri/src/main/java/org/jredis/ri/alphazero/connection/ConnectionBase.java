@@ -81,6 +81,9 @@ public abstract class ConnectionBase implements Connection {
 
 	private boolean 			isConnected = false;
 	
+	/** PINGs for heartbeat */
+	private HeartbeatJinn			heartbeat;
+
 	// ------------------------------------------------------------------------
 	// Internal use fields
 	// ------------------------------------------------------------------------
@@ -126,7 +129,6 @@ public abstract class ConnectionBase implements Connection {
 			initializeComponents();
 			if(connectImmediately) {
 				connect ();
-				notifyConnected();
 			}
 		}
 		catch (IllegalArgumentException e) { 
@@ -181,16 +183,33 @@ public abstract class ConnectionBase implements Connection {
      * </pre>
      */
     protected void initializeComponents () {
-    	// protocol handler
-    	//
 		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
+
+		if(spec.isReliable()){
+	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), "connection [" + hashCode() + "] heartbeat");
+	    	heartbeat.start();
+		}
     }
 
     /**
      * Extension point -- callback on this method when {@link ConnectionBase} has connected to server.
+     * <b>It is important to note that the extension must call super.notifyConnected</b> if reliable service (using
+     * heartbeats) is required!.
      */
     protected void notifyConnected () {
-    	// no-op
+    	if (spec.isReliable()){
+	    	heartbeat.notifyConnected();
+    	}
+    }
+    /**
+     * Extension point -- callback on this method when {@link ConnectionBase} has disconnected from server.
+     * <b>It is important to note that the extension must call super.notifyDisconnected</b> if reliable service (using
+     * heartbeats) is required!.
+     */
+    protected void notifyDisconnected () {
+    	if (spec.isReliable()){
+	    	heartbeat.notifyDisconnected();
+    	}
     }
     /**
      * Extension point:  child classes may override to return specific {@link Protocol} implementations per their requirements.
@@ -287,7 +306,7 @@ public abstract class ConnectionBase implements Connection {
         }
 		
 //		Log.log("RedisConnection - connected");
-
+		notifyConnected();
 	}
 
 	/**
@@ -299,6 +318,7 @@ public abstract class ConnectionBase implements Connection {
 		socketClose();
 		isConnected = false;
 
+		notifyDisconnected();
 //		Log.log("RedisConnection - disconnected");
 	}
 	

@@ -116,6 +116,7 @@ public class JRedisService extends SynchJRedisBase {
 		conns = new Connection[connCount];
 		connInUse = new boolean [connCount];
 		Connection conn = null;
+		connectionSpec.isReliable(true);
 		for(int i=0; i< connCount;i++) {
 			try {
 				conn = Assert.notNull(createSynchConnection(connectionSpec, true, RedisVersion.current_revision), "Connection " + i, ClientRuntimeException.class);

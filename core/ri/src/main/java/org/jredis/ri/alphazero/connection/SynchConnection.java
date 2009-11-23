@@ -113,7 +113,7 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	/* (non-Javadoc)
 	 * @see org.jredis.ri.alphazero.connection.ConnectionBase#serviceRequest(org.jredis.protocol.Command, byte[][])
 	 */
-	public Response serviceRequest (Command cmd, byte[]... args) 
+	public synchronized Response serviceRequest (Command cmd, byte[]... args) 
 		throws RedisException
 	{
 		
@@ -124,14 +124,6 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		ResponseStatus  status = null;
 		
 		try {
-			// TODO:
-//			if(spec.isReliable()) {
-//				request = Assert.notNull(protocol.createRequest (Command.PING), "request object from handler", ProviderException.class);
-//				request.write(super.getOutputStream());
-//				response = Assert.notNull(protocol.createResponse(Command.PING), "response object from handler", ProviderException.class);
-//				response.read(super.getInputStream());
-//			}
-			
 			// 1 - Request
 			//				Log.log("RedisConnection - requesting ..." + cmd.code);
 			
@@ -155,13 +147,7 @@ public class SynchConnection extends ConnectionBase implements Connection {
 			Log.problem ("serviceRequest() -- ClientRuntimeException  => " + cre.getLocalizedMessage());
 			reconnect();
 			
-//			if(!spec.isReliable()) {
-				throw new ConnectionResetException ("Connection re-established but last request not processed:  " + cre.getCause().getLocalizedMessage());
-//			}
-//			else {
-//				// reliable ping check got us here -- we can retry the request
-//				// TODO:
-//			}
+			throw new ConnectionResetException ("Connection re-established but last request not processed:  " + cre.getCause().getLocalizedMessage());
 		}
 		catch (RuntimeException e){
 			e.printStackTrace();

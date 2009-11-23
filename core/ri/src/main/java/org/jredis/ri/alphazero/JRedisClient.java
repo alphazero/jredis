@@ -88,6 +88,7 @@ public class JRedisClient extends SynchJRedisBase  {
 
 	public JRedisClient (ConnectionSpec connectionSpec){
 		// note: using a non shared connection mod
+		connectionSpec.isReliable(true);
 		Connection synchConnection = createSynchConnection (connectionSpec, false, RedisVersion.current_revision);
 		setConnection (synchConnection);
 	}

@@ -59,9 +59,6 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	private Thread 					respHandlerThread;
 
 	/**  */
-	private Thread 					heartbeatThread;
-
-	/**  */
 	private BlockingQueue<PendingRequest>	pendingResponseQueue;
 
 	/** synchronization object used to serialize request queuing  */
@@ -78,9 +75,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	
 	/** counted down on notifyConnect */
 	private CountDownLatch		    connectionEstablished;
-	
-//	Concurrent
-	
+
 	// ------------------------------------------------------------------------
 	// Constructor(s)
 	// ------------------------------------------------------------------------
@@ -99,6 +94,11 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
      */
     @Override
     protected void initializeComponents () {
+    	
+    	spec.isReliable(true);
+    	spec.isPipeline(true);
+    	spec.isShared(true);
+    	
     	super.initializeComponents();
     	
     	serviceLock = new Object();
@@ -111,13 +111,19 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	respHandlerThread.start();
     	
     	isActive.set(false);
-    	heartbeatThread = new Thread(new Heartbeat(), "heartbeat");
-    	heartbeatThread.start();
     }
     
     @Override
     protected void notifyConnected () {
+    	super.notifyConnected();
 		Log.log("Pipeline <%s> connected", this);
+    	isActive.set(true);
+    	connectionEstablished.countDown();
+    }
+    @Override
+    protected void notifyDisconnected () {
+    	super.notifyDisconnected();
+		Log.log("Pipeline <%s> disconnected", this);
     	isActive.set(true);
     	connectionEstablished.countDown();
     }
@@ -178,6 +184,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 			else {
 				pendingQuit = true;
 				isActive.set(false);
+//				heartbeat.exit();
 			}
 				
 			pendingResponse = new PendingRequest(request, cmd);
@@ -189,27 +196,6 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	// ------------------------------------------------------------------------
 	// Inner Class
 	// ------------------------------------------------------------------------
-    public final class Heartbeat implements Runnable {
-    	public void run () {
-    		try {
-	            PipelineConnectionBase.this.connectionEstablished.await();
-				Log.log("Pipeline thread <%s> started.", Thread.currentThread().getName());
-				while (PipelineConnectionBase.this.isActive.get()) {
-					try {
-						PipelineConnectionBase.this.queueRequest(Command.PING);
-			            Thread.sleep(1000);
-		            }
-		            catch (InterruptedException e) {
-			            e.printStackTrace();
-		            }
-				}
-				Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
-            }
-            catch (InterruptedException e1) {
-	            e1.printStackTrace();
-            }
-    	}
-    }
     /**
      * Provides the response processing logic as a {@link Runnable}.
      * 

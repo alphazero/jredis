@@ -40,7 +40,7 @@ public class JRedisPipelineServiceBenchmark extends JRedisBenchmark {
 		String password = "jredis";
 		int    port = 6379;
 		int	   size = 3;
-		int workerCnt = 1000;
+		int workerCnt = 100;
 		int reqCnt = 1000;
 		int	db = 13;
 		if(args.length > 0) db = Integer.valueOf (args[0]);
