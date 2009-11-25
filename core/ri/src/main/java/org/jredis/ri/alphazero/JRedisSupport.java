@@ -23,11 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
-
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
+import org.jredis.KeyValueSet;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.RedisType;
@@ -38,9 +39,11 @@ import org.jredis.protocol.Command;
 import org.jredis.protocol.MultiBulkResponse;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.ValueResponse;
+import org.jredis.ri.alphazero.semantics.DefaultKeyCodec;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.SortSupport;
+import org.jredis.semantics.KeyCodec;
 
 /**
  * 
@@ -412,6 +415,41 @@ public abstract class JRedisSupport implements JRedis {
 		return setnx(key, DefaultCodec.encode(value));
 	}
 
+	private boolean msetnx(byte[][] mappings) throws RedisException {
+		boolean resvalue = false;
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.MSETNX, mappings);
+			resvalue = valResponse.getBooleanValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resvalue;
+	}
+	public boolean msetnx(Map<String, byte[]> keyValueMap) throws RedisException {
+		KeyCodec codec = DefaultKeyCodec.provider();
+		byte[][] mappings = new byte[keyValueMap.size()*2][];
+		int i = 0;
+		for (Entry<String, byte[]> e : keyValueMap.entrySet()){
+			mappings[i++] = codec.encode(e.getKey());
+			mappings[i++] = e.getValue();
+		}
+		return msetnx(mappings);
+	}
+	public boolean msetnx(KeyValueSet.ByteArrays keyValueMap) throws RedisException {
+		return msetnx(keyValueMap.getMappings());
+	}
+	public boolean msetnx(KeyValueSet.Strings keyValueMap) throws RedisException{
+		return msetnx(keyValueMap.getMappings());
+	}
+	public boolean msetnx(KeyValueSet.Numbers keyValueMap) throws RedisException{
+		return msetnx(keyValueMap.getMappings());
+	}
+	public <T extends Serializable> boolean msetnx(KeyValueSet.Objects<T> keyValueMap) throws RedisException{
+		return msetnx(keyValueMap.getMappings());
+	}
+
+	
 //	@Override
 	public boolean sismember(String key, byte[] member) throws RedisException {
 		byte[] keybytes = null;
@@ -775,7 +813,31 @@ public abstract class JRedisSupport implements JRedis {
 		return infomap;
 	}
 
-	/* ------------------------------- commands returning Lists --------- */
+	private void mset(byte[][] mappings) throws RedisException {
+		this.serviceRequest(Command.MSET, mappings);
+	}
+	public void mset(Map<String, byte[]> keyValueMap) throws RedisException {
+		KeyCodec codec = DefaultKeyCodec.provider();
+		byte[][] mappings = new byte[keyValueMap.size()*2][];
+		int i = 0;
+		for (Entry<String, byte[]> e : keyValueMap.entrySet()){
+			mappings[i++] = codec.encode(e.getKey());
+			mappings[i++] = e.getValue();
+		}
+		mset(mappings);
+	}
+	public void mset(KeyValueSet.ByteArrays keyValueMap) throws RedisException {
+		mset(keyValueMap.getMappings());
+	}
+	public void mset(KeyValueSet.Strings keyValueMap) throws RedisException{
+		mset(keyValueMap.getMappings());
+	}
+	public void mset(KeyValueSet.Numbers keyValueMap) throws RedisException{
+		mset(keyValueMap.getMappings());
+	}
+	public <T extends Serializable> void mset(KeyValueSet.Objects<T> keyValueMap) throws RedisException{
+		mset(keyValueMap.getMappings());
+	}
 
 //	@Override
 	public List<byte[]> mget(String key, String... moreKeys) throws RedisException {

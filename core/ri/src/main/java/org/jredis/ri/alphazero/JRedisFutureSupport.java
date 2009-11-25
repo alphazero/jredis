@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
+import org.jredis.KeyValueSet;
 import org.jredis.ProviderException;
 import org.jredis.RedisType;
 import org.jredis.Sort;
@@ -40,9 +42,11 @@ import org.jredis.protocol.MultiBulkResponse;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.ResponseStatus;
 import org.jredis.protocol.ValueResponse;
+import org.jredis.ri.alphazero.semantics.DefaultKeyCodec;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.SortSupport;
+import org.jredis.semantics.KeyCodec;
 
 /**
  * 
@@ -560,6 +564,69 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		}
 		return new FutureByteArrayList(this.queueRequest(Command.MGET, keybytes));
 	}
+	
+	/* MSETs */
+	private FutureStatus mset(byte[][] mappings){
+		Future<Response> futureResponse = this.queueRequest(Command.MSET, mappings);
+		return new FutureStatus(futureResponse);
+	}
+	public FutureStatus mset(Map<String, byte[]> keyValueMap){
+		KeyCodec codec = DefaultKeyCodec.provider();
+		byte[][] mappings = new byte[keyValueMap.size()*2][];
+		int i = 0;
+		for (Entry<String, byte[]> e : keyValueMap.entrySet()){
+			mappings[i++] = codec.encode(e.getKey());
+			mappings[i++] = e.getValue();
+		}
+		return mset(mappings);
+	}
+	
+	public FutureStatus mset(KeyValueSet.ByteArrays keyValueMap){
+		return mset(keyValueMap.getMappings());
+	}
+	public FutureStatus mset(KeyValueSet.Strings keyValueMap){
+		return mset(keyValueMap.getMappings());
+	}
+
+	public FutureStatus mset(KeyValueSet.Numbers keyValueMap){
+		return mset(keyValueMap.getMappings());
+	}
+
+	public <T extends Serializable> FutureStatus mset(KeyValueSet.Objects<T> keyValueMap){
+		return mset(keyValueMap.getMappings());
+	}
+
+	/* MSETNXs */
+	private Future<Boolean> msetnx(byte[][] mappings){
+		Future<Response> futureResponse = this.queueRequest(Command.MSETNX, mappings);
+		return new FutureBoolean(futureResponse);
+	}
+	public Future<Boolean> msetnx(Map<String, byte[]> keyValueMap){
+		KeyCodec codec = DefaultKeyCodec.provider();
+		byte[][] mappings = new byte[keyValueMap.size()*2][];
+		int i = 0;
+		for (Entry<String, byte[]> e : keyValueMap.entrySet()){
+			mappings[i++] = codec.encode(e.getKey());
+			mappings[i++] = e.getValue();
+		}
+		return msetnx(mappings);
+	}
+	
+	public Future<Boolean> msetnx(KeyValueSet.ByteArrays keyValueMap){
+		return msetnx(keyValueMap.getMappings());
+	}
+	public Future<Boolean> msetnx(KeyValueSet.Strings keyValueMap){
+		return msetnx(keyValueMap.getMappings());
+	}
+
+	public Future<Boolean> msetnx(KeyValueSet.Numbers keyValueMap){
+		return msetnx(keyValueMap.getMappings());
+	}
+
+	public <T extends Serializable> Future<Boolean> msetnx(KeyValueSet.Objects<T> keyValueMap){
+		return msetnx(keyValueMap.getMappings());
+	}
+
 
 //	@Override
 	public Future<List<byte[]>> smembers(String key) {

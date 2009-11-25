@@ -168,6 +168,32 @@ public interface JRedisFuture {
 	public Future<List<byte[]>> mget(String key, String...moreKeys);
 
 	/**
+	 * @Redis MSET
+	 * @param keyValueMap a {@link Map}ping of {@link String} key names to byte[] values.
+	 * @return Future<Boolean> indicating if all of sets were OK or not
+	 * @throws RedisException
+	 */
+	public Future<ResponseStatus> mset(Map<String, byte[]> keyValueMap);
+	
+	public Future<ResponseStatus> mset(KeyValueSet.ByteArrays mappings);
+	public Future<ResponseStatus> mset(KeyValueSet.Strings mappings);
+	public Future<ResponseStatus> mset(KeyValueSet.Numbers mappings);
+	public <T extends Serializable> Future<ResponseStatus> mset(KeyValueSet.Objects<T> mappings);
+	
+	/**
+	 * @Redis MSETNX
+	 * @param keyValueMap a {@link Map}ping of {@link String} key names to byte[] values.
+	 * @return Future<Boolean> indicating if all of sets were OK or not
+	 * @throws RedisException
+	 */
+	public Future<Boolean> msetnx(Map<String, byte[]> keyValueMap);
+	
+	public Future<Boolean> msetnx(KeyValueSet.ByteArrays mappings);
+	public Future<Boolean> msetnx(KeyValueSet.Strings mappings);
+	public Future<Boolean> msetnx(KeyValueSet.Numbers mappings);
+	public <T extends Serializable> Future<Boolean> msetnx(KeyValueSet.Objects<T> mappings);
+	
+	/**
 	 * @Redis INCR
 	 * @param key
 	 * @return

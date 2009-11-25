@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.net.SocketException;
 
 import org.jredis.ClientRuntimeException;
+import org.jredis.NotSupportedException;
 import org.jredis.ProviderException;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
@@ -57,6 +58,7 @@ public abstract class ProtocolBase implements Protocol {
 	public static final byte	COUNT_BYTE 	= (byte) 42; // *
 	public static final byte	SIZE_BYTE 	= (byte) 36; // $
 	public static final byte	NUM_BYTE 	= (byte) 58; // :
+	public static final byte	ASCII_ZERO	= (byte) 48; // 0
 	
 	// ------------------------------------------------------------------------
 	// Protocol Revision specific consts
@@ -195,6 +197,46 @@ public abstract class ProtocolBase implements Protocol {
 				// -------------------
 			}	
 			break;
+			
+			case BULK_SET:
+				Assert.isTrue(args.length%2==0, "args length should be an even number and expected to be seq of tuple {key, value}", ProviderException.class);
+				Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX, "Only MSET/NX bulk commands are supported", NotSupportedException.class);
+
+				byte[] setCmdLenBytes = Convert.toBytes(cmd.length);
+				byte[] bulkSetLineCntBytes = Convert.toBytes(args.length+1);
+
+				buffer.write(COUNT_BYTE);
+				buffer.write(bulkSetLineCntBytes);
+				buffer.write(CRLF);
+
+				buffer.write(SIZE_BYTE);
+				buffer.write(setCmdLenBytes);
+				buffer.write(CRLF);
+				buffer.write(cmd.bytes);
+				buffer.write(CRLF);
+				
+				for(int s=0; s<args.length; s+=2){
+					buffer.write(SIZE_BYTE);
+					buffer.write(Convert.toBytes(args[s].length));
+					buffer.write(CRLF);
+					buffer.write(args[s]);
+					buffer.write(CRLF);
+					
+					buffer.write(SIZE_BYTE);
+					if(null != args[s+1]) {
+						buffer.write(Convert.toBytes(args[s+1].length));
+						buffer.write(CRLF);
+						buffer.write(args[s+1]);
+						buffer.write(CRLF);
+					}
+					else {
+						buffer.write(ASCII_ZERO);
+						buffer.write(CRLF);
+						buffer.write(CRLF);
+					}
+				}
+				break;
+			
 			}
 		}
 		catch (Exception e) {

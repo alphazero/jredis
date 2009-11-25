@@ -164,6 +164,32 @@ public interface JRedis {
 	public List<byte[]> mget(String key, String...moreKeys) throws RedisException;
 
 	/**
+	 * @Redis MSET
+	 * @param keyValueMap a {@link Map}ping of {@link String} key names to byte[] values.
+	 * @return 
+	 * @throws RedisException
+	 */
+	public void mset(Map<String, byte[]> keyValueMap) throws RedisException;
+	
+	public void mset(KeyValueSet.ByteArrays mappings) throws RedisException;
+	public void mset(KeyValueSet.Strings mappings) throws RedisException;
+	public void mset(KeyValueSet.Numbers mappings) throws RedisException;
+	public <T extends Serializable> void mset(KeyValueSet.Objects<T> mappings) throws RedisException;
+	
+	/**
+	 * @Redis MSETNX
+	 * @param keyValueMap a {@link Map}ping of {@link String} key names to byte[] values.
+	 * @return false if ANY of the keys in the map already existed, true if all were new and were set.
+	 * @throws RedisException
+	 */
+	public boolean msetnx(Map<String, byte[]> keyValueMap) throws RedisException;
+	
+	public boolean msetnx(KeyValueSet.ByteArrays mappings) throws RedisException;
+	public boolean msetnx(KeyValueSet.Strings mappings) throws RedisException;
+	public boolean msetnx(KeyValueSet.Numbers mappings) throws RedisException;
+	public <T extends Serializable> boolean msetnx(KeyValueSet.Objects<T> mappings) throws RedisException;
+	
+	/**
 	 * @Redis INCR
 	 * @param key
 	 * @return
