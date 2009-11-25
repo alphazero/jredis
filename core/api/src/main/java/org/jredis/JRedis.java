@@ -580,11 +580,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public double zscore (String setkey, byte[] member) throws RedisException;
-	public double zscore (String setkey, String stringValue) throws RedisException;
-	public double zscore (String setkey, Number numberValue) throws RedisException;
+	public Double zscore (String setkey, byte[] member) throws RedisException;
+	public Double zscore (String setkey, String stringValue) throws RedisException;
+	public Double zscore (String setkey, Number numberValue) throws RedisException;
 	public <T extends Serializable> 
-		double zscore (String setkey, T object) throws RedisException;
+		Double zscore (String setkey, T object) throws RedisException;
 
 	/**
 	 * @Redis ZRANGE
@@ -615,6 +615,20 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	public List<byte[]> zrangebyscore (String setkey, double minScore, double maxScore) throws RedisException; 
+
+//	/**
+//	 * @Redis ZINCRBY
+//	 * @param setkey
+//	 * @param score
+//	 * @param member
+//	 * @return
+//	 * @throws RedisException
+//	 */
+//	public Double zincrby (String setkey, double score, byte[] member) throws RedisException;
+//	public Double zincrby (String setkey, double score, String stringValue) throws RedisException;
+//	public Double zincrby (String setkey, double score, Number numberValue) throws RedisException;
+//	public <T extends Serializable> 
+//		Double zincrby (String setkey, double score, T object) throws RedisException;
 
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands

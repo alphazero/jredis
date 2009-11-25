@@ -1090,14 +1090,18 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
         public Double get () throws InterruptedException, ExecutionException {
         	BulkResponse bulkResp = (BulkResponse) pendingRequest.get();
-        	return Convert.toDouble(bulkResp.getBulkData());
+        	if(bulkResp.getBulkData() != null)
+        		return Convert.toDouble(bulkResp.getBulkData());
+        	return null;
         }
 
         public Double get (long timeout, TimeUnit unit)
         	throws InterruptedException, ExecutionException, TimeoutException 
         {
         	BulkResponse bulkResp = (BulkResponse) pendingRequest.get(timeout, unit);
-        	return Convert.toDouble(bulkResp.getBulkData());
+        	if(bulkResp.getBulkData() != null)
+        		return Convert.toDouble(bulkResp.getBulkData());
+        	return null;
         }
 	}
 	public static class FutureByteArray extends FutureResultBase implements Future<byte[]>{

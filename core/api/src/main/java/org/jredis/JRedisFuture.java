@@ -569,6 +569,19 @@ public interface JRedisFuture {
 	 */
 	public Future<List<byte[]>> zrevrange (String setkey, long from, long to); 
 
+//	/**
+//	 * @Redis ZINCRBY
+//	 * @param setkey
+//	 * @param score
+//	 * @param member
+//	 * @return
+//	 */
+//	public Future<Double> zincrby (String setkey, double score, byte[] member);
+//	public Future<Double> zincrby (String setkey, double score, String stringValue);
+//	public Future<Double> zincrby (String setkey, double score, Number numberValue);
+//	public <T extends Serializable> 
+//		Future<Double> zincrby (String setkey, double score, T object);
+
 	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands

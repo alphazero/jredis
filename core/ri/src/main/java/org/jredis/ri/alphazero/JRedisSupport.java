@@ -1278,15 +1278,16 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
-	public double zscore(String key, byte[] member) throws RedisException {
+	public Double zscore(String key, byte[] member) throws RedisException {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
-		double resvalue = 0;
+		Double resvalue = null;
 		try {
 			BulkResponse bulkResponse = (BulkResponse) this.serviceRequest(Command.ZSCORE, keybytes, member);
-			resvalue = Convert.toDouble(bulkResponse.getBulkData());
+			if (bulkResponse.getBulkData() != null)
+				resvalue = Convert.toDouble(bulkResponse.getBulkData());
 		}
 		catch (ClassCastException e){
 			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
@@ -1294,15 +1295,15 @@ public abstract class JRedisSupport implements JRedis {
 		return resvalue;
 	}
 //	@Override
-	public double zscore (String key, String value) throws RedisException {
+	public Double zscore (String key, String value) throws RedisException {
 		return zscore (key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public double zscore (String key, Number value) throws RedisException {
+	public Double zscore (String key, Number value) throws RedisException {
 		return zscore (key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> double zscore (String key, T value) throws RedisException
+	public <T extends Serializable> Double zscore (String key, T value) throws RedisException
 	{
 		return zscore (key, DefaultCodec.encode(value));
 	}

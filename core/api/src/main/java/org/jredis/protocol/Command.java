@@ -101,6 +101,7 @@ public enum Command {
 	ZRANGE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
 	ZREVRANGE	(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
 	ZRANGEBYSCORE	(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
+//	ZINCRBY		(RequestType.KEY_IDX_VALUE, ResponseType.BULK),
 		
 	
 	// "Multiple databases handling commands"

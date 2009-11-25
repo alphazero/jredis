@@ -20,6 +20,7 @@ import static org.jredis.ri.alphazero.support.DefaultCodec.toStr;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import java.util.ArrayList;
@@ -405,7 +406,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			for(int i=0;i<SMALL_CNT; i++)
 				scores.add (provider.zscore(setkey, dataList.get(i)));
 			
-
+			Future<Double>  noneSuchKeyScore = provider.zscore(setkey, "no such member");
 			try {
 				for(Future<Boolean> resp : expectedOKResponses)
 					assertTrue (resp.get().booleanValue(), "zadd of random element should have been true");
@@ -415,6 +416,8 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 					assertEquals (score.get(), doubleList.get(i), "zscore of element should have been " + doubleList.get(i));
 					i++;
 				}	
+				
+				assertNull(noneSuchKeyScore.get(), "zscore of none existent member of sorted set should be null");
 			}
 			catch(ExecutionException e){
 				Throwable cause = e.getCause();

@@ -20,6 +20,7 @@ import static org.jredis.ri.alphazero.support.DefaultCodec.decode;
 import static org.jredis.ri.alphazero.support.DefaultCodec.toLong;
 import static org.jredis.ri.alphazero.support.DefaultCodec.toDouble;
 import static org.jredis.ri.alphazero.support.DefaultCodec.toStr;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
@@ -1458,7 +1459,9 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 				assertTrue(provider.zadd(setkey, doubleList.get(i), dataList.get(i)), "zadd of random element should be true");
 			
 			for(int i=0;i<SMALL_CNT; i++)
-				assertEquals (provider.zscore(setkey, dataList.get(i)), doubleList.get(i), "zscore of element should be " + doubleList.get(i));
+				assertEquals (provider.zscore(setkey, dataList.get(i)).doubleValue(), doubleList.get(i), "zscore of element should be " + doubleList.get(i));
+			
+			assertNull(provider.zscore(setkey, "no such set member"), "zscore of none existent member of sorted set should be null");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
@@ -1476,8 +1479,8 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			
 			List<byte[]>  range = provider.zrange(setkey, 0, SMALL_CNT);
 			for(int i=1;i<SMALL_CNT-1; i++){
-				assertTrue(provider.zscore(setkey, range.get(i)) <= provider.zscore(setkey, range.get(i+1)), "range member score should be smaller or equal to previous range member");
-				assertTrue(provider.zscore(setkey, range.get(i)) >= provider.zscore(setkey, range.get(i-1)), "range member score should be bigger or equal to previous range member");
+				assertTrue(provider.zscore(setkey, range.get(i)).doubleValue() <= provider.zscore(setkey, range.get(i+1)).doubleValue(), "range member score should be smaller or equal to previous range member");
+				assertTrue(provider.zscore(setkey, range.get(i)).doubleValue() >= provider.zscore(setkey, range.get(i-1)).doubleValue(), "range member score should be bigger or equal to previous range member");
 			}
 			
 			for(int i=0;i<SMALL_CNT; i++)
