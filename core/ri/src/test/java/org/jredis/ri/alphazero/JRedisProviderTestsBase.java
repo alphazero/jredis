@@ -1467,6 +1467,28 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	}
 	
 	@Test
+	public void testZincrbyStringByteArray() {
+		cmd = Command.ZSCORE.code + " byte[] | " + Command.ZINCRBY.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<SMALL_CNT; i++)
+				assertTrue(provider.zadd(setkey, doubleList.get(i), dataList.get(i)), "zadd of random element should be true");
+			
+			for(int i=0;i<SMALL_CNT; i++)
+				assertEquals (provider.zscore(setkey, dataList.get(i)).doubleValue(), doubleList.get(i), "zscore of element should be " + doubleList.get(i));
+
+			double increment = 0.05;
+			for(int i=0;i<SMALL_CNT; i++)
+				assertEquals (provider.zincrby(setkey, increment ,dataList.get(i)).doubleValue(), doubleList.get(i) + increment, "zincr of element should be " + doubleList.get(i) + increment);
+
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
+	@Test
 	public void testZrangeStringByteArray() {
 		cmd = Command.ZRANGE.code + " byte[]";
 		Log.log("TEST: %s command", cmd);

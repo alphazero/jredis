@@ -391,8 +391,8 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
 	@Test
-	public void testZscoreStringByteArray() throws InterruptedException{
-		cmd = Command.ZSCORE.code + " byte[]";
+	public void testZscoreAndZincrbyStringByteArray() throws InterruptedException{
+		cmd = Command.ZSCORE.code + " byte[] | " + Command.ZINCRBY.code + " byte[]";
 		Log.log("TEST: %s command", cmd);
 
 		try {
@@ -406,6 +406,11 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			for(int i=0;i<SMALL_CNT; i++)
 				scores.add (provider.zscore(setkey, dataList.get(i)));
 			
+			double increment = 0.05;
+			List<Future<Double>> incrementedScores = new ArrayList<Future<Double>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				incrementedScores.add (provider.zincrby(setkey, increment, dataList.get(i)));
+			
 			Future<Double>  noneSuchKeyScore = provider.zscore(setkey, "no such member");
 			try {
 				for(Future<Boolean> resp : expectedOKResponses)
@@ -414,6 +419,12 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				int i=0;
 				for(Future<Double> score : scores){
 					assertEquals (score.get(), doubleList.get(i), "zscore of element should have been " + doubleList.get(i));
+					i++;
+				}	
+				
+				i=0;
+				for(Future<Double> score : incrementedScores){
+					assertEquals (score.get(), doubleList.get(i) + increment, "zincr of element should be " + doubleList.get(i) + increment);
 					i++;
 				}	
 				
@@ -426,6 +437,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		} 
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
+	
 	
 	@Test
 	public void testSaddStringByteArray() throws InterruptedException{

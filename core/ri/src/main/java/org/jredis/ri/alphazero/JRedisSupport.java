@@ -288,6 +288,40 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
+	public Double zincrby(String key, double score, byte[] member) 
+	throws RedisException 
+	{
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+		/* Double BulkResponse */
+		Double resvalue = null;
+		try {
+			BulkResponse bulkResponse = (BulkResponse) this.serviceRequest(Command.ZINCRBY, keybytes, Convert.toBytes(score), member);
+			if (bulkResponse.getBulkData() != null)
+				resvalue = Convert.toDouble(bulkResponse.getBulkData());
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resvalue;
+	}
+//	@Override
+	public Double zincrby (String key, double score, String value) throws RedisException {
+		return zincrby (key, score, DefaultCodec.encode(value));
+	}
+//	@Override
+	public Double zincrby (String key, double score, Number value) throws RedisException {
+		return zincrby (key, score, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> Double zincrby (String key, double score, T value) throws RedisException
+	{
+		return zincrby (key, score, DefaultCodec.encode(value));
+	}
+
+	
+//	@Override
 	public void save() 
 	throws RedisException 
 	{
@@ -1290,7 +1324,7 @@ public abstract class JRedisSupport implements JRedis {
 				resvalue = Convert.toDouble(bulkResponse.getBulkData());
 		}
 		catch (ClassCastException e){
-			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
 		}
 		return resvalue;
 	}

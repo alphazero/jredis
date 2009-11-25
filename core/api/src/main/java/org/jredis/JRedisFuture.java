@@ -72,6 +72,7 @@ import org.jredis.protocol.ResponseStatus;
  * @since   alpha.0
  * 
  */
+@Redis(versions="1.07")
 public interface JRedisFuture {
 	
 	// ------------------------------------------------------------------------
@@ -569,18 +570,19 @@ public interface JRedisFuture {
 	 */
 	public Future<List<byte[]>> zrevrange (String setkey, long from, long to); 
 
-//	/**
-//	 * @Redis ZINCRBY
-//	 * @param setkey
-//	 * @param score
-//	 * @param member
-//	 * @return
-//	 */
-//	public Future<Double> zincrby (String setkey, double score, byte[] member);
-//	public Future<Double> zincrby (String setkey, double score, String stringValue);
-//	public Future<Double> zincrby (String setkey, double score, Number numberValue);
-//	public <T extends Serializable> 
-//		Future<Double> zincrby (String setkey, double score, T object);
+	/**
+	 * @Redis ZINCRBY
+	 * @param setkey
+	 * @param score
+	 * @param member
+	 * @return
+	 */
+	@Redis(versions="1.07")
+	public Future<Double> zincrby (String setkey, double score, byte[] member);
+	public Future<Double> zincrby (String setkey, double score, String stringValue);
+	public Future<Double> zincrby (String setkey, double score, Number numberValue);
+	public <T extends Serializable> 
+		Future<Double> zincrby (String setkey, double score, T object);
 
 	
 	// ------------------------------------------------------------------------

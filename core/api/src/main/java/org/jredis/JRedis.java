@@ -33,6 +33,7 @@ import java.util.Map;
  * @since   alpha.0
  * 
  */
+@Redis(versions="1.07")
 public interface JRedis {
 	
 	// ------------------------------------------------------------------------
@@ -616,19 +617,20 @@ public interface JRedis {
 	 */
 	public List<byte[]> zrangebyscore (String setkey, double minScore, double maxScore) throws RedisException; 
 
-//	/**
-//	 * @Redis ZINCRBY
-//	 * @param setkey
-//	 * @param score
-//	 * @param member
-//	 * @return
-//	 * @throws RedisException
-//	 */
-//	public Double zincrby (String setkey, double score, byte[] member) throws RedisException;
-//	public Double zincrby (String setkey, double score, String stringValue) throws RedisException;
-//	public Double zincrby (String setkey, double score, Number numberValue) throws RedisException;
-//	public <T extends Serializable> 
-//		Double zincrby (String setkey, double score, T object) throws RedisException;
+	/**
+	 * @Redis ZINCRBY
+	 * @param setkey
+	 * @param score
+	 * @param member
+	 * @return
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.07")
+	public Double zincrby (String setkey, double score, byte[] member) throws RedisException;
+	public Double zincrby (String setkey, double score, String stringValue) throws RedisException;
+	public Double zincrby (String setkey, double score, Number numberValue) throws RedisException;
+	public <T extends Serializable> 
+		Double zincrby (String setkey, double score, T object) throws RedisException;
 
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands

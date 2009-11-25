@@ -232,7 +232,31 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	{
 		return zadd (key, score, DefaultCodec.encode(value));
 	}
-	
+
+//	@Override
+	public Future<Double> zincrby(String key, double score, byte[] member) 
+	{
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.ZINCRBY, keybytes,  Convert.toBytes(score), member);
+		return new FutureDouble(futureResponse);
+	}
+//	@Override
+	public Future<Double> zincrby (String key, double score, String value) {
+		return zincrby (key, score, DefaultCodec.encode(value));
+	}
+//	@Override
+	public Future<Double> zincrby (String key, double score, Number value) {
+		return zincrby (key, score, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> Future<Double> zincrby (String key, double score, T value)
+	{
+		return zincrby (key, score, DefaultCodec.encode(value));
+	}
+
 //	@Override
 	public FutureStatus save() 
 	{
