@@ -127,9 +127,9 @@ public abstract class ConnectionBase implements Connection {
 			this.spec = notNull(spec, "ConnectionSpec init parameter", ClientRuntimeException.class);
 			socketAddress = new InetSocketAddress(spec.getAddress(), spec.getPort());
 			initializeComponents();
-			if(connectImmediately) {
-				connect ();
-			}
+//			if(connectImmediately) {
+//				connect ();
+//			}
 		}
 		catch (IllegalArgumentException e) { 
 			throw new ClientRuntimeException 
@@ -138,6 +138,8 @@ public abstract class ConnectionBase implements Connection {
 		catch (Exception e) {
 			throw new ProviderException("Unexpected error on initialize -- BUG", e);
 		} 
+		
+		if(connectImmediately) { connect (); }
 	}
 	
 	// ------------------------------------------------------------------------
