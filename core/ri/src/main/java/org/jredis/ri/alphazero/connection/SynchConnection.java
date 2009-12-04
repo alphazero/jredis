@@ -113,6 +113,8 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	/* (non-Javadoc)
 	 * @see org.jredis.ri.alphazero.connection.ConnectionBase#serviceRequest(org.jredis.protocol.Command, byte[][])
 	 */
+	// TODO: not happy about the performance hit synchronized has caused ... but its required for heartbeat.
+	// is it worth it?
 	public synchronized Response serviceRequest (Command cmd, byte[]... args) 
 		throws RedisException
 	{

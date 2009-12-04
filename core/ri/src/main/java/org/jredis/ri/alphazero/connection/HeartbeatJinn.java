@@ -67,14 +67,16 @@ public class HeartbeatJinn extends Thread{
 	public void notifyConnected () {
 		connected.set(true);
 	}
+	// TODO: no one is calling this method (yet) and we're relying on daemon status to
+	// avoid the jvm hanging around but this ain't right.
 	public void exit() {
 		mustBeat.set(false);
 	}
 	public void run () {
-		Log.log("HeartbeatJinn thread <%s> started.", getName());
+//		Log.log("HeartbeatJinn thread <%s> started.", getName());
 		while (mustBeat.get()) {
 			try {
-				if(connected.get()){
+				if(connected.get()){  // << buggy.
 					try {
 						switch (modality){
 						case Asynchronous:
@@ -86,9 +88,15 @@ public class HeartbeatJinn extends Thread{
 						}
 					}
 					catch (Exception e) {
-						// how now brown cow?  we'll log it for now and assume reconnect try in progress and wait for the flag change.
-						Log.problem("HeartbeatJinn thread <" + getName() + "> encountered exception on PING: " + e.getMessage() );
-						connected.set(false);
+						// addressing buggy above.  notifyDisconnected gets called after we have checked it but before we
+						// made the call - it is disconnected by the time the call is made and we end up here
+						// checking the flag again and if it is indeed not the above scenario then there is something wrong,
+						// otherwise ignore it and basically loop on sleep until we get notify on connect again (if ever).
+						if(connected.get()){
+							// how now brown cow?  we'll log it for now and assume reconnect try in progress and wait for the flag change.
+							Log.problem("HeartbeatJinn thread <" + Thread.currentThread().getName() + "> encountered exception on PING: " + e.getMessage() );
+							connected.set(false);
+						}
 					}
 				}
 				sleep (period);	// sleep regardless - 
