@@ -209,6 +209,9 @@ public abstract class JRedisSupport implements JRedis {
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 		
+		if(value == null) 
+			throw new IllegalArgumentException ("null value for list op");
+		
 		this.serviceRequest(Command.RPUSH, keybytes, value);
 	}
 //	@Override
@@ -1219,6 +1222,10 @@ public abstract class JRedisSupport implements JRedis {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+		
+		if(value == null) 
+			throw new IllegalArgumentException ("null value for list op");
+		
 		
 		this.serviceRequest(Command.LPUSH, keybytes, value);
 	}
