@@ -550,7 +550,7 @@ public class SynchProtocol extends ProtocolBase {
 					for(int i=0;i<count; i++){
 						size = readControlLine(in, false, SIZE_BYTE);
 
-						if(size > 0)
+						if(size >= 0)
 							datalist.add (super.readBulkData(in, size));
 						else
 							datalist.add(null);
