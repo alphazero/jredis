@@ -74,6 +74,7 @@ public abstract class JRedisTestSuiteBase<T> extends ProviderTestBase<T>{
 	protected final byte[]			emptyBytes = new byte[0];
 	protected final String			emptyString = "";
 	protected final List<byte[]>	dataList = new ArrayList<byte[]>();
+	protected final List<byte[]>	sparseList = new ArrayList<byte[]>();
 	protected final List<TestBean>	objectList = new ArrayList<TestBean>();
 	protected final List<String>	stringList = new ArrayList<String>();
 	protected final List<String>	patternList = new ArrayList<String>();
@@ -194,6 +195,7 @@ public abstract class JRedisTestSuiteBase<T> extends ProviderTestBase<T>{
 	private final void setupTestSuiteData () {
 		/** setup data */
 		cnt = MEDIUM_CNT;
+		byte[] zerobytes = new byte[0];
 		for(int i=0; i<cnt; i++){
 			keys.add(getRandomAsciiString (48));
 			patternList.add(getRandomAsciiString(random.nextInt(10)+2) + patternA + getRandomAsciiString(random.nextInt(10)+2));
@@ -202,6 +204,11 @@ public abstract class JRedisTestSuiteBase<T> extends ProviderTestBase<T>{
 			set1.add("set_1" + getRandomAsciiString(20));
 			set2.add("set_2" + getRandomAsciiString(20));
 			dataList.add(getRandomBytes (128));
+			if(random.nextBoolean())
+				sparseList.add(zerobytes);
+			else
+				sparseList.add(getRandomBytes (128));
+			
 			stringList.add(getRandomAsciiString (128));
 			objectList.add(new TestBean("testbean." + i));
 			intList.add(random.nextInt());

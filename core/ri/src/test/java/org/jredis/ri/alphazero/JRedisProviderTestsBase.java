@@ -18,12 +18,11 @@ package org.jredis.ri.alphazero;
 
 import static org.jredis.ri.alphazero.support.DefaultCodec.decode;
 import static org.jredis.ri.alphazero.support.DefaultCodec.toLong;
-import static org.jredis.ri.alphazero.support.DefaultCodec.toDouble;
 import static org.jredis.ri.alphazero.support.DefaultCodec.toStr;
-import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import java.util.List;
@@ -623,9 +622,42 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	
 	/**************** LIST COMMANDS ******************************/
 
-	/**
-	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#rpush(java.lang.String, byte[])}.
-	 */
+	@Test
+	public void testListPushWithSparseList() {
+		cmd = Command.RPUSH.code + " byte[] | " + Command.LLEN + " | " + Command.LRANGE;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+
+			String listkey = this.keys.get(0);
+			for(int i=0; i<SMALL_CNT; i++)
+				provider.rpush(listkey, sparseList.get(i));
+			
+			assertEquals(provider.llen(listkey), SMALL_CNT, "LLEN after RPUSH is wrong");
+			
+			List<byte[]>  range = provider.lrange(listkey, 0, SMALL_CNT);
+			assertTrue(range.size()==SMALL_CNT, "range size after RPUSH is wrong");
+			for(int i=0; i<SMALL_CNT; i++){
+				assertEquals (sparseList.get(i), range.get(i), "range and reference list differ at i: " + i);
+			}
+			
+			provider.flushdb();
+
+			for(int i=0; i<SMALL_CNT; i++)
+				provider.lpush(listkey, sparseList.get(i));
+			
+			assertEquals(provider.llen(listkey), SMALL_CNT, "LLEN after LPUSH is wrong");
+			
+			range = provider.lrange(listkey, 0, SMALL_CNT);
+			assertTrue(range.size()==SMALL_CNT, "range size after LPUSH is wrong");
+			for(int i=0; i<SMALL_CNT; i++){
+				int r = SMALL_CNT - i - 1;
+				assertEquals (sparseList.get(i), range.get(r), "range and reference list differ at i: " + i);
+			}
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
 	@Test
 	public void testRpushStringByteArray() {
 		cmd = Command.RPUSH.code + " byte[] | " + Command.LLEN + " | " + Command.LRANGE;
@@ -633,6 +665,14 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		try {
 			provider.flushdb();
 
+			boolean expected = false;
+			try {
+				byte[] nil = null;
+				provider.rpush("foo", nil);
+			}
+			catch(IllegalArgumentException e) { expected = true; }
+			assertTrue(expected, "expecting exception for null value to RPUSH");
+			
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
 				provider.rpush(listkey, dataList.get(i));
@@ -659,6 +699,14 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		try {
 			provider.flushdb();
 
+			boolean expected = false;
+			try {
+				byte[] nil = null;
+				provider.rpush("foo", nil);
+			}
+			catch(IllegalArgumentException e) { expected = true; }
+			assertTrue(expected, "expecting exception for null value to RPUSH");
+			
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
 				provider.lpush(listkey, dataList.get(i));
