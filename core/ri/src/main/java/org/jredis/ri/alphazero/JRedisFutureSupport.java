@@ -159,6 +159,9 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 		
+		if(value == null) 
+			throw new IllegalArgumentException ("null value");
+		
 		return new FutureStatus(this.queueRequest(Command.RPUSH, keybytes, value));
 	}
 	
@@ -859,6 +862,10 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+		
+		if(value == null) 
+			throw new IllegalArgumentException ("null value");
+		
 		
 		return new FutureStatus(this.queueRequest(Command.LPUSH, keybytes, value));
 	}

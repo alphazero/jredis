@@ -801,6 +801,14 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		Log.log("TEST: %s command", cmd);
 		try {
 			provider.flushdb();
+			boolean expected = false;
+			try {
+				byte[] nil = null;
+				provider.lpush("foo", nil);
+			}
+			catch(IllegalArgumentException e) { expected = true; }
+			assertTrue(expected, "expecting exception for null value to RPUSH");
+			
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
 				provider.lpush(listkey, dataList.get(i));
@@ -873,6 +881,14 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		try {
 			provider.flushdb();
 
+			boolean expected = false;
+			try {
+				byte[] nil = null;
+				provider.rpush("foo", nil);
+			}
+			catch(IllegalArgumentException e) { expected = true; }
+			assertTrue(expected, "expecting exception for null value to RPUSH");
+			
 			String listkey = this.keys.get(0);
 			for(int i=0; i<SMALL_CNT; i++){
 				provider.rpush(listkey, dataList.get(i));
