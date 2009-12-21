@@ -51,6 +51,7 @@ public class JRedisAsynchClient extends JRedisFutureSupport {
 	 */
 	public JRedisAsynchClient (ConnectionSpec connectionSpec) {
 		// note: using a shared connection mod
+		connectionSpec.isReliable(true);
 		connection = new AsynchConnection(connectionSpec, true);
 	}
 	
