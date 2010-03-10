@@ -145,6 +145,23 @@ public abstract class JRedisSupport implements JRedis {
 //		this.serviceRequest(Command.SELECT, Convert.toBytes(index));
 //		return this;
 //	}
+	
+	public void slaveof(String host, int port) throws RedisException{
+		byte[] hostbytes = null;
+		if((hostbytes = getKeyBytes(host)) == null) 
+			throw new IllegalArgumentException ("invalid host => ["+host+"]");
+
+		byte[] portbytes = null;
+		if((portbytes = Convert.toBytes(port)) == null) 
+			throw new IllegalArgumentException ("invalid port => ["+port+"]");
+
+		this.serviceRequest(Command.SLAVEOF, hostbytes, portbytes);
+	}
+	
+	public void slaveofnone() throws RedisException{
+		this.serviceRequest(Command.SLAVEOF, "no".getBytes(), "one".getBytes());
+	}
+	
 //	@Override
 	public void rename(String oldkey, String newkey) throws RedisException {
 		byte[] oldkeydata = null;

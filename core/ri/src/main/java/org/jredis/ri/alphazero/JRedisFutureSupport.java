@@ -33,6 +33,7 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.KeyValueSet;
 import org.jredis.ProviderException;
+import org.jredis.RedisException;
 import org.jredis.RedisType;
 import org.jredis.Sort;
 import org.jredis.connector.Connection;
@@ -128,6 +129,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //		this.queueRequest(Command.SELECT, Convert.toBytes(index));
 //		return this;
 //	}
+
+	public Future<ResponseStatus>  slaveof(String host, int port) {
+		byte[] hostbytes = null;
+		if((hostbytes = getKeyBytes(host)) == null) 
+			throw new IllegalArgumentException ("invalid host => ["+host+"]");
+
+		byte[] portbytes = null;
+		if((portbytes = Convert.toBytes(port)) == null) 
+			throw new IllegalArgumentException ("invalid port => ["+port+"]");
+
+		return new FutureStatus(this.queueRequest(Command.SLAVEOF, hostbytes, portbytes));
+	}
+	public Future<ResponseStatus>  slaveofnone() {
+		return new FutureStatus(this.queueRequest(Command.SLAVEOF, "no".getBytes(), "one".getBytes()));
+	}
+	
 //	@Override
 	public FutureStatus rename(String oldkey, String newkey) {
 		byte[] oldkeydata = null;

@@ -764,4 +764,17 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	public Map<String, String>	info ()  throws RedisException;
+	
+	/**
+	 * @Redis SLAVEOF
+	 * @param host ip address 
+	 * @param port
+	 */
+	public void slaveof(String host, int port) throws RedisException;
+	
+	/**
+	 * Convenience method.  Turns off replication.
+	 * @Redis SLAVEOF "no one"
+	 */
+	public void slaveofnone() throws RedisException;
 }

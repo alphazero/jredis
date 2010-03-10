@@ -699,4 +699,17 @@ public interface JRedisFuture {
 	 * @return
 	 */
 	public Future<Map<String, String>>	info () ;
+
+	/**
+	 * @Redis SLAVEOF
+	 * @param host ip address 
+	 * @param port
+	 */
+	public Future<ResponseStatus>  slaveof(String host, int port);
+	
+	/**
+	 * Convenience method.  Turns off replication.
+	 * @Redis SLAVEOF "no one"
+	 */
+	public Future<ResponseStatus>  slaveofnone();
 }

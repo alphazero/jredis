@@ -123,7 +123,8 @@ public enum Command {
 	
 	// Remote server control commands
 	INFO		(RequestType.NO_ARG, 		ResponseType.BULK), 
-	MONITOR	    (RequestType.NO_ARG, 		ResponseType.VIRTUAL);
+	MONITOR	    (RequestType.NO_ARG, 		ResponseType.VIRTUAL), 
+	SLAVEOF		(RequestType.KEY_KEY, 		ResponseType.STATUS);
 	
 	/** semantic sugar */
 	public final String code;
