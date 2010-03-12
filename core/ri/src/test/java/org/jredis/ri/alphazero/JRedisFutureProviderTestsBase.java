@@ -33,6 +33,8 @@ import org.jredis.RedisException;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.ResponseStatus;
 import org.jredis.ri.JRedisTestSuiteBase;
+import org.jredis.ri.JRedisTestSuiteBase.TestBean;
+import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.Test;
 
@@ -1060,6 +1062,43 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				assertEquals(getResp.get(), dataList.get(0), "get results doesn't match the expected data");
 				assertEquals(getsetResp1.get(), dataList.get(0), "getset results doesn't match the expected data");
 				assertEquals(getsetResp2.get(), null, "getset result for new key should have been null");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
+	@Test
+	public void testHsetHget() throws InterruptedException {
+		cmd = Command.HSET.code + " | " + Command.HGET;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			Future<Boolean> hsetResp1 = provider.hset(keys.get(0), keys.get(1), dataList.get(0));
+			Future<Boolean> hsetResp2 = provider.hset(keys.get(0), keys.get(2), stringList.get(0));
+			Future<Boolean> hsetResp3 = provider.hset(keys.get(0), keys.get(3), 222);
+			objectList.get(0).setName("Hash Stash");
+			Future<Boolean> hsetResp4 = provider.hset(keys.get(0), keys.get(4), objectList.get(0));
+			
+			Future<byte[]> hgetResp1 = provider.hget(keys.get(0), keys.get(1));
+			Future<byte[]> hgetResp2 = provider.hget(keys.get(0), keys.get(2));
+			Future<byte[]> hgetResp3 = provider.hget(keys.get(0), keys.get(3));
+			Future<byte[]> hgetResp4 = provider.hget(keys.get(0), keys.get(4));
+			
+			try {
+				assertTrue (hsetResp1.get(), "hset using byte[] value");
+				assertTrue (hsetResp2.get(), "hset using String value");
+				assertTrue (hsetResp3.get(), "hset using Number value");
+				assertTrue (hsetResp4.get(), "hset using Object value");
+				
+				assertEquals (hgetResp1.get(), dataList.get(0), "hget of field with byte[] value");
+				assertEquals (DefaultCodec.toStr(hgetResp2.get()), stringList.get(0), "hget of field with String value");
+				assertEquals (DefaultCodec.toLong(hgetResp3.get()).longValue(), 222, "hget of field with Number value");
+				TestBean objval = DefaultCodec.decode(hgetResp4.get());
+				assertEquals (objval.getName(), objectList.get(0).getName(), "hget of field with Object value");
 			}
 			catch(ExecutionException e){
 				Throwable cause = e.getCause();

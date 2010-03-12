@@ -32,7 +32,7 @@ import org.jredis.Redis;
  * @since   alpha.0
  * 
  */
-@Redis(versions="1.1")
+@Redis(versions="1.3")
 public enum Command {
 	
 	// security
@@ -59,7 +59,7 @@ public enum Command {
 	TYPE		(RequestType.KEY, 			ResponseType.STRING),
 
 	// "Commands operating on the key space"
-	KEYS		(RequestType.KEY, 			ResponseType.BULK), 
+	KEYS		(RequestType.KEY, 			ResponseType.MULTI_BULK), 
 	RANDOMKEY	(RequestType.NO_ARG,		ResponseType.STRING),
 	RENAME		(RequestType.KEY_KEY, 		ResponseType.STATUS), 
 	RENAMENX	(RequestType.KEY_KEY, 		ResponseType.BOOLEAN), 
@@ -105,6 +105,14 @@ public enum Command {
 	ZRANGEBYSCORE	(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
 	ZINCRBY		(RequestType.KEY_IDX_VALUE, ResponseType.BULK),
 		
+	// Commands operating on hashes
+	HSET 		(RequestType.KEY_KEY_VALUE, ResponseType.BOOLEAN),
+	HGET 		(RequestType.KEY_VALUE, 	ResponseType.BULK),
+	
+	// transactional commands
+	MULTI		(RequestType.NO_ARG, 		ResponseType.STATUS),
+	EXEC		(RequestType.NO_ARG, 		ResponseType.STATUS), // NEED NEW RESPONSE TYPE
+	DISCARD		(RequestType.NO_ARG, 		ResponseType.STATUS),
 	
 	// "Multiple databases handling commands"
 	SELECT		(RequestType.KEY,			ResponseType.STATUS),

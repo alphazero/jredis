@@ -18,7 +18,6 @@ package org.jredis.ri.alphazero;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.KeyValueSet;
 import org.jredis.ProviderException;
-import org.jredis.RedisException;
 import org.jredis.RedisType;
 import org.jredis.Sort;
 import org.jredis.connector.Connection;
@@ -405,6 +403,45 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return smove (srcKey, destKey, DefaultCodec.encode(object));
 	}
 		   
+	// ------------------------------------------------------------------------
+	// Commands operating on hashes
+	// ------------------------------------------------------------------------
+	
+	public Future<Boolean> hset(String key, String field, byte[] value) {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] hashFieldBytes = null;
+		if((hashFieldBytes = getKeyBytes(field)) == null) 
+			throw new IllegalArgumentException ("invalid field => ["+field+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.HSET, hashKeyBytes, hashFieldBytes, value);
+		return new FutureBoolean(futureResponse);
+	}
+	public Future<Boolean> hset(String key, String field, String stringValue) {
+		return hset (key, field, DefaultCodec.encode(stringValue));
+	}
+	public Future<Boolean> hset(String key, String field, Number numberValue) {
+		return hset (key, field, String.valueOf(numberValue).getBytes());
+	}
+	public <T extends Serializable> 
+		Future<Boolean> hset(String key, String field, T object) {
+		return hset (key, field, DefaultCodec.encode(object));
+	}
+	
+	public Future<byte[]> hget(String hashKey, String hashField) {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+
+		byte[] hashFieldBytes = null;
+		if((hashFieldBytes = getKeyBytes(hashField)) == null) 
+			throw new IllegalArgumentException ("invalid field => ["+hashField+"]");
+		
+		Future<Response> futureResponse = this.queueRequest(Command.HGET, hashKeyBytes, hashFieldBytes);
+		return new FutureByteArray(futureResponse);
+	}
 	
 	
 	/* ------------------------------- commands returning int value --------- */
@@ -1255,24 +1292,28 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
         protected FutureKeyList (Future<Response> pendingRequest) { super(pendingRequest); }
 
-        private List<String>  getResultList (BulkResponse resp) {
-    		StringTokenizer tokenizer = new StringTokenizer(new String(resp.getBulkData()), " ");
-    		List<String>  list = new ArrayList <String>(12);
-    		while (tokenizer.hasMoreTokens()){
-    			list.add(tokenizer.nextToken());
-    		}
-    		return list;
-        }
+//        private List<String>  getResultList (BulkResponse resp) {
+//    		StringTokenizer tokenizer = new StringTokenizer(new String(resp.getBulkData()), " ");
+//    		List<String>  list = new ArrayList <String>(12);
+//    		while (tokenizer.hasMoreTokens()){
+//    			list.add(tokenizer.nextToken());
+//    		}
+//    		return list;
+//        }
         public List<String> get () throws InterruptedException, ExecutionException {
-        	BulkResponse resp = (BulkResponse) pendingRequest.get();
-        	return getResultList(resp);
+//        	BulkResponse resp = (BulkResponse) pendingRequest.get();
+//        	return getResultList(resp);
+        	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get();
+        	return DefaultCodec.toStr(resp.getMultiBulkData());
         }
 
         public List<String> get (long timeout, TimeUnit unit)
         	throws InterruptedException, ExecutionException, TimeoutException 
         {
-        	BulkResponse resp = (BulkResponse) pendingRequest.get(timeout, unit);
-        	return getResultList(resp);
+//        	BulkResponse resp = (BulkResponse) pendingRequest.get(timeout, unit);
+//        	return getResultList(resp);
+            	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get(timeout, unit);
+            	return DefaultCodec.toStr(resp.getMultiBulkData());
         }
 	}
 	public static class FutureInfo extends FutureResultBase implements Future<Map<String, String>>{

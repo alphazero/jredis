@@ -286,12 +286,12 @@ public abstract class JRedisTestSuiteBase<T> extends ProviderTestBase<T>{
 	public static class TestBean implements Serializable {
 		/**  */
 		private static final long	serialVersionUID	= 4457509786469904810L;
-		protected final long getCreated_on() {return named_on;}
-		protected final void setCreated_on(long created_on) {this.named_on = created_on;}
-		protected final String getName() {return name;}
-		protected final void setName(String name) {this.name = name;}
-		protected final byte[] getData() { return data;}
-		protected final void setData(byte[] data) { this.data = data;}
+		public final long getCreated_on() {return named_on;}
+		public final void setCreated_on(long created_on) {this.named_on = created_on;}
+		public final String getName() {return name;}
+		public final void setName(String name) {this.name = name;}
+		public final byte[] getData() { return data;}
+		public final void setData(byte[] data) { this.data = data;}
 		private long   named_on;
 		private String name;
 		private byte[] data;

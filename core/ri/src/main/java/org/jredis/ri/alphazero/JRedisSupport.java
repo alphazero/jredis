@@ -18,7 +18,6 @@ package org.jredis.ri.alphazero;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -530,10 +529,66 @@ public abstract class JRedisSupport implements JRedis {
 		return smove (srcKey, destKey, String.valueOf(numberValue).getBytes());
 	}
 	public <T extends Serializable> 
-		   boolean smove (String srcKey, String destKey, T object) throws RedisException {
+	boolean smove (String srcKey, String destKey, T object) throws RedisException {
 		return smove (srcKey, destKey, DefaultCodec.encode(object));
 	}
 		   
+	// ------------------------------------------------------------------------
+	// Commands operating on hashes
+	// ------------------------------------------------------------------------
+	
+	public boolean hset(String hashKey, String hashField, byte[] value)  throws RedisException {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+
+		byte[] hashFieldBytes = null;
+		if((hashFieldBytes = getKeyBytes(hashField)) == null) 
+			throw new IllegalArgumentException ("invalid field => ["+hashField+"]");
+
+		/* boolean ValueRespose */
+		boolean response = false;
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.HSET, hashKeyBytes, hashFieldBytes, value);
+			response = valResponse.getBooleanValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return response;
+	}
+	
+	
+	public boolean hset(String key, String field, String stringValue)  throws RedisException {
+		return hset (key, field, DefaultCodec.encode(stringValue));
+	}
+	public boolean hset(String key, String field, Number numberValue)  throws RedisException {
+		return hset (key, field, String.valueOf(numberValue).getBytes());
+	}
+	public <T extends Serializable> 
+	boolean hset(String key, String field, T object)  throws RedisException {
+		return hset (key, field, DefaultCodec.encode(object));
+	}
+	
+	public byte[] hget(String hashKey, String hashField)  throws RedisException {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+
+		byte[] hashFieldBytes = null;
+		if((hashFieldBytes = getKeyBytes(hashField)) == null) 
+			throw new IllegalArgumentException ("invalid field => ["+hashField+"]");
+
+		byte[] bulkData= null;
+		try {
+			BulkResponse response = (BulkResponse) this.serviceRequest(Command.HGET, hashKeyBytes, hashFieldBytes);
+			bulkData = response.getBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return bulkData;
+	}
 	
 	
 	/* ------------------------------- commands returning int value --------- */
@@ -912,7 +967,16 @@ public abstract class JRedisSupport implements JRedis {
 		if((keydata = getKeyBytes(pattern)) == null) 
 			throw new RedisException (Command.KEYS, "ERR Invalid key.");
 
-
+		List<byte[]> multiBulkData= null;
+		try {
+			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.KEYS, keydata);
+			multiBulkData = MultiBulkResponse.getMultiBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return DefaultCodec.toStr(multiBulkData);
+		/*
 		byte[] bulkData= null;
 		try {
 			BulkResponse response = (BulkResponse) this.serviceRequest(Command.KEYS, keydata);
@@ -928,6 +992,7 @@ public abstract class JRedisSupport implements JRedis {
 			keyList.add(tokenizer.nextToken());
 		}
 		return keyList;
+		*/
 	}
 
 //	@Override

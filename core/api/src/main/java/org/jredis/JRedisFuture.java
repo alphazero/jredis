@@ -610,6 +610,61 @@ public interface JRedisFuture {
 	public <T extends Serializable> 
 		Future<Double> zincrby (String setkey, double score, T object);
 
+	// ------------------------------------------------------------------------
+	// Commands operating on hashes
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * @Redis HSET
+	 * @param key
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	@Redis(versions="1.3.n")
+	public Future<Boolean> hset(String key, String field, byte[] value);
+	
+	/**
+	 * @Redis HSET
+	 * @param key
+	 * @param field
+	 * @param string
+	 * @return
+	 */
+	@Redis(versions="1.3.n")
+	public Future<Boolean> hset(String key, String field, String string);
+	
+	/**
+	 * @Redis HSET
+	 * @param key
+	 * @param field
+	 * @param number
+	 * @return
+	 */
+	@Redis(versions="1.3.n")
+	public Future<Boolean> hset(String key, String field, Number number);
+	
+	/**
+	 * @Redis HSET
+	 * @param <T>
+	 * @param key
+	 * @param field
+	 * @param object
+	 * @return
+	 */
+	@Redis(versions="1.3.n")
+	public <T extends Serializable> 
+		Future<Boolean> hset(String key, String field, T object);
+	
+	/**
+	 * @Redis HGET
+	 * @param key
+	 * @param field
+	 * @return
+	 */
+	@Redis(versions="1.3.n")
+	public Future<byte[]> hget(String key, String field);
+	
 	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands

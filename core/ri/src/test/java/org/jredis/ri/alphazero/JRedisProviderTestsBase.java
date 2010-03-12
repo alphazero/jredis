@@ -421,6 +421,32 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
 
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, java.io.Serializable)}.
+	 */
+	@Test
+	public void testHsetHget() {
+		cmd = Command.HSET.code + " | " + Command.HGET;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			assertTrue( provider.hset(keys.get(0), keys.get(1), dataList.get(0)), "hset using byte[] value");
+			assertTrue( provider.hset(keys.get(0), keys.get(2), stringList.get(0)), "hset using String value");
+			assertTrue( provider.hset(keys.get(0), keys.get(3), 222), "hset using Number value");
+			TestBean obj = objectList.get(0);
+			obj.setName("Hash Stash");
+			assertTrue( provider.hset(keys.get(0), keys.get(4), objectList.get(0)), "hset using Object value");
+			
+			assertEquals (provider.hget(keys.get(0), keys.get(1)), dataList.get(0), "hget of field with byte[] value");
+			assertEquals (DefaultCodec.toStr(provider.hget(keys.get(0), keys.get(2))), stringList.get(0), "hget of field with String value");
+			assertEquals (DefaultCodec.toLong(provider.hget(keys.get(0), keys.get(3))).longValue(), 222, "hget of field with Number value");
+			TestBean objval = DefaultCodec.decode(provider.hget(keys.get(0), keys.get(4)));
+			assertEquals (objval.getName(), obj.getName(), "hget of field with Object value");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+
 	
 	
 	/**

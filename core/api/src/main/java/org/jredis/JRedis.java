@@ -659,6 +659,77 @@ public interface JRedis {
 		Double zincrby (String setkey, double score, T object) throws RedisException;
 
 	// ------------------------------------------------------------------------
+	// Commands operating on hashes
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * @Redis HSET
+	 * @param key
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	@Redis(versions="1.3.n")
+	public boolean hset(String key, String field, byte[] value)  throws RedisException;
+	
+	/**
+	 * @Redis HSET
+	 * @param key
+	 * @param field
+	 * @param string
+	 * @return
+	 */
+	@Redis(versions="1.3.n")
+	public boolean hset(String key, String field, String string)  throws RedisException;
+	
+	/**
+	 * @Redis HSET
+	 * @param key
+	 * @param field
+	 * @param number
+	 * @return
+	 */
+	@Redis(versions="1.3.n")
+	public boolean hset(String key, String field, Number number)  throws RedisException;
+	
+	/**
+	 * @Redis HSET
+	 * @param <T>
+	 * @param key
+	 * @param field
+	 * @param object
+	 * @return
+	 */
+	@Redis(versions="1.3.n")
+	public <T extends Serializable> 
+		boolean hset(String key, String field, T object)  throws RedisException;
+	
+	/**
+	 * @Redis HGET
+	 * @param key
+	 * @param field
+	 * @return
+	 */
+	@Redis(versions="1.3.n")
+	public byte[] hget(String key, String field)  throws RedisException;
+	
+//	// ------------------------------------------------------------------------
+//	// Transactional commands
+//	// ------------------------------------------------------------------------
+//	/**
+//	 * one option is to return a subclass of JRedis (e.g. JRedisCommandSequence)
+//	 * and have that interface declare discard and multi.  Benefit is being able
+//	 * to associate state with the transaction.
+//	 * @throws RedisException
+//	 */
+//	@Redis(versions="1.3")
+//	public void multi() throws RedisException;
+//	/**
+//	 * @throws RedisException
+//	 */
+//	public void discard () throws RedisException;
+	
+	// ------------------------------------------------------------------------
 	// Multiple databases handling commands
 	// ------------------------------------------------------------------------
 	
