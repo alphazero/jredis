@@ -1,0 +1,36 @@
+Final release for Redis 1.2.n compliant clients.
+
+REQUIREMENTS CHANGES:
+
+Requires Redis server 1.2.n.  This release is NOT compatible with either Redis 1.000 or 2.n (development edge).
+
+See: 
+http://code.google.com/p/redis/downloads/list
+
+NEW FEATURES:
+
+* Heartbeat
+
+Connectors will launch a heartbeat thread to maintain connections.  Frequency can be set using ConnectionSpec, with default of 1/sec.
+
+* Synchronous semantics for Pipeline
+
+See JRedisPipeline.sync().  In a nutshell, allows for mixing in synchronous semantics when using the asynchronous pipelines.  For example, you may issue a set of asynchronous commands (per JRedisFuture interface) and then use pipeline.sync() to obtain a JRedis (synchronous) interface to issue a blocking command.  See UsingJredisPipeline.exampleUseofSyncInPipeline() (in /Examples)
+
+
+BUG FIX:
+
+A few bugs were reported and have been addressed.  (Thanks to all who provided feedback.)
+
+See: 
+http://github.com/alphazero/jredis/issues/closed 
+
+ROAD MAP:
+
+Development focus will be on Redis 2.n compliance in tandem with Redis edge (http://github.com/antirez/redis), and maintenance for (this) 1.2.n compliant clients. 
+
+/enjoy
+
+03-12-2010
+NoVA
+
