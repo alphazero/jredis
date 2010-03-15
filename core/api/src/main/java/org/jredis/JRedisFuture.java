@@ -773,4 +773,18 @@ public interface JRedisFuture {
 	 * @Redis SLAVEOF "no one"
 	 */
 	public Future<ResponseStatus>  slaveofnone();
+	// ------------------------------------------------------------------------
+	// Diagnostics commands
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * @Redis ECHO
+	 * @param msg
+	 * @return
+	 */
+	public Future<byte[]> echo (byte[] msg);
+	public Future<byte[]> echo (String msg);
+	public Future<byte[]> echo (Number msg);
+	public <T extends Serializable> 
+		Future<byte[]> echo (T msg);
 }

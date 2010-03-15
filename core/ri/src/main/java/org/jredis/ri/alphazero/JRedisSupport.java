@@ -1589,4 +1589,33 @@ public abstract class JRedisSupport implements JRedis {
 
 		return bytes;
 	}
+//	@Override
+	public byte[] echo (byte[] value) throws RedisException {
+		if(value ==null) 
+			throw new IllegalArgumentException ("invalid echo value => ["+value+"]");
+
+		byte[] bulkData= null;
+		try {
+			BulkResponse response = (BulkResponse) this.serviceRequest(Command.ECHO, value);
+			bulkData = response.getBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return bulkData;
+	}
+//	@Override
+	public byte[] echo(String value) throws RedisException {
+		return echo(DefaultCodec.encode(value));
+	}
+//	@Override
+	public byte[] echo(Number value) throws RedisException {
+		return echo(String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> 
+	byte[] echo (T value) throws RedisException
+	{
+		return echo(DefaultCodec.encode(value));
+	}
 }

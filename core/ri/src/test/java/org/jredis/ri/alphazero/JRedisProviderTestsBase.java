@@ -2427,6 +2427,27 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
+	@Test
+	public void testEcho() {
+		cmd = Command.ECHO.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			assertEquals(dataList.get(0), provider.echo(dataList.get(0)), "data and echo results");
+			
+			byte[] zerolenData = new byte[0];
+			assertEquals(zerolenData, provider.echo(zerolenData), "zero len byte[] and echo results");
+			
+			boolean expected = false;
+			try {
+				provider.echo((byte[])null);
+			}
+			catch(IllegalArgumentException e) { expected = true; }
+			assertTrue(expected, "expecting exception for null value to ECHO");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
 //	/**
 //	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#shutdown()}.
 //	 */
