@@ -144,6 +144,48 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
 
+	@Test
+	public void testSpop () throws InterruptedException {
+		cmd = Command.SPOP.code + " String | " + Command.SMEMBERS;
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			String setkey = keys.get(0);
+			
+			List<Future<Boolean>> saddResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<SMALL_CNT; i++)
+				saddResponses.add (provider.sadd(setkey, stringList.get(i)));
+			
+			List<Future<byte[]>>  poppedList = new ArrayList<Future<byte[]>>(SMALL_CNT);
+			for(int i=0;i<SMALL_CNT; i++)
+				poppedList.add(provider.spop(setkey));
+			
+			try {
+				for(Future<Boolean> resp : saddResponses)
+					assertTrue (resp.get().booleanValue(), "sadd of random element should have been true");
+				
+				for(Future<byte[]> item : poppedList){
+					assertTrue(item != null, "random popped set element should be non-null");
+				}
+				
+				// edge cases
+				
+				// empty set
+				String emptyset = "empty-set";
+				provider.sadd(emptyset, "delete-me");
+				provider.srem(emptyset, "delete-me");
+				assertEquals (provider.scard(setkey).get().longValue(), 0, "set should be empty after all elements are popped");
+				assertEquals (provider.spop("no-such-set").get(), null, "spop of non existent key should be null");
+				
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
 
 	@Test
 	public void testSmoveStringByteArray() throws InterruptedException{

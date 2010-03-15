@@ -1685,7 +1685,47 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	        assertEquals(toStr(membytes), null, "non-existent key/set random member should be null");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
-		
+	}
+	
+	@Test
+	public void testSpop() {
+		cmd = Command.SPOP.code + " String ";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			// add a small set
+			String setkey = keys.get(0);
+			for(int i=0;i<SMALL_CNT; i++)
+				assertTrue(provider.sadd(setkey, stringList.get(i)), "sadd of random element should be true");
+			
+			// get members
+			List<String> members = null;
+			members = toStr(provider.smembers(setkey));
+			assertTrue(members.size() == SMALL_CNT);
+			
+			for(int i=0;i<SMALL_CNT; i++) {
+				String randomPopedMember = toStr(provider.spop(setkey));
+				boolean found = false;
+				for(String m : members){
+					if(m.equals(randomPopedMember)) {
+						found = true;
+						break;
+					}
+				}
+				assertTrue(found, "random set element should have been in the members list");
+			}
+
+			assertTrue(provider.spop(setkey) == null, "");
+			
+			// test edget conditions
+	        assertEquals(provider.spop(setkey), null, "empty set random popped member should be null");
+	        assertEquals(provider.scard(setkey), 0, "expecting an empty set with scard of 0 ");
+
+			// non-existent key
+	        assertEquals(provider.spop("NO-SUCH-SET"), null, "non-existent key/set random spop member should be null");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#smembers(java.lang.String)}.

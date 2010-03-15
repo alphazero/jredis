@@ -558,7 +558,21 @@ public interface JRedis {
 	 */
 	public List<byte[]> smembers (String setkey) throws RedisException;
 	
+	/**
+	 * @Redis SRANDMEMBER
+	 * @param setkey
+	 * @return
+	 * @throws RedisException
+	 */
 	public byte[] srandmember (String setkey) throws RedisException;
+	
+	/**
+	 * @Redis SPOP
+	 * @param setkey
+	 * @return
+	 * @throws RedisException
+	 */
+	public byte[] spop (String setkey) throws RedisException;
 	
 	// ------------------------------------------------------------------------
 	// Commands operating on sets
