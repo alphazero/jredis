@@ -525,6 +525,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArray (futureResponse);
 	}
 
+	public Future<byte[]> spop (String key) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.SPOP, keybytes);
+		return new FutureByteArray (futureResponse);
+	}
+
 	/* ------------------------------- commands returning long value --------- */
 
 //	@Override

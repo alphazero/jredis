@@ -731,6 +731,22 @@ public abstract class JRedisSupport implements JRedis {
 		return bulkData;
 	}
 
+	public byte[] spop (String setkey) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(setkey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+setkey+"]");
+
+		byte[] bulkData= null;
+		try {
+			BulkResponse response = (BulkResponse) this.serviceRequest(Command.SPOP, keybytes);
+			bulkData = response.getBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return bulkData;
+	}
+
 	/* ------------------------------- commands returning long value --------- */
 
 //	@Override

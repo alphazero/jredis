@@ -530,6 +530,12 @@ public interface JRedisFuture {
 	 */
 	public Future<byte[]> srandmember (String setkey);
 
+	/**
+	 * @Redis SPOP
+	 * @param setkey
+	 * @return
+	 */
+	public Future<byte[]> spop (String setkey);
 	// ------------------------------------------------------------------------
 	// Commands operating on sorted sets
 	// ------------------------------------------------------------------------

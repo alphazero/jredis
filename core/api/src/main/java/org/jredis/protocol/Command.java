@@ -94,7 +94,7 @@ public enum Command {
 	SMEMBERS	(RequestType.KEY,			ResponseType.MULTI_BULK), 
 	SMOVE		(RequestType.KEY_KEY_VALUE,	ResponseType.BOOLEAN),
 	SRANDMEMBER (RequestType.KEY,  			ResponseType.BULK),
-	
+	SPOP     	(RequestType.KEY,        	ResponseType.BULK),
 	// Commands operating on sorted sets
 	ZADD		(RequestType.KEY_IDX_VALUE,	ResponseType.BOOLEAN), 
 	ZREM		(RequestType.KEY_VALUE,		ResponseType.BOOLEAN),
