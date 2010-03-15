@@ -791,4 +791,21 @@ public interface JRedis {
 	 * @Redis SLAVEOF "no one"
 	 */
 	public void slaveofnone() throws RedisException;
+	
+	// ------------------------------------------------------------------------
+	// Diagnostics commands
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * @Redis ECHO
+	 * @param msg
+	 * @return
+	 * @throws RedisException
+	 */
+	public byte[] echo (byte[] msg) throws RedisException;
+	public byte[] echo (String msg) throws RedisException;
+	public byte[] echo (Number msg) throws RedisException;
+	public <T extends Serializable> 
+		byte[] echo (T msg) throws RedisException;
+	
 }

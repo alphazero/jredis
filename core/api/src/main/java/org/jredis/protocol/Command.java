@@ -123,6 +123,9 @@ public enum Command {
 	SHUTDOWN	(RequestType.NO_ARG, 		ResponseType.VIRTUAL),
 	
 	// Remote server control commands
+	ECHO		(RequestType.VALUE, 		ResponseType.BULK), 
+	
+	// Remote server control commands
 	INFO		(RequestType.NO_ARG, 		ResponseType.BULK), 
 	MONITOR	    (RequestType.NO_ARG, 		ResponseType.VIRTUAL), 
 	SLAVEOF		(RequestType.KEY_KEY, 		ResponseType.STATUS);
@@ -170,6 +173,8 @@ public enum Command {
     	NO_ARG,
     	/**  */
     	KEY,
+    	/**  */
+    	VALUE,
     	/**  */
     	KEY_KEY,
     	/**  */

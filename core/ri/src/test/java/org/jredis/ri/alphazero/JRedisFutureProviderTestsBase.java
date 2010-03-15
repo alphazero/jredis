@@ -1397,4 +1397,28 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	        fail(cmd + " FAULT: " + e.getCause().getLocalizedMessage(), e);
         }
 	}
+	@Test
+	public void testEcho() throws InterruptedException {
+		Future<byte[]> echoResp = null;
+		cmd = Command.ECHO.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			echoResp = provider.echo(dataList.get(0));
+			assertEquals(dataList.get(0), echoResp.get(), "data and echo results");
+
+			byte[] zerolenData = new byte[0];
+			assertEquals(zerolenData, provider.echo(zerolenData).get(), "zero len byte[] and echo results");
+			boolean expected = false;
+			try {
+				provider.echo((byte[])null);
+			}
+			catch(IllegalArgumentException e) { expected = true; }
+			assertTrue(expected, "expecting exception for null value to ECHO");
+
+		}
+        catch (ExecutionException e) {
+	        e.printStackTrace();
+	        fail(cmd + " FAULT: " + e.getCause().getLocalizedMessage(), e);
+        }
+	}
 }

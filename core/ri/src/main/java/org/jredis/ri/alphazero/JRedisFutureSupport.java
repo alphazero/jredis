@@ -33,7 +33,6 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.KeyValueSet;
 import org.jredis.ProviderException;
-import org.jredis.RedisException;
 import org.jredis.RedisType;
 import org.jredis.Sort;
 import org.jredis.connector.Connection;
@@ -909,6 +908,33 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return lpush(key, DefaultCodec.encode(value));
 	}
 	
+	// ------------------------------------------------------------------------
+	// Diagnostics commands
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * @Redis ECHO
+	 * @param msg
+	 * @return
+	 */
+	public Future<byte[]> echo (byte[] msg) {
+		if(msg == null) 
+			throw new IllegalArgumentException ("invalid value for echo => ["+msg+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.ECHO, msg);
+		return new FutureByteArray(futureResponse);
+		
+	}
+	public Future<byte[]> echo (String msg) {
+		return echo(DefaultCodec.encode(msg));
+	}
+	public Future<byte[]> echo (Number msg) {
+		return echo(String.valueOf(msg).getBytes());
+	}
+	public <T extends Serializable> 
+		Future<byte[]> echo (T msg) {
+			return echo (DefaultCodec.encode(msg));
+	}
 
 
 //	@Override
