@@ -877,4 +877,13 @@ public interface JRedis {
 	public byte[] echo (Number msg) throws RedisException;
 	public <T extends Serializable> 
 		byte[] echo (T msg) throws RedisException;
+	
+	/**
+	 * @Redis DEBUG OBJECT <key>
+	 * @param key
+	 * @return
+	 * @throws RedisException
+	 * @see {@link ObjectInfo}
+	 */
+	public ObjectInfo debug (String key) throws RedisException;
 }

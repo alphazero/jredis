@@ -131,6 +131,7 @@ public enum Command {
 	
 	// diagnostics commands
 	ECHO    	(RequestType.VALUE,     	ResponseType.BULK),
+	DEBUG		(RequestType.KEY_KEY, 		ResponseType.STRING), 
 	
 	// Remote server control commands
 	INFO		(RequestType.NO_ARG, 		ResponseType.BULK), 

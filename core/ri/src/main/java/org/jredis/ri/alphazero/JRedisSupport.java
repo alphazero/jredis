@@ -28,6 +28,7 @@ import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
 import org.jredis.KeyValueSet;
+import org.jredis.ObjectInfo;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.RedisType;
@@ -878,6 +879,25 @@ public abstract class JRedisSupport implements JRedis {
 		return type;
 	}
 
+//	@Override
+	public ObjectInfo debug (String key) throws RedisException {
+		
+		byte[] keybytes = getKeyBytes(key);
+		if(key.length() == 0)
+			throw new IllegalArgumentException ("invalid zero length key => ["+key+"]");
+
+		ObjectInfo	objectInfo = null;
+		/* ValueRespose */
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.DEBUG, "OBJECT".getBytes(), keybytes);
+			String stringValue = valResponse.getStringValue();
+			objectInfo = ObjectInfo.valueOf(stringValue);
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return objectInfo;
+	}
 	/* ------------------------------- commands returning Maps --------- */
 
 //	@Override

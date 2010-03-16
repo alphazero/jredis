@@ -787,4 +787,11 @@ public interface JRedisFuture {
 	public Future<byte[]> echo (Number msg);
 	public <T extends Serializable> 
 		Future<byte[]> echo (T msg);
+		
+	/**
+	 * @Redis DEBUG OBJECT <key>
+	 * @param key
+	 * @return
+	 */
+	public Future<ObjectInfo> debug (String key);
 }

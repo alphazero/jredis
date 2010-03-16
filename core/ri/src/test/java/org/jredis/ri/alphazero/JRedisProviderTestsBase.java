@@ -28,6 +28,7 @@ import static org.testng.Assert.fail;
 import java.util.List;
 import java.util.Map;
 import org.jredis.JRedis;
+import org.jredis.ObjectInfo;
 import org.jredis.RedisException;
 import org.jredis.RedisInfo;
 import org.jredis.RedisType;
@@ -2363,6 +2364,23 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			assertTrue(provider.type(keys.get(0))==RedisType.string, "type should be string");
 			assertTrue(provider.type(keys.get(1))==RedisType.set, "type should be set");
 			assertTrue(provider.type(keys.get(2))==RedisType.list, "type should be list");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#debug()}.
+	 */
+	@Test
+	public void testDebug() {
+		cmd = Command.DEBUG.code ;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			provider.set("foo", "bar");
+			ObjectInfo info = provider.debug("foo");
+			assertNotNull(info);
+			Log.log("DEBUG of key => %s", info);
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
