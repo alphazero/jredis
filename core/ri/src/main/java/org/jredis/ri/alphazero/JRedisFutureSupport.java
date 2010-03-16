@@ -32,6 +32,7 @@ import java.util.concurrent.TimeoutException;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.KeyValueSet;
+import org.jredis.ObjectInfo;
 import org.jredis.ProviderException;
 import org.jredis.RedisType;
 import org.jredis.Sort;
@@ -560,11 +561,18 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 //	@Override
 	public Future<RedisType> type(String key) {
-		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
-			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+		byte[] keybytes = getKeyBytes(key);
+		if(key.length() == 0)
+			throw new IllegalArgumentException ("invalid zero length key => ["+key+"]");
 
 		return new FutureRedisType(this.queueRequest(Command.TYPE, keybytes));
+	}
+	public Future<ObjectInfo> debug (String key) {
+		byte[] keybytes = getKeyBytes(key);
+		if(key.length() == 0)
+			throw new IllegalArgumentException ("invalid zero length key => ["+key+"]");
+
+		return new FutureObjectInfo (this.queueRequest(Command.DEBUG, "OBJECT".getBytes(), keybytes));
 	}
 
 	/* ------------------------------- commands returning Maps --------- */
@@ -573,6 +581,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	public Future<Map<String, String>> info() {
 		return new FutureInfo(this.queueRequest(Command.INFO));
 	}
+	
 
 	/* ------------------------------- commands returning Lists --------- */
 
@@ -936,7 +945,6 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 			return echo (DefaultCodec.encode(msg));
 	}
 
-
 //	@Override
 	public Future<Long> lrem(String key, byte[] value, int count) {
 		byte[] keybytes = null;
@@ -1218,6 +1226,27 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         	return getRedisType(valResp);
         }
 	}
+	public static class FutureObjectInfo extends FutureResultBase implements Future<ObjectInfo>{
+
+        protected FutureObjectInfo (Future<Response> pendingRequest) { super(pendingRequest); }
+
+        private final ObjectInfo getObjectInfo(ValueResponse resp){
+			String stringValue = resp.getStringValue();
+			return ObjectInfo.valueOf(stringValue);
+        }
+        public ObjectInfo get () throws InterruptedException, ExecutionException {
+        	ValueResponse valResp = (ValueResponse) pendingRequest.get();
+        	return getObjectInfo(valResp);
+        }
+
+        public ObjectInfo get (long timeout, TimeUnit unit)
+        	throws InterruptedException, ExecutionException, TimeoutException 
+        {
+        	ValueResponse valResp = (ValueResponse) pendingRequest.get(timeout, unit);
+        	return getObjectInfo(valResp);
+        }
+	}
+	
 	public static class FutureLong extends FutureResultBase implements Future<Long>{
 
         protected FutureLong (Future<Response> pendingRequest) { super(pendingRequest); }

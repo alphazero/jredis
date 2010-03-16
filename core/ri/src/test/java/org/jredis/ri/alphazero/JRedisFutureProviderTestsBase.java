@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
+import org.jredis.ObjectInfo;
 import org.jredis.RedisException;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.ResponseStatus;
@@ -1372,6 +1373,28 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			frStatus = provider.ping();
 			ResponseStatus status = frStatus.get();
 			assertTrue(!status.isError(), "ping return status");
+		}
+        catch (ExecutionException e) {
+	        e.printStackTrace();
+	        fail(cmd + " FAULT: " + e.getCause().getLocalizedMessage(), e);
+        }
+	}
+	/**
+	 * Test {@link JRedisFuture#debug()}
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testDebug () throws InterruptedException {
+		Future<ObjectInfo> frInfo = null;
+		cmd = Command.DEBUG.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			provider.set("foo", "bar");
+			frInfo = provider.debug("foo");
+			ObjectInfo info = frInfo.get();
+			assertNotNull(info);
+			Log.log("DEBUG of key => %s", info);
 		}
         catch (ExecutionException e) {
 	        e.printStackTrace();

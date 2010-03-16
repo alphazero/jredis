@@ -122,8 +122,9 @@ public enum Command {
 	LASTSAVE	(RequestType.NO_ARG,		ResponseType.NUMBER),
 	SHUTDOWN	(RequestType.NO_ARG, 		ResponseType.VIRTUAL),
 	
-	// Remote server control commands
+	// Diagnostics commands
 	ECHO		(RequestType.VALUE, 		ResponseType.BULK), 
+	DEBUG		(RequestType.KEY_KEY, 		ResponseType.STRING), 
 	
 	// Remote server control commands
 	INFO		(RequestType.NO_ARG, 		ResponseType.BULK), 
