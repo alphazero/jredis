@@ -753,12 +753,21 @@ public interface JRedis {
 	 * 
 	 * @Redis HLEN
 	 * @param key
-	 * @param field
 	 * @return # of fields/entries in the given hashtable.
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
 	public long hlen(String key)  throws RedisException;
+	
+	/**
+	 * 
+	 * @Redis HKEYS
+	 * @param key
+	 * @return list of keys in the given hashtable.
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.n")
+	public List<String> hkeys(String key)  throws RedisException;
 	
 //	// ------------------------------------------------------------------------
 //	// Transactional commands

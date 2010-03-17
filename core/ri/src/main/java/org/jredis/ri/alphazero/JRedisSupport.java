@@ -30,6 +30,7 @@ import org.jredis.JRedis;
 import org.jredis.KeyValueSet;
 import org.jredis.ObjectInfo;
 import org.jredis.ProviderException;
+import org.jredis.Redis;
 import org.jredis.RedisException;
 import org.jredis.RedisType;
 import org.jredis.Sort;
@@ -606,7 +607,7 @@ public abstract class JRedisSupport implements JRedis {
 			resp = response.getBooleanValue();
 		}
 		catch (ClassCastException e){
-			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
 		}
 		return resp;
 	}
@@ -626,7 +627,7 @@ public abstract class JRedisSupport implements JRedis {
 			resp = response.getBooleanValue();
 		}
 		catch (ClassCastException e){
-			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
 		}
 		return resp;
 	}
@@ -642,11 +643,27 @@ public abstract class JRedisSupport implements JRedis {
 			resp = response.getLongValue();
 		}
 		catch (ClassCastException e){
-			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
 		}
 		return resp;
 	}
-	
+	@Redis(versions="1.3.n")
+	public List<String> hkeys(String hashKey)  throws RedisException {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+
+		List<String> resp = null;
+		try {
+			MultiBulkResponse response = (MultiBulkResponse) this.serviceRequest(Command.HKEYS, hashKeyBytes);
+			if(null != response.getMultiBulkData()) resp = DefaultCodec.toStr(response.getMultiBulkData());
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resp;
+	}
+
 	
 	/* ------------------------------- commands returning int value --------- */
 

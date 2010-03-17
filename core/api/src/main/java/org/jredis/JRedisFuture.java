@@ -677,7 +677,6 @@ public interface JRedisFuture {
 	 * @param key
 	 * @param field
 	 * @return true if the spec'd field exists for the spec'd (hash type) key
-	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.5")
 	public Future<Boolean> hexists(String key, String field);
@@ -688,7 +687,6 @@ public interface JRedisFuture {
 	 * @param key
 	 * @param field
 	 * @return true if the spec'd field exists for the spec'd (hash type) key
-	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.5")
 	public Future<Boolean> hdel(String key, String field);
@@ -699,11 +697,19 @@ public interface JRedisFuture {
 	 * @param key
 	 * @param field
 	 * @return # of fields/entries for the given hash type key
-	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.5")
 	public Future<Long> hlen(String key);
 	
+	/**
+	 * 
+	 * @Redis HKEYS
+	 * @param key
+	 * @return list of keys in the given hashtable.
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.n")
+	public Future<List<String>> hkeys(String key);
 	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands

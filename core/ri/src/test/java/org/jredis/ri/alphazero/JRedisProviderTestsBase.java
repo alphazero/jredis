@@ -422,9 +422,6 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
 
-	/**
-	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, java.io.Serializable)}.
-	 */
 	@Test
 	public void testHsetHgetHexists() {
 		cmd = Command.HSET.code + " | " + Command.HGET + " | " + Command.HEXISTS;
@@ -444,6 +441,7 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			
 			assertEquals( provider.hlen(keys.get(0)), 4, "hlen value");
 			assertEquals( provider.hlen("some-random-key"), 0, "hlen of non-existent hash should be zero");
+
 			
 			assertEquals (provider.hget(keys.get(0), keys.get(1)), dataList.get(0), "hget of field with byte[] value");
 			assertEquals (DefaultCodec.toStr(provider.hget(keys.get(0), keys.get(2))), stringList.get(0), "hget of field with String value");
@@ -459,6 +457,37 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	}
 
 	
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, java.io.Serializable)}.
+	 */
+	@Test
+	public void testHkeys() {
+		cmd = Command.HKEYS.code + " | " + Command.HSET + " | " + Command.HDEL;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			assertTrue( provider.hset(keys.get(0), keys.get(1), dataList.get(0)), "hset using byte[] value");
+			assertTrue( provider.hset(keys.get(0), keys.get(2), stringList.get(0)), "hset using String value");
+			assertTrue( provider.hset(keys.get(0), keys.get(3), 222), "hset using Number value");
+			objectList.get(0).setName("Hash Stash");
+			assertTrue( provider.hset(keys.get(0), keys.get(4), objectList.get(0)), "hset using Object value");
+			
+			List<String> hkeys = provider.hkeys(keys.get(0));
+			assertEquals( hkeys.size(), 4, "keys list length");
+			
+			for(String key : hkeys){
+				assertTrue(provider.hdel(keys.get(0), key), "deleting existing field should be true");
+			}
+			assertEquals(provider.hlen(keys.get(0)), 0, "hash should empty");
+			List<String> hkeys2 = provider.hkeys(keys.get(0));
+			assertEquals( hkeys2.size(), 0, "keys list should be empty");
+			
+			List<String> hkeys3 = provider.hkeys("no-such-hash");
+			assertEquals( hkeys3, null, "keys list of non-existent hash should be null.");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
 	
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, byte[])}.

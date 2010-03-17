@@ -481,6 +481,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(futureResponse);
 	}
 	
+	public Future<List<String>> hkeys(String hashKey) {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.HKEYS, hashKeyBytes);
+		return new FutureKeyList (futureResponse);
+	}
+	
 	
 	/* ------------------------------- commands returning int value --------- */
 
@@ -1356,19 +1365,24 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //    		return list;
 //        }
         public List<String> get () throws InterruptedException, ExecutionException {
-//        	BulkResponse resp = (BulkResponse) pendingRequest.get();
-//        	return getResultList(resp);
+
         	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get();
-        	return DefaultCodec.toStr(resp.getMultiBulkData());
+        	List<byte[]> multibulkdata = resp.getMultiBulkData();
+        	List<String> list = null;
+        	if(null != multibulkdata)
+        		list = DefaultCodec.toStr(multibulkdata);
+        	return list;
         }
 
         public List<String> get (long timeout, TimeUnit unit)
         	throws InterruptedException, ExecutionException, TimeoutException 
         {
-//        	BulkResponse resp = (BulkResponse) pendingRequest.get(timeout, unit);
-//        	return getResultList(resp);
             	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get(timeout, unit);
-            	return DefaultCodec.toStr(resp.getMultiBulkData());
+            	List<byte[]> multibulkdata = resp.getMultiBulkData();
+            	List<String> list = null;
+            	if(null != multibulkdata)
+            		list = DefaultCodec.toStr(multibulkdata);
+            	return list;
         }
 	}
 	public static class FutureInfo extends FutureResultBase implements Future<Map<String, String>>{
