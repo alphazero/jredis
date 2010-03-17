@@ -426,13 +426,17 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, java.io.Serializable)}.
 	 */
 	@Test
-	public void testHsetHget() {
-		cmd = Command.HSET.code + " | " + Command.HGET;
+	public void testHsetHgetHexists() {
+		cmd = Command.HSET.code + " | " + Command.HGET + " | " + Command.HEXISTS;
 		Log.log("TEST: %s command", cmd);
 		try {
 			provider.flushdb();
 			
 			assertTrue( provider.hset(keys.get(0), keys.get(1), dataList.get(0)), "hset using byte[] value");
+			assertTrue( provider.hexists(keys.get(0), keys.get(1)), "field should exist");
+			assertTrue( !provider.hexists(keys.get(0), keys.get(2)), "field should NOT exist");
+			assertTrue( !provider.hset(keys.get(0), keys.get(1), dataList.get(0)), "repeated hset using byte[] value should return false");
+			
 			assertTrue( provider.hset(keys.get(0), keys.get(2), stringList.get(0)), "hset using String value");
 			assertTrue( provider.hset(keys.get(0), keys.get(3), 222), "hset using Number value");
 			objectList.get(0).setName("Hash Stash");

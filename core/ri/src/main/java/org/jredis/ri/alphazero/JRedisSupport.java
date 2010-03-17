@@ -591,6 +591,26 @@ public abstract class JRedisSupport implements JRedis {
 		return bulkData;
 	}
 	
+	public boolean hexists(String hashKey, String hashField)  throws RedisException {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+
+		byte[] hashFieldBytes = null;
+		if((hashFieldBytes = getKeyBytes(hashField)) == null) 
+			throw new IllegalArgumentException ("invalid field => ["+hashField+"]");
+
+		boolean resp = false;
+		try {
+			ValueResponse response = (ValueResponse) this.serviceRequest(Command.HEXISTS, hashKeyBytes, hashFieldBytes);
+			resp = response.getBooleanValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resp;
+	}
+	
 	
 	/* ------------------------------- commands returning int value --------- */
 

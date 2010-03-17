@@ -713,7 +713,7 @@ public interface JRedis {
 	 * @param object
 	 * @return
 	 */
-	@Redis(versions="1.3.n")
+	@Redis(versions="1.3.4")
 	public <T extends Serializable> 
 		boolean hset(String key, String field, T object)  throws RedisException;
 	
@@ -723,8 +723,20 @@ public interface JRedis {
 	 * @param field
 	 * @return
 	 */
-	@Redis(versions="1.3.n")
+	@Redis(versions="1.3.4")
 	public byte[] hget(String key, String field)  throws RedisException;
+	
+	
+	/**
+	 * 
+	 * @Redis HEXISTS
+	 * @param key
+	 * @param field
+	 * @return true if the spec'd field exists for the spec'd (hash type) key
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.n")
+	public boolean hexists(String key, String field)  throws RedisException;
 	
 //	// ------------------------------------------------------------------------
 //	// Transactional commands

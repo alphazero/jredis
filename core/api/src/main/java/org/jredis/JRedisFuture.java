@@ -658,7 +658,7 @@ public interface JRedisFuture {
 	 * @param object
 	 * @return
 	 */
-	@Redis(versions="1.3.n")
+	@Redis(versions="1.3.4")
 	public <T extends Serializable> 
 		Future<Boolean> hset(String key, String field, T object);
 	
@@ -668,8 +668,19 @@ public interface JRedisFuture {
 	 * @param field
 	 * @return
 	 */
-	@Redis(versions="1.3.n")
+	@Redis(versions="1.3.4")
 	public Future<byte[]> hget(String key, String field);
+	
+	/**
+	 * 
+	 * @Redis HEXISTS
+	 * @param key
+	 * @param field
+	 * @return true if the spec'd field exists for the spec'd (hash type) key
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.5")
+	public Future<Boolean> hexists(String key, String field);
 	
 	
 	// ------------------------------------------------------------------------

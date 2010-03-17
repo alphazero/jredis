@@ -1073,11 +1073,14 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 
 	@Test
 	public void testHsetHget() throws InterruptedException {
-		cmd = Command.HSET.code + " | " + Command.HGET;
+		cmd = Command.HSET.code + " | " + Command.HGET + " | " + Command.HEXISTS;
 		Log.log("TEST: %s command", cmd);
 		try {
 			provider.flushdb();
 			Future<Boolean> hsetResp1 = provider.hset(keys.get(0), keys.get(1), dataList.get(0));
+			Future<Boolean> hexistsResp1 = provider.hexists(keys.get(0), keys.get(1));
+			Future<Boolean> hexistsResp2 = provider.hexists(keys.get(0), keys.get(2));
+			Future<Boolean> hsetResp1_1 = provider.hset(keys.get(0), keys.get(1), dataList.get(0));
 			Future<Boolean> hsetResp2 = provider.hset(keys.get(0), keys.get(2), stringList.get(0));
 			Future<Boolean> hsetResp3 = provider.hset(keys.get(0), keys.get(3), 222);
 			objectList.get(0).setName("Hash Stash");
@@ -1090,6 +1093,9 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			
 			try {
 				assertTrue (hsetResp1.get(), "hset using byte[] value");
+				assertTrue (hexistsResp1.get(), "hexists of field should be true");
+				assertTrue (!hexistsResp2.get(), "hexists of non existent field should be false");
+				assertTrue (!hsetResp1_1.get(), "second hset using byte[] value should return false");
 				assertTrue (hsetResp2.get(), "hset using String value");
 				assertTrue (hsetResp3.get(), "hset using Number value");
 				assertTrue (hsetResp4.get(), "hset using Object value");

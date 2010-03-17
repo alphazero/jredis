@@ -108,6 +108,7 @@ public enum Command {
 	// Commands operating on hashes
 	HSET 		(RequestType.KEY_KEY_VALUE, ResponseType.BOOLEAN),
 	HGET 		(RequestType.KEY_VALUE, 	ResponseType.BULK),
+	HEXISTS 	(RequestType.KEY_VALUE, 	ResponseType.BOOLEAN),
 	
 	// transactional commands
 	MULTI		(RequestType.NO_ARG, 		ResponseType.STATUS),

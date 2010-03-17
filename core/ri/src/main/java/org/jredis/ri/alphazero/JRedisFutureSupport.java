@@ -445,6 +445,20 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	
 	
+	public Future<Boolean> hexists(String hashKey, String hashField) {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+
+		byte[] hashFieldBytes = null;
+		if((hashFieldBytes = getKeyBytes(hashField)) == null) 
+			throw new IllegalArgumentException ("invalid field => ["+hashField+"]");
+		
+		Future<Response> futureResponse = this.queueRequest(Command.HEXISTS, hashKeyBytes, hashFieldBytes);
+		return new FutureBoolean(futureResponse);
+	}
+	
+	
 	/* ------------------------------- commands returning int value --------- */
 
 //	@Override
