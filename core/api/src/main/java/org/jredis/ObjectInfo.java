@@ -30,21 +30,21 @@ import java.util.StringTokenizer;
  * @since   alpha.0
  * @see JRedis#debug(String)
  */
-// serializedlength:11
+
 public class ObjectInfo {
 	private final String keyAddress;
 	private final long keyRefCount;
 	private final String valueAddress;
 	private final long valueRefCount;
-	private final int encoding;
+	private final ObjectEncoding encoding;
 	private final long serializedLength;
 	public ObjectInfo(
-			String 	keyAddress,
-			long	keyRefCount,
-			String 	valueAddress,
-			long	valueRefCount,
-			int		encoding,
-			long	serializedLength
+			String 				keyAddress,
+			long				keyRefCount,
+			String 				valueAddress,
+			long				valueRefCount,
+			ObjectEncoding		encoding,
+			long				serializedLength
 		) 
 	{
 		this.keyAddress = keyAddress;
@@ -71,7 +71,7 @@ public class ObjectInfo {
     	return valueRefCount;
     }
     /**  @return the encoding */
-    public int getEncoding () {
+    public ObjectEncoding getEncoding () {
 	    return encoding;
     }
     /**
@@ -88,7 +88,7 @@ public class ObjectInfo {
     public String toString() {
     	Formatter formatter = new Formatter();
     	formatter.format(
-    			"ObjectInfo: key [addr:%s  refCnt: %d] value [addr:%s  refCnt: %d] encoding:%d serializedLength: %d" , 
+    			"ObjectInfo: key [addr:%s  refCnt: %d] value [addr:%s  refCnt: %d] encoding:%s serializedLength: %d" , 
     			keyAddress, keyRefCount, valueAddress, valueRefCount, encoding, serializedLength);
     	return formatter.toString();
     }
@@ -112,10 +112,17 @@ public class ObjectInfo {
     	keyCnt = keyCnt.substring(0, keyCnt.length()-1);
     	String valAddr = tokens.get(4).substring(3);
     	String valCnt = tokens.get(5).substring("refcount:".length());
-    	String encoding = tokens.get(6).substring("encoding:".length());
+    	String encodingRep = tokens.get(6).substring("encoding:".length());
     	String serlen = tokens.get(7).substring("serializedlength:".length());
 
-    	ObjectInfo info = new ObjectInfo(keyAddr, Integer.parseInt(keyCnt), valAddr, Integer.parseInt(valCnt), Integer.parseInt(encoding), Integer.parseInt(serlen));
+    	ObjectInfo info = new ObjectInfo(
+    			keyAddr, 
+    			Integer.parseInt(keyCnt), 
+    			valAddr, 
+    			Integer.parseInt(valCnt), 
+    	    	ObjectEncoding.valueOf(encodingRep.toUpperCase()),
+    			Integer.parseInt(serlen)
+    		);
 
     	return info;
     }
