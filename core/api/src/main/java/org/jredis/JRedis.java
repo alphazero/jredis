@@ -749,6 +749,17 @@ public interface JRedis {
 	@Redis(versions="1.3.n")
 	public boolean hdel(String key, String field)  throws RedisException;
 	
+	/**
+	 * 
+	 * @Redis HLEN
+	 * @param key
+	 * @param field
+	 * @return # of fields/entries in the given hashtable.
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.n")
+	public long hlen(String key)  throws RedisException;
+	
 //	// ------------------------------------------------------------------------
 //	// Transactional commands
 //	// ------------------------------------------------------------------------

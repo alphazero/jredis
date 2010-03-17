@@ -442,6 +442,9 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			objectList.get(0).setName("Hash Stash");
 			assertTrue( provider.hset(keys.get(0), keys.get(4), objectList.get(0)), "hset using Object value");
 			
+			assertEquals( provider.hlen(keys.get(0)), 4, "hlen value");
+			assertEquals( provider.hlen("some-random-key"), 0, "hlen of non-existent hash should be zero");
+			
 			assertEquals (provider.hget(keys.get(0), keys.get(1)), dataList.get(0), "hget of field with byte[] value");
 			assertEquals (DefaultCodec.toStr(provider.hget(keys.get(0), keys.get(2))), stringList.get(0), "hget of field with String value");
 			assertEquals (DefaultCodec.toLong(provider.hget(keys.get(0), keys.get(3))).longValue(), 222, "hget of field with Number value");

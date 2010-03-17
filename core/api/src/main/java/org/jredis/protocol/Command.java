@@ -110,6 +110,7 @@ public enum Command {
 	HGET 		(RequestType.KEY_VALUE, 	ResponseType.BULK),
 	HEXISTS 	(RequestType.KEY_VALUE, 	ResponseType.BOOLEAN),
 	HDEL 		(RequestType.KEY_VALUE, 	ResponseType.BOOLEAN),
+	HLEN 		(RequestType.KEY, 			ResponseType.NUMBER),
 	
 	// transactional commands
 	MULTI		(RequestType.NO_ARG, 		ResponseType.STATUS),

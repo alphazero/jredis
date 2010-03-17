@@ -693,6 +693,17 @@ public interface JRedisFuture {
 	@Redis(versions="1.3.5")
 	public Future<Boolean> hdel(String key, String field);
 	
+	/**
+	 * 
+	 * @Redis HLEN
+	 * @param key
+	 * @param field
+	 * @return # of fields/entries for the given hash type key
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.5")
+	public Future<Long> hlen(String key);
+	
 	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands

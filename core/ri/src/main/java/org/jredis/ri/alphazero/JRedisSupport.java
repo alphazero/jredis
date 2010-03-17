@@ -631,6 +631,22 @@ public abstract class JRedisSupport implements JRedis {
 		return resp;
 	}
 	
+	public long hlen(String hashKey)  throws RedisException {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+
+		long resp = 0;
+		try {
+			ValueResponse response = (ValueResponse) this.serviceRequest(Command.HLEN, hashKeyBytes);
+			resp = response.getLongValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resp;
+	}
+	
 	
 	/* ------------------------------- commands returning int value --------- */
 
