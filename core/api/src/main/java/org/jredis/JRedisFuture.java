@@ -682,6 +682,17 @@ public interface JRedisFuture {
 	@Redis(versions="1.3.5")
 	public Future<Boolean> hexists(String key, String field);
 	
+	/**
+	 * 
+	 * @Redis HDEL
+	 * @param key
+	 * @param field
+	 * @return true if the spec'd field exists for the spec'd (hash type) key
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.5")
+	public Future<Boolean> hdel(String key, String field);
+	
 	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands

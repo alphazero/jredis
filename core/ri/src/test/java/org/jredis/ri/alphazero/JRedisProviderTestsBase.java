@@ -447,6 +447,10 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			assertEquals (DefaultCodec.toLong(provider.hget(keys.get(0), keys.get(3))).longValue(), 222, "hget of field with Number value");
 			TestBean objval = DefaultCodec.decode(provider.hget(keys.get(0), keys.get(4)));
 			assertEquals (objval.getName(), objectList.get(0).getName(), "hget of field with Object value");
+			
+			assertTrue( provider.hdel(keys.get(0), keys.get(1)), "hdel of existing field should be true");
+			assertTrue( !provider.hdel(keys.get(0), keys.get(1)), "hdel of non-existing field should be false");
+			
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}

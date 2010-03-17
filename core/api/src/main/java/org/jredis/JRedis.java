@@ -738,6 +738,17 @@ public interface JRedis {
 	@Redis(versions="1.3.n")
 	public boolean hexists(String key, String field)  throws RedisException;
 	
+	/**
+	 * 
+	 * @Redis HDEL
+	 * @param key
+	 * @param field
+	 * @return true if the spec'd field exists for the spec'd (hash type) key
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.n")
+	public boolean hdel(String key, String field)  throws RedisException;
+	
 //	// ------------------------------------------------------------------------
 //	// Transactional commands
 //	// ------------------------------------------------------------------------

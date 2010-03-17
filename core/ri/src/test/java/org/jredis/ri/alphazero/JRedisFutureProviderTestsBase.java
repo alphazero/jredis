@@ -1090,6 +1090,9 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			Future<byte[]> hgetResp2 = provider.hget(keys.get(0), keys.get(2));
 			Future<byte[]> hgetResp3 = provider.hget(keys.get(0), keys.get(3));
 			Future<byte[]> hgetResp4 = provider.hget(keys.get(0), keys.get(4));
+
+			Future<Boolean> hdelResp1 = provider.hdel(keys.get(0), keys.get(1));
+			Future<Boolean> hdelResp2 = provider.hdel(keys.get(0), keys.get(1));
 			
 			try {
 				assertTrue (hsetResp1.get(), "hset using byte[] value");
@@ -1105,6 +1108,10 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				assertEquals (DefaultCodec.toLong(hgetResp3.get()).longValue(), 222, "hget of field with Number value");
 				TestBean objval = DefaultCodec.decode(hgetResp4.get());
 				assertEquals (objval.getName(), objectList.get(0).getName(), "hget of field with Object value");
+				
+				assertTrue (hexistsResp1.get(), "hdel of field should be true");
+				assertTrue (!hexistsResp2.get(), "hdel of non-existent field should be false");
+
 			}
 			catch(ExecutionException e){
 				Throwable cause = e.getCause();
