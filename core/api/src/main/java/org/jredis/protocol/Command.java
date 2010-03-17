@@ -112,6 +112,7 @@ public enum Command {
 	HDEL 		(RequestType.KEY_VALUE, 	ResponseType.BOOLEAN),
 	HLEN 		(RequestType.KEY, 			ResponseType.NUMBER),
 	HKEYS 		(RequestType.KEY, 			ResponseType.MULTI_BULK),
+	HVALS 		(RequestType.KEY, 			ResponseType.MULTI_BULK),
 	
 	// transactional commands
 	MULTI		(RequestType.NO_ARG, 		ResponseType.STATUS),

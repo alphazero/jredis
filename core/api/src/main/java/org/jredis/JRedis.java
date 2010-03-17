@@ -769,6 +769,16 @@ public interface JRedis {
 	@Redis(versions="1.3.n")
 	public List<String> hkeys(String key)  throws RedisException;
 	
+	/**
+	 * 
+	 * @Redis HVALS
+	 * @param key
+	 * @return list of values in the given hashtable.
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.n")
+	public List<byte[]> hvals(String key)  throws RedisException;
+	
 //	// ------------------------------------------------------------------------
 //	// Transactional commands
 //	// ------------------------------------------------------------------------

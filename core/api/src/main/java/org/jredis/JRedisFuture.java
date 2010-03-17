@@ -711,6 +711,16 @@ public interface JRedisFuture {
 	@Redis(versions="1.3.n")
 	public Future<List<String>> hkeys(String key);
 	
+	/**
+	 * 
+	 * @Redis HVALS
+	 * @param key
+	 * @return list of values in the given hashtable.
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.n")
+	public Future<List<byte[]>> hvals(String key);
+	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands
 	// ------------------------------------------------------------------------

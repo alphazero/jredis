@@ -1180,6 +1180,58 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
 
+	@Test
+	public void testHvals() throws InterruptedException {
+		cmd = Command.HSET.code + " | " + Command.HVALS;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			Future<Boolean> hsetResp1 = provider.hset(keys.get(0), keys.get(1), dataList.get(0));
+			Future<Boolean> hsetResp2 = provider.hset(keys.get(0), keys.get(2), stringList.get(0));
+			Future<Boolean> hsetResp3 = provider.hset(keys.get(0), keys.get(3), 222);
+			objectList.get(0).setName("Hash Stash");
+			Future<Boolean> hsetResp4 = provider.hset(keys.get(0), keys.get(4), objectList.get(0));
+			
+			// get keys
+			Future<List<String>> hkeysResp1 = provider.hkeys(keys.get(0));
+			// get values
+			Future<List<byte[]>> hvalsResp1 = provider.hvals(keys.get(0));
+			// alright - empty the hash
+			for(int i=1; i<5; i++)
+	            try {
+	                assertTrue(provider.hdel(keys.get(0), keys.get(i)).get());
+                }
+                catch (ExecutionException e) {
+    				Throwable cause = e.getCause();
+    				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+                }
+			// get values again
+    			// get values
+			Future<List<byte[]>> hvalsResp2 = provider.hvals(keys.get(0));
+			// nil case
+			Future<List<byte[]>> hvalsResp3 = provider.hvals("no-such-hash");
+			
+			
+			try {
+				assertTrue (hsetResp1.get(), "hset using byte[] value");
+				assertTrue (hsetResp2.get(), "hset using String value");
+				assertTrue (hsetResp3.get(), "hset using Number value");
+				assertTrue (hsetResp4.get(), "hset using Object value");
+				
+				List<byte[]> hvals = hvalsResp1.get(); 
+				assertEquals (hvals.size(), 4, "values list size should be 4");
+				assertEquals (hvalsResp2.get().size(), 0, "values list size should be 0");
+				assertEquals (hvalsResp3.get(), null, "list of values of non-existent hash should be null");
+
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
 	
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, byte[])}.

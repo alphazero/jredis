@@ -490,6 +490,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureKeyList (futureResponse);
 	}
 	
+	public Future<List<byte[]>> hvals(String hashKey) {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.HKEYS, hashKeyBytes);
+		return new FutureByteArrayList (futureResponse);
+	}
+	
 	
 	/* ------------------------------- commands returning int value --------- */
 
