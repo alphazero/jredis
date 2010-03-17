@@ -681,6 +681,29 @@ public abstract class JRedisSupport implements JRedis {
 		return resp;
 	}
 
+	@Redis(versions="1.3.n")
+	public Map<String, byte[]> hgetall(String hashKey)  throws RedisException {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+
+		Map<String, byte[]> resp = null;
+		try {
+			MultiBulkResponse response = (MultiBulkResponse) this.serviceRequest(Command.HGETALL, hashKeyBytes);
+			List<byte[]> bulkdata = response.getMultiBulkData();
+			if(null != bulkdata) {
+				resp = new HashMap<String, byte[]>(bulkdata.size()/2);
+				for(int i=0; i<bulkdata.size(); i+=2){
+					resp.put(DefaultCodec.toStr(bulkdata.get(i)), bulkdata.get(i+1));
+				}
+			}
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resp;
+	}
+
 	
 	/* ------------------------------- commands returning int value --------- */
 

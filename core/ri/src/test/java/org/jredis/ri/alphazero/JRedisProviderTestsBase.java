@@ -490,7 +490,7 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	}
 	
 	/**
-	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#hkeys(java.lang.String, java.io.Serializable)}.
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#hvals(java.lang.String, java.io.Serializable)}.
 	 */
 	@Test
 	public void testHvals() {
@@ -520,6 +520,48 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			
 			List<byte[]> hvals3 = provider.hvals("no-such-hash");
 			assertEquals( hvals3, null, "values list of non-existent hash should be null.");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#hvals(java.lang.String, java.io.Serializable)}.
+	 */
+	@Test
+	public void testHgetall() {
+		cmd = Command.HGETALL.code + " | " + Command.HSET + " | " + Command.HDEL;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			assertTrue( provider.hset(keys.get(0), keys.get(1), dataList.get(0)), "hset using byte[] value");
+			assertTrue( provider.hset(keys.get(0), keys.get(2), stringList.get(0)), "hset using String value");
+			assertTrue( provider.hset(keys.get(0), keys.get(3), 222), "hset using Number value");
+			objectList.get(0).setName("Hash Stash");
+			assertTrue( provider.hset(keys.get(0), keys.get(4), objectList.get(0)), "hset using Object value");
+			
+			Map<String, byte[]> hmap = provider.hgetall(keys.get(0));
+			assertEquals( hmap.size(), 4, "hash map length");
+			
+			List<String> hkeys = provider.hkeys(keys.get(0));
+			assertEquals( hkeys.size(), 4, "keys list length");
+			
+			for(String key : hkeys)
+				assertTrue(hmap.get(key) != null, "key should exists in map and have a corresponding non null value");
+			
+			assertEquals(hmap.get(keys.get(1)), dataList.get(0), "byte[] value mapping should correspond to prior HSET");
+			assertEquals(DefaultCodec.toStr(hmap.get(keys.get(2))), stringList.get(0), "String value mapping should correspond to prior HSET");
+			assertEquals(DefaultCodec.toLong(hmap.get(keys.get(3))).longValue(), 222, "Number value mapping should correspond to prior HSET");
+			assertEquals(DefaultCodec.decode(hmap.get(keys.get(4))), objectList.get(0), "Object value mapping should correspond to prior HSET");
+			
+			for(String key : hkeys)
+				assertTrue(provider.hdel(keys.get(0), key), "deletion of existing key in hash should be true");
+			
+			Map<String, byte[]> hmap2 = provider.hgetall(keys.get(0));
+			assertEquals( hmap2.size(), 0, "hash map should be empty");
+			
+			Map<String, byte[]> hmap3 = provider.hgetall("no-such-hash");
+			assertEquals( hmap3, null, "hgetall for non existent hash should be null");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}

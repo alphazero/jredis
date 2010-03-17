@@ -25,6 +25,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
@@ -1223,6 +1224,70 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				assertEquals (hvalsResp2.get().size(), 0, "values list size should be 0");
 				assertEquals (hvalsResp3.get(), null, "list of values of non-existent hash should be null");
 
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
+
+	@Test
+	public void testHgetall() throws InterruptedException {
+		cmd = Command.HSET.code + " | " + Command.HGETALL;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			Future<Boolean> hsetResp1 = provider.hset(keys.get(0), keys.get(1), dataList.get(0));
+			Future<Boolean> hsetResp2 = provider.hset(keys.get(0), keys.get(2), stringList.get(0));
+			Future<Boolean> hsetResp3 = provider.hset(keys.get(0), keys.get(3), 222);
+			objectList.get(0).setName("Hash Stash");
+			Future<Boolean> hsetResp4 = provider.hset(keys.get(0), keys.get(4), objectList.get(0));
+			
+			// get keys
+			Future<List<String>> frHkeys = provider.hkeys(keys.get(0));
+			
+			// get all
+			Future<Map<String, byte[]>> frHmap1 = provider.hgetall(keys.get(0));
+			
+			// delete all keys
+			for(int i =1; i<5; i++) {
+	            try {
+	                provider.hdel(keys.get(0), keys.get(i)).get();
+                }
+                catch (ExecutionException e) {
+    				Throwable cause = e.getCause();
+    				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+                }
+			}
+			// get all again
+			Future<Map<String, byte[]>> frHmap2 = provider.hgetall(keys.get(0));
+    			
+			// get all for non-existent hash
+			Future<Map<String, byte[]>> frHmap3 = provider.hgetall("no-such-hash");
+        			
+			try {
+				assertTrue (hsetResp1.get(), "hset using byte[] value");
+				assertTrue (hsetResp2.get(), "hset using String value");
+				assertTrue (hsetResp3.get(), "hset using Number value");
+				assertTrue (hsetResp4.get(), "hset using Object value");
+				
+				assertEquals( frHmap1.get().size(), 4, "hash map length");
+				assertEquals( frHkeys.get().size(), 4, "keys list length");
+
+				Map<String, byte[]> hmap = frHmap1.get();
+				assertEquals(hmap.get(keys.get(1)), dataList.get(0), "byte[] value mapping should correspond to prior HSET");
+				assertEquals(DefaultCodec.toStr(hmap.get(keys.get(2))), stringList.get(0), "String value mapping should correspond to prior HSET");
+				assertEquals(DefaultCodec.toLong(hmap.get(keys.get(3))).longValue(), 222, "Number value mapping should correspond to prior HSET");
+				assertEquals(DefaultCodec.decode(hmap.get(keys.get(4))), objectList.get(0), "Object value mapping should correspond to prior HSET");
+				
+				Map<String, byte[]> hmap2 = frHmap2.get();
+				assertEquals( hmap2.size(), 0, "hash map should be empty");
+				
+				Map<String, byte[]> hmap3 = frHmap3.get();
+				assertEquals( hmap3, null, "hgetall for non existent hash should be null");
 			}
 			catch(ExecutionException e){
 				Throwable cause = e.getCause();

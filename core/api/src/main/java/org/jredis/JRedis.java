@@ -779,6 +779,16 @@ public interface JRedis {
 	@Redis(versions="1.3.n")
 	public List<byte[]> hvals(String key)  throws RedisException;
 	
+	/**
+	 * 
+	 * @Redis HGETALL
+	 * @param key
+	 * @return the given hash as a Map<String, byte[]>
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.n")
+	public Map<String, byte[]> hgetall(String key)  throws RedisException;
+	
 //	// ------------------------------------------------------------------------
 //	// Transactional commands
 //	// ------------------------------------------------------------------------

@@ -499,6 +499,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArrayList (futureResponse);
 	}
 	
+	public Future<Map<String, byte[]>> hgetall(String hashKey) {
+		byte[] hashKeyBytes = null;
+		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.HGETALL, hashKeyBytes);
+		return new FutureDataDictionary (futureResponse);
+	}
+	
 	
 	/* ------------------------------- commands returning int value --------- */
 
@@ -1361,6 +1370,34 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         	return resp.getMultiBulkData();
         }
 	}
+
+	public static class FutureDataDictionary extends FutureResultBase implements Future<Map<String, byte[]>>{
+
+        protected FutureDataDictionary (Future<Response> pendingRequest) { super(pendingRequest); }
+
+        public Map<String, byte[]> get () throws InterruptedException, ExecutionException {
+        	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get();
+        	return convert(resp.getMultiBulkData());
+        }
+
+        public Map<String, byte[]> get (long timeout, TimeUnit unit)
+        	throws InterruptedException, ExecutionException, TimeoutException 
+        {
+        	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get(timeout, unit);
+        	return convert(resp.getMultiBulkData());
+        }
+        private static final Map<String, byte[]> convert (List<byte[]> bulkdata) {
+        	Map<String, byte[]> map = null;
+        	if(null != bulkdata) {
+        		map = new HashMap<String, byte[]>(bulkdata.size()/2);
+        		for(int i=0; i<bulkdata.size(); i+=2){
+        			map.put(DefaultCodec.toStr(bulkdata.get(i)), bulkdata.get(i+1));
+        		}
+        	}
+        	return map;
+        }
+	}
+
 	public static class FutureKeyList extends FutureResultBase implements Future<List<String>>{
 
         protected FutureKeyList (Future<Response> pendingRequest) { super(pendingRequest); }
