@@ -773,6 +773,13 @@ public interface JRedis {
 	public void bgsave () throws RedisException;
 
 	/**
+	 * @Redis BGREWRITEAOF
+	 * @return ack message.  
+	 * @throws RedisException
+	 */
+	public String bgrewriteaof () throws RedisException;
+
+	/**
 	 * @Redis LASTSAVE
 	 * @return
 	 * @throws RedisException

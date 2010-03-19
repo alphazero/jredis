@@ -1446,6 +1446,21 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	}
 	
 	@Test
+	public void testBgrewriteaof() throws InterruptedException {
+		Future<String> cmdRespMsg = null;
+		cmd = Command.BGREWRITEAOF.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			cmdRespMsg = provider.bgrewriteaof();
+			assertTrue(cmdRespMsg.get() != null, "cmd response message should not be null");
+		}
+        catch (ExecutionException e) {
+	        e.printStackTrace();
+	        fail(cmd + " FAULT: " + e.getCause().getLocalizedMessage(), e);
+        }
+	}
+	
+	@Test
 	public void testExpireat() throws InterruptedException {
 		cmd = Command.EXPIREAT.code;
 		Log.log("TEST: %s command", cmd);

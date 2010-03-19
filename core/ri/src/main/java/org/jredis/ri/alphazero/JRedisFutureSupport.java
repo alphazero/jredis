@@ -111,6 +111,13 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	public FutureStatus bgsave() {
 		return new FutureStatus(this.queueRequest(Command.BGSAVE));
 	}
+	
+//	@Override
+	public FutureString bgrewriteaof() {
+		Future<Response> futureResponse = this.queueRequest(Command.BGREWRITEAOF);
+		return new FutureString(futureResponse);
+	}
+	
 //	@Override
 	public FutureStatus ping() {
 		return new FutureStatus(this.queueRequest(Command.PING));

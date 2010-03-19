@@ -702,6 +702,12 @@ public interface JRedisFuture {
 	public Future<ResponseStatus> bgsave ();
 
 	/**
+	 * @Redis BGREWRITEAOF
+	 * @return ack message.  
+	 */
+	public Future<String> bgrewriteaof ();
+
+	/**
 	 * @Redis LASTSAVE
 	 * @return
 	 */
