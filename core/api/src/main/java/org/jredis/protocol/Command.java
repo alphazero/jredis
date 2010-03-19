@@ -102,6 +102,7 @@ public enum Command {
 	ZCARD		(RequestType.KEY,			ResponseType.NUMBER), 
 	ZSCORE		(RequestType.KEY_VALUE,		ResponseType.BULK),
 	ZRANK		(RequestType.KEY_VALUE,		ResponseType.NUMBER),
+	ZREVRANK	(RequestType.KEY_VALUE,		ResponseType.NUMBER),
 	ZRANGE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
 	ZREVRANGE	(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
 	ZINCRBY		(RequestType.KEY_IDX_VALUE, ResponseType.BULK),

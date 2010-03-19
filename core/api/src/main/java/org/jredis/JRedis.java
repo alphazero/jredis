@@ -653,6 +653,19 @@ public interface JRedis {
 		long zrank (String setkey, T object) throws RedisException;
 
 	/**
+	 * @Redis ZREVRANK
+	 * @param setkey
+	 * @param member
+	 * @return
+	 * @throws RedisException
+	 */
+	public long zrevrank (String setkey, byte[] member) throws RedisException;
+	public long zrevrank (String setkey, String stringValue) throws RedisException;
+	public long zrevrank (String setkey, Number numberValue) throws RedisException;
+	public <T extends Serializable> 
+		long zrevrank (String setkey, T object) throws RedisException;
+
+	/**
 	 * @Redis ZRANGE
 	 * @param setkey
 	 * @param from

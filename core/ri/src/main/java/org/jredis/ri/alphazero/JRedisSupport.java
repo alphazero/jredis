@@ -1728,6 +1728,36 @@ public abstract class JRedisSupport implements JRedis {
 		return zrank (key, DefaultCodec.encode(value));
 	}
 
+//	@Override
+	public long zrevrank(String key, byte[] member) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		long resvalue = -1;
+		try {
+			ValueResponse bulkResponse = (ValueResponse) this.serviceRequest(Command.ZREVRANK, keybytes, member);
+			resvalue = bulkResponse.getLongValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resvalue;
+	}
+//	@Override
+	public long zrevrank (String key, String value) throws RedisException {
+		return zrevrank (key, DefaultCodec.encode(value));
+	}
+//	@Override
+	public long zrevrank (String key, Number value) throws RedisException {
+		return zrevrank (key, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> long zrevrank (String key, T value) throws RedisException
+	{
+		return zrevrank (key, DefaultCodec.encode(value));
+	}
+
 
 //	@Override
 	public void ltrim(String key, long keepFrom, long keepTo) throws RedisException {

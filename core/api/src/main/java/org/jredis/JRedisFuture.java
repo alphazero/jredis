@@ -608,6 +608,18 @@ public interface JRedisFuture {
 		Future<Long> zrank (String setkey, T object);
 
 	/**
+	 * @Redis ZREVRANK
+	 * @param setkey
+	 * @param member
+	 * @return
+	 */
+	public Future<Long> zrevrank (String setkey, byte[] member);
+	public Future<Long> zrevrank (String setkey, String stringValue);
+	public Future<Long> zrevrank (String setkey, Number numberValue);
+	public <T extends Serializable> 
+		Future<Long> zrevrank (String setkey, T object);
+
+	/**
 	 * @Redis ZRANGE
 	 * @param setkey
 	 * @param from

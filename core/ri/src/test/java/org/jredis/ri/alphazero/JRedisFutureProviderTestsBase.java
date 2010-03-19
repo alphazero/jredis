@@ -569,6 +569,45 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
 	
+	
+	@Test
+	public void testZrevrankStringByteArray() throws InterruptedException{
+		cmd = Command.ZREVRANK.code;
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			String setkey = keys.get(0);
+			
+			List<Future<Boolean>> expectedOKResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<=SMALL_CNT; i++)
+				expectedOKResponses.add (provider.zadd(setkey, i, dataList.get(i)));
+			
+			List<Future<Long>> rankingResps = new ArrayList<Future<Long>>();
+			for(int i=0;i<=SMALL_CNT; i++)
+				rankingResps.add(provider.zrevrank(setkey, dataList.get(i)));
+
+			Future<Long>  frRankForMissingElement = provider.zrevrank(setkey, dataList.get(SMALL_CNT+1));
+			Future<Long>  frRankForNoSuchSet = provider.zrevrank("no-such-set", dataList.get(0));
+			try {
+				for(Future<Boolean> resp : expectedOKResponses)
+					assertTrue (resp.get().booleanValue(), "zadd of random element should have been true");
+				
+				int i=0;
+				for(Future<Long> resp : rankingResps)
+					assertEquals (resp.get().longValue(), SMALL_CNT - i++, "zrevrank of element");
+				
+				assertEquals (frRankForMissingElement.get().longValue(), -1, "zrevrank against non-existent member should be -1");
+				assertEquals (frRankForNoSuchSet.get().longValue(), -1, "zrevrank against non-existent key should be -1");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
 	@Test
 	public void testSaddStringByteArray() throws InterruptedException{
 		cmd = Command.SADD.code + " byte[]";
