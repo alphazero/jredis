@@ -57,6 +57,7 @@ public enum Command {
 	EXISTS		(RequestType.KEY, 			ResponseType.BOOLEAN), 
 	DEL			(RequestType.KEY, 			ResponseType.BOOLEAN), 
 	TYPE		(RequestType.KEY, 			ResponseType.STRING),
+	SUBSTR		(RequestType.KEY_NUM_NUM,	ResponseType.BULK),
 
 	// "Commands operating on the key space"
 	KEYS		(RequestType.KEY, 			ResponseType.MULTI_BULK), 

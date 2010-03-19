@@ -810,6 +810,18 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
+	public Future<byte[]> substr(String key, long from, long to) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(from);
+		byte[] toBytes = Convert.toBytes(to);
+
+		return new FutureByteArray(this.queueRequest(Command.SUBSTR, keybytes, fromBytes, toBytes));
+	}
+
+//	@Override
 	public Future<List<byte[]>> zrange(String key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 

@@ -825,6 +825,43 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	}
 	
 	@Test
+	public void testSubstr() throws InterruptedException {
+		cmd = Command.SUBSTR.code ;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String key = keys.get(0);
+			byte[] value = dataList.get(0);
+			provider.set(key, value);
+			
+			List<Future<byte[]>> frBytesRespList = new ArrayList<Future<byte[]>>();
+			for(int i=0; i<value.length; i++){
+				frBytesRespList.add(provider.substr(key, i, i));
+			}
+			
+			Future<byte[]> frFullValue1 = provider.substr(key, 0, -1);
+			Future<byte[]> frFullValue2 = provider.substr(key, 0, value.length);
+			Future<byte[]> frExpectedNull = provider.substr(key, -1, 0);
+
+			try {
+				assertEquals(frFullValue1.get(), value, "full range substr should be equal to value");
+				assertEquals(frFullValue2.get(), value, "full range substr should be equal to value");
+				assertEquals(frExpectedNull.get(), null, "substr with -1 from idx should be null");
+				for(int i=0; i<value.length; i++){
+					assertTrue(frBytesRespList.get(i).get().length == 1, "checking size: using substr to iterate over value bytes @ idx " + i);
+					assertEquals(frBytesRespList.get(i).get()[0], value[i], "checking value: using substr to iterate over value bytes @ idx " + i);
+				}
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
 	public void testRpop() throws InterruptedException {
 		cmd = Command.RPOP.code ;
 		Log.log("TEST: %s command", cmd);

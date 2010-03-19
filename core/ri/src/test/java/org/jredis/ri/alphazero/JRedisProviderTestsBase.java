@@ -1288,6 +1288,38 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
 	
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#substr(java.lang.String, int, int)}.
+	 */
+	@Test
+	public void testSubstr() {
+		cmd = Command.SUBSTR.code ;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String key = keys.get(0);
+			byte[] value = dataList.get(0);
+			provider.set(key, value);
+			
+			byte[] substr = null;
+			substr = provider.substr(key, 0, value.length);
+			assertEquals(substr, value, "full range substr should be equal to value");
+			
+			for(int i=0; i<value.length; i++){
+				assertTrue(provider.substr(key, i, i).length == 1, "checking size: using substr to iterate over value bytes @ idx " + i);
+				assertEquals(provider.substr(key, i, i)[0], value[i], "checking value: using substr to iterate over value bytes @ idx " + i);
+			}
+				
+			substr = provider.substr(key, 0, -1);
+			assertEquals(substr, value, "full range substr should be equal to value");
+			
+			substr = provider.substr(key, -1, 0);
+			assertEquals(substr, null, "substr with -1 from idx should be null");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
 
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#lrem(java.lang.String, byte[], int)}.

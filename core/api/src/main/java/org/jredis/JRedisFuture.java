@@ -224,6 +224,15 @@ public interface JRedisFuture {
 	public Future<Long> decrby (String key, int delta);
 
 	/**
+	 * @Redis SUBSTR
+	 * @param listkey
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public Future<byte[]> substr (String listkey, long from, long to); 
+	
+	/**
 	 * @Redis EXISTS
 	 * @param key
 	 * @return

@@ -1171,13 +1171,33 @@ public abstract class JRedisSupport implements JRedis {
 
 		List<byte[]> multiBulkData= null;
 		try {
-			MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.LRANGE, keybytes, fromBytes, toBytes);
-			multiBulkData = MultiBulkResponse.getMultiBulkData();
+			MultiBulkResponse multiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.LRANGE, keybytes, fromBytes, toBytes);
+			multiBulkData = multiBulkResponse.getMultiBulkData();
 		}
 		catch (ClassCastException e){
 			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
 		}
 		return multiBulkData;
+	}
+
+//	@Override
+	public byte[] substr(String key, long from, long to) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(from);
+		byte[] toBytes = Convert.toBytes(to);
+
+		byte[] bulkData= null;
+		try {
+			BulkResponse bulkResponse = (BulkResponse) this.serviceRequest(Command.SUBSTR, keybytes, fromBytes, toBytes);
+			bulkData = bulkResponse.getBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return bulkData;
 	}
 
 //	@Override

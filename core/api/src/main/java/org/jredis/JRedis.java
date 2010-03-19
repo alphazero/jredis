@@ -224,6 +224,20 @@ public interface JRedis {
 	public long decrby (String key, int delta) throws RedisException;
 
 	/**
+	 * @Redis SUBSTR
+	 * @param key
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws RedisException
+	 */
+	public byte[] substr (String key, long from, long to) throws RedisException;
+	
+	// ------------------------------------------------------------------------
+	// "Commands operating on the key space"
+	// ------------------------------------------------------------------------
+	
+	/**
 	 * @Redis EXISTS
 	 * @param key
 	 * @return
@@ -247,10 +261,6 @@ public interface JRedis {
 	 */
 	public RedisType type (String key) throws RedisException;
 	
-	
-	// ------------------------------------------------------------------------
-	// "Commands operating on the key space"
-	// ------------------------------------------------------------------------
 	
 	/**
 	 * @Redis KEYS
