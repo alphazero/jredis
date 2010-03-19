@@ -670,6 +670,16 @@ public interface JRedis {
 	public List<byte[]> zrangebyscore (String setkey, double minScore, double maxScore) throws RedisException; 
 
 	/**
+	 * @Redis ZREMRANGEBYSCORE
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return number of removed elements
+	 * @throws RedisException
+	 */
+	public long zremrangebyscore (String setkey, double minScore, double maxScore) throws RedisException; 
+
+	/**
 	 * @Redis ZINCRBY
 	 * @param setkey
 	 * @param score

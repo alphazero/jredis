@@ -627,6 +627,25 @@ public interface JRedisFuture {
 	public <T extends Serializable> 
 		Future<Double> zincrby (String setkey, double score, T object);
 
+	/**
+	 * @Redis ZRANGEBYSCORE
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public Future<List<byte[]>> zrangebyscore (String setkey, double minScore, double maxScore); 
+
+	/**
+	 * @Redis ZREMRANGEBYSCORE
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return number of removed elements
+	 */
+	public Future<Long> zremrangebyscore (String setkey, double minScore, double maxScore); 
+	
+	
 	// ------------------------------------------------------------------------
 	// Commands operating on hashes
 	// ------------------------------------------------------------------------
