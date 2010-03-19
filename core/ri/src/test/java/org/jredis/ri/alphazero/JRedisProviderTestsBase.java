@@ -1710,6 +1710,29 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
 	
+	
+	@Test
+	public void testZrankStringByteArray() {
+		cmd = Command.ZRANK.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<=SMALL_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+			
+			for(int i=0;i<=SMALL_CNT; i++)
+				assertEquals (provider.zrank(setkey, dataList.get(i)), i, "zrank of element");
+
+			// edge cases
+			assertEquals (provider.zrank(setkey, dataList.get(SMALL_CNT+1)), -1, "zrank against non-existent member should be -1");
+			assertEquals (provider.zrank("no-such-set", dataList.get(0)), -1, "zrank against non-existent key should be -1");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
 	@Test
 	public void testZrangebyscoreStringByteArray() {
 		cmd = Command.ZRANGEBYSCORE.code + " byte[]";

@@ -640,6 +640,19 @@ public interface JRedis {
 		Double zscore (String setkey, T object) throws RedisException;
 
 	/**
+	 * @Redis ZRANK
+	 * @param setkey
+	 * @param member
+	 * @return
+	 * @throws RedisException
+	 */
+	public long zrank (String setkey, byte[] member) throws RedisException;
+	public long zrank (String setkey, String stringValue) throws RedisException;
+	public long zrank (String setkey, Number numberValue) throws RedisException;
+	public <T extends Serializable> 
+		long zrank (String setkey, T object) throws RedisException;
+
+	/**
 	 * @Redis ZRANGE
 	 * @param setkey
 	 * @param from

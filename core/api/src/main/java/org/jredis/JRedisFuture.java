@@ -596,6 +596,18 @@ public interface JRedisFuture {
 		Future<Double> zscore (String setkey, T object);
 
 	/**
+	 * @Redis ZRANK
+	 * @param setkey
+	 * @param member
+	 * @return
+	 */
+	public Future<Long> zrank (String setkey, byte[] member);
+	public Future<Long> zrank (String setkey, String stringValue);
+	public Future<Long> zrank (String setkey, Number numberValue);
+	public <T extends Serializable> 
+		Future<Long> zrank (String setkey, T object);
+
+	/**
 	 * @Redis ZRANGE
 	 * @param setkey
 	 * @param from
