@@ -126,6 +126,21 @@ public abstract class JRedisSupport implements JRedis {
 	public void bgsave() throws RedisException {
 		this.serviceRequest(Command.BGSAVE);
 	}
+	
+//	@Override
+	public String bgrewriteaof() throws RedisException {
+		/* boolean ValueRespose */
+		String value = null;
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.BGREWRITEAOF);
+			value = valResponse.getStringValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return value;
+	}
+	
 //	@Override
 	public JRedis ping() throws RedisException {
 		this.serviceRequest(Command.PING);

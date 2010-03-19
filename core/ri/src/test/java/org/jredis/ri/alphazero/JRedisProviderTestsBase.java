@@ -373,6 +373,23 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	}
 
 	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#bgrewriteaof()}.
+	 */
+	@Test
+	public void testBgrewriteaofe() {
+		cmd = Command.BGREWRITEAOF.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			// TODO: what's a meaningful test for this besides asserting command works?
+			String msg = provider.bgrewriteaof();
+			assertTrue(msg != null, "expecting a non null response message - msg details may change so will not be checked here");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+
+	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, byte[])}.
 	 */
 	@Test

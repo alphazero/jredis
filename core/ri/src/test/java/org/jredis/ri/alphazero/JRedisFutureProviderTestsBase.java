@@ -1193,8 +1193,6 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			objectList.get(0).setName("Hash Stash");
 			Future<Boolean> hsetResp4 = provider.hset(keys.get(0), keys.get(4), objectList.get(0));
 			
-			// get keys
-			Future<List<String>> hkeysResp1 = provider.hkeys(keys.get(0));
 			// get values
 			Future<List<byte[]>> hvalsResp1 = provider.hvals(keys.get(0));
 			// alright - empty the hash
@@ -1607,6 +1605,22 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	        fail(cmd + " FAULT: " + e.getCause().getLocalizedMessage(), e);
         }
 	}
+	
+	@Test
+	public void testBgrewriteaof() throws InterruptedException {
+		Future<String> cmdRespMsg = null;
+		cmd = Command.BGREWRITEAOF.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			cmdRespMsg = provider.bgrewriteaof();
+			assertTrue(cmdRespMsg.get() != null, "cmd response message should not be null");
+		}
+        catch (ExecutionException e) {
+	        e.printStackTrace();
+	        fail(cmd + " FAULT: " + e.getCause().getLocalizedMessage(), e);
+        }
+	}
+	
 	/**
 	 * Test {@link JRedisFuture#debug()}
 	 * @throws InterruptedException 

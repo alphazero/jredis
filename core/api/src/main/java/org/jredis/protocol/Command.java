@@ -133,6 +133,7 @@ public enum Command {
 	// Persistence control commands
 	SAVE		(RequestType.NO_ARG,		ResponseType.STATUS), 
 	BGSAVE		(RequestType.NO_ARG,		ResponseType.STATUS), 
+	BGREWRITEAOF(RequestType.NO_ARG,		ResponseType.STRING), 
 	LASTSAVE	(RequestType.NO_ARG,		ResponseType.NUMBER),
 	SHUTDOWN	(RequestType.NO_ARG, 		ResponseType.VIRTUAL),
 	
