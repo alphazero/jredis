@@ -1636,6 +1636,44 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
+	
+	@Test
+	public void testZrangebyscoreStringByteArray() {
+		cmd = Command.ZRANGEBYSCORE.code + " byte[] | " + Command.ZSCORE.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<MEDIUM_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+			
+			List<byte[]>  range = provider.zrangebyscore(setkey, 0, SMALL_CNT);
+			assertTrue(range.size() > 0, "should have non empty results for range by score here");
+			for(int i=0;i<SMALL_CNT-1; i++){
+				assertEquals(range.get(i), dataList.get(i), "expected value in the range by score missing");
+			}
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
+	@Test
+	public void testZremrangebyscoreStringByteArray() {
+		cmd = Command.ZREMRANGEBYSCORE.code + " byte[] | " + Command.ZSCORE.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<MEDIUM_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+			
+			long remCnt = provider.zremrangebyscore(setkey, 0, SMALL_CNT);
+			assertTrue(remCnt > 0, "should have non-zero number of rem cnt for zremrangebyscore");
+			assertEquals(remCnt, SMALL_CNT+1, "should have specific number of rem cnt for zremrangebyscore");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
 	/**************** SET COMMANDS ******************************/
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#sadd(java.lang.String, byte[])}.

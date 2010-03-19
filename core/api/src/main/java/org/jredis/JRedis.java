@@ -19,7 +19,6 @@ package org.jredis;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -670,6 +669,16 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	public List<byte[]> zrangebyscore (String setkey, double minScore, double maxScore) throws RedisException; 
+
+	/**
+	 * @Redis ZREMRANGEBYSCORE
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return number of removed elements
+	 * @throws RedisException
+	 */
+	public long zremrangebyscore (String setkey, double minScore, double maxScore) throws RedisException; 
 
 	/**
 	 * @Redis ZINCRBY

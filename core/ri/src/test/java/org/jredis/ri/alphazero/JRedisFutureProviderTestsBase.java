@@ -433,6 +433,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		} 
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
+	
 	@Test
 	public void testZscoreAndZincrbyStringByteArray() throws InterruptedException{
 		cmd = Command.ZSCORE.code + " byte[] | " + Command.ZINCRBY.code + " byte[]";
@@ -480,8 +481,68 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		} 
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
-	
-	
+
+	@Test
+	public void testZrangebyscoreStringByteArray() throws InterruptedException{
+		cmd = Command.ZRANGEBYSCORE.code + " byte[] | " + Command.ZSCORE.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			String setkey = keys.get(0);
+			List<Future<Boolean>> expectedOKResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<MEDIUM_CNT; i++)
+				expectedOKResponses.add (provider.zadd(setkey, i, dataList.get(i)));
+			
+			Future<List<byte[]>> frRange = provider.zrangebyscore(setkey, 0, SMALL_CNT); 
+			try {
+				for(Future<Boolean> resp : expectedOKResponses)
+					assertTrue (resp.get().booleanValue(), "zadd of random element should have been true");
+				
+				List<byte[]> range = frRange.get();
+				assertTrue(range.size() > 0, "should have non empty results for range by score here");
+				
+				for(int i=0;i<SMALL_CNT-1; i++){
+					assertEquals(range.get(i), dataList.get(i), "expected value in the range by score missing");
+				}
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
+	@Test
+	public void testZremrangebyscoreStringByteArray() throws InterruptedException{
+		cmd = Command.ZREMRANGEBYSCORE.code + " byte[] | " + Command.ZSCORE.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			String setkey = keys.get(0);
+			List<Future<Boolean>> expectedOKResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<MEDIUM_CNT; i++)
+				expectedOKResponses.add (provider.zadd(setkey, i, dataList.get(i)));
+			
+			Future<Long> frRemCnt = provider.zremrangebyscore(setkey, 0, SMALL_CNT); 
+			try {
+				for(Future<Boolean> resp : expectedOKResponses)
+					assertTrue (resp.get().booleanValue(), "zadd of random element should have been true");
+				
+				long remCnt = frRemCnt.get().longValue();
+				assertTrue(remCnt > 0, "should have non-zero number of rem cnt for zremrangebyscore");
+				assertEquals(remCnt, SMALL_CNT+1, "should have specific number of rem cnt for zremrangebyscore");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
 	@Test
 	public void testSaddStringByteArray() throws InterruptedException{
 		cmd = Command.SADD.code + " byte[]";

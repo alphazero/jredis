@@ -615,6 +615,25 @@ public interface JRedisFuture {
 	public Future<List<byte[]>> zrevrange (String setkey, long from, long to); 
 
 	/**
+	 * @Redis ZRANGEBYSCORE
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public Future<List<byte[]>> zrangebyscore (String setkey, double minScore, double maxScore); 
+
+	/**
+	 * @Redis ZREMRANGEBYSCORE
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return number of removed elements
+	 */
+	public Future<Long> zremrangebyscore (String setkey, double minScore, double maxScore); 
+
+	
+	/**
 	 * @Redis ZINCRBY
 	 * @param setkey
 	 * @param score
