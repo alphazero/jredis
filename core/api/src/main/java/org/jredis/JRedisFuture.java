@@ -300,6 +300,17 @@ public interface JRedisFuture {
 	public Future<Boolean> expire (String key, int ttlseconds); 
 	
 	/**
+	 * @Redis EXPIREAT
+	 * @param key
+	 * @param UNIX epoch-time in <b>milliseconds</b>.  Note that Redis expects epochtime
+	 * in seconds. Implementations are responsible for converting to seconds.
+	 * method   
+	 * @return
+	 * @see {@link System#currentTimeMillis()}
+	 */
+	public Future<Boolean> expireat (String key, long epochtimeMillisecs); 
+	
+	/**
 	 * @Redis TTL
 	 * @param key
 	 * @return

@@ -19,6 +19,7 @@ package org.jredis;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -308,6 +309,19 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	public boolean expire (String key, int ttlseconds) throws RedisException; 
+	
+	/**
+	 * 
+	 * @Redis EXPIREAT
+	 * @param key
+	 * @param UNIX epoch-time in <b>milliseconds</b>.  Note that Redis expects epochtime
+	 * in seconds. Implementations are responsible for converting to seconds.
+	 * method   
+	 * @return
+	 * @throws RedisException
+	 * @see {@link System#currentTimeMillis()}
+	 */
+	public boolean expireat (String key, long epochtimeMillisecs) throws RedisException; 
 	
 	/**
 	 * @Redis TTL

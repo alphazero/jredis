@@ -26,6 +26,7 @@ import java.util.StringTokenizer;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
 import org.jredis.KeyValueSet;
@@ -1519,6 +1520,26 @@ public abstract class JRedisSupport implements JRedis {
 		boolean resvalue = false;
 		try {
 			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.EXPIRE, keybytes, ttlbytes);
+			resvalue = valResponse.getBooleanValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resvalue;
+	}
+
+//	@Override
+	public boolean expireat(String key, long epochtime) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		long expiretime = TimeUnit.SECONDS.convert(epochtime, TimeUnit.MILLISECONDS);
+		byte[] expiretimeBytes = Convert.toBytes(expiretime);
+		
+		boolean resvalue = false;
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.EXPIREAT, keybytes, expiretimeBytes);
 			resvalue = valResponse.getBooleanValue();
 		}
 		catch (ClassCastException e){

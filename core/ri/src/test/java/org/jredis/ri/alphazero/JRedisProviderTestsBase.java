@@ -200,6 +200,41 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		}
 	}
 
+	@Test
+	public void testExpireat() {
+		cmd = Command.EXPIREAT.code;
+		Log.log("TEST: %s command(s)", cmd);
+		try {
+			provider.flushdb();
+			assertTrue(provider.dbsize() == 0);
+			
+			String keyToExpire = "expire-me";
+			provider.set(keyToExpire, dataList.get(0));
+			assertTrue (provider.exists(keyToExpire));
+			
+			long expireTime = System.currentTimeMillis() + 500;
+			Log.log("TEST: %s with expire time 1000 msecs in future", Command.EXPIREAT);
+			assertTrue(provider.expireat(keyToExpire, expireTime), "expireat for existing key should be true");
+			assertTrue(!provider.expireat("no-such-key", expireTime), "expireat for non-existant key should be false");
+			assertTrue (provider.exists(keyToExpire));
+			
+			
+			// NOTE: IT SIMPLY WON'T WORK WITHOUT GIVING REDIS A CHANCE
+			// could be network latency, or whatever, but the expire command is NOT
+			// that precise, so we need to wait a bit longer
+			
+			Thread.sleep(2000);
+			assertTrue (!provider.exists(keyToExpire), "key should have expired by now");
+			
+		} 
+		catch (RedisException e) {
+			fail(cmd + " with password: " + password, e);
+		}
+		catch (InterruptedException e) {
+			fail (cmd + "thread was interrupted and test did not conclude" + e.getLocalizedMessage());
+		}
+	}
+
 // CANT test this without risking hosing the user's DBs
 // TODO: use a flag
 //	/**

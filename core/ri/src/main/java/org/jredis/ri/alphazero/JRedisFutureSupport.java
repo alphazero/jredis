@@ -1099,6 +1099,19 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
+	public Future<Boolean> expireat(String key, long epochtime) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		long expiretime = TimeUnit.SECONDS.convert(epochtime, TimeUnit.MILLISECONDS);
+		byte[] expiretimeBytes = Convert.toBytes(expiretime);
+		
+		Future<Response> futureResponse = this.queueRequest(Command.EXPIREAT, keybytes, expiretimeBytes);
+		return new FutureBoolean(futureResponse);
+	}
+
+//	@Override
 	public Future<Long> ttl (String key) {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
