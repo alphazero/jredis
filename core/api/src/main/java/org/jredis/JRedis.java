@@ -310,6 +310,19 @@ public interface JRedis {
 	public boolean expire (String key, int ttlseconds) throws RedisException; 
 	
 	/**
+	 * 
+	 * @Redis EXPIREAT
+	 * @param key
+	 * @param UNIX epoch-time in <b>milliseconds</b>.  Note that Redis expects epochtime
+	 * in seconds. Implementations are responsible for converting to seconds.
+	 * method   
+	 * @return
+	 * @throws RedisException
+	 * @see {@link System#currentTimeMillis()}
+	 */
+	public boolean expireat (String key, long epochtimeMillisecs) throws RedisException; 
+	
+	/**
 	 * @Redis TTL
 	 * @param key
 	 * @return

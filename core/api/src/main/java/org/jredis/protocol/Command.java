@@ -65,6 +65,7 @@ public enum Command {
 	RENAMENX	(RequestType.KEY_KEY, 		ResponseType.BOOLEAN), 
 	DBSIZE		(RequestType.NO_ARG,		ResponseType.NUMBER),
 	EXPIRE		(RequestType.KEY_NUM,		ResponseType.BOOLEAN), 
+	EXPIREAT	(RequestType.KEY_NUM,		ResponseType.BOOLEAN), 
 	TTL			(RequestType.KEY,			ResponseType.NUMBER),
 	
 	// Commands operating on lists

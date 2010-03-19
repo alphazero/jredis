@@ -1629,5 +1629,34 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	        fail(cmd + " FAULT: " + e.getCause().getLocalizedMessage(), e);
         }
 	}
+	
+	@Test
+	public void testExpireat() throws InterruptedException {
+		cmd = Command.EXPIREAT.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb().get();
+			String keyToExpire = "expire-me";
+			provider.set(keyToExpire, dataList.get(0)).get();
+
+			long expireTime = System.currentTimeMillis() + 500;
+			Log.log("TEST: %s with expire time 1000 msecs in future", Command.EXPIREAT);
+			assertTrue(provider.expireat(keyToExpire, expireTime).get(), "expireat for existing key should be true");
+			assertTrue(!provider.expireat("no-such-key", expireTime).get(), "expireat for non-existant key should be false");
+			assertTrue (provider.exists(keyToExpire).get());
+			
+			
+			// NOTE: IT SIMPLY WON'T WORK WITHOUT GIVING REDIS A CHANCE
+			// could be network latency, or whatever, but the expire command is NOT
+			// that precise, so we need to wait a bit longer
+			
+			Thread.sleep(2000);
+			assertTrue (!provider.exists(keyToExpire).get(), "key should have expired by now");
+		}
+        catch (ExecutionException e) {
+	        e.printStackTrace();
+	        fail(cmd + " FAULT: " + e.getCause().getLocalizedMessage(), e);
+        }
+	}
 
 }
