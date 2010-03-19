@@ -503,6 +503,35 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	}
 	
 	@Test
+	public void testZremrangebyrankStringByteArray() throws InterruptedException{
+		cmd = Command.ZREMRANGEBYRANK.code + " byte[] | " + Command.ZSCORE.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			String setkey = keys.get(0);
+			List<Future<Boolean>> expectedOKResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<MEDIUM_CNT; i++)
+				expectedOKResponses.add (provider.zadd(setkey, i, dataList.get(i)));
+			
+			Future<Long> frRemCnt = provider.zremrangebyrank(setkey, 0, SMALL_CNT); 
+			try {
+				for(Future<Boolean> resp : expectedOKResponses)
+					assertTrue (resp.get().booleanValue(), "zadd of random element should have been true");
+				
+				long remCnt = frRemCnt.get().longValue();
+				assertTrue(remCnt > 0, "should have non-zero number of rem cnt for zremrangebyrank");
+				assertEquals(remCnt, SMALL_CNT+1, "should have specific number of rem cnt for zremrangebyrank");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	@Test
 	public void testSaddStringByteArray() throws InterruptedException{
 		cmd = Command.SADD.code + " byte[]";
 		Log.log("TEST: %s command", cmd);

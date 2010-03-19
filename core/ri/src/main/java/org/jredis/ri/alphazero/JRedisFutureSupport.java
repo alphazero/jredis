@@ -844,6 +844,18 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 		return new FutureLong(this.queueRequest(Command.ZREMRANGEBYSCORE, keybytes, minScoreBytes, maxScoreBytes));
 	}
+	
+//	@Override
+	public Future<Long> zremrangebyrank(String key, double minRank, double maxRank) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] minScoreBytes = Convert.toBytes(minRank);
+		byte[] maxScoreBytes = Convert.toBytes(maxRank);
+
+		return new FutureLong(this.queueRequest(Command.ZREMRANGEBYRANK, keybytes, minScoreBytes, maxScoreBytes));
+	}
 
 
 //	@Override

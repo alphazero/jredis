@@ -662,8 +662,8 @@ public interface JRedis {
 	/**
 	 * @Redis ZRANGE
 	 * @param setkey
-	 * @param from
-	 * @param to
+	 * @param minScore
+	 * @param maxScore
 	 * @return
 	 * @throws RedisException
 	 */
@@ -672,12 +672,22 @@ public interface JRedis {
 	/**
 	 * @Redis ZREMRANGEBYSCORE
 	 * @param setkey
-	 * @param from
-	 * @param to
+	 * @param minScore
+	 * @param maxScore
 	 * @return number of removed elements
 	 * @throws RedisException
 	 */
 	public long zremrangebyscore (String setkey, double minScore, double maxScore) throws RedisException; 
+
+	/**
+	 * @Redis ZREMRANGEBYRANK
+	 * @param setkey
+	 * @param minRank
+	 * @param maxRank
+	 * @return number of removed elements
+	 * @throws RedisException
+	 */
+	public long zremrangebyrank (String setkey, double minRank, double maxRank) throws RedisException; 
 
 	/**
 	 * @Redis ZINCRBY

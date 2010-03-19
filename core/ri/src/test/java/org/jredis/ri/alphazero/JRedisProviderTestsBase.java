@@ -1749,6 +1749,24 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	}
 	
 	@Test
+	public void testZremrangebyrankStringByteArray() {
+		cmd = Command.ZREMRANGEBYRANK.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<MEDIUM_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+			
+			long remCnt = provider.zremrangebyrank(setkey, 0, SMALL_CNT);
+			assertTrue(remCnt > 0, "should have non-zero number of rem cnt for zremrangebyrank");
+			assertEquals(remCnt, SMALL_CNT+1, "should have specific number of rem cnt for zremrangebyrank");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
+	@Test
 	public void testZincrbyStringByteArray() {
 		cmd = Command.ZSCORE.code + " byte[] | " + Command.ZINCRBY.code + " byte[]";
 		Log.log("TEST: %s command", cmd);

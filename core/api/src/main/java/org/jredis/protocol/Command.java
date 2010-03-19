@@ -106,6 +106,7 @@ public enum Command {
 	ZINCRBY		(RequestType.KEY_IDX_VALUE, ResponseType.BULK),
 	ZRANGEBYSCORE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
 	ZREMRANGEBYSCORE	(RequestType.KEY_NUM_NUM,	ResponseType.NUMBER),
+	ZREMRANGEBYRANK	(RequestType.KEY_NUM_NUM,	ResponseType.NUMBER),
 		
 	// Commands operating on hashes
 	HSET 		(RequestType.KEY_KEY_VALUE, ResponseType.BOOLEAN),
