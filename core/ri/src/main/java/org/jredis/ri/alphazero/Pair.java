@@ -14,27 +14,22 @@
  *   limitations under the License.
  */
 
-package org.jredis;
-
-import java.io.Serializable;
-
+package org.jredis.ri.alphazero;
 
 /**
- * [TODO: document me!]
- *
+ * Generic immutable 2-tuple data struct.
+ *  
  * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, Nov 25, 2009
+ * @version alpha.0, Mar 20, 2010
  * @since   alpha.0
  * 
  */
 
-public interface KeyValueSet <T> {
-	public KeyValueSet<T> add(String key, T value);
-	byte[][] getMappings ();
-	
-	public interface ByteArrays extends KeyValueSet<byte[]>{}
-	public interface Numbers extends KeyValueSet<Number>{}
-	public interface Strings extends KeyValueSet<String>{}
-	public interface Objects <T extends Serializable> extends KeyValueSet<T>{}
-	
+class Pair<T1, T2> {
+	public final T1 t1;
+	public final T2 t2;
+	public Pair(T1 t1, T2 t2){
+		this.t1 = t1;
+		this.t2 = t2;
+	}
 }

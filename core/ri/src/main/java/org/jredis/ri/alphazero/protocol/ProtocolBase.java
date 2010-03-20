@@ -144,6 +144,21 @@ public abstract class ProtocolBase implements Protocol {
 				// -------------------
 				break;
 
+			case KEY_NUM_NUM_OPTS:
+				// -------------------
+				buffer.write(cmd.bytes);
+				buffer.write(SPACE);
+				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
+				buffer.write(SPACE);
+				buffer.write(Assert.notNull(args[1], "num_1 arg", ProviderException.class));
+				buffer.write(SPACE);
+				buffer.write(Assert.notNull(args[2], "num_2 arg", ProviderException.class));
+				buffer.write(SPACE);
+				buffer.write(Assert.notNull(args[3], "opts arg", ProviderException.class));
+				buffer.write(CRLF);
+				// -------------------
+				break;
+
 			case KEY_VALUE:
 			{
 				byte[] value = Assert.notNull(args[1], "value arg", ProviderException.class);

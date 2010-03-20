@@ -125,6 +125,13 @@ public class DefaultCodec {
 		for(byte[] b : bytearray) list.add(Convert.toDouble(b));
 		return list;
 	}
+	/**
+     * @param bs
+     * @return
+     */
+    public static double toDouble (byte[] bs) {
+	    return Convert.toDouble(bs);
+    }
 
 	/**
 	 * This helper method will assume the List<byte[]> being presented is the list returned

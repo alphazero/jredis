@@ -35,6 +35,7 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.RedisType;
 import org.jredis.Sort;
+import org.jredis.ZSetEntry;
 import org.jredis.connector.Connection;
 import org.jredis.protocol.BulkResponse;
 import org.jredis.protocol.Command;
@@ -1111,6 +1112,58 @@ public abstract class JRedisSupport implements JRedis {
 			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
 		}
 		return multiBulkData;
+	}
+
+//	@Override
+	public List<ZSetEntry> zrangeSubset(String key, long from, long to) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(from);
+		byte[] toBytes = Convert.toBytes(to);
+
+		List<ZSetEntry> list= null;
+		try {
+			MultiBulkResponse multiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.ZRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Options.WITHSCORES.bytes);
+			List<byte[]> bulkData = multiBulkResponse.getMultiBulkData();
+			if(null != bulkData){
+				list = new ArrayList<ZSetEntry>(bulkData.size()/2);
+				for(int i=0; i<bulkData.size(); i+=2){
+					list.add(new ZSetEntryImpl(bulkData.get(i), bulkData.get(i+1)));
+				}
+			}
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return list;
+	}
+
+//	@Override
+	public List<ZSetEntry> zrevrangeSubset(String key, long from, long to) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(from);
+		byte[] toBytes = Convert.toBytes(to);
+
+		List<ZSetEntry> list= null;
+		try {
+			MultiBulkResponse multiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.ZREVRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Options.WITHSCORES.bytes);
+			List<byte[]> bulkData = multiBulkResponse.getMultiBulkData();
+			if(null != bulkData){
+				list = new ArrayList<ZSetEntry>(bulkData.size()/2);
+				for(int i=0; i<bulkData.size(); i+=2){
+					list.add(new ZSetEntryImpl(bulkData.get(i), bulkData.get(i+1)));
+				}
+			}
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return list;
 	}
 
 	// TODO: NOTIMPLEMENTED:

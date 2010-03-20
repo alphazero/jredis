@@ -16,25 +16,19 @@
 
 package org.jredis;
 
-import java.io.Serializable;
-
-
 /**
- * [TODO: document me!]
+ * An entry in a Redis "sorted set" and returned by a subset Z* commands.  
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, Nov 25, 2009
+ * @version alpha.0, Mar 20, 2010
  * @since   alpha.0
  * 
  */
 
-public interface KeyValueSet <T> {
-	public KeyValueSet<T> add(String key, T value);
-	byte[][] getMappings ();
+public interface ZSetEntry{
+	/**  @return the value of this entry in a Redis sorted set */
+	byte[] getValue();
 	
-	public interface ByteArrays extends KeyValueSet<byte[]>{}
-	public interface Numbers extends KeyValueSet<Number>{}
-	public interface Strings extends KeyValueSet<String>{}
-	public interface Objects <T extends Serializable> extends KeyValueSet<T>{}
-	
+	/** @return the score associated with the value */
+	double getScore();
 }

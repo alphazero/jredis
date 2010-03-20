@@ -25,6 +25,16 @@ import org.jredis.ri.alphazero.semantics.DefaultKeyCodec;
 import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.semantics.KeyCodec;
 
+/**
+ * [TODO: document me!]
+ *
+ * @author  Joubin Houshyar (alphazero@sensesay.net)
+ * @version alpha.0, Mar 20, 2010
+ * @since   alpha.0
+ * @See {@link KeyValueSet}
+ * @See {@link JRedis#mset}
+ * @param <T>
+ */
 public abstract class BulkSetMapping<T> implements KeyValueSet<T>{
 	private final Map<String, T> map = new HashMap<String, T>();
 	abstract byte[] toBytes(T value) ;

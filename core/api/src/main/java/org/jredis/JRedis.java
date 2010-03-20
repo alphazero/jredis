@@ -19,6 +19,7 @@ package org.jredis;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import org.jredis.protocol.Command;
 
 
 /**
@@ -659,6 +660,38 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	public List<byte[]> zrevrange (String setkey, long from, long to) throws RedisException; 
+
+	/**
+	 * Equivalent to {@link JRedis#zrange(String, long, long)} with the {@link Command.Options#WITHSCORES}.
+	 * Unlike the general ZRANGE command that only returns the values, this method returns both
+	 * values and associated scores for the specified range.
+	 *  
+	 * @Redis ZRANGE ... WITHSCORES
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return the subset of the specified set 
+	 * @throws RedisException
+	 * @see JRedis#zrange(String, long, long)
+	 * @see ZSetEntry
+	 */
+	public List<ZSetEntry> zrangeSubset (String setkey, long from, long to) throws RedisException; 
+
+	/**
+	 * Equivalent to {@link JRedis#zrevrange(String, long, long)} with the {@link Command.Options#WITHSCORES}.
+	 * Unlike the general ZREVRANGE command that only returns the values, this method returns both
+	 * values and associated scores for the specified range.
+	 *  
+	 * @Redis ZREVRANGE ... WITHSCORES
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return the subset of the specified set 
+	 * @throws RedisException
+	 * @see JRedis#zrevrange(String, long, long)
+	 * @see ZSetEntry
+	 */
+	public List<ZSetEntry> zrevrangeSubset (String setkey, long from, long to) throws RedisException; 
 
 	/**
 	 * @Redis ZRANGE

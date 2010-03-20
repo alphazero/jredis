@@ -14,27 +14,26 @@
  *   limitations under the License.
  */
 
-package org.jredis;
+package org.jredis.ri.alphazero;
 
-import java.io.Serializable;
-
+import org.jredis.ZSetEntry;
+import org.jredis.ri.alphazero.support.DefaultCodec;
 
 /**
- * [TODO: document me!]
- *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, Nov 25, 2009
+ * @version alpha.0, Mar 20, 2010
  * @since   alpha.0
- * 
+ * @see ZSetEntry
  */
 
-public interface KeyValueSet <T> {
-	public KeyValueSet<T> add(String key, T value);
-	byte[][] getMappings ();
-	
-	public interface ByteArrays extends KeyValueSet<byte[]>{}
-	public interface Numbers extends KeyValueSet<Number>{}
-	public interface Strings extends KeyValueSet<String>{}
-	public interface Objects <T extends Serializable> extends KeyValueSet<T>{}
-	
+class ZSetEntryImpl extends Pair<byte[], byte[]> implements ZSetEntry {
+
+    public ZSetEntryImpl (byte[] valueBytes, byte[] scoreBytes) {
+    	super(valueBytes, scoreBytes);
+    }
+	/* (non-Javadoc) @see org.jredis.ZSetEntry#getScore() */
+	public double getScore () { return DefaultCodec.toDouble(t2); }
+
+	/* (non-Javadoc) @see org.jredis.ZSetEntry#getValue() */
+	public byte[] getValue () { return t1;}
 }
