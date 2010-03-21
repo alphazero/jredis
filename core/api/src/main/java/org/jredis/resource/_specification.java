@@ -16,9 +16,9 @@
 
 package org.jredis.resource;
 
+
 /**
- * [TODO: document me!]
- *
+ * specification meta info for org.jredis.resource package.
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Apr 16, 2009
  * @since   alpha.0

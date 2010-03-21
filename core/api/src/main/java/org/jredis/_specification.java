@@ -17,8 +17,8 @@
 package org.jredis;
 
 /**
- * [TODO: document me!]
- *
+ * JRedis API specification meta info.
+ * 
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09
  * @since   alpha.0
@@ -28,7 +28,7 @@ public interface _specification {
 
 	/** specification level */
 	public interface Version {
-		long	major	= 0xA;
-	    long 	minor	= 0x0;
+		long	major	= 1;
+	    long 	minor	= 0;
 	}
 }

@@ -17,12 +17,14 @@
 package org.jredis;
 
 /**
- * An entry in a Redis "sorted set" and returned by a subset Z* commands.  
+ * An entry in a Redis "sorted set" and returned by a subset Z* commands, such as
+ * {@link JRedis#zrangeSubset(String, long, long)}.
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Mar 20, 2010
  * @since   alpha.0
- * 
+ * @see JRedis
+ * @See {@link JRedisFuture}
  */
 
 public interface ZSetEntry{

@@ -39,9 +39,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.jredis.protocol.ResponseStatus;
 
-
 /**
- * The asynchronous interface to Redis.
+ * The asynchronous interface to Redis. 
  * <p>
  * This is effectively a one to one mapping to Redis commands.  Depending on the implementation
  * either the redis response and/or redis write are asynchronous.  Regardless, each method returns
@@ -70,6 +69,7 @@ import org.jredis.protocol.ResponseStatus;
  * @author  Joubin (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09
  * @since   alpha.0
+ * @see JRedis
  * 
  */
 @Redis(versions="1.07")

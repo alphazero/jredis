@@ -27,7 +27,8 @@ package org.jredis;
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09
  * @since   alpha.0
- * 
+ * @see JRedis
+ * @see ClientRuntimeException
  */
 public class ProviderException extends ClientRuntimeException {
 

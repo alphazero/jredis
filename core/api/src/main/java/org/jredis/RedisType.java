@@ -17,8 +17,13 @@
 package org.jredis;
 
 /**
+ * Enumeration of the valid Redis db key types, and values returned by {@link JRedis#type(String)} and
+ * {@link JRedisFuture#type(String)}.
  * 
+ * @Redis TYPE
  * @author Joubin Houshyar (alphazero@sensesay.net)
+ * @see JRedis
+ * @see JRedisFuture
  */
 public enum RedisType {
 	NONE, 

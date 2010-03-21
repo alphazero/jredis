@@ -21,8 +21,6 @@ import org.jredis.protocol.Command;
 //import org.jredis.connector.ProviderException;
 
 /**
- * [TODO: update doc regarding "extensions"]
- * 
  * RedisExceptions are only created/raised subsequent to an error result from the redis server.
  * These exceptions are <b>_not_</b> intended as a general purpose exception mechanism for
  * implementations of this specification.  Accordingly, this exception (and extensions if any)
@@ -35,11 +33,13 @@ import org.jredis.protocol.Command;
  * status to an issued command and the content of that message (e.g. "-ERR operation on wrong type"</b>
  * is what is required for instantiating a {@link RedisException}.
  * 
- * @see ClientRuntimeException
- *
+ * @Redis -ERR <error msg>
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09
  * @since   alpha.0
+ * @see JRedis
+ * @see ClientRuntimeException
+ * @see ProviderException
  * 
  */
 public final class RedisException extends Exception {

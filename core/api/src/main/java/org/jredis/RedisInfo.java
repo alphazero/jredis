@@ -17,12 +17,12 @@
 package org.jredis;
 
 /**
- * [TODO: document me!]
- *
+ * Enumeration of elements of the structured information returned by {@link JRedis#info()} and {@link JRedisFuture#info}.
+ * @Redis INFO
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09
  * @since   alpha.0
- * 
+ * @see JRedis
  */
 public enum RedisInfo {
 	redis_version,
@@ -33,6 +33,15 @@ public enum RedisInfo {
 	last_save_time,
 	total_connections_received,
 	total_commands_processed,
+	arch_bits,
+	multiplexing_api,
+	used_memory_human,
+	bgsave_in_progress,
+	bgrewriteaof_in_progress,
+	role,
 	uptime_in_seconds,
 	uptime_in_days
 }
+/* missing in action
+db0:keys=1,expires=0
+*/

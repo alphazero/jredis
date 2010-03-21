@@ -199,6 +199,7 @@ public class PipelineInAction {
 	        e.printStackTrace();
         }
     }
+    @SuppressWarnings("unused")
     private static void runJRedisPipelineLPUSH (ConnectionSpec spec, int reqCnt, int size, boolean forever) {
     	JRedisFuture pipeline = new JRedisPipeline(spec);
     	long totTime = 0;
@@ -274,11 +275,8 @@ public class PipelineInAction {
 	    			futureStat = pipeline.set(key, data);
 	    			cnt++;
 	    		}
-	    		long reqDoneTime = timer.mark();
 				futureStat.get();
 	    		long respDoneTime = timer.mark();
-//				System.out.format("JRedisPipeline: %d SETs invoked   @ %5d  (%.2f ops/s)\n", cnt, reqDoneTime, timer.opsPerSecAtDelta(cnt, reqDoneTime));
-//				System.out.format("JRedisPipeline: %d SETs completed @ %5d  (%.2f ops/s) [%d msecs to comp] \n", cnt, timer.deltaAtMark(), timer.opsPerSecAtMark(cnt), respDoneTime-reqDoneTime);
 				if(iters > 0){
 					totTime += respDoneTime;
 					avgRespTime = (totTime) / (long)iters;
@@ -308,6 +306,7 @@ public class PipelineInAction {
      * @param reqCnt
      * @param forever
      */
+    @SuppressWarnings("unused")
     private static void runJRedisPipelineINCR (ConnectionSpec spec, int reqCnt, int size, boolean forever) {
     	JRedisFuture pipeline = new JRedisPipeline(spec);
     	long totTime = 0;

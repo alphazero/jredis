@@ -18,6 +18,6 @@
  * Optional package.
  * <p>
  * This package provides the necessary types to support non-trivial usage of JRedis
- * implementation artifacts as resources in the JRedis usage contexts.
+ * implementation artifacts as (managable) resources in the JRedis usage contexts.
  */
 package org.jredis.resource; 

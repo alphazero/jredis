@@ -20,21 +20,54 @@ import java.io.Serializable;
 
 
 /**
- * [TODO: document me!]
- *
+ * Generalized interface to support 'Multi SET' ops, {such as @link JRedis#mset(ByteArrays)} and {@link JRedis#msetnx(ByteArrays)}.
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Nov 25, 2009
  * @since   alpha.0
- * 
+ * @see JRedis
+ * @see JRedisFuture
  */
 
 public interface KeyValueSet <T> {
+	
+	/**
+	 * Adds a key/value pair to the set for the multi set op.
+	 * @param key
+	 * @param value
+	 * @return
+	 */
 	public KeyValueSet<T> add(String key, T value);
+	
+	
+	/**
+	 * For internal use by the implementations.
+	 * @return the 2-dim byte array
+	 */
 	byte[][] getMappings ();
 	
-	public interface ByteArrays extends KeyValueSet<byte[]>{}
-	public interface Numbers extends KeyValueSet<Number>{}
-	public interface Strings extends KeyValueSet<String>{}
-	public interface Objects <T extends Serializable> extends KeyValueSet<T>{}
+	// ------------------------------------------------------------------------
+	// Type specific extensions
+	// ------------------------------------------------------------------------
 	
+	/** 
+	 * Specialization of {@link KeyValueSet} for byte[] value payloads. You should
+	 * use this data structure and corresponding {@link JRedis#mset(ByteArrays)} and
+	 * {@link JRedis#msetnx(ByteArrays)} when you have a mix of various value types.
+	 */
+	public interface ByteArrays extends KeyValueSet<byte[]>{}
+	
+	/**
+	 * Specialization of {@link KeyValueSet} for {@link Number} values.
+	 */
+	public interface Numbers extends KeyValueSet<Number>{}
+
+	/**
+	 * Specialization of {@link KeyValueSet} for {@link String} values.
+	 */
+	public interface Strings extends KeyValueSet<String>{}
+	
+	/**
+	 * Specialization of {@link KeyValueSet} for {@link Serializable} values.
+	 */
+	public interface Objects <T extends Serializable> extends KeyValueSet<T>{}
 }

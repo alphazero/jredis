@@ -16,7 +16,7 @@
 
 /**
  * This package contains the constructs that define the Java API semantics of the
- * JRedis clients.
+ * JRedis clients for the end user, and are further intended as an informal specification.
  * 
  * TODO: elaborate on the spec requirements.
  * 

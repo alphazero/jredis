@@ -19,11 +19,11 @@ package org.jredis;
 
 /**
  * Interface to specify the semantics of the actual key/values stored in the Redis server.
- *
+ * Support for this interface is currently not required.
  * @author  Joubin (alphazero@sensesay.net)
  * @version alpha.0, Aug 23, 2009
  * @since   alpha.0
- * 
+ * @see Codec
  */
 
 public interface Semantics {

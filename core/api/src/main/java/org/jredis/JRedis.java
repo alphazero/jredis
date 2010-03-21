@@ -23,45 +23,27 @@ import org.jredis.protocol.Command;
 
 
 /**
- * <p>This is effectively a one to one mapping to Redis commands.  And that
- * is basically it.
- * <p>Beyond that , just be aware that an implementation may throw {@link ClientRuntimeException}
- * or an extension to report problems (typically connectivity) or features {@link NotSupportedException}
- * or bugs.  These are {@link RuntimeException}.
+ * <p>This is effectively a one to one mapping to Redis commands, with a few minor exceptions
+ * when necessary to avoid ambiguity or overly long method names.
+ * <p>
+ * Commands that write byte[] data to the database have a corresponding set of overloaded
+ * methods as a convenience for saving values of type {@link Number}, {@link String}, and {@link Serializable} objects. 
+ * <p>
+ * Data (on reads) is always returned as byte[] unless the method semantics clearly require a specific 
+ * type (such as {@link JRedis#incr(String), for example}.  Implementations may provide either (typed) wrappers, or
+ * convenience utility classes to help with the conversion from the raw data bytes to common data flavors.  
+ * <p>
+ * For any of the methods in this interface, the implementation must throw {@link ClientRuntimeException}
+ * or an extension to report runtime (environment) problems (typically connectivity).  
+ * "Features" (aka bugs) must be indicated by {@link ProviderException}s.  These are all unchecked {@link RuntimeException}s.
  * 
  * @author  joubin (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09
  * @since   alpha.0
  * 
  */
-@Redis(versions="1.07")
+@Redis(versions="1.2.n")
 public interface JRedis {
-	
-	// ------------------------------------------------------------------------
-	// Semantic context methods
-	// ------------------------------------------------------------------------
-
-	// TODO: reach a decision on whether to include this or not.
-//	/**
-//	 * Provides for access to an interface providing standard Java collections
-//	 * semantics on the specified parametric type.  
-//	 * <p>
-//	 * The type <code>T</code> can be of 3 categories:
-//	 * <ol>
-//	 * <li>It is 
-//	 * </ol>
-//	 * @param <T> a Java class type that you wish to perform {@link Set}, 
-//	 * {@link List}, or {@link Map}, operations. 
-//	 * @return the {@link JavaSemantics} for type <code>T</code>, if the type specified meets
-//	 * the required initialization characteristics.
-//	 */
-//	public <T> JavaSemantics<T>  semantic (Class<T>  type) throws ClientRuntimeException;
-	
-	// ------------------------------------------------------------------------
-	// Security and User Management
-	// NOTE: Moved to ConnectionSpec
-	// ------------------------------------------------------------------------
-
 	
 	// ------------------------------------------------------------------------
 	// "Connection Handling"

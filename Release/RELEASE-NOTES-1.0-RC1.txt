@@ -15,6 +15,8 @@ JARS:
 
 NEW FEATURES:
 
+* Added support for the missing elements of the INFO result map.
+
 * Added support for Z[REV]RANGE ... WITHSCORES.  (Synch/Asynch).
   Usage example class <UsingZrangeSubset> in /Examples module.
 

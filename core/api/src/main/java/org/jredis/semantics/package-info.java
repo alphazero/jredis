@@ -15,14 +15,19 @@
  */
 
 /**
- * This package is optional.  Its entirely debatable whether such mechanisms
+ * This package is optional.  
+ * <p>
+ * Its entirely debatable whether such mechanisms
  * have any legitimate place in JRedis, which is a connector to a type-less
  * system storing blobs of bytes.  At this intial point, its place here simply
  * serves the purpose of keeping the issues that this package attempts to address
- * in mind.
+ * in mind and to have starting point to address these concerns should Redis evolve
+ * to a point where it becomes necessary. 
  * <p>
  * When all is said and done, all these artifacts will provide little more than
  * what a helper or wrapper object will provide -- JRedis can not be in the
- * type management business, as it does not control the object store.
+ * type management business, as it does not control the object store and may also 
+ * be used in environments where client interop (between alternative impl/languages)
+ * may be required.
  */
 package org.jredis.semantics;

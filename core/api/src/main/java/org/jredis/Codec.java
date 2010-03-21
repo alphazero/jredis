@@ -23,11 +23,12 @@ package org.jredis;
  * interface can be registered with a {@link CodecManager} used by a {@link JRedis} implementation
  * (whether per instance or by other relations per JRedis provider implementation), and used
  * during the encoding of an semantic java type into {@link byte[]} and back.  
- *
+ * <br>
+ * Support for this interface is currently not required.
  * @author  Joubin (alphazero@sensesay.net)
  * @version alpha.0, Apr 14, 2009
  * @since   alpha.0
- * 
+ * @see Semantics
  */
 
 public interface Codec <T>  {

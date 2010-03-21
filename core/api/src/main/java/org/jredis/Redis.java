@@ -22,10 +22,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to mark complaint elements of JRedis implementations.
+ * Annotation to mark compliance level of the elements of JRedis implementations.
+ * This is an optional marker and for tooling purposes only.
  * 
- * [TODO: document me!]
- *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09
  * @since   alpha.0
