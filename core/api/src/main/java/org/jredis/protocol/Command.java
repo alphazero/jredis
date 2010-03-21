@@ -139,7 +139,7 @@ public enum Command {
 	/** semantic sugar */
 	public final String code;
 	public final byte[] bytes;
-	public final int length;
+//	public final int length;
 //	public final int arg_cnt;
 	public final RequestType requestType;
 	public final ResponseType responseType;
@@ -159,7 +159,7 @@ public enum Command {
 		else
 			this.bytes = code.getBytes();
 		
-		this.length = code.length();
+//		this.length = code.length();
 		this.requestType = reqType;
 		this.responseType = respType;
 //		this.arg_cnt = -1; // to raise exception -- make sure we don't miss any

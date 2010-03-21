@@ -231,7 +231,7 @@ public abstract class ProtocolBase implements Protocol {
 				Assert.isTrue(args.length%2==0, "args length should be an even number and expected to be seq of tuple {key, value}", ProviderException.class);
 				Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX, "Only MSET/NX bulk commands are supported", NotSupportedException.class);
 
-				byte[] setCmdLenBytes = Convert.toBytes(cmd.length);
+				byte[] setCmdLenBytes = Convert.toBytes(cmd.bytes.length);
 				byte[] bulkSetLineCntBytes = Convert.toBytes(args.length+1);
 
 				buffer.write(COUNT_BYTE);
