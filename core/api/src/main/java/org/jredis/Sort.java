@@ -75,4 +75,7 @@ public interface Sort extends Query {
 	
 	/** sort is be default numeric -- use this to indicate lexiographic alphanumeric sort */
 	Sort ALPHA ();
+	
+//	/** store the sort results in another key */
+//	Sort STORE (String destKey);
 }
