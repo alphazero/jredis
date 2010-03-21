@@ -2,13 +2,21 @@ Release: JRedis 1.0 RC 1
 
 REQUIREMENTS:
 
-Requires Redis server 1.2.n.  This release is NOT compatible with either Redis 1.000 or 2.n (development edge).  
-Developed and tested for Redis 1.2.5.
+* Requires Redis server 1.2.n.  (Developed and tested for Redis 1.2.5)
+  Please note that this release is _NOT_ compatible with either Redis 1.000 or 2.n (antirez@github master branch).  
+
+  As of this note, you can download Redis 1.2.5 here: <http://redis.googlecode.com/files/redis-1.2.5.tar.gz>
+
+JARS:
+
+* A single (binary only) jar <jredis-1.0-rc1.jar> is all you need to use JRedis and the reference implementations in your application.
+
+* The full distribution under /Release includes all installed jars as before, if you need sources and/or benchmark and example modules as well.  
 
 NEW FEATURES:
 
 * Added support for Z[REV]RANGE ... WITHSCORES.  (Synch/Asynch).
-  Usage example class (UsingZrangeSubset) in /Examples module.
+  Usage example class <UsingZrangeSubset> in /Examples module.
 
 * Added support for ZREMRANGEBYSCORE.  (Synch/Asynch). 
   Includes missing tests for ZRANGEBYSCORE.
@@ -32,6 +40,7 @@ BUG FIX:
 * Fix for issue GH-12: http://github.com/alphazero/jredis/issues#issue/12
 
 See: 
+http://github.com/alphazero/jredis/issues/ 
 http://github.com/alphazero/jredis/issues/closed 
 
 
