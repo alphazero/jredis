@@ -22,6 +22,7 @@ import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
 import org.jredis.RedisException;
 import org.jredis.Sort;
+import org.jredis.protocol.Command;
 
 
 public abstract class SortSupport implements Sort {
@@ -32,27 +33,22 @@ public abstract class SortSupport implements Sort {
 		this.key = key;
 		this.keyBytes = validatedKeyBytes;
 	}
-	static final String ALPHA = " ALPHA ";
-	static final String DESC = " DESC ";
-	static final String ASC = " ASC ";
-	static final String LIMIT = " LIMIT ";
-	static final String GET = " GET ";
-	static final String BY = " BY ";
-	
+	static final String WSPAD = " ";
 	String alphaSpec = "";
 	String sortSpec = "";
 	String  getSpec = "";
 	String  bySpec = "";
 	String  limitSpec = "";
-	public Sort ALPHA() { alphaSpec = ALPHA; return this;}
-	public Sort DESC() { sortSpec = DESC; return this;}
-	public Sort BY(String pattern) { bySpec = BY + pattern; return this; }
-	public Sort GET(String pattern) { getSpec = GET + pattern + " "; return this; }
+	
+	public Sort ALPHA() { alphaSpec = Command.Options.ALPHA.name() + WSPAD; return this;}
+	public Sort DESC() { sortSpec = Command.Options.DESC.name() + WSPAD; return this;}
+	public Sort BY(String pattern) { bySpec = Command.Options.BY.name() + WSPAD + pattern; return this; }
+	public Sort GET(String pattern) { getSpec = Command.Options.GET.name() + WSPAD + pattern + " "; return this; }
 	public Sort LIMIT(long from, long to) {
 		// TODO: validate here
 		Assert.inRange(to, 0, Long.MAX_VALUE, "from in LIMIT clause", ClientRuntimeException.class);
 		Assert.inRange(to, from, Long.MAX_VALUE, "to in LIMIT clause (when from=" + from + ")", ClientRuntimeException.class);
-		limitSpec = LIMIT + from + " " + to;
+		limitSpec = Command.Options.LIMIT.name() + WSPAD + from + " " + to;
 		return this;
 	}
 	private final byte[] getSortSpec() {
@@ -65,14 +61,6 @@ public abstract class SortSupport implements Sort {
 		return spec.toString().getBytes();
 	}
 	public List<byte[]> exec() throws IllegalStateException, RedisException {
-		// SORT key by pattern limit from to get pattern desc alpha 
-//		StringBuilder spec = new StringBuilder()
-//			.append(bySpec)
-//			.append(limitSpec)
-//			.append(getSpec)
-//			.append(sortSpec)
-//			.append(alphaSpec);
-//		byte[] sortSpec = spec.toString().getBytes();
 		return execSort (keyBytes, getSortSpec());
 	}
 	public Future<List<byte[]>> execAsynch() {
