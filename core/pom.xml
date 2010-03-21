@@ -6,14 +6,14 @@
   <parent>
     <groupId>org.jredis</groupId>
     <artifactId>jredis</artifactId>
-    <version>a.0-SNAPSHOT</version>
+    <version>1.0-rc1</version>
   </parent>
 
   <!-- coordination | build pom -->
   <name>JRedis - Core [Build POM]</name>
   <groupId>org.jredis</groupId>
   <artifactId>jredis-core</artifactId>
-  <version>a.0-SNAPSHOT</version>
+  <version>1.0-rc1</version>
   <packaging>pom</packaging>
 
   <!-- production units -->
@@ -70,7 +70,7 @@
       <name>Apache 2</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>all</distribution>
-      <comments>Copyright 2009 (c) Joubin Houshyar - All Right Resererved</comments>
+      <comments>Copyright 2009-2010 (c) Joubin Houshyar - All Right Resererved</comments>
     </license>
   </licenses>
   <developers>

@@ -1,0 +1,60 @@
+Release: JRedis 1.0 RC 1
+
+REQUIREMENTS:
+
+Requires Redis server 1.2.n.  This release is NOT compatible with either Redis 1.000 or 2.n (development edge).  
+Developed and tested for Redis 1.2.5.
+
+NEW FEATURES:
+
+* Added support for Z[REV]RANGE ... WITHSCORES.  (Synch/Asynch).
+  Usage example class (UsingZrangeSubset) in /Examples module.
+
+* Added support for ZREMRANGEBYSCORE.  (Synch/Asynch). 
+  Includes missing tests for ZRANGEBYSCORE.
+
+* Added support for BGREWRITEAOF.  (Synch/Asynch).
+
+* Added support for EXPIREAT.  (Synch/Asynch).  .
+
+* Added support for DEBUG OBJECT <key> (Synch/Asynch).
+
+* Added ECHO (synch/asynch). Tested.
+
+* Added SPOP (synch/Asynch). Tested
+
+See:
+http://github.com/alphazero/jredis/commits/1.2.n
+
+
+BUG FIX:
+
+* Fix for issue GH-12: http://github.com/alphazero/jredis/issues#issue/12
+
+See: 
+http://github.com/alphazero/jredis/issues/closed 
+
+
+INTERNALS:
+
+Of interest to those who are using components to build their own clients, and not relevant to reference implementation users.
+
+* SortSupport changed to use Command.Options
+
+* Retiring Command.length
+
+* A few new top-level and inner classes to support command options, 
+  and a mod to semantics of Command names (using $OPTS)
+
+
+ROAD MAP:
+
+* This release is only missing SYNC and MONITOR as far as I know.  The reasons were noted here: <http://groups.google.com/group/redis-db/browse_thread/thread/192b7a5cf0994bba>.  These may be supported in a subsequent release candidate for JRedis 1.0.  
+
+* An extension point for customizable consistent hashing schema to support sharding may be included in subsequent release candidate for JRedis 1.0. 
+
+/enjoy
+
+03-21-2010
+NoVA
+
