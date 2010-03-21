@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package org.jredis.examples;
+package org.jredis.examples.commands;
 
 import java.util.HashMap;
 import java.util.Map;
