@@ -647,6 +647,36 @@ public interface JRedisFuture {
 	public Future<List<byte[]>> zrevrange (String setkey, long from, long to); 
 
 	/**
+	 * Equivalent to {@link JRedis#zrange(String, long, long)} with the {@link Command.Options#WITHSCORES}.
+	 * Unlike the general ZRANGE command that only returns the values, this method returns both
+	 * values and associated scores for the specified range.
+	 * 
+	 * @Redis ZRANGE ... WITHSCORES
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return
+	 * @see JRedis#zrange(String, long, long)
+	 * @see ZSetEntry
+	 */
+	public Future<List<ZSetEntry>> zrangeSubset (String setkey, long from, long to); 
+
+	/**
+	 * Equivalent to {@link JRedis#zrange(String, long, long)} with the {@link Command.Options#WITHSCORES}.
+	 * Unlike the general ZRANGE command that only returns the values, this method returns both
+	 * values and associated scores for the specified range.
+	 * 
+	 * @Redis ZREVRANGE ... WITHSCORES
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return
+	 * @see JRedis#zrevrange(String, long, long)
+	 * @see ZSetEntry
+	 */
+	public Future<List<ZSetEntry>> zrevrangeSubset (String setkey, long from, long to); 
+
+	/**
 	 * @Redis ZINCRBY
 	 * @param setkey
 	 * @param score

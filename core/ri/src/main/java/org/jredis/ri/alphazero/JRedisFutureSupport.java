@@ -18,6 +18,7 @@ package org.jredis.ri.alphazero;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import org.jredis.ObjectInfo;
 import org.jredis.ProviderException;
 import org.jredis.RedisType;
 import org.jredis.Sort;
+import org.jredis.ZSetEntry;
 import org.jredis.connector.Connection;
 import org.jredis.protocol.BulkResponse;
 import org.jredis.protocol.Command;
@@ -882,6 +884,30 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArrayList(this.queueRequest(Command.ZREVRANGE, keybytes, fromBytes, toBytes));
 	}
 
+//	@Override
+	public Future<List<ZSetEntry>> zrangeSubset(String key, long from, long to) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(from);
+		byte[] toBytes = Convert.toBytes(to);
+
+		return new FutureZSetList(this.queueRequest(Command.ZRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Options.WITHSCORES.bytes));
+	}
+
+//	@Override
+	public Future<List<ZSetEntry>> zrevrangeSubset(String key, long from, long to) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(from);
+		byte[] toBytes = Convert.toBytes(to);
+
+		return new FutureZSetList(this.queueRequest(Command.ZREVRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Options.WITHSCORES.bytes));
+	}
+	
 	// TODO: NOTIMPLEMENTED:
 //	@Override
 	public Sort sort(final String key) {
@@ -1580,6 +1606,32 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         {
         	ValueResponse valResp = (ValueResponse) pendingRequest.get(timeout, unit);
         	return getObjectInfo(valResp);
+        }
+	}
+	public static class FutureZSetList extends FutureResultBase implements Future<List<ZSetEntry>>{
+
+        protected FutureZSetList (Future<Response> pendingRequest) { super(pendingRequest); }
+
+        public List<ZSetEntry> get () throws InterruptedException, ExecutionException {
+        	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get();
+        	return convert(resp.getMultiBulkData());
+        }
+
+        public List<ZSetEntry> get (long timeout, TimeUnit unit)
+        	throws InterruptedException, ExecutionException, TimeoutException 
+        {
+        	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get(timeout, unit);
+        	return convert(resp.getMultiBulkData());
+        }
+        private static final List<ZSetEntry> convert (List<byte[]> mbulkdata) {
+        	List<ZSetEntry> zset = null;
+        	if(mbulkdata.size() > 0){
+        		zset = new ArrayList<ZSetEntry>(mbulkdata.size()/2);
+        		for(int i=0; i<mbulkdata.size(); i+=2){
+        			zset.add(new ZSetEntryImpl(mbulkdata.get(i),  mbulkdata.get(i+1)));
+        		}
+        	}
+        	return zset;
         }
 	}
 	// ------------------------------------------------------------------------

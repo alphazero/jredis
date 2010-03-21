@@ -104,8 +104,10 @@ public enum Command {
 	ZSCORE		(RequestType.KEY_VALUE,		ResponseType.BULK),
 	ZRANK		(RequestType.KEY_VALUE,		ResponseType.NUMBER),
 	ZREVRANK	(RequestType.KEY_VALUE,		ResponseType.NUMBER),
-	ZRANGE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
-	ZREVRANGE	(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
+	ZRANGE			(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
+	ZRANGE$OPTS		(RequestType.KEY_NUM_NUM_OPTS,	ResponseType.MULTI_BULK),
+	ZREVRANGE		(RequestType.KEY_NUM_NUM,		ResponseType.MULTI_BULK),
+	ZREVRANGE$OPTS	(RequestType.KEY_NUM_NUM_OPTS,	ResponseType.MULTI_BULK),
 	ZINCRBY		(RequestType.KEY_IDX_VALUE, ResponseType.BULK),
 	ZRANGEBYSCORE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
 	ZREMRANGEBYSCORE	(RequestType.KEY_NUM_NUM,	ResponseType.NUMBER),
@@ -154,7 +156,7 @@ public enum Command {
 	/** semantic sugar */
 	public final String code;
 	public final byte[] bytes;
-	public final int length;
+//	public final int length;
 //	public final int arg_cnt;
 	public final RequestType requestType;
 	public final ResponseType responseType;
@@ -167,9 +169,14 @@ public enum Command {
 	 * @param respType the {@link ResponseType} of the Command
 	 */
 	Command (RequestType reqType, ResponseType respType) { 
-		this.code = this.name(); 
-		this.bytes = code.getBytes();
-		this.length = code.length();
+		this.code = this.name();
+		
+		if(code.indexOf("$OPT") > 0) 
+			this.bytes = code.substring(0, code.indexOf('$')).getBytes();
+		else
+			this.bytes = code.getBytes();
+		
+//		this.length = code.length();
 		this.requestType = reqType;
 		this.responseType = respType;
 //		this.arg_cnt = -1; // to raise exception -- make sure we don't miss any
@@ -179,6 +186,30 @@ public enum Command {
 	// Inner Types
 	// ------------------------------------------------------------------------
 
+	/**
+	 * Redis Command Options and modifiers
+	 * 
+	 * @author  Joubin Houshyar (alphazero@sensesay.net)
+	 * @version alpha.0, Mar 20, 2010
+	 * @since   alpha.0
+	 * 
+	 */
+	public enum Options {
+		WITHSCORES,
+		BY,
+		LIMIT,
+		GET,
+		ASC,
+		DESC,
+		ALPHA,
+		STORE;
+		/** semantic sugar */
+		public final byte[] bytes;
+		Options () {
+			this.bytes = name().getBytes();
+		}
+	}
+	
     /**
      * Broad Request Type categorization of the Redis Command per the request's
      * argument signature.  These categories are a more differentiated than the
@@ -204,6 +235,8 @@ public enum Command {
     	KEY_SPEC,
     	/**  */
     	KEY_NUM_NUM,
+    	/** */
+    	KEY_NUM_NUM_OPTS,
     	/**  */
     	KEY_VALUE,
     	/**  */

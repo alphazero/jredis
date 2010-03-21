@@ -120,6 +120,13 @@ public class DefaultCodec {
 		return list;
 	}
 
+	/**
+     * @param bs bytes of the ascii string representation of a double number. E.g. "2.002".getBytes()
+     * @return
+     */
+    public static double toDouble (byte[] bs) {
+	    return Convert.toDouble(bs);
+    }
 	public static final List<Double> toDouble(List<byte[]> bytearray){
 		List<Double> list = new ArrayList<Double>(bytearray.size());
 		for(byte[] b : bytearray) list.add(Convert.toDouble(b));

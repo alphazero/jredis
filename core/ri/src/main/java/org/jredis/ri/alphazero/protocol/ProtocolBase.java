@@ -144,6 +144,21 @@ public abstract class ProtocolBase implements Protocol {
 				// -------------------
 				break;
 
+			case KEY_NUM_NUM_OPTS:
+				// -------------------
+				buffer.write(cmd.bytes);
+				buffer.write(SPACE);
+				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
+				buffer.write(SPACE);
+				buffer.write(Assert.notNull(args[1], "num_1 arg", ProviderException.class));
+				buffer.write(SPACE);
+				buffer.write(Assert.notNull(args[2], "num_2 arg", ProviderException.class));
+				buffer.write(SPACE);
+				buffer.write(Assert.notNull(args[3], "opt args", ProviderException.class));
+				buffer.write(CRLF);
+				// -------------------
+				break;
+				
 			case KEY_VALUE:
 			{
 				byte[] value = Assert.notNull(args[1], "value arg", ProviderException.class);
@@ -216,7 +231,7 @@ public abstract class ProtocolBase implements Protocol {
 				Assert.isTrue(args.length%2==0, "args length should be an even number and expected to be seq of tuple {key, value}", ProviderException.class);
 				Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX, "Only MSET/NX bulk commands are supported", NotSupportedException.class);
 
-				byte[] setCmdLenBytes = Convert.toBytes(cmd.length);
+				byte[] setCmdLenBytes = Convert.toBytes(cmd.bytes.length);
 				byte[] bulkSetLineCntBytes = Convert.toBytes(args.length+1);
 
 				buffer.write(COUNT_BYTE);

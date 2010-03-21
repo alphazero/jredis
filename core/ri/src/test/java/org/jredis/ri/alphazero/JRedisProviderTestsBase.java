@@ -32,6 +32,7 @@ import org.jredis.ObjectInfo;
 import org.jredis.RedisException;
 import org.jredis.RedisInfo;
 import org.jredis.RedisType;
+import org.jredis.ZSetEntry;
 import org.jredis.protocol.Command;
 import org.jredis.ri.JRedisTestSuiteBase;
 import org.jredis.ri.alphazero.support.DefaultCodec;
@@ -1787,6 +1788,57 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
+
+	@Test
+	public void testZrangeWithscoresStringByteArray() {
+		cmd = Command.ZRANGE$OPTS.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<MEDIUM_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+			
+			List<byte[]>  zvalues = provider.zrange(setkey, 0, SMALL_CNT);
+			
+			List<ZSetEntry>  zsubset = provider.zrangeSubset(setkey, 0, SMALL_CNT);
+			for(int i=0;i<SMALL_CNT; i++){
+				assertEquals(zsubset.get(i).getValue(), dataList.get(i), "value of element from zrange_withscore");
+				assertEquals(zsubset.get(i).getValue(), zvalues.get(i), "value of element from zrange_withscore compared with zscore with same range query");
+				assertEquals (zsubset.get(i).getScore(), (double)i, "score of element from zrange_withscore");
+				assertTrue(zsubset.get(i).getScore() <= zsubset.get(i+1).getScore(), "range member score should be smaller or equal to previous range member.  idx: " + i);
+				if(i>0) assertTrue(zsubset.get(i).getScore() >= zsubset.get(i-1).getScore(), "range member score should be bigger or equal to previous range member.  idx: " + i);
+			}
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
+	@Test
+	public void testZrevrangeWithscoresStringByteArray() {
+		cmd = Command.ZREVRANGE$OPTS.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<MEDIUM_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+			
+			List<byte[]>  zvalues = provider.zrevrange(setkey, 0, SMALL_CNT);
+			
+			List<ZSetEntry>  zsubset = provider.zrevrangeSubset(setkey, 0, SMALL_CNT);
+			for(int i=0;i<SMALL_CNT; i++){
+				assertEquals(zsubset.get(i).getValue(), dataList.get(MEDIUM_CNT-i-1), "value of element from zrange_withscore");
+				assertEquals(zsubset.get(i).getValue(), zvalues.get(i), "value of element from zrange_withscore compared with zscore with same range query");
+				assertEquals (zsubset.get(i).getScore(), (double)MEDIUM_CNT-i-1, "score of element from zrange_withscore");
+				assertTrue(zsubset.get(i).getScore() >= zsubset.get(i+1).getScore(), "range member score should be smaller or equal to previous range member.  idx: " + i);
+				if(i>0) assertTrue(zsubset.get(i).getScore() <= zsubset.get(i-1).getScore(), "range member score should be bigger or equal to previous range member.  idx: " + i);
+			}
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
 	@Test
 	public void testZrangebyscoreStringByteArray() {
 		cmd = Command.ZRANGEBYSCORE.code + " byte[]";
