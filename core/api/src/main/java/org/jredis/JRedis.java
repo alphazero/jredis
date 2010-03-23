@@ -772,6 +772,15 @@ public interface JRedis {
 	public <T extends Serializable> 
 		Double zincrby (String setkey, double score, T object) throws RedisException;
 
+	/**
+	 * @Redis ZCOUNT
+	 * @param setkey
+	 * @param minScore
+	 * @param maxScore
+	 * @return count of set members with score in the given range.
+	 * @throws RedisException
+	 */
+	public long zcount (String setkey, double minScore, double maxScore) throws RedisException; 
 	// ------------------------------------------------------------------------
 	// Commands operating on hashes
 	// ------------------------------------------------------------------------

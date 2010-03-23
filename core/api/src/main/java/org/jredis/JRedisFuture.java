@@ -709,6 +709,15 @@ public interface JRedisFuture {
 	public Future<Long> zremrangebyscore (String setkey, double minScore, double maxScore); 
 
 	/**
+	 * @Redis ZCOUNT
+	 * @param setkey
+	 * @param minScore
+	 * @param maxScore
+	 * @return number of removed elements
+	 */
+	public Future<Long> zcount (String setkey, double minScore, double maxScore); 
+
+	/**
 	 * @Redis ZREMRANGEBYRANK
 	 * @param setkey
 	 * @param from

@@ -502,6 +502,35 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		} 
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
+
+	@Test
+	public void testZcountStringByteArray() throws InterruptedException{
+		cmd = Command.ZCOUNT.code + " byte[] | " + Command.ZADD.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+
+		try {
+			provider.flushdb();
+			String setkey = keys.get(0);
+			List<Future<Boolean>> expectedOKResponses = new ArrayList<Future<Boolean>>();
+			for(int i=0;i<MEDIUM_CNT; i++)
+				expectedOKResponses.add (provider.zadd(setkey, i, dataList.get(i)));
+			
+			Future<Long> frCount = provider.zcount(setkey, 0, SMALL_CNT); 
+			try {
+				for(Future<Boolean> resp : expectedOKResponses)
+					assertTrue (resp.get().booleanValue(), "zadd of random element should have been true");
+				
+				long remCnt = frCount.get().longValue();
+				assertTrue(remCnt > 0, "should have non-zero number of rem cnt for zremrangebyscore");
+				assertEquals(remCnt, SMALL_CNT+1, "should have specific number for zcount");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
 	
 	@Test
 	public void testZremrangebyrankStringByteArray() throws InterruptedException{

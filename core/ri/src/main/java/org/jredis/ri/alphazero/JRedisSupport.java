@@ -1243,6 +1243,26 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
+	public long zcount (String key, double minScore, double maxScore) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(minScore);
+		byte[] toBytes = Convert.toBytes(maxScore);
+
+		long resp = Long.MIN_VALUE;
+		try {
+			ValueResponse valueResponse = (ValueResponse) this.serviceRequest(Command.ZCOUNT, keybytes, fromBytes, toBytes);
+			resp = valueResponse.getLongValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a numeric ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resp;
+	}
+
+//	@Override
 	public long zremrangebyrank (String key, double minRank, double maxRank) throws RedisException {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
