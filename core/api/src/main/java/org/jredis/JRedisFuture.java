@@ -233,6 +233,18 @@ public interface JRedisFuture {
 	public Future<byte[]> substr (String listkey, long from, long to); 
 	
 	/**
+	 * @Redis APPEND
+	 * @param key
+	 * @param value
+	 * @return the length (byte count) of appended key.
+	 */
+	public Future<Long> append (String key, byte[] value);
+	public Future<Long> append (String key, String stringValue);
+	public Future<Long> append (String key, Number numberValue);
+	public <T extends Serializable> 
+		   Future<Long> append (String key, T object);
+
+	/**
 	 * @Redis EXISTS
 	 * @param key
 	 * @return

@@ -365,6 +365,29 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return setnx(key, DefaultCodec.encode(value));
 	}
 
+	
+//	@Override
+	public Future<Long> append (String key, byte[] value){
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.APPEND, keybytes, value);
+		return new FutureLong(futureResponse);
+	}
+//	@Override
+	public Future<Long> append(String key, String value) {
+		return append(key, DefaultCodec.encode(value));
+	}
+//	@Override
+	public Future<Long> append(String key, Number value) {
+		return append(key, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> Future<Long> append (String key, T value) {
+		return append(key, DefaultCodec.encode(value));
+	}
+
 //	@Override
 	public Future<Boolean> sismember(String key, byte[] member) {
 		byte[] keybytes = null;

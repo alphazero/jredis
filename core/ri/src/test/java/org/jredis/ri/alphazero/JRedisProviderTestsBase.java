@@ -414,6 +414,99 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	}
 
 	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#append(java.lang.String, byte[])}.
+	 */
+	@Test
+	public void testAppendStringByteArray() {
+		cmd = Command.SET.code + " | " + Command.APPEND.code + " byte[] | " + Command.GET;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			// append to a non-existent key
+			// as of Redis 1.3.7 it behaves just like set but returns value len instead of status
+			String key1 = keys.get(0);
+			long key1len = 0;
+			key1len = provider.append(key1, emptyBytes);
+			assertEquals(key1len, 0, "append of emtpy bytes to new key should be zero");
+			assertEquals(provider.get(key1), emptyBytes, "get results after append to new key for empty byte[]");
+			
+			long len = 0;
+			len = provider.append(key1, dataList.get(0));
+			assertEquals(len+key1len, dataList.get(0).length, "append results");
+			assertEquals(provider.get(key1), dataList.get(0), "get results after append");
+			key1len += len;
+			
+			len = provider.append(key1, dataList.get(1));
+			assertEquals(len, dataList.get(0).length + dataList.get(1).length, "append results");
+			
+			byte[] appendedBytes = new byte[dataList.get(0).length + dataList.get(1).length];
+			System.arraycopy(dataList.get(0), 0, appendedBytes, 0, dataList.get(0).length);
+			System.arraycopy(dataList.get(1), 0, appendedBytes, dataList.get(0).length, dataList.get(1).length);
+			assertEquals(provider.get(key1), appendedBytes, "get results after 2nd append");
+			
+			// raise errors
+			boolean expected = false;
+			try {
+				String nonStringKey = keys.get(1);
+				provider.sadd(nonStringKey, dataList.get(0));
+				provider.append(nonStringKey, dataList.get(3));
+			}
+			catch(RedisException e) { expected = true; }
+			assertTrue(expected, "expecting RedisException for append to a non-string key");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#append(java.lang.String, java.lang.String)}.
+	 */
+	@Test
+	public void testAppendStringString() {
+		cmd = Command.SET.code + " | " + Command.APPEND.code + " String | " + Command.GET;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			// append to a non-existent key
+			// as of Redis 1.3.7 it behaves just like set but returns value len instead of status
+			String key1 = keys.get(0);
+			long key1len = 0;
+			long len = 0;
+			
+			// append empty string to non-existent key
+			key1len = provider.append(key1, emptyString);
+			assertEquals(key1len, 0, "append of emtpy string to new key should be zero");
+			assertEquals(DefaultCodec.toStr(provider.get(key1)), emptyString, "get results after append to new key for empty string");
+			
+			// append a string
+			len = provider.append(key1, stringList.get(0));
+			assertEquals(len+key1len, stringList.get(0).length(), "append results");
+			assertEquals(DefaultCodec.toStr(provider.get(key1)), stringList.get(0), "get results after append");
+			key1len += len;
+			
+			// append a string again
+			len = provider.append(key1, stringList.get(1));
+			assertEquals(len, stringList.get(0).length() + stringList.get(1).length(), "append results");
+			StringBuffer appendedString = new StringBuffer();
+			appendedString.append(stringList.get(0));
+			appendedString.append(stringList.get(1));
+			assertEquals(DefaultCodec.toStr(provider.get(key1)), appendedString.toString(), "get results after 2nd append");
+			
+			// raise RedisException
+			boolean expected = false;
+			try {
+				String nonStringKey = keys.get(1);
+				provider.sadd(nonStringKey, stringList.get(0));
+				provider.append(nonStringKey, stringList.get(3));
+			}
+			catch(RedisException e) { expected = true; }
+			assertTrue(expected, "expecting RedisException for append to a non-string key");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+
+	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, java.lang.String)}.
 	 */
 	@Test

@@ -233,6 +233,20 @@ public interface JRedis {
 	 */
 	public byte[] substr (String key, long from, long to) throws RedisException;
 	
+	
+	/**
+	 * @Redis APPEND
+	 * @param key
+	 * @param value
+	 * @return length (byte count) of appended value
+	 * @throws RedisException
+	 */
+	public long append (String key, byte[] value) throws RedisException;
+	public long append (String key, String stringValue) throws RedisException;
+	public long append (String key, Number numberValue) throws RedisException;
+	public <T extends Serializable> 
+		   long append (String key, T object) throws RedisException;
+
 	// ------------------------------------------------------------------------
 	// "Commands operating on the key space"
 	// ------------------------------------------------------------------------

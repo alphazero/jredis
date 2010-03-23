@@ -41,6 +41,8 @@ import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.Test;
 
 /**
+ * [TODO: cleanup the unit test comments]
+ * 
  * Provides the comprehensive set of tests of all {@link JRedisFuture} methods.
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
@@ -1626,6 +1628,70 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				Throwable cause = e.getCause();
 				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
 			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
+	/**
+	 * Test method for {@link JRedisFuture#append(String, String)}
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testAppendStringString() throws InterruptedException {
+		cmd = Command.APPEND.code + " | " + Command.GET.code + " String";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			// append to a non-existent key
+			// as of Redis 1.3.7 it behaves just like set but returns value len instead of status
+			String key1 = keys.get(0);
+			
+			Future<Long> frLen0 = provider.append(key1, emptyString);
+			Future<byte[]> frGet0 = provider.get(key1);
+			
+			Future<Long> frLen1 = provider.append(key1, stringList.get(0));
+			Future<byte[]> frGet1 = provider.get(key1);
+			
+			Future<Long> frLen2 = provider.append(key1, stringList.get(1));
+			Future<byte[]> frGet2 = provider.get(key1);
+			
+			provider.sadd(keys.get(1), stringList.get(0));
+			Future<Long>   frExpectedError = provider.append(keys.get(1), stringList.get(0));
+			
+			try {
+				assertEquals(frLen0.get().longValue(), 0, "append of emtpy string to new key should be zero");
+				assertEquals(DefaultCodec.toStr(frGet0.get()), emptyString, "get results after append to new key for empty string");
+				
+				assertEquals(frLen1.get().longValue(), stringList.get(0).length(), "append of emtpy string to new key should be zero");
+				assertEquals(DefaultCodec.toStr(frGet1.get()), stringList.get(0), "get results after append to new key for empty string");
+				
+				assertEquals(frLen2.get().longValue(), stringList.get(0).length() + stringList.get(1).length(), "append of emtpy string to new key should be zero");
+				StringBuffer appendedString = new StringBuffer();
+				appendedString.append(stringList.get(0));
+				appendedString.append(stringList.get(1));
+				assertEquals(DefaultCodec.toStr(frGet2.get()), appendedString.toString(), "get results after append to new key for empty string");
+				
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+
+			
+			// check see if we got the expected RedisException
+			boolean expected = false;
+			try {
+				frExpectedError.get();
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				if(cause instanceof RedisException)
+					expected = true;
+				else
+					fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+			assertTrue(expected, "expecting RedisException for append to a non-string key");
 		} 
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}

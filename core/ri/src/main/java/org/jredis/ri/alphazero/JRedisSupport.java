@@ -454,6 +454,36 @@ public abstract class JRedisSupport implements JRedis {
 		return setnx(key, DefaultCodec.encode(value));
 	}
 
+	
+//	@Override
+	public long append(String key, byte[] value) throws RedisException{
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		long resvalue = -1;
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.APPEND, keybytes, value);
+			resvalue = valResponse.getLongValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resvalue;
+	}
+//	@Override
+	public long append(String key, String value) throws RedisException {
+		return append(key, DefaultCodec.encode(value));
+	}
+//	@Override
+	public long append(String key, Number value) throws RedisException {
+		return append(key, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> long append (String key, T value) throws RedisException {
+		return append(key, DefaultCodec.encode(value));
+	}
+
 	private boolean msetnx(byte[][] mappings) throws RedisException {
 		boolean resvalue = false;
 		try {
