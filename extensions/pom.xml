@@ -1,4 +1,4 @@
-<!-- ~/core/pom.xml -->
+<!-- ~/extensions/pom.xml -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -11,21 +11,21 @@
   </parent>
 
   <!-- coordination | build pom -->
-  <name>JRedis - Core [Build POM]</name>
+  <name>JRedis - Extensions [Build POM]</name>
   <groupId>org.jredis</groupId>
-  <artifactId>jredis-core</artifactId>
+  <artifactId>jredis-extensions</artifactId>
   <version>1.0-rc1</version>
   <packaging>pom</packaging>
 
   <!-- production units -->
   <modules>
     <module>api</module>
+    <!--
     <module>ri</module>
-    <module>bench</module>
-    <module>all</module>
+    -->
   </modules>
   
-  <!-- core specific surefire testrunner-->
+  <!-- extensions specific surefire testrunner-->
   <build>
     <plugins>
       <plugin>
