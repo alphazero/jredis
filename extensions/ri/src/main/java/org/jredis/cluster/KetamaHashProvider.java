@@ -1,7 +1,7 @@
 /* -- BEGIN NOTICE --
  * 
  * This class uses in parts extant and/or modified code from net.spy.memcached.HashAlgorithm
- * by Dustin Sallings.
+ * by Dustin Sallings.  See this module's 3rd party license folder for license details.
  * 
  * -- END NOTICE -- 
  * 
@@ -41,6 +41,7 @@ public class KetamaHashProvider implements HashProvider {
 	/* (non-Javadoc) @see org.jredis.cluster.HashProvider#hash(java.lang.String) */
 	@Override
 	public long hash (byte[] b) {
+		if(null == b || b.length ==0) throw new IllegalArgumentException();
 		
 		/* Copyright (c) 2006-2009  Dustin Sallings <dustin@spy.net> */
 		/* -- BEGIN code segment */

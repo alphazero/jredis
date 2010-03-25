@@ -38,6 +38,7 @@ import org.testng.annotations.BeforeSuite;
 public class RefImplTestSuiteBase {
 
 	protected final Set<ClusterNodeSpec> clusterNodeSpecs = new HashSet<ClusterNodeSpec>();
+	protected ClusterNodeSpec[] clusterNodeSpecsArray = null;
 
 	@BeforeSuite
 	public void suiteParametersInit(
@@ -59,6 +60,13 @@ public class RefImplTestSuiteBase {
 			nodeSpec = new ClusterNodeSpecRI (connSpec);
 			clusterNodeSpecs.add(nodeSpec);
 		}
+		// sets are a pain if you just want a member
+		clusterNodeSpecsArray = new ClusterNodeSpec[clusterNodeSpecs.size()];
+		clusterNodeSpecsArray = clusterNodeSpecs.toArray(clusterNodeSpecsArray);
+
+		Log.log("clusterNodeSpecsArray: " + clusterNodeSpecsArray);
+		for(ClusterNodeSpec s : clusterNodeSpecsArray)
+			if (null == s) Log.log("NULL clusterNodeSpec: " + s);
 	}	
 	// ------------------------------------------------------------------------
 	// Helper methods
@@ -111,7 +119,8 @@ public class RefImplTestSuiteBase {
 		return address;
 	}
 	protected ConnectionSpec getConnectionSpecFor (InetAddress address, int port) {
-		ConnectionSpec connSpec = DefaultConnectionSpec.newSpec().setAddress(address).setPort(port);
+		int db = 10; // TODO: grab from pom
+		ConnectionSpec connSpec = DefaultConnectionSpec.newSpec().setAddress(address).setPort(port).setDatabase(db);
 		return connSpec;
 	}
 }

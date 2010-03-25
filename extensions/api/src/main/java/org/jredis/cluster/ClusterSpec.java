@@ -44,14 +44,14 @@ public interface ClusterSpec {
 	/**
 	 * @return
 	 */
-	public Set<ClusterNodeSpec> getNodes();
+	public Set<ClusterNodeSpec> getNodeSpecs();
 	
 	/**
 	 * @param nodeSpec
 	 * @return
 	 * @throws IllegalArgumentException if nodeSpec provided is already present.
 	 */
-	public ClusterSpec addNode(ClusterNodeSpec nodeSpec);
+	public ClusterSpec addNodeSpec(ClusterNodeSpec nodeSpec);
 	
 	/**
 	 * @param nodeSpecs
@@ -77,19 +77,27 @@ public interface ClusterSpec {
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addAll(java.util.List) */
         @Override
         public ClusterSpec addAll (Set<ClusterNodeSpec> nodeSpecs) {
-	        return null;
+        	for(ClusterNodeSpec nodeSpec : nodeSpecs){
+        		addNodeSpec(nodeSpec);
+        	}
+	        return this;
         }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addNode(org.jredis.cluster.ClusterNodeSpec) */
         @Override
-        public ClusterSpec addNode (ClusterNodeSpec nodeSpec) {
-	        // TODO Auto-generated method stub
-	        return null;
+        public ClusterSpec addNodeSpec (ClusterNodeSpec nodeSpec) {
+        	if(null == nodeSpec)
+    			throw new IllegalArgumentException("null nodeSpec");
+        	
+    		if(!this.nodeSpecs.add(nodeSpec))
+    			throw new IllegalArgumentException("nodeSpec [id: <"+nodeSpec.getId()+">] is already present");
+    		
+    		return this;
         }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getNodes() */
         @Override
-        public Set<ClusterNodeSpec> getNodes () {
+        public Set<ClusterNodeSpec> getNodeSpecs () {
         	Set<ClusterNodeSpec> set = new HashSet<ClusterNodeSpec>(nodeSpecs.size());
         	for(ClusterNodeSpec spec : nodeSpecs)
         		set.add(spec);
@@ -99,7 +107,7 @@ public interface ClusterSpec {
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getHashProvider() */
         @Override
         public HashProvider getHashProvider () {
-	        return null;
+	        return hashProvider;
         }
 		// ------------------------------------------------------------------------
 		// Extension points

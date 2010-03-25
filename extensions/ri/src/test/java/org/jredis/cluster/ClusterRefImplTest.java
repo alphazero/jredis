@@ -28,8 +28,8 @@ import static org.testng.Assert.*;
  * @author  joubin (alphazero@sensesay.net)
  * @date    Mar 24, 2010
  */
-@Test(suiteName="api-spec-refimpl-tests")
-public class ClusterNodeSpecRefImplTest extends RefImplTestSuiteBase {
+@Test(suiteName="extensions-refimpl-tests")
+public class ClusterRefImplTest extends RefImplTestSuiteBase {
 	
 	@Test
 	public void testIdentityContract () {
@@ -120,5 +120,65 @@ public class ClusterNodeSpecRefImplTest extends RefImplTestSuiteBase {
 			}
 			if(++n > 100) break;
 		}
+	}
+	
+	@Test
+	public void testHashProviderAvailability() {
+		Log.log("Testing ClusterSpec.getHashProvider()");
+		
+		// new (empty) ClusterSpec
+		ClusterSpec clusterSpec = new DefaultClusterSpec();
+		
+		// getHashProvider should return non-null results
+		assertTrue (clusterSpec.getHashProvider() != null, "ClusterSpec.getHashProvider should not be null");
+		
+		// getHashProvider should return an instance of KetamaHashProvider for the DefaultClusterSpec
+		assertTrue (clusterSpec.getHashProvider() instanceof KetamaHashProvider, "Default ClusterSpec.getHashProvider should be a Ketama algoritm");
+	}
+	
+	@Test
+	public void testAddNodeSpec() {
+		Log.log("Testing ClusterSpec.addNodeSpec()");
+		ClusterSpec clusterSpec = new DefaultClusterSpec();
+		
+		Log.log("clusterNodeSpecsArray: " + clusterNodeSpecsArray);
+		try {
+			clusterSpec.addNodeSpec(clusterNodeSpecsArray[0]);
+		}
+		catch (Exception e){ fail("when adding a unique spec", e); }
+		
+		try {
+			clusterSpec.addNodeSpec(clusterNodeSpecsArray[1]);
+		}
+		catch (Exception e){ fail("when adding a unique spec", e); }
+		
+		// now lets raise some errors
+		boolean didRaiseError;
+		
+		// should not allow adding of duplicate ClusterNodeSpecs
+		didRaiseError = false;
+		int db = 10;
+		ClusterNodeSpec validSpec = new ClusterNodeSpecRI(DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null));
+		ClusterNodeSpec dupSpec = new ClusterNodeSpecRI(DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null));
+		
+		assertTrue(clusterSpec.addNodeSpec(validSpec) == clusterSpec, "add of unique spec should be possible and must return the clusterSpec instance");
+		try {
+			assertTrue(clusterSpec.addNodeSpec(dupSpec) == clusterSpec, "add of duplicate spec is expected to raise a runtime exception");
+		}
+		catch (IllegalArgumentException e){
+			didRaiseError = true;
+		}
+		if(!didRaiseError) fail("Expecting an IllegalArgumentException raised for duplicate ClusterNodeSpec to add()");
+		
+		// should not allow adding of null specs
+		didRaiseError = false;
+		ClusterNodeSpec nullRef = null;
+		try {
+			assertTrue(clusterSpec.addNodeSpec(nullRef) == clusterSpec, "add of null spec is expected to raise a runtime exception");
+		}
+		catch (IllegalArgumentException e){
+			didRaiseError = true;
+		}
+		if(!didRaiseError) fail("Expecting an IllegalArgumentException raised for null input arg to add()");
 	}
 }
