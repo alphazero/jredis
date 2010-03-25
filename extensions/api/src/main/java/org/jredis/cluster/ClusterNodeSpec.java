@@ -16,7 +16,6 @@
 
 package org.jredis.cluster;
 
-import java.util.Formatter;
 import java.util.Set;
 import org.jredis.connector.ConnectionSpec;
 
@@ -72,7 +71,7 @@ public interface ClusterNodeSpec {
 	 * @date    Mar 24, 2010
 	 * 
 	 */
-	public static class RefImpl implements ClusterNodeSpec {
+	public abstract static class Support implements ClusterNodeSpec {
 
 		// ------------------------------------------------------------------------
 		// Attrs
@@ -91,7 +90,7 @@ public interface ClusterNodeSpec {
 		 * @param connSpec
 		 * @throws IllegalArgumentException 
 		 */
-		public RefImpl(ConnectionSpec connSpec){
+		public Support(ConnectionSpec connSpec){
 			if(null == connSpec)
 				throw new IllegalArgumentException("ConnectionSpec is null");
 			
@@ -119,7 +118,7 @@ public interface ClusterNodeSpec {
          * @throws IllegalArgumentException if arg is null or not a {@link ClusterNodeSpec}
          */
         @Override
-        public boolean equals(Object o) {
+        final public boolean equals(Object o) {
         	if(null == o) throw new IllegalArgumentException("null argument");
         	ClusterNodeSpec n = null;
         	try { n = (ClusterNodeSpec) o; }
@@ -133,7 +132,7 @@ public interface ClusterNodeSpec {
          * id.  Delegates to {@link String#hashCode()}
          */
         @Override
-        public int hashCode() {
+        final public int hashCode() {
         	return this.getId().hashCode();
         }
         
@@ -142,7 +141,7 @@ public interface ClusterNodeSpec {
 		// ------------------------------------------------------------------------
         /**
          * Method is called once (and only once) by the constructor to set the
-         * final {@link RefImpl#id} field.  This (default) implementation simply
+         * final {@link Support#id} field.  This (default) implementation simply
          * creates a string of form <ip-address-string-rep>:<0-padded-5-digit-port-number>:<0 padded 2-digit-db-number.
          * <p>
          * ex:
@@ -153,29 +152,6 @@ public interface ClusterNodeSpec {
          * Optional extension point.
          * @return
          */
-        protected String generateId () {
-        	Formatter fmt = new Formatter();
-        	fmt.format("%s:%05d:%02d", 
-        			this.connSpec.getAddress().getHostAddress(),
-        			this.connSpec.getPort(),
-        			this.connSpec.getDatabase()
-        		);
-        	return fmt.toString();
-        }
-
-        /**
-         * Default implementation will simply return a string of form
-         * <node-id>[<@see org.jredis.cluster.ClusterNodeSpec#getKeyForCHRangeInstance(int)>]
-         * <p>
-         * Optional extension point. 
-         * @param rangeReplicationIndex
-         * @see org.jredis.cluster.ClusterNodeSpec#getKeyForCHRangeInstance(int)
-         */
-        @Override
-        public String getKeyForCHRangeInstance (int rangeReplicationIndex) {
-        	Formatter fmt = new Formatter();
-        	fmt.format("%s[%d]",  this.id, rangeReplicationIndex);
-        	return fmt.toString();
-        }
+        protected abstract String generateId () ;
 	}
 }

@@ -56,7 +56,7 @@ public class RefImplTestSuiteBase {
 		for(int i=0;i<65536; i++) {
 			InetAddress address = getInetAddressFor(getRandomIPv$HostName());
 			ConnectionSpec connSpec = getConnectionSpecFor(address, i);
-			nodeSpec = new ClusterNodeSpec.RefImpl(connSpec);
+			nodeSpec = new ClusterNodeSpecRI (connSpec);
 			clusterNodeSpecs.add(nodeSpec);
 		}
 	}	

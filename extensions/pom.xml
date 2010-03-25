@@ -20,9 +20,7 @@
   <!-- production units -->
   <modules>
     <module>api</module>
-    <!--
     <module>ri</module>
-    -->
   </modules>
   
   <!-- extensions specific surefire testrunner-->

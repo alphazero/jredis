@@ -40,9 +40,9 @@ public class ClusterNodeSpecRefImplTest extends RefImplTestSuiteBase {
 		ConnectionSpec node2Spec = DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null);
 		ConnectionSpec node3Spec = DefaultConnectionSpec.newSpec("127.0.0.1", 6379, anotherDb, null);
 		
-		ClusterNodeSpec node1 = new ClusterNodeSpec.RefImpl(node1Spec);
-		ClusterNodeSpec node2 = new ClusterNodeSpec.RefImpl(node2Spec);
-		ClusterNodeSpec node3 = new ClusterNodeSpec.RefImpl(node3Spec);
+		ClusterNodeSpec node1 = new ClusterNodeSpecRI(node1Spec);
+		ClusterNodeSpec node2 = new ClusterNodeSpecRI(node2Spec);
+		ClusterNodeSpec node3 = new ClusterNodeSpecRI(node3Spec);
 		
 		assertTrue(node1.getId().equals(node2.getId()), "ids should be identical");
 		assertTrue(node1.hashCode() == node2.hashCode(), "hashCodes should be equal");

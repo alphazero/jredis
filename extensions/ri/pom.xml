@@ -11,9 +11,9 @@
   </parent>
 
   <!-- production | jar -->
-  <name>JRedis - Extensions - API</name>
+  <name>JRedis - Extensions - RI</name>
   <groupId>org.jredis</groupId>
-  <artifactId>jredis-extensions-api</artifactId>
+  <artifactId>jredis-extensions-ri</artifactId>
   <version>1.0-rc1</version>
   <packaging>jar</packaging>
   
@@ -33,6 +33,13 @@
       <version>1.0-rc1</version>
     </dependency>
     
+    <!-- extensions api -->
+    <dependency>
+      <groupId>org.jredis</groupId>
+      <artifactId>jredis-extensions-api</artifactId>
+      <version>1.0-rc1</version>
+    </dependency>
+
     <!-- unit testing -->
     <dependency>
       <groupId>org.testng</groupId>
