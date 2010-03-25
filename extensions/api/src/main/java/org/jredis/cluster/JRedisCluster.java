@@ -27,7 +27,7 @@ import org.jredis.JRedisFuture;
  * 
  */
 
-public interface RedisCluster {
+public interface JRedisCluster {
 	/**
 	 * @return
 	 */
