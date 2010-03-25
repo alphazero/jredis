@@ -16,7 +16,8 @@
 
 package org.jredis.cluster;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * [TODO: document me!]
@@ -27,13 +28,71 @@ import java.util.List;
  */
 
 public interface ClusterSpec {
+	
 	/**
 	 * @return
 	 */
-	public List<ClusterNodeSpec> getNodes();
+	public HashProvider getHashProvider();
+	
+	
+	/**
+	 * @return
+	 */
+	public Set<ClusterNodeSpec> getNodes();
+	
 	/**
 	 * @param nodeSpec
 	 * @return
+	 * @throws IllegalArgumentException if nodeSpec provided is already present.
 	 */
 	public ClusterSpec addNode(ClusterNodeSpec nodeSpec);
+	
+	/**
+	 * @param nodeSpecs
+	 * @return
+	 */
+	public ClusterSpec addAll(Set<ClusterNodeSpec> nodeSpecs);
+	
+	// ------------------------------------------------------------------------
+	// Reference Implementation 
+	// ------------------------------------------------------------------------
+	
+	public static class RefImpl implements ClusterSpec {
+
+		protected HashProvider hashProvider;
+		
+		final protected Set<ClusterNodeSpec> nodeSpecs = new HashSet<ClusterNodeSpec>();
+		
+		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addAll(java.util.List) */
+        @Override
+        public ClusterSpec addAll (Set<ClusterNodeSpec> nodeSpecs) {
+	        // TODO Auto-generated method stub
+	        return null;
+        }
+
+		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addNode(org.jredis.cluster.ClusterNodeSpec) */
+        @Override
+        public ClusterSpec addNode (ClusterNodeSpec nodeSpec) {
+	        // TODO Auto-generated method stub
+	        return null;
+        }
+
+		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getNodes() */
+        @Override
+        public Set<ClusterNodeSpec> getNodes () {
+        	Set<ClusterNodeSpec> set = new HashSet<ClusterNodeSpec>(nodeSpecs.size());
+        	for(ClusterNodeSpec spec : nodeSpecs)
+        		set.add(spec);
+	        return set;
+        }
+
+		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getHashProvider() */
+        @Override
+        public HashProvider getHashProvider () {
+	        // TODO Auto-generated method stub
+	        return null;
+        }
+		
+	}
+
 }

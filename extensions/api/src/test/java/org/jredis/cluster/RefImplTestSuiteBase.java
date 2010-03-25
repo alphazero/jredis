@@ -16,16 +16,16 @@
 
 package org.jredis.cluster;
 
+import static org.testng.Assert.fail;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.BeforeSuite;
-import static org.testng.Assert.*;
 
 /**
  * [TODO: document me!]
@@ -37,7 +37,7 @@ import static org.testng.Assert.*;
 
 public class RefImplTestSuiteBase {
 
-	protected final List<ClusterNodeSpec> clusterNodeSpecs = new ArrayList<ClusterNodeSpec>();
+	protected final Set<ClusterNodeSpec> clusterNodeSpecs = new HashSet<ClusterNodeSpec>();
 
 	@BeforeSuite
 	public void suiteParametersInit(

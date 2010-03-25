@@ -17,9 +17,17 @@
 package org.jredis.cluster;
 
 import java.util.Formatter;
+import java.util.Set;
 import org.jredis.connector.ConnectionSpec;
 
 /**
+ * Contract:
+ * <br>
+ * Any given pair of {@link ClusterNodeSpec}s with identical <i>id</i>s (per {@link ClusterNodeSpec#getId()}) must
+ * also return identical results for {@link ClusterNodeSpec#getKeyForCHRangeInstance(int)} and will be considered equivalent. 
+ * Implementations are required to appropriately override {@link Object#equals(Object)} to enforce this contract for use in 
+ * Collections (such as {@link Set}.
+ * 
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
@@ -101,22 +109,56 @@ public interface ClusterNodeSpec {
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterNodeSpec#getId() */
         @Override
         final public String getId () { return this.id;}
+        
+		// ------------------------------------------------------------------------
+		// Identity
+		// ------------------------------------------------------------------------
+        /**
+         * Test for equality to enforce {@link ClusterNodeSpec} identity contract spec,
+         * will compare the ids of the two objects.
+         * @throws IllegalArgumentException if arg is null or not a {@link ClusterNodeSpec}
+         */
+        @Override
+        public boolean equals(Object o) {
+        	if(null == o) throw new IllegalArgumentException("null argument");
+        	ClusterNodeSpec n = null;
+        	try { n = (ClusterNodeSpec) o; }
+        	catch (ClassCastException e) { throw new IllegalArgumentException ("object is not a ClusterNodeSpec");}
+        	
+        	return this.getId().equals(n.getId());
+        }
+        
+        /**
+         * Enforece {@link ClusterNodeSpec} identity contract by returning the hashcode of the
+         * id.  Delegates to {@link String#hashCode()}
+         */
+        @Override
+        public int hashCode() {
+        	return this.getId().hashCode();
+        }
+        
 		// ------------------------------------------------------------------------
 		// Extension points
 		// ------------------------------------------------------------------------
         /**
          * Method is called once (and only once) by the constructor to set the
          * final {@link RefImpl#id} field.  This (default) implementation simply
-         * creates a string of form <ip-address-string-rep>:<0-padded-5-digit-port-number>.
+         * creates a string of form <ip-address-string-rep>:<0-padded-5-digit-port-number>:<0 padded 2-digit-db-number.
+         * <p>
+         * ex:
+         * <code>
+         * "127.0.0.1:06379:02" 
+         * </code>
          * <p>
          * Optional extension point.
          * @return
          */
         protected String generateId () {
         	Formatter fmt = new Formatter();
-        	fmt.format("%s:%05d", 
+        	fmt.format("%s:%05d:%02d", 
         			this.connSpec.getAddress().getHostAddress(),
-        			this.connSpec.getPort()
+        			this.connSpec.getPort(),
+        			this.connSpec.getDatabase()
         		);
         	return fmt.toString();
         }
