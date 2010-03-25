@@ -34,6 +34,12 @@ public interface ClusterSpec {
 	 */
 	public HashProvider getHashProvider();
 	
+//	/**
+//	 * @param hashProvider
+//	 * @return
+//	 */
+//	public ClusterSpec setHashProvider(HashProvider hashProvider);
+	
 	
 	/**
 	 * @return
@@ -57,16 +63,20 @@ public interface ClusterSpec {
 	// Reference Implementation 
 	// ------------------------------------------------------------------------
 	
-	public static class RefImpl implements ClusterSpec {
+	public abstract static class Support implements ClusterSpec {
 
-		protected HashProvider hashProvider;
+		/**  */
+		final protected HashProvider hashProvider;
 		
+		/**  */
 		final protected Set<ClusterNodeSpec> nodeSpecs = new HashSet<ClusterNodeSpec>();
 		
+		public Support() {
+			this.hashProvider = newHashProvider();
+		}
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addAll(java.util.List) */
         @Override
         public ClusterSpec addAll (Set<ClusterNodeSpec> nodeSpecs) {
-	        // TODO Auto-generated method stub
 	        return null;
         }
 
@@ -89,10 +99,11 @@ public interface ClusterSpec {
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getHashProvider() */
         @Override
         public HashProvider getHashProvider () {
-	        // TODO Auto-generated method stub
 	        return null;
         }
-		
+		// ------------------------------------------------------------------------
+		// Extension points
+		// ------------------------------------------------------------------------
+        protected abstract HashProvider newHashProvider();
 	}
-
 }

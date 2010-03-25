@@ -16,14 +16,28 @@
 
 package org.jredis.cluster;
 
+import org.jredis.cluster.ClusterSpec.Support;
+
 /**
- * [TODO: document me!]
+ * The default ClusterSpec uses the {@link KetamaHashProvider} as its {@link HashProvider}. 
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 24, 2010
+ * @date    Mar 25, 2010
  * 
  */
 
-public interface HashProvider {
-	public long hash(byte[] kb);
+public class DefaultClusterSpec extends Support implements ClusterSpec {
+	
+	public DefaultClusterSpec () {
+		super();
+	}
+
+	// ------------------------------------------------------------------------
+	// super overrides
+	// ------------------------------------------------------------------------
+	/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec.Support#newHashProvider() */
+    @Override
+    protected HashProvider newHashProvider () {
+		return new KetamaHashProvider();
+    }
 }
