@@ -16,6 +16,7 @@
 
 package org.jredis.cluster;
 
+import java.util.NavigableMap;
 import org.jredis.JRedis;
 import org.jredis.JRedisFuture;
 
@@ -29,25 +30,56 @@ import org.jredis.JRedisFuture;
 
 public class JRedisClusterSupport implements JRedisCluster {
 
+	// ------------------------------------------------------------------------
+	// Properties
+	// ------------------------------------------------------------------------
+
+	/** {@link ClusterSpec} */
+	protected final ClusterSpec clusterSpec;
+	
+	/** Initialized at instantiation using the info/algos of associated ClusterSpec */
+	protected final NavigableMap<Long, ClusterNodeSpec> clusterMap;
+	// ------------------------------------------------------------------------
+	// Constructors
+	// ------------------------------------------------------------------------
+	
+	protected JRedisClusterSupport (ClusterSpec clusterSpec) {
+		this.clusterSpec = clusterSpec;
+		this.clusterMap = clusterSpec.getNodeMappingAlgorithm().mapNodes(clusterSpec);
+	}
+	
+	// ------------------------------------------------------------------------
+	// Extension point(s)
+	/*
+	 * [TODO]
+	 */
+	// ------------------------------------------------------------------------
+	
+	// ???
+	
+	// ------------------------------------------------------------------------
+	// INTERFACE
+	// ========================================================== JRedisCluster
+	/*
+	 * TODO: doc this
+	 */
+	// ------------------------------------------------------------------------
+	
 	/* (non-Javadoc) @see org.jredis.cluster.JRedisCluster#getAsychInterface() */
 	@Override
 	public JRedisFuture getAsychInterface () {
-		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("not implemented!");
 	}
 
 	/* (non-Javadoc) @see org.jredis.cluster.JRedisCluster#getClusterSpec() */
 	@Override
-	public ClusterSpec getClusterSpec () {
-		// TODO Auto-generated method stub
-		return null;
+	final public ClusterSpec getClusterSpec () {
+		return this.clusterSpec;
 	}
 
 	/* (non-Javadoc) @see org.jredis.cluster.JRedisCluster#getSynchInterface() */
 	@Override
 	public JRedis getSynchInterface () {
-		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("not implemented!");
 	}
-
 }
