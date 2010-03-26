@@ -1664,6 +1664,35 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	}
 	
 	@Test
+	public void testZrangebyscoreWithscoresStringByteArray() {
+		cmd = Command.ZRANGEBYSCORE$OPTS.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<MEDIUM_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+			
+			List<byte[]>  zvalues = provider.zrangebyscore(setkey, 0, SMALL_CNT);
+			List<ZSetEntry>  zsubset = provider.zrangebyscoreSubset(setkey, 0, SMALL_CNT);
+			
+			assertTrue(zvalues.size() > 0, "should have non empty results for range by score here");
+			assertTrue(zsubset.size() > 0, "should have non empty results for range by score here");
+			assertEquals(zsubset.size(), zvalues.size(), "size of collections should be equal");
+
+			for(int i=0;i<SMALL_CNT; i++){
+				assertEquals(zsubset.get(i).getValue(), dataList.get(i), "value of element from zrange_withscore");
+				assertEquals(zsubset.get(i).getValue(), zvalues.get(i), "value of element from zrange_withscore compared with zscore with same range query");
+				assertEquals (zsubset.get(i).getScore(), (double)i, "score of element from zrange_withscore");
+				assertTrue(zsubset.get(i).getScore() <= zsubset.get(i+1).getScore(), "range member score should be smaller or equal to previous range member.  idx: " + i);
+				if(i>0) assertTrue(zsubset.get(i).getScore() >= zsubset.get(i-1).getScore(), "range member score should be bigger or equal to previous range member.  idx: " + i);
+			}
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
+	@Test
 	public void testZrevrangeWithscoresStringByteArray() {
 		cmd = Command.ZREVRANGE$OPTS.code + " byte[]";
 		Log.log("TEST: %s command", cmd);
@@ -2191,6 +2220,24 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
 
+	@Test
+	public void testZcountStringByteArray() {
+		cmd = Command.ZCOUNT.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			String setkey = keys.get(0);
+			for(int i=0;i<MEDIUM_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+			
+			long remCnt = provider.zremrangebyscore(setkey, 0, SMALL_CNT);
+			assertTrue(remCnt > 0, "should have non-zero number of rem cnt for zremrangebyscore");
+			assertEquals(remCnt, SMALL_CNT+1, "should have specific number of rem cnt for zremrangebyscore");
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#sinter(java.lang.String, java.lang.String[])}.
 	 */

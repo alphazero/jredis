@@ -611,6 +611,16 @@ public interface JRedis {
 	
 	
 	/**
+	 * @Redis ZCOUNT
+	 * @param setkey
+	 * @param minScore
+	 * @param maxScore
+	 * @return
+	 * @throws RedisException
+	 */
+	public long zcount (String setkey, double minScore, double maxScore) throws RedisException;
+	
+	/**
 	 * @Redis ZSCORE
 	 * @param setkey
 	 * @param member
@@ -676,7 +686,7 @@ public interface JRedis {
 	public List<ZSetEntry> zrevrangeSubset (String setkey, long from, long to) throws RedisException; 
 
 	/**
-	 * @Redis ZRANGE
+	 * @Redis ZRANGEBYSCORE
 	 * @param setkey
 	 * @param from
 	 * @param to
@@ -684,6 +694,19 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	public List<byte[]> zrangebyscore (String setkey, double minScore, double maxScore) throws RedisException; 
+
+	/**
+	 * Equivalent to {@link JRedis#zrangebyscore(String, double, double)} with the {@link Command.Options#WITHSCORES}.
+	 * Unlike the general ZRANGEBYSCORE command that only returns the values, this method returns both
+	 * values and associated scores for the specified range.
+	 * @Redis ZRANGEBYSCORE ... WITHSCORES
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws RedisException
+	 */
+	public List<ZSetEntry> zrangebyscoreSubset (String setkey, double minScore, double maxScore) throws RedisException; 
 
 	/**
 	 * @Redis ZREMRANGEBYSCORE

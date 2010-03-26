@@ -103,12 +103,14 @@ public enum Command {
 	ZCARD		(RequestType.KEY,			ResponseType.NUMBER), 
 	ZSCORE		(RequestType.KEY_VALUE,		ResponseType.BULK),
 	ZRANGE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
-	ZRANGE$OPTS		(RequestType.KEY_NUM_NUM_OPTS,	ResponseType.MULTI_BULK),
-	ZREVRANGE		(RequestType.KEY_NUM_NUM,		ResponseType.MULTI_BULK),
-	ZREVRANGE$OPTS	(RequestType.KEY_NUM_NUM_OPTS,	ResponseType.MULTI_BULK),
-	ZINCRBY			(RequestType.KEY_IDX_VALUE, ResponseType.BULK),
-	ZRANGEBYSCORE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
-	ZREMRANGEBYSCORE	(RequestType.KEY_NUM_NUM,	ResponseType.NUMBER),
+	ZCOUNT    (RequestType.KEY_NUM_NUM, ResponseType.NUMBER),	
+	ZRANGE$OPTS			(RequestType.KEY_NUM_NUM_OPTS,	ResponseType.MULTI_BULK),
+	ZREVRANGE			(RequestType.KEY_NUM_NUM,		ResponseType.MULTI_BULK),
+	ZREVRANGE$OPTS		(RequestType.KEY_NUM_NUM_OPTS,	ResponseType.MULTI_BULK),
+	ZINCRBY				(RequestType.KEY_IDX_VALUE, 	ResponseType.BULK),
+	ZRANGEBYSCORE		(RequestType.KEY_NUM_NUM,		ResponseType.MULTI_BULK),
+	ZRANGEBYSCORE$OPTS	(RequestType.KEY_NUM_NUM_OPTS,	ResponseType.MULTI_BULK),
+	ZREMRANGEBYSCORE	(RequestType.KEY_NUM_NUM,		ResponseType.NUMBER),
 		
 	
 	// "Multiple databases handling commands"

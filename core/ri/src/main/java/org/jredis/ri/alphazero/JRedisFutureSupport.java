@@ -487,6 +487,18 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong (futureResponse);
 	}
 	
+//	@Override
+	public Future<Long> zcount(String key, double minScore, double maxScore) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] minScoreBytes = Convert.toBytes(minScore);
+		byte[] maxScoreBytes = Convert.toBytes(maxScore);
+
+		return new FutureLong(this.queueRequest(Command.ZCOUNT, keybytes, minScoreBytes, maxScoreBytes));
+	}
+	
 	public Future<byte[]> srandmember (String key) {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
@@ -754,6 +766,18 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		byte[] maxScoreBytes = Convert.toBytes(maxScore);
 
 		return new FutureByteArrayList(this.queueRequest(Command.ZRANGEBYSCORE, keybytes, minScoreBytes, maxScoreBytes));
+	}
+
+//	@Override
+	public Future<List<ZSetEntry>> zrangebyscoreSubset(String key, double minScore, double maxScore) {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] minScoreBytes = Convert.toBytes(minScore);
+		byte[] maxScoreBytes = Convert.toBytes(maxScore);
+
+		return new FutureZSetList(this.queueRequest(Command.ZRANGEBYSCORE$OPTS, keybytes, minScoreBytes, maxScoreBytes, Command.Options.WITHSCORES.bytes));
 	}
 
 //	@Override

@@ -1,1 +1,3 @@
-Redis 1.2.n
+compliance:  Redis 1.2.n
+tested with: Redis 1.2.6
+

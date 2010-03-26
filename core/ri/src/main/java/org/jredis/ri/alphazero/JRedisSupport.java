@@ -728,6 +728,26 @@ public abstract class JRedisSupport implements JRedis {
 		return value;
 	}
 	
+//	@Override
+	public long zcount (String key, double minScore, double maxScore) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(minScore);
+		byte[] toBytes = Convert.toBytes(maxScore);
+
+		long resp = Long.MIN_VALUE;
+		try {
+			ValueResponse valueResponse = (ValueResponse) this.serviceRequest(Command.ZCOUNT, keybytes, fromBytes, toBytes);
+			resp = valueResponse.getLongValue();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a numeric ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resp;
+	}
+	
 	public byte[] srandmember (String setkey) throws RedisException {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(setkey)) == null) 
@@ -1052,6 +1072,32 @@ public abstract class JRedisSupport implements JRedis {
 			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
 		}
 		return multiBulkData;
+	}
+
+//	@Override
+	public List<ZSetEntry> zrangebyscoreSubset(String key, double minScore, double maxScore) throws RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] fromBytes = Convert.toBytes(minScore);
+		byte[] toBytes = Convert.toBytes(maxScore);
+
+		List<ZSetEntry> list= null;
+		try {
+			MultiBulkResponse multiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.ZRANGEBYSCORE$OPTS, keybytes, fromBytes, toBytes, Command.Options.WITHSCORES.bytes);
+			List<byte[]> bulkData = multiBulkResponse.getMultiBulkData();
+			if(null != bulkData){
+				list = new ArrayList<ZSetEntry>(bulkData.size()/2);
+				for(int i=0; i<bulkData.size(); i+=2){
+					list.add(new ZSetEntryImpl(bulkData.get(i), bulkData.get(i+1)));
+				}
+			}
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return list;
 	}
 
 //	@Override

@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import org.jredis.protocol.Command;
 import org.jredis.protocol.ResponseStatus;
 
 /**
@@ -585,6 +586,15 @@ public interface JRedisFuture {
 	public Future<Long> zcard (String setKey);	
 	
 	/**
+	 * @Redis ZCOUNT
+	 * @param setkey
+	 * @param minScore
+	 * @param maxScore
+	 * @return
+	 */
+	public Future<Long> zcount (String setkey, double minScore, double maxScore);
+	
+	/**
 	 * @Redis ZSCORE
 	 * @param setkey
 	 * @param member
@@ -652,6 +662,18 @@ public interface JRedisFuture {
 	 * @return
 	 */
 	public Future<List<byte[]>> zrangebyscore (String setkey, double minScore, double maxScore); 
+
+	/**
+	 * Equivalent to {@link JRedis#zrangebyscore(String, double, double)} with the {@link Command.Options#WITHSCORES}.
+	 * Unlike the general ZRANGEBYSCORE command that only returns the values, this method returns both
+	 * values and associated scores for the specified range.
+	 * @Redis ZRANGEBYSCORE ... WITHSCORES
+	 * @param setkey
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public Future<List<ZSetEntry>> zrangebyscoreSubset (String setkey, double minScore, double maxScore); 
 
 	/**
 	 * @Redis ZREMRANGEBYSCORE
