@@ -2,7 +2,7 @@ Release: JRedis 1.0 RC 1
 
 REQUIREMENTS:
 
-* Requires Redis server 1.2.n.  (Developed and tested for Redis 1.2.5)
+* Requires Redis server 1.2.n.  (Developed and tested for Redis 1.2.6)
   Please note that this release is _NOT_ compatible with either Redis 1.000 or 2.n (antirez@github master branch).  
 
   As of this note, you can download Redis 1.2.5 here: <http://redis.googlecode.com/files/redis-1.2.5.tar.gz>
@@ -14,6 +14,13 @@ JARS:
 * The full distribution under /Release includes all installed jars as before, if you need sources and/or benchmark and example modules as well.  
 
 NEW FEATURES:
+
+* (Redis 1.2.6 update) 
+  Added support for ZCOUNT.  (Synch/Asynch).
+
+* (Redis 1.2.6 update)
+  Added support for ZRANGEBYSCORE ... WITHSCORES.  (Synch/Asynch). 
+  Usage example class <UsingZrangeSubset> in /Examples module.
 
 * Added support for the missing elements of the INFO result map.
 
@@ -66,6 +73,8 @@ ROAD MAP:
 
 /enjoy
 
-03-21-2010
+03-21-2010 
 NoVA
+
+(Redis 1.2.6 update @ 03-26-2010 | NYC)
 
