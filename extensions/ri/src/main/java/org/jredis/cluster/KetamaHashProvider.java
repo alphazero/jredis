@@ -36,7 +36,7 @@ import org.jredis.ClientRuntimeException;
  * 
  */
 
-public class KetamaHashProvider implements HashProvider {
+public class KetamaHashProvider implements HashAlgorithm {
 
 	/* (non-Javadoc) @see org.jredis.cluster.HashProvider#hash(java.lang.String) */
 	@Override

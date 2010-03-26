@@ -16,34 +16,41 @@
 
 package org.jredis.cluster;
 
-import org.jredis.cluster.ClusterSpec.Support;
-
 /**
- * The default ClusterSpec uses the {@link KetamaHashProvider} as its {@link HashAlgorithm}. 
+ * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
  * @date    Mar 25, 2010
  * 
  */
 
-public class DefaultClusterSpec extends Support implements ClusterSpec {
-	
-	public DefaultClusterSpec () {
-		super();
-	}
+public class KetamaNodeMapper extends ClusterNodeMapper.Support implements ClusterNodeMapper {
 
-	// ------------------------------------------------------------------------
-	// super overrides
-	// ------------------------------------------------------------------------
-	/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec.Support#newHashProvider() */
-    @Override
-    protected HashAlgorithm newHashAlgorithm () {
-		return new KetamaHashProvider();
+	
+	/**
+     * @param clusterSpec
+     */
+    public KetamaNodeMapper (ClusterSpec clusterSpec) {
+	    super(clusterSpec);
     }
 
-	/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec.Support#newNodeMappingAlgorithm() */
+	/* (non-Javadoc) @see org.jredis.cluster.ClusterNodeMapper#getPrimary(byte[]) */
+	@Override
+	public ClusterNodeSpec getPrimary (byte[] key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc) @see org.jredis.cluster.ClusterNodeMapper#getSecondary(byte[]) */
+	@Override
+	public ClusterNodeSpec getSecondary (byte[] key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc) @see org.jredis.cluster.ClusterNodeMapper.Support#newMappingAlgorithm() */
     @Override
-    protected NodeMappingAlgorithm newNodeMappingAlgorithm () {
+    protected NodeMappingAlgorithm newMappingAlgorithm () {
 	    return new KetamaNodeMappingAlgorithm();
     }
 }

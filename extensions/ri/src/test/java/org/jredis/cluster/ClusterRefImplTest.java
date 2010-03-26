@@ -124,16 +124,30 @@ public class ClusterRefImplTest extends RefImplTestSuiteBase {
 	
 	@Test
 	public void testHashProviderAvailability() {
-		Log.log("Testing ClusterSpec.getHashProvider()");
+		Log.log("Testing ClusterSpec.getHashAlgorithm()");
 		
 		// new (empty) ClusterSpec
 		ClusterSpec clusterSpec = new DefaultClusterSpec();
 		
 		// getHashProvider should return non-null results
-		assertTrue (clusterSpec.getHashProvider() != null, "ClusterSpec.getHashProvider should not be null");
+		assertTrue (clusterSpec.getHashAlgorithm() != null, "ClusterSpec.getHashAlgorithm should not be null");
 		
 		// getHashProvider should return an instance of KetamaHashProvider for the DefaultClusterSpec
-		assertTrue (clusterSpec.getHashProvider() instanceof KetamaHashProvider, "Default ClusterSpec.getHashProvider should be a Ketama algoritm");
+		assertTrue (clusterSpec.getHashAlgorithm() instanceof KetamaHashProvider, "Default ClusterSpec.getHashAlgorithm should be a Ketama algoritm");
+	}
+	
+	@Test
+	public void testNodeMappingAlgorithmAvailability() {
+		Log.log("Testing ClusterSpec.getNodeMappingAlgorithm()");
+		
+		// new (empty) ClusterSpec
+		ClusterSpec clusterSpec = new DefaultClusterSpec();
+		
+		// getHashProvider should return non-null results
+		assertTrue (clusterSpec.getNodeMappingAlgorithm() != null, "ClusterSpec.getNodeMappingAlgorithm should not be null");
+		
+		// getHashProvider should return an instance of KetamaHashProvider for the DefaultClusterSpec
+		assertTrue (clusterSpec.getNodeMappingAlgorithm() instanceof KetamaNodeMappingAlgorithm, "Default ClusterSpec.getNodeMappingAlgorithm should be a Ketama algoritm");
 	}
 	
 	@Test

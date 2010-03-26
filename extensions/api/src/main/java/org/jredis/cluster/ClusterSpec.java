@@ -32,7 +32,9 @@ public interface ClusterSpec {
 	/**
 	 * @return
 	 */
-	public HashProvider getHashProvider();
+	public HashAlgorithm getHashAlgorithm();
+	
+	public NodeMappingAlgorithm getNodeMappingAlgorithm();
 	
 //	/**
 //	 * @param hashProvider
@@ -66,13 +68,16 @@ public interface ClusterSpec {
 	public abstract static class Support implements ClusterSpec {
 
 		/**  */
-		final protected HashProvider hashProvider;
+		final protected HashAlgorithm hashProvider;
+		
+		final protected NodeMappingAlgorithm nodeMappingAlgorithm;
 		
 		/**  */
 		final protected Set<ClusterNodeSpec> nodeSpecs = new HashSet<ClusterNodeSpec>();
 		
 		public Support() {
-			this.hashProvider = newHashProvider();
+			this.hashProvider = newHashAlgorithm();
+			this.nodeMappingAlgorithm = newNodeMappingAlgorithm();
 		}
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addAll(java.util.List) */
         @Override
@@ -106,12 +111,19 @@ public interface ClusterSpec {
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getHashProvider() */
         @Override
-        public HashProvider getHashProvider () {
+        public HashAlgorithm getHashAlgorithm () {
 	        return hashProvider;
+        }
+
+		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getHashProvider() */
+        @Override
+        public NodeMappingAlgorithm getNodeMappingAlgorithm () {
+	        return nodeMappingAlgorithm;
         }
 		// ------------------------------------------------------------------------
 		// Extension points
 		// ------------------------------------------------------------------------
-        protected abstract HashProvider newHashProvider();
+        protected abstract HashAlgorithm newHashAlgorithm();
+        protected abstract NodeMappingAlgorithm newNodeMappingAlgorithm();
 	}
 }
