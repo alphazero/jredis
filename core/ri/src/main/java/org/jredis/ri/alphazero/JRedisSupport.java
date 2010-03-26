@@ -1253,6 +1253,36 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
+        public List<byte[]> zrangebyscore(String key, double minScore, double maxScore, long offset, long count) throws RedisException {
+                byte[] keybytes = null;
+                byte[] bytes = new byte[0];
+                try {
+                        bytes = key.getBytes(DefaultCodec.SUPPORTED_CHARSET_NAME);
+                } catch (UnsupportedEncodingException e) {
+                        throw new IllegalStateException(e); // TODO: handle
+                }
+                if ((keybytes = bytes) == null)
+                        throw new IllegalArgumentException("invalid key => [" + key + "]");
+
+                byte[] fromBytes = Convert.toBytes(minScore);
+                byte[] toBytes = Convert.toBytes(maxScore);
+
+                List<byte[]> multiBulkData = null;
+                try {
+                        String limitSpec = "LIMIT " + offset + " " + count;
+
+                        MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) this.serviceRequest(
+                                        Command.ZRANGEBYSCORE$OPTS, keybytes, fromBytes, toBytes,
+                                        limitSpec.getBytes());
+                        multiBulkData = MultiBulkResponse.getMultiBulkData();
+                }
+                catch (ClassCastException e) {
+                        throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+                }
+                return multiBulkData;
+        }
+
+//	@Override
 	public long zremrangebyscore (String key, double minScore, double maxScore) throws RedisException {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
