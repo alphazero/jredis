@@ -20,7 +20,6 @@
  *   limitations under the License.
  */
 
-
 package org.jredis.cluster;
 
 import java.security.MessageDigest;
@@ -28,38 +27,14 @@ import java.security.NoSuchAlgorithmException;
 import org.jredis.ClientRuntimeException;
 
 /**
- * The Ketama consistent hash algorithm as implemented by Dustin Sallings,
- * with some minor (non-algorithmic) modifications.
+ * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 25, 2010
+ * @date    Mar 26, 2010
  * 
  */
 
-public class KetamaHashProvider implements HashAlgorithm {
-
-	/* (non-Javadoc) @see org.jredis.cluster.HashProvider#hash(java.lang.String) */
-	@Override
-	public long hash (byte[] b) {
-		if(null == b || b.length ==0) throw new IllegalArgumentException();
-		
-		/* Copyright (c) 2006-2009  Dustin Sallings <dustin@spy.net> */
-		/* -- BEGIN code segment */
-		byte[] kb;
-		long rv = 0;
-        try {
-	        kb = computeMd5(b);
-			rv = ((long) (kb[3] & 0xFF) << 24)
-			| ((long) (kb[2] & 0xFF) << 16)
-			| ((long) (kb[1] & 0xFF) << 8)
-			| (kb[0] & 0xFF);
-        }
-        catch (NoSuchAlgorithmException e) {
-	        throw new ClientRuntimeException("MD5 Algorithm not supported.", e);
-        }
-		/* -- END code segment */
-		return rv;
-	}
+public class CryptoHashUtils {
 	/**
 	 * Get the md5 of the given key. 
 	 * @throws ClientRuntimeException if MD5 algorithm is not supported.
@@ -72,5 +47,8 @@ public class KetamaHashProvider implements HashAlgorithm {
 		md5.reset();
 		md5.update(b);
 		return md5.digest();
+	}
+	public static byte[] computeMd5(String string) throws NoSuchAlgorithmException{
+		return computeMd5(string.getBytes());
 	}
 }

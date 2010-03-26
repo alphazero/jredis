@@ -18,6 +18,8 @@ package org.jredis.cluster;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.jredis.cluster.ketama.KetamaHashProvider;
+import org.jredis.cluster.ketama.KetamaNodeMappingAlgorithm;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
@@ -115,7 +117,7 @@ public class ClusterRefImplTest extends RefImplTestSuiteBase {
 		int n = 0;
 		for(ClusterNodeSpec nodeSpec : clusterNodeSpecs){
 			for(int i=0; i<instanceCnt; i++) {
-				String nodeInstanceCHKey = nodeSpec.getKeyForCHRangeInstance(i);
+				String nodeInstanceCHKey = nodeSpec.getKeyForReplicationInstance(i);
 				assertTrue(chRangeKeys.add(nodeInstanceCHKey), "generated ConsistentHash Key for node "+nodeSpec.getId()+" for instance "+i+" should be unique but was not: " + nodeInstanceCHKey);
 			}
 			if(++n > 100) break;

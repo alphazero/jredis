@@ -14,7 +14,12 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster;
+package org.jredis.cluster.ketama;
+
+import org.jredis.cluster.ClusterNodeMapper;
+import org.jredis.cluster.ClusterNodeSpec;
+import org.jredis.cluster.ClusterSpec;
+import org.jredis.cluster.NodeMappingAlgorithm;
 
 /**
  * [TODO: document me!]

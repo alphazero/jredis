@@ -34,7 +34,16 @@ public interface ClusterSpec {
 	 */
 	public HashAlgorithm getHashAlgorithm();
 	
+	/**
+	 * @return
+	 */
 	public NodeMappingAlgorithm getNodeMappingAlgorithm();
+	
+//	/**
+//	 * DOES THIS REALLY BELONG HERE?
+//	 * @return
+//	 */
+//	public int  getNodeReplicationCount();
 	
 //	/**
 //	 * @param hashProvider
@@ -70,14 +79,19 @@ public interface ClusterSpec {
 		/**  */
 		final protected HashAlgorithm hashProvider;
 		
+		/**  */
 		final protected NodeMappingAlgorithm nodeMappingAlgorithm;
 		
+//		/**  */
+//		final protected int nodeReplicationCount;
 		/**  */
 		final protected Set<ClusterNodeSpec> nodeSpecs = new HashSet<ClusterNodeSpec>();
 		
 		public Support() {
 			this.hashProvider = newHashAlgorithm();
 			this.nodeMappingAlgorithm = newNodeMappingAlgorithm();
+			// TODO: mapping algo should recommend a replication count
+			// but wait: isn't that Ketama/CH specific?
 		}
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addAll(java.util.List) */
         @Override

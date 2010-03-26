@@ -23,7 +23,7 @@ import org.jredis.connector.ConnectionSpec;
  * Contract:
  * <br>
  * Any given pair of {@link ClusterNodeSpec}s with identical <i>id</i>s (per {@link ClusterNodeSpec#getId()}) must
- * also return identical results for {@link ClusterNodeSpec#getKeyForCHRangeInstance(int)} and will be considered equivalent. 
+ * also return identical results for {@link ClusterNodeSpec#getKeyForReplicationInstance(int)} and will be considered equivalent. 
  * Implementations are required to appropriately override {@link Object#equals(Object)} to enforce this contract for use in 
  * Collections (such as {@link Set}.
  * 
@@ -51,14 +51,14 @@ public interface ClusterNodeSpec {
 	 * Consistent Hashing.  The implementation must satisfy the global uniqueness of the returned key within the associated
 	 * cluster.
 	 * <p>
-	 * This is an optional method, but is required for all implementations supproting Consistent Hashing for sharded clusters.
+	 * This is an optional method, but is required for all implementations supporting Consistent Hashing for sharded clusters.
 	 * <p>
 	 * See Consistent Hashing and Random Trees: Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web
 	 * (sec 4).
 	 * @param rangeReplicationIndex 
 	 * @return a globally unique {@link String} key. 
 	 */
-	public String getKeyForCHRangeInstance (int rangeReplicationIndex);
+	public String getKeyForReplicationInstance (int rangeReplicationIndex);
 	
 	// ------------------------------------------------------------------------
 	// Reference Implementation 

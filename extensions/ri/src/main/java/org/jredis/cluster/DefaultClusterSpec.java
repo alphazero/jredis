@@ -17,6 +17,8 @@
 package org.jredis.cluster;
 
 import org.jredis.cluster.ClusterSpec.Support;
+import org.jredis.cluster.ketama.KetamaHashProvider;
+import org.jredis.cluster.ketama.KetamaNodeMappingAlgorithm;
 
 /**
  * The default ClusterSpec uses the {@link KetamaHashProvider} as its {@link HashAlgorithm}. 
