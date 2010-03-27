@@ -38,19 +38,33 @@ public class CryptoHashUtils {
 	/**
 	 * Get the md5 of the given key. 
 	 * @throws ClientRuntimeException if MD5 algorithm is not supported.
-	 *
+	 * @throws IllegalArgumentException if input is null or zero length
+	 * 
 	 * @Copyright (c) 2006-2009  Dustin Sallings <dustin@spy.net> 
 	 */
-	public static byte[] computeMd5(byte[] b) throws NoSuchAlgorithmException{
+	public static byte[] computeMd5(byte[] b) throws ClientRuntimeException{
 		if(null == b) throw new IllegalArgumentException ("null input");
 		if(b.length == 0) throw new IllegalArgumentException ("zero length input");
-		MessageDigest md5;
-		md5 = MessageDigest.getInstance("MD5");
-		md5.reset();
-		md5.update(b);
+		MessageDigest md5 = null;
+		try {
+	        md5 = MessageDigest.getInstance("MD5");
+			md5.reset();
+			md5.update(b);
+        }
+        catch (NoSuchAlgorithmException e) {
+        	throw new ClientRuntimeException("MD5 Message Digest algorithm is not present in this JRE", e);
+        }
 		return md5.digest();
 	}
-	public static byte[] computeMd5(String string) throws NoSuchAlgorithmException{
-		return computeMd5(string.getBytes());
+	
+	/**
+	 * @param s
+	 * @return
+	 * @throws ClientRuntimeException
+	 * @throws IllegalArgumentException if input is null or zero length
+	 */
+	public static byte[] computeMd5(String s) throws ClientRuntimeException{
+		if(null == s) throw new IllegalArgumentException ("null input");
+		return computeMd5(s.getBytes());
 	}
 }

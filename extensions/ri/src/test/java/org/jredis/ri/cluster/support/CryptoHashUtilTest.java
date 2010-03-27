@@ -17,6 +17,7 @@
 package org.jredis.ri.cluster.support;
 
 import java.security.NoSuchAlgorithmException;
+import org.jredis.ClientRuntimeException;
 import org.jredis.cluster.RefImplTestSuiteBase;
 import org.jredis.ri.alphazero.support.Log;
 import org.jredis.ri.cluster.support.CryptoHashUtils;
@@ -86,8 +87,11 @@ public class CryptoHashUtilTest extends RefImplTestSuiteBase<Object> {
 	        catch (RuntimeException what) { fail("Unexpected runtime exception raised",what); }
         	assertTrue(didRaiseError, "Expecting a raised exception for zero length input");
         }
-        catch (NoSuchAlgorithmException e) {
+        catch (ClientRuntimeException e) {
 	        fail("Required cryptographic algorithm (MD5) is not available", e);
+        }
+        catch (RuntimeException whatsthis){
+        	fail("Unexpected exception class thrown", whatsthis);
         }
 	}
 }

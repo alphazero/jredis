@@ -22,7 +22,6 @@
 
 package org.jredis.ri.cluster.ketama;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -34,7 +33,10 @@ import org.jredis.cluster.NodeMappingAlgorithm;
 import org.jredis.ri.cluster.support.CryptoHashUtils;
 
 /**
- * [TODO: document me!]
+ * <p>
+ * <b>Note</b> that if certain expected cryptographic algorithms expected to be 
+ * present in your JRE are not available, {@link ClientRuntimeException}s 
+ * will be thrown.
  *
  * @author  joubin (alphazero@sensesay.net)
  * @date    Mar 25, 2010
@@ -74,9 +76,9 @@ public class KetamaNodeMappingAlgorithm implements NodeMappingAlgorithm {
 			if(ketamaNodes.size() != numReps * nodes.size())
 				throw new ProviderException ("[BUG]: expecting node map size to be multiple of replication count * cluster node count");
 		}
-		catch (NoSuchAlgorithmException e) {
-			throw new ClientRuntimeException("Ketama algorithm requires JRE support for MD5 message digest algorithm.", e);
-		}
+//		catch (NoSuchAlgorithmException e) {
+//			throw new ClientRuntimeException("Ketama algorithm requires JRE support for MD5 message digest algorithm.", e);
+//		}
 		catch (ClassCastException e) {
 			throw new ProviderException ("[BUG] KetamaNodeMappingAlgorithm requires a KetamaHashAlgorithm");
 		}

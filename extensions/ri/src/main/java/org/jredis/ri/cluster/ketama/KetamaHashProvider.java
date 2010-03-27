@@ -23,7 +23,6 @@
 
 package org.jredis.ri.cluster.ketama;
 
-import java.security.NoSuchAlgorithmException;
 import org.jredis.ClientRuntimeException;
 import org.jredis.cluster.HashAlgorithm;
 import org.jredis.ri.cluster.support.CryptoHashUtils;
@@ -31,6 +30,10 @@ import org.jredis.ri.cluster.support.CryptoHashUtils;
 /**
  * The Ketama consistent hash algorithm as implemented by Dustin Sallings,
  * with some minor (non-algorithmic) modifications.
+ * <p>
+ * <b>Note</b> that if certain expected cryptographic algorithms expected to be 
+ * present in your JRE are not available, {@link ClientRuntimeException}s 
+ * will be thrown.
  *
  * @author  joubin (alphazero@sensesay.net)
  * @date    Mar 25, 2010
@@ -51,16 +54,16 @@ public class KetamaHashProvider implements HashAlgorithm {
 		/* -- BEGIN code segment */
 		byte[] kb;
 		long rv = 0;
-        try {
+//        try {
 	        kb = CryptoHashUtils.computeMd5(b);
 			rv = ((long) (kb[3] & 0xFF) << 24)
 			| ((long) (kb[2] & 0xFF) << 16)
 			| ((long) (kb[1] & 0xFF) << 8)
 			| (kb[0] & 0xFF);
-        }
-        catch (NoSuchAlgorithmException e) {
-	        throw new ClientRuntimeException("MD5 Algorithm not supported.", e);
-        }
+//        }
+//        catch (NoSuchAlgorithmException e) {
+//	        throw new ClientRuntimeException("MD5 Algorithm not supported.", e);
+//        }
 		/* -- END code segment */
 		return rv;
 	}
