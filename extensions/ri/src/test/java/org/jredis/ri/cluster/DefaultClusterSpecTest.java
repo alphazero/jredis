@@ -14,8 +14,10 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster;
+package org.jredis.ri.cluster;
 
+import org.jredis.cluster.ClusterSpec;
+import org.jredis.cluster.ClusterSpecProviderTestBase;
 import org.jredis.ri.cluster.DefaultClusterSpec;
 
 /**

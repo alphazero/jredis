@@ -17,6 +17,7 @@
 package org.jredis.cluster;
 
 import java.security.NoSuchAlgorithmException;
+import org.jredis.ri.alphazero.support.Log;
 import org.jredis.ri.cluster.CryptoHashUtils;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -35,6 +36,7 @@ public class CryptoHashUtilTest extends RefImplTestSuiteBase<Object> {
 	@SuppressWarnings("static-access")
     @Test
 	public void testComputeMd5 () {
+		Log.log("Testing Crptographic function computeMd5(byte[])");
 		byte[] nullref = null;
 		byte[] zerobytes = data.getRandomBytes(0);
 		byte[] data1 = data.getRandomBytes(255);
@@ -43,6 +45,9 @@ public class CryptoHashUtilTest extends RefImplTestSuiteBase<Object> {
 //	        byte[] nullref_md5 = CryptoHashUtils.computeMd5(nullref);
 	        byte[] zerobytes_md5 = CryptoHashUtils.computeMd5(zerobytes);
 	        byte[] data1_md5 = CryptoHashUtils.computeMd5(data1);
+	        assertNotNull(data1_md5, "md5 digest should not be null");
+	        assertNotSame(data1_md5, data1, "md5 digest result shoud not be the same as the input array");
+	        assertTrue(data1_md5.length > 0, "md5 digest length should be non-zero");
         }
         catch (NoSuchAlgorithmException e) {
 	        fail("Required cryptographic algorithm (MD5) is not available", e);
