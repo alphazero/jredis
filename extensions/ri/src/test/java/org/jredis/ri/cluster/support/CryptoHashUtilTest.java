@@ -16,7 +16,6 @@
 
 package org.jredis.ri.cluster.support;
 
-import java.security.NoSuchAlgorithmException;
 import org.jredis.ClientRuntimeException;
 import org.jredis.cluster.RefImplTestSuiteBase;
 import org.jredis.ri.alphazero.support.Log;

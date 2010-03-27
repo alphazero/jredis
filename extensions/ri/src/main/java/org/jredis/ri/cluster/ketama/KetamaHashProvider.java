@@ -45,7 +45,15 @@ public class KetamaHashProvider implements HashAlgorithm {
 	// ------------------------------------------------------------------------
 	// Interface
 	// ------------------------------------------------------------------------
-	/* (non-Javadoc) @see org.jredis.cluster.HashProvider#hash(java.lang.String) */
+
+	/**
+	 * Uses MD5 digest.  
+	 * <p>
+	 * Contains code from net.spy.memecached.
+	 * @ Copyright (c) 2006-2009  Dustin Sallings <dustin@spy.net>
+	 * 
+	 * @param b bytes to be hashed
+	 */
 	@Override
 	public long hash (byte[] b) {
 		if(null == b || b.length ==0) throw new IllegalArgumentException();
@@ -54,17 +62,13 @@ public class KetamaHashProvider implements HashAlgorithm {
 		/* -- BEGIN code segment */
 		byte[] kb;
 		long rv = 0;
-//        try {
-	        kb = CryptoHashUtils.computeMd5(b);
-			rv = ((long) (kb[3] & 0xFF) << 24)
-			| ((long) (kb[2] & 0xFF) << 16)
-			| ((long) (kb[1] & 0xFF) << 8)
-			| (kb[0] & 0xFF);
-//        }
-//        catch (NoSuchAlgorithmException e) {
-//	        throw new ClientRuntimeException("MD5 Algorithm not supported.", e);
-//        }
+        kb = CryptoHashUtils.computeMd5(b);
+		rv = ((long) (kb[3] & 0xFF) << 24)
+		| ((long) (kb[2] & 0xFF) << 16)
+		| ((long) (kb[1] & 0xFF) << 8)
+		| (kb[0] & 0xFF);
 		/* -- END code segment */
+		
 		return rv;
 	}
 	// ------------------------------------------------------------------------
@@ -72,11 +76,13 @@ public class KetamaHashProvider implements HashAlgorithm {
 	// ------------------------------------------------------------------------
 	
 	/**
-	 * Rip of the inner loop of the KetamaNodeLocator.
+	 * Rip of the inner loop of the KetamaNodeLocator's constructor, in full.
+	 * <p>
+	 * @ Copyright (c) 2006-2009  Dustin Sallings <dustin@spy.net>
+	 * 
 	 * @param digest
 	 * @param h
 	 * @return
-	 * @Copyright (c) 2006-2009  Dustin Sallings <dustin@spy.net>
 	 */
 	long hash (byte[] digest, int h) {
 		return 
