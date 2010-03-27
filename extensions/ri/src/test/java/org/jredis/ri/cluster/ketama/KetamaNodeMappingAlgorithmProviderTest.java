@@ -14,25 +14,25 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster;
+package org.jredis.ri.cluster.ketama;
 
-import java.util.SortedMap;
+import org.jredis.cluster.NodeMappingAlgorithm;
+import org.jredis.cluster.NodeMappingAlgorithmProviderTestBase;
 
 /**
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 25, 2010
+ * @date    Mar 27, 2010
  * 
  */
 
-public interface NodeMappingAlgorithm {
-	/**
-	 * The invoked method expects a compatible {@link HashAlgorithm} available from
-	 * {@link ClusterSpec#getHashAlgorithm()}.
-	 * 
-	 * @param clusterSpec
-	 * @return
-	 */
-	SortedMap<Long, ClusterNodeSpec> mapNodes(ClusterSpec clusterSpec);
+public class KetamaNodeMappingAlgorithmProviderTest extends
+        NodeMappingAlgorithmProviderTestBase {
+
+	/* (non-Javadoc) @see org.jredis.cluster.ProviderTestBase#newProviderInstance() */
+	@Override
+	protected NodeMappingAlgorithm newProviderInstance () {
+		return new KetamaNodeMappingAlgorithm ();
+	}
 }

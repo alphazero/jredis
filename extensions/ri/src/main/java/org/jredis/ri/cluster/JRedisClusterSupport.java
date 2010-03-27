@@ -16,7 +16,7 @@
 
 package org.jredis.ri.cluster;
 
-import java.util.NavigableMap;
+import java.util.SortedMap;
 import org.jredis.JRedis;
 import org.jredis.JRedisFuture;
 import org.jredis.cluster.ClusterNodeSpec;
@@ -41,7 +41,7 @@ public class JRedisClusterSupport implements JRedisCluster {
 	protected final ClusterSpec clusterSpec;
 	
 	/** Initialized at instantiation using the info/algos of associated ClusterSpec */
-	protected final NavigableMap<Long, ClusterNodeSpec> clusterMap;
+	protected final SortedMap<Long, ClusterNodeSpec> clusterMap;
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
@@ -69,19 +69,19 @@ public class JRedisClusterSupport implements JRedisCluster {
 	// ------------------------------------------------------------------------
 	
 	/* (non-Javadoc) @see org.jredis.cluster.JRedisCluster#getAsychInterface() */
-	@Override
+//	@Override
 	public JRedisFuture getAsychInterface () {
 		throw new RuntimeException("not implemented!");
 	}
 
 	/* (non-Javadoc) @see org.jredis.cluster.JRedisCluster#getClusterSpec() */
-	@Override
+//	@Override
 	final public ClusterSpec getClusterSpec () {
 		return this.clusterSpec;
 	}
 
 	/* (non-Javadoc) @see org.jredis.cluster.JRedisCluster#getSynchInterface() */
-	@Override
+//	@Override
 	public JRedis getSynchInterface () {
 		throw new RuntimeException("not implemented!");
 	}

@@ -94,7 +94,7 @@ public interface ClusterSpec {
 			// but wait: isn't that Ketama/CH specific?
 		}
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addAll(java.util.List) */
-        @Override
+//        @Override
         public ClusterSpec addAll (Set<ClusterNodeSpec> nodeSpecs) {
         	for(ClusterNodeSpec nodeSpec : nodeSpecs){
         		addNodeSpec(nodeSpec);
@@ -103,7 +103,7 @@ public interface ClusterSpec {
         }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addNode(org.jredis.cluster.ClusterNodeSpec) */
-        @Override
+//        @Override
         public ClusterSpec addNodeSpec (ClusterNodeSpec nodeSpec) {
         	if(null == nodeSpec)
     			throw new IllegalArgumentException("null nodeSpec");
@@ -115,7 +115,7 @@ public interface ClusterSpec {
         }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getNodes() */
-        @Override
+//        @Override
         public Set<ClusterNodeSpec> getNodeSpecs () {
         	Set<ClusterNodeSpec> set = new HashSet<ClusterNodeSpec>(nodeSpecs.size());
         	for(ClusterNodeSpec spec : nodeSpecs)
@@ -124,13 +124,13 @@ public interface ClusterSpec {
         }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getHashProvider() */
-        @Override
+//        @Override
         public HashAlgorithm getHashAlgorithm () {
 	        return hashProvider;
         }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getHashProvider() */
-        @Override
+//        @Override
         public NodeMappingAlgorithm getNodeMappingAlgorithm () {
 	        return nodeMappingAlgorithm;
         }

@@ -86,7 +86,7 @@ public class ClusterNodeSpecRI extends ClusterNodeSpec.Support implements Cluste
      * @param rangeReplicationIndex
      * @see org.jredis.cluster.ClusterNodeSpec#getKeyForReplicationInstance(int)
      */
-    @Override
+//    @Override
     public String getKeyForReplicationInstance (int rangeReplicationIndex) {
     	Formatter fmt = new Formatter();
     	fmt.format("%s[%d]",  this.id, rangeReplicationIndex);

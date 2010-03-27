@@ -57,13 +57,13 @@ public interface ClusterNodeMapper {
         abstract protected NodeMappingAlgorithm newMappingAlgorithm () ;
         
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterNodeMapper#getPrimary(byte[]) */
-        @Override
+//        @Override
         public ClusterNodeSpec getPrimary (byte[] key) {
 	        return null;
         }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterNodeMapper#getSecondary(byte[]) */
-        @Override
+//        @Override
         public ClusterNodeSpec getSecondary (byte[] key) {
 	        return null;
         }

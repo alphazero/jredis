@@ -16,23 +16,36 @@
 
 package org.jredis.cluster;
 
-import java.util.SortedMap;
+
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 /**
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 25, 2010
+ * @date    Mar 27, 2010
  * 
  */
 
-public interface NodeMappingAlgorithm {
-	/**
-	 * The invoked method expects a compatible {@link HashAlgorithm} available from
-	 * {@link ClusterSpec#getHashAlgorithm()}.
-	 * 
-	 * @param clusterSpec
-	 * @return
-	 */
-	SortedMap<Long, ClusterNodeSpec> mapNodes(ClusterSpec clusterSpec);
+abstract
+public class NodeMappingAlgorithmProviderTestBase extends RefImplTestSuiteBase<NodeMappingAlgorithm> {
+
+	// ------------------------------------------------------------------------
+	// Specification Interface tested
+	// ------------------------------------------------------------------------
+	
+	protected final Class<?> getSpecificationClass () {
+		return NodeMappingAlgorithm.class;
+	}
+	
+	// ------------------------------------------------------------------------
+	// Tests
+	// ------------------------------------------------------------------------
+	
+	@Test
+	public void fooTest () {
+		assertTrue(true, "");
+	}
+	
 }

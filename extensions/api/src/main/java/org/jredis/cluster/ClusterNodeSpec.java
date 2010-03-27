@@ -102,11 +102,11 @@ public interface ClusterNodeSpec {
 		// ------------------------------------------------------------------------
 		
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterNodeSpec#getConnectionSpec() */
-        @Override
+//        @Override
         final public ConnectionSpec getConnectionSpec () { return this.connSpec; }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterNodeSpec#getId() */
-        @Override
+//        @Override
         final public String getId () { return this.id;}
         
 		// ------------------------------------------------------------------------

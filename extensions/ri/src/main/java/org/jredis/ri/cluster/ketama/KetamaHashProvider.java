@@ -54,7 +54,7 @@ public class KetamaHashProvider implements HashAlgorithm {
 	 * 
 	 * @param b bytes to be hashed
 	 */
-	@Override
+//	@Override
 	public long hash (byte[] b) {
 		if(null == b || b.length ==0) throw new IllegalArgumentException();
 		

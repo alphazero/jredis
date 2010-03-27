@@ -22,7 +22,7 @@
 
 package org.jredis.ri.cluster.ketama;
 
-import java.util.NavigableMap;
+import java.util.SortedMap;
 import java.util.Set;
 import java.util.TreeMap;
 import org.jredis.ClientRuntimeException;
@@ -52,10 +52,10 @@ public class KetamaNodeMappingAlgorithm implements NodeMappingAlgorithm {
 	 * This method is a slightly modified version of net.spy.memcached.KetamaNodeLocator's constructor.
 	 * @see <a href="http://github.com/????????/">GIT HUB LINK HERE ...</a>
 	 */
-	@Override
-	public NavigableMap<Long, ClusterNodeSpec> mapNodes (ClusterSpec clusterSpec) 
+//	@Override
+	public SortedMap<Long, ClusterNodeSpec> mapNodes (ClusterSpec clusterSpec) 
 	{		
-		NavigableMap<Long, ClusterNodeSpec> ketamaNodes=new TreeMap<Long, ClusterNodeSpec>();
+		SortedMap<Long, ClusterNodeSpec> ketamaNodes=new TreeMap<Long, ClusterNodeSpec>();
 		
 		try {
 			KetamaHashProvider 		ketamaHashAlgo = (KetamaHashProvider) clusterSpec.getHashAlgorithm();
