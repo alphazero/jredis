@@ -31,7 +31,7 @@ import org.jredis.ProviderException;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
 import org.jredis.cluster.NodeMappingAlgorithm;
-import org.jredis.ri.cluster.CryptoHashUtils;
+import org.jredis.ri.cluster.support.CryptoHashUtils;
 
 /**
  * [TODO: document me!]

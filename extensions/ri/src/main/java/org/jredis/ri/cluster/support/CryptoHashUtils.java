@@ -20,7 +20,7 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.cluster;
+package org.jredis.ri.cluster.support;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -42,6 +42,8 @@ public class CryptoHashUtils {
 	 * @Copyright (c) 2006-2009  Dustin Sallings <dustin@spy.net> 
 	 */
 	public static byte[] computeMd5(byte[] b) throws NoSuchAlgorithmException{
+		if(null == b) throw new IllegalArgumentException ("null input");
+		if(b.length == 0) throw new IllegalArgumentException ("zero length input");
 		MessageDigest md5;
 		md5 = MessageDigest.getInstance("MD5");
 		md5.reset();

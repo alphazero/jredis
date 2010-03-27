@@ -32,6 +32,10 @@ import static org.testng.Assert.*;
 abstract 
 public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpec> {
 
+	// ------------------------------------------------------------------------
+	// Specification Interface tested
+	// ------------------------------------------------------------------------
+	
 	protected final Class<?> getSpecificationClass () {
 		return ClusterSpec.class;
 	}

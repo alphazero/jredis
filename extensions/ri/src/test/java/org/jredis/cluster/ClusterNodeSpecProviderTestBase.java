@@ -34,16 +34,21 @@ import static org.testng.Assert.*;
 abstract 
 public class ClusterNodeSpecProviderTestBase extends RefImplTestSuiteBase<ClusterNodeSpec> {
 
+	// ------------------------------------------------------------------------
+	// Specification Interface tested
+	// ------------------------------------------------------------------------
+	
+	/* (non-Javadoc) @see org.jredis.cluster.ProviderTestBase#getSpecificationClass() */
+	protected final Class<?> getSpecificationClass () {
+		return ClusterNodeSpec.class;
+	}
+
     /**
      * Ok, so its a hack.  (TODO: add a context param to this method in super).
      * @param connectionSpec
      * @return
      */
     protected abstract ClusterNodeSpec newProviderInstance (ConnectionSpec connectionSpec) ;
-
-	protected final Class<?> getSpecificationClass () {
-		return ClusterNodeSpec.class;
-	}
 
 	// ------------------------------------------------------------------------
 	// Test general contract of SPECS for Cluster and its Nodes
