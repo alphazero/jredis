@@ -14,11 +14,14 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster;
+package org.jredis.ri.cluster;
 
 import java.util.NavigableMap;
 import org.jredis.JRedis;
 import org.jredis.JRedisFuture;
+import org.jredis.cluster.ClusterNodeSpec;
+import org.jredis.cluster.ClusterSpec;
+import org.jredis.cluster.JRedisCluster;
 
 /**
  * [TODO: document me!]

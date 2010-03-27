@@ -32,30 +32,11 @@
         <configuration>
           <systemProperties>
             <!-- TestNG parameters -->
-
-            <!-- redis tests | Test Server info -->
-            <property><name>jredis.test.host</name>     <value>localhost</value></property>
-            <property><name>jredis.test.port</name>     <value>6379</value></property>
-            <property><name>jredis.test.password</name> <value>jredis</value></property>
-            <!-- redis tests | Test DBs info *NOTE* THESE WILL BE FLUSHED *NOTE* -->
-            <property><name>jredis.test.db.1</name>     <value>13</value></property>
-            <property><name>jredis.test.db.2</name>     <value>10</value></property>
-            
-            <!-- redis core tests | test data sizes -->
-            <property><name>jredis.test.datasize.small</name>   <value>128</value></property>
-            <property><name>jredis.test.datasize.medium</name>  <value>2048</value></property>
-            <property><name>jredis.test.datasize.large</name>   <value>524288</value></property>
-
-            <!-- redis core tests | test cnt limits; mostly for iteration cnts -->
-            <property><name>jredis.test.cnt.small</name>   <value>10</value></property>
-            <property><name>jredis.test.cnt.medium</name>  <value>1000</value></property>
-            <property><name>jredis.test.cnt.large</name>   <value>100000</value></property>
-            
-            <property><name>jredis.test.expire.secs</name>   <value>1</value></property>
-            <property><name>jredis.test.expire.wait.millisecs</name>   <value>2000</value></property>
-
+            <!-- TODO: generic test params should be in the root toplevel pom .. -->
             <!-- redis core tests | Service params -->
-            <property><name>jredis.service.connection.cnt</name><value>5</value></property>
+            <property><name>jredis.cluster.node.cnt</name><value>100</value></property>
+            <property><name>jredis.cluster.node.address.base</name><value>localhost</value></property>
+            <property><name>jredis.cluster.node.port.base</name><value>6379</value></property>
 
           </systemProperties>
         </configuration>

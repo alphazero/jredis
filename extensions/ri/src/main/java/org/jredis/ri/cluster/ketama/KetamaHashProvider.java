@@ -21,12 +21,12 @@
  */
 
 
-package org.jredis.cluster.ketama;
+package org.jredis.ri.cluster.ketama;
 
 import java.security.NoSuchAlgorithmException;
 import org.jredis.ClientRuntimeException;
-import org.jredis.cluster.CryptoHashUtils;
 import org.jredis.cluster.HashAlgorithm;
+import org.jredis.ri.cluster.CryptoHashUtils;
 
 /**
  * The Ketama consistent hash algorithm as implemented by Dustin Sallings,

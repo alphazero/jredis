@@ -20,7 +20,7 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster;
+package org.jredis.ri.cluster;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

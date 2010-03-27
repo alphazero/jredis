@@ -77,10 +77,10 @@ public interface ClusterNodeSpec {
 		// Attrs
 		// ------------------------------------------------------------------------
 		/** {@link ConnectionSpec} of this node */
-		final ConnectionSpec connSpec;
+		final protected ConnectionSpec connSpec;
 		
 		/** Cluster wide unique identifier */
-		final String id;
+		final protected String id;
 		
 		// ------------------------------------------------------------------------
 		// Constructor(s)

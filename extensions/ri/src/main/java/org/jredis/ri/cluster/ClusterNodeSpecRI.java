@@ -14,9 +14,10 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster;
+package org.jredis.ri.cluster;
 
 import java.util.Formatter;
+import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.connector.ConnectionSpec;
 
 /**

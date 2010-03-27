@@ -16,111 +16,91 @@
 
 package org.jredis.cluster;
 
-import static org.testng.Assert.fail;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-import org.jredis.connector.ConnectionSpec;
-import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
-import org.jredis.ri.alphazero.support.Log;
+import org.testng.Assert;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Parameters;
 
 /**
- * [TODO: document me!]
- *
+ * As base for all org.jredis.cluster[...] tests, this class is mainly responsible
+ * for 
+ * <li> [-TODO] initialize the test suite parameters through testNG injection from module's pom
+ * <li> [-TODO] get and initialize the test data singleton   
+ * <li> providing any required helper methods
+ * <b>
  * @author  joubin (alphazero@sensesay.net)
  * @date    Mar 24, 2010
- * 
  */
 
-public class RefImplTestSuiteBase {
+public abstract class RefImplTestSuiteBase <T> extends ProviderTestBase <T>{
 
-	protected final Set<ClusterNodeSpec> clusterNodeSpecs = new HashSet<ClusterNodeSpec>();
-	protected ClusterNodeSpec[] clusterNodeSpecsArray = null;
+	// ------------------------------------------------------------------------
+	// General RI Test Suite Parameters with default values to avoid XML
+	// ------------------------------------------------------------------------
+	
+	protected int		NODE_CNT =  10;
+	protected String 	CLUSTER_NODES_ADDRESS_BASE = "127.0.0.1";
+	protected int 		CLUSTER_NODES_PORT_BASE = 6379;
+	
+	protected T			provider;
+	
+	// ------------------------------------------------------------------------
+	// General RI Test Suite test data
+	// ------------------------------------------------------------------------
+	
+	/** data holds the ref to a singleton class with all the test data */
+	protected ClusterSuiteTestData data;
 
+	@Parameters({ 
+//		"jredis.test.password", 
+//		"jredis.test.host", 
+//		"jredis.test.port",
+//		"jredis.test.db.1",
+//		"jredis.test.db.2",
+//
+//		"jredis.test.datasize.small",
+//		"jredis.test.datasize.medium",
+//		"jredis.test.datasize.large",
+//		"jredis.test.cnt.small",
+//		"jredis.test.cnt.medium",
+//		"jredis.test.cnt.large",
+//		"jredis.test.expire.secs",
+//		"jredis.test.expire.wait.millisecs"
+		"jredis.cluster.node.cnt",
+		"jredis.cluster.node.address.base",
+		"jredis.cluster.node.port.base"
+	})
 	@BeforeSuite
 	public void suiteParametersInit(
+//		String password, 
+//		String host, 
+//		int port,
+//		int db1,
+//		int db2,
+
+		int 	nodecnt,
+		String 	nodesAddressBase,
+		int		nodesPortBase
 	) 
 	{
-		Log.log("Suite parameters initialized <suiteParametersInit>");
-
-		setupTestSuiteData();
+		NODE_CNT = nodecnt;
+		CLUSTER_NODES_ADDRESS_BASE = nodesAddressBase;
+		CLUSTER_NODES_PORT_BASE = nodesPortBase;
+		
+//		Log.log("nodecnt: %d", NODE_CNT);
+//		Log.log("cluster nodes address base: %s", CLUSTER_NODES_ADDRESS_BASE);
+//		Log.log("cluster nodes port base:    %d", CLUSTER_NODES_PORT_BASE);
+//		Log.log("nodecnt: %d", NODE_CNT);
+//		Log.log("[extensions.cluster] Suite parameters initialized <suiteParametersInit>");
+		
+		data = setupTestSuiteData();
+		Assert.assertNotNull(data, "ClusterSuiteTestData instance obtained is null");
 	}
-
 	/**
-	 * 
+	 * a do nothing method - keeping it around in case I change my mind about using the
+	 * singleton test data class.
+	 * @return
 	 */
-	private void setupTestSuiteData () {
-		ClusterNodeSpec nodeSpec = null;
-		for(int i=0;i<65536; i++) {
-			InetAddress address = getInetAddressFor(getRandomIPv$HostName());
-			ConnectionSpec connSpec = getConnectionSpecFor(address, i);
-			nodeSpec = new ClusterNodeSpecRI (connSpec);
-			clusterNodeSpecs.add(nodeSpec);
-		}
-		// sets are a pain if you just want a member
-		clusterNodeSpecsArray = new ClusterNodeSpec[clusterNodeSpecs.size()];
-		clusterNodeSpecsArray = clusterNodeSpecs.toArray(clusterNodeSpecsArray);
-
-		Log.log("clusterNodeSpecsArray: " + clusterNodeSpecsArray);
-		for(ClusterNodeSpec s : clusterNodeSpecsArray)
-			if (null == s) Log.log("NULL clusterNodeSpec: " + s);
+	private ClusterSuiteTestData setupTestSuiteData () {
+		return ClusterSuiteTestData.getInstance();
 	}	
-	// ------------------------------------------------------------------------
-	// Helper methods
-	// ------------------------------------------------------------------------
-
-	protected final Random random = new Random(System.currentTimeMillis());
-
-	/**
-	 * Creates a random ascii string
-	 * @param length
-	 * @return
-	 */
-	protected String getRandomAsciiString (int length) {
-		StringBuilder builder = new  StringBuilder(length);
-		for(int i = 0; i<length; i++){
-			char c = (char) (random.nextInt(126-33) + 33);
-			builder.append(c);
-		}
-		return builder.toString();
-	}
-
-	/**
-	 * Creates a buffer of given size filled with random byte values
-	 * @param size
-	 * @return
-	 */
-	protected byte[] getRandomBytes(int size) {
-		int len = size;
-		byte[]	buff = new byte[len];
-		random.nextBytes(buff);
-		return buff;
-	}
-
-	/**
-	 * @return
-	 */
-	protected String getRandomIPv$HostName () {
-		// {255.255.255.255}
-		return "127.0.0.1";
-	}
-	protected InetAddress getInetAddressFor (String hostName) {
-		InetAddress address = null;
-		try {
-			address = InetAddress.getByName(hostName);
-//			ConnectionSpec connSpec = DefaultConnectionSpec.newSpec().setAddress(address);
-		}
-		catch (UnknownHostException e) {
-			fail("In suite setup for random address <"+hostName+">", e);
-		}
-		return address;
-	}
-	protected ConnectionSpec getConnectionSpecFor (InetAddress address, int port) {
-		int db = 10; // TODO: grab from pom
-		ConnectionSpec connSpec = DefaultConnectionSpec.newSpec().setAddress(address).setPort(port).setDatabase(db);
-		return connSpec;
-	}
 }

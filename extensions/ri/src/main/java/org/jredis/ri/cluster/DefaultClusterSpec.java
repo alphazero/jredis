@@ -14,11 +14,14 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster;
+package org.jredis.ri.cluster;
 
+import org.jredis.cluster.ClusterSpec;
+import org.jredis.cluster.HashAlgorithm;
+import org.jredis.cluster.NodeMappingAlgorithm;
 import org.jredis.cluster.ClusterSpec.Support;
-import org.jredis.cluster.ketama.KetamaHashProvider;
-import org.jredis.cluster.ketama.KetamaNodeMappingAlgorithm;
+import org.jredis.ri.cluster.ketama.KetamaHashProvider;
+import org.jredis.ri.cluster.ketama.KetamaNodeMappingAlgorithm;
 
 /**
  * The default ClusterSpec uses the {@link KetamaHashProvider} as its {@link HashAlgorithm}. 
@@ -34,6 +37,10 @@ public class DefaultClusterSpec extends Support implements ClusterSpec {
 		super();
 	}
 
+	// ------------------------------------------------------------------------
+	// public interface
+	// ------------------------------------------------------------------------
+	
 	// ------------------------------------------------------------------------
 	// super overrides
 	// ------------------------------------------------------------------------

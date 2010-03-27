@@ -18,11 +18,13 @@ package org.jredis.cluster;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.jredis.cluster.ketama.KetamaHashProvider;
-import org.jredis.cluster.ketama.KetamaNodeMappingAlgorithm;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
+import org.jredis.ri.cluster.ClusterNodeSpecRI;
+import org.jredis.ri.cluster.DefaultClusterSpec;
+import org.jredis.ri.cluster.ketama.KetamaHashProvider;
+import org.jredis.ri.cluster.ketama.KetamaNodeMappingAlgorithm;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -30,9 +32,16 @@ import static org.testng.Assert.*;
  * @author  joubin (alphazero@sensesay.net)
  * @date    Mar 24, 2010
  */
-@Test(suiteName="extensions-refimpl-tests")
-public class ClusterRefImplTest extends RefImplTestSuiteBase {
-	
+@Test(suiteName="extensions-ri-cluster-tests")
+public abstract class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpec> {
+
+	protected final Class<?> getSpecificationClass () {
+		return ClusterSpec.class;
+	}
+
+	// ------------------------------------------------------------------------
+	// Test general contract of SPECS for Cluster and its Nodes
+	// ------------------------------------------------------------------------
 	@Test
 	public void testIdentityContract () {
 		Log.log("Testing ClusterNodeSpec identity contract enforcement: [Object.equals() | Object.hashCode()]");
@@ -88,6 +97,7 @@ public class ClusterRefImplTest extends RefImplTestSuiteBase {
 		}
 		if(!didRaiseError) fail("Expecting an IllegalArgumentException raised for invalid object type arg to equals()");
 	}
+	
 	/**
 	 * We have the full port range of an IPv4 address as our clusterNodes.  Here
 	 * we make sure the ids are unique.
@@ -95,9 +105,9 @@ public class ClusterRefImplTest extends RefImplTestSuiteBase {
 	@Test
 	public void testIdGeneration () {
 		Log.log("Testing ClusterNodeSpec.getId() ...");
-		Set<String> generatedIdSet = new HashSet<String>(this.clusterNodeSpecs.size());
-		Log.log("... cluster list member cnt: " + this.clusterNodeSpecs.size());
-		for(ClusterNodeSpec nodeSpec : clusterNodeSpecs){
+		Set<String> generatedIdSet = new HashSet<String>(data.clusterNodeSpecs.size());
+		Log.log("... cluster list member cnt: " + data.clusterNodeSpecs.size());
+		for(ClusterNodeSpec nodeSpec : data.clusterNodeSpecs){
 			String nodeId = nodeSpec.getId();
 			assertTrue(generatedIdSet.add(nodeId), "generated ID should be unique but was not: " + nodeId);
 		}
@@ -113,9 +123,9 @@ public class ClusterRefImplTest extends RefImplTestSuiteBase {
 		int nodeCnt = 100;
 		Log.log("Testing CHRange key uqniueness for "+instanceCnt+" instances in the ring... this will take a while! (TODO: cnt should be a parameter!)");
 		Set<String> chRangeKeys = new HashSet<String>(nodeCnt*instanceCnt);
-		Log.log("... cluster list member cnt: " + this.clusterNodeSpecs.size());
+		Log.log("... cluster list member cnt: " + data.clusterNodeSpecs.size());
 		int n = 0;
-		for(ClusterNodeSpec nodeSpec : clusterNodeSpecs){
+		for(ClusterNodeSpec nodeSpec : data.clusterNodeSpecs){
 			for(int i=0; i<instanceCnt; i++) {
 				String nodeInstanceCHKey = nodeSpec.getKeyForReplicationInstance(i);
 				assertTrue(chRangeKeys.add(nodeInstanceCHKey), "generated ConsistentHash Key for node "+nodeSpec.getId()+" for instance "+i+" should be unique but was not: " + nodeInstanceCHKey);
@@ -157,14 +167,14 @@ public class ClusterRefImplTest extends RefImplTestSuiteBase {
 		Log.log("Testing ClusterSpec.addNodeSpec()");
 		ClusterSpec clusterSpec = new DefaultClusterSpec();
 		
-		Log.log("clusterNodeSpecsArray: " + clusterNodeSpecsArray);
+		Log.log("clusterNodeSpecsArray: " + data.clusterNodeSpecsArray);
 		try {
-			clusterSpec.addNodeSpec(clusterNodeSpecsArray[0]);
+			clusterSpec.addNodeSpec(data.clusterNodeSpecsArray[0]);
 		}
 		catch (Exception e){ fail("when adding a unique spec", e); }
 		
 		try {
-			clusterSpec.addNodeSpec(clusterNodeSpecsArray[1]);
+			clusterSpec.addNodeSpec(data.clusterNodeSpecsArray[1]);
 		}
 		catch (Exception e){ fail("when adding a unique spec", e); }
 		

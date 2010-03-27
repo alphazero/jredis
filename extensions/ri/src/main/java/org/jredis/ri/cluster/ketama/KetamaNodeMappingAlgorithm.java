@@ -20,7 +20,7 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster.ketama;
+package org.jredis.ri.cluster.ketama;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.NavigableMap;
@@ -30,8 +30,8 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
-import org.jredis.cluster.CryptoHashUtils;
 import org.jredis.cluster.NodeMappingAlgorithm;
+import org.jredis.ri.cluster.CryptoHashUtils;
 
 /**
  * [TODO: document me!]
@@ -43,7 +43,13 @@ import org.jredis.cluster.NodeMappingAlgorithm;
 
 public class KetamaNodeMappingAlgorithm implements NodeMappingAlgorithm {
 
-	/* (non-Javadoc) @see org.jredis.cluster.NodeMappingAlgorithm#mapNodes(org.jredis.cluster.ClusterSpec) */
+	/** what is a sensible value here? */
+	private static final double REPLICATION_CONST = 10;
+
+	/**
+	 * This method is a slightly modified version of net.spy.memcached.KetamaNodeLocator's constructor.
+	 * @see <a href="http://github.com/????????/">GIT HUB LINK HERE ...</a>
+	 */
 	@Override
 	public NavigableMap<Long, ClusterNodeSpec> mapNodes (ClusterSpec clusterSpec) 
 	{		
@@ -59,7 +65,8 @@ public class KetamaNodeMappingAlgorithm implements NodeMappingAlgorithm {
 					byte[] digest;
 					digest = CryptoHashUtils.computeMd5(node.getKeyForReplicationInstance(i));
 					for(int h=0;h<4;h++) {
-						// Joubin says: here's we're calling a KetamaHashProvider specific method that does the Ketama chunking  
+						// Joubin says: here's we're calling a KetamaHashProvider specific method that does the 
+						// Ketama chunking per above.  
 						ketamaNodes.put(ketamaHashAlgo.hash(digest, h), node);
 					}
 				}
@@ -78,10 +85,14 @@ public class KetamaNodeMappingAlgorithm implements NodeMappingAlgorithm {
 	}
 
 	/**
+	 * Per original paper on consistent hashing, the replication count of any given bucket is
+	 * k*log(C), where C is the number of buckets (i.e. nodes).  We're using {@link KetamaNodeMappingAlgorithm#REPLICATION_CONST}
+	 * as k.
+	 * 
      * @param size
      * @return
      */
     int getNodeReplicationCount (int nodeCnt) {
-	    return 0;
+	    return (int) (Math.log(nodeCnt) * REPLICATION_CONST);
     }
 }
