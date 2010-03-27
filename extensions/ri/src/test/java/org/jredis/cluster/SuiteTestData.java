@@ -31,15 +31,19 @@ import org.jredis.ri.cluster.ClusterNodeSpecRI;
 /**
  * We'll use a singleton for our test data to minimize jvm heap impact
  * of the potentially very large test data.
+ * <p>
+ * This class uses the Reference Implementation classes where necessary.  Implementations
+ * are required to be interoperable and this should not present a problem for testing other
+ * providers of the JReds Cluster specs.
  * 
  * @author  joubin (alphazero@sensesay.net)
  * @date    Mar 27, 2010
  */
 
-public class ClusterSuiteTestData {
+public class SuiteTestData {
 	
 	/** singleton instance - otherwise multiple test runs kill the jvm heap */
-	static private final ClusterSuiteTestData instance = new ClusterSuiteTestData();
+	static private final SuiteTestData instance = new SuiteTestData();
 	// ------------------------------------------------------------------------
 	// General RI Test Suite Parameters with default values to avoid XML
 	// ------------------------------------------------------------------------
@@ -54,20 +58,22 @@ public class ClusterSuiteTestData {
 	// ------------------------------------------------------------------------
 	public final Set<ClusterNodeSpec> clusterNodeSpecs = new HashSet<ClusterNodeSpec>();
 	public final ClusterNodeSpec[] clusterNodeSpecsArray;
-	
+	public ClusterNodeSpec defaultRedisWithDb10ClusterNodeSpec;
+	public ClusterNodeSpec defaultRedisWithDb10ClusterNodeSpec_dup;
+
 	// ------------------------------------------------------------------------
 	// Access
 	// ------------------------------------------------------------------------
 	/**
-	 * @return the singleton instance of  {@link ClusterSuiteTestData}
+	 * @return the singleton instance of  {@link SuiteTestData}
 	 */
-	public static ClusterSuiteTestData getInstance () {
+	public static SuiteTestData getInstance () {
 		return instance;
 	}
 	// ------------------------------------------------------------------------
 	// Const
 	// ------------------------------------------------------------------------
-	private ClusterSuiteTestData () {
+	private SuiteTestData () {
 		ClusterNodeSpec nodeSpec = null;
 		for(int i=0;i<NODE_CNT; i++) {
 			InetAddress address = getInetAddressFor(CLUSTER_NODES_ADDRESS_BASE);
@@ -80,6 +86,10 @@ public class ClusterSuiteTestData {
 		clusterNodeSpecsArray = new ClusterNodeSpec[clusterNodeSpecs.size()];
 		clusterNodeSpecs.toArray(clusterNodeSpecsArray);
 
+
+		defaultRedisWithDb10ClusterNodeSpec = new ClusterNodeSpecRI(DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null));
+		defaultRedisWithDb10ClusterNodeSpec_dup = new ClusterNodeSpecRI(DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null));
+		
 		Log.log("clusterNodeSpecsArray: " + clusterNodeSpecsArray);
 		for(ClusterNodeSpec s : clusterNodeSpecsArray)
 			if (null == s) Log.log("NULL clusterNodeSpec: " + s);

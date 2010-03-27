@@ -14,27 +14,25 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster;
+package org.jredis.ri.cluster.ketama;
 
-import org.jredis.ri.alphazero.support.Log;
-import org.testng.annotations.Test;
-import static org.testng.Assert.*;
-
+import org.jredis.cluster.HashAlgorithm;
+import org.jredis.cluster.HashAlgorithmProviderTestBase;
+import org.jredis.ri.cluster.ketama.KetamaHashProvider;
 
 /**
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 26, 2010
+ * @date    Mar 27, 2010
  * 
  */
 
-//@Test(suiteName="extensions-ri-cluster-tests")
-//public class KetamaAlgorithmTest extends RefImplTestSuiteBase{
-//
-//	@Test
-//	public void fooTest() {
-//		Log.log("Testing ClusterNodeSpec identity contract enforcement: [Object.equals() | Object.hashCode()]");
-//		assertTrue(true);
-//	}
-//}
+public class KetamaHashAlgoProviderTest extends HashAlgorithmProviderTestBase {
+
+	/* (non-Javadoc) @see org.jredis.cluster.ProviderTestBase#newProviderInstance() */
+	@Override
+	protected HashAlgorithm newProviderInstance () {
+		return new KetamaHashProvider();
+	}
+}
