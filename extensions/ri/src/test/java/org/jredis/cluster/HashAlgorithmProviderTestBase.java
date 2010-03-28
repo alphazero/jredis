@@ -18,9 +18,13 @@ package org.jredis.cluster;
 
 
 
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+import java.util.HashSet;
+import java.util.Set;
+import org.jredis.ClientRuntimeException;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.Test;
-import static org.testng.Assert.*;
 
 /**
  * [TODO: document me!]
@@ -34,13 +38,68 @@ import static org.testng.Assert.*;
 abstract
 public class HashAlgorithmProviderTestBase extends RefImplTestSuiteBase<HashAlgorithm>{
 
+	// ------------------------------------------------------------------------
+	// Specification Interface tested
+	// ------------------------------------------------------------------------
+	
 	protected final Class<?> getSpecificationClass () {
 		return HashAlgorithm.class;
 	}
 	
+	// ------------------------------------------------------------------------
+    // Tests
+	// ------------------------------------------------------------------------
+	@SuppressWarnings("static-access")
 	@Test
-	public void fooTest() {
-		Log.log("Testing HashAlgorithm foo test!");
-		assertTrue(true);
+	public void testHashByteArray() {
+		Log.log("Testing HashAlgorithm hash(byte[])");
+		HashAlgorithm hashAlgo = newProviderInstance();
+		try {
+			byte[] data1 = data.getRandomBytes(255);
+	        long data1_hash = hashAlgo.hash(data1);
+	        
+	        int c = 2000;
+	        int cnt = (int) (10 * Math.log(c)) * c;
+        	Log.log("Test hashing %d keys", cnt);
+	        Set<Long> hashSet = new HashSet<Long>(cnt);
+	        for(int i=0; i<cnt; i++){
+	        	long hash = hashAlgo.hash(data.getRandomBytes(255));
+	        	boolean didAdd = hashSet.add(hash);
+	        	if(!didAdd){
+	        		Log.log("[NOTE] got a collision (hash: %d) at idx: %d!", hash, i);
+	        	}
+	        }
+//	        assertEquals(hashSet.size(), cnt);
+	        if(hashSet.size() == cnt)
+	        	Log.log("Hashed %d keys with no collisions", cnt);
+	        else
+	        	Log.log("Hashed %d keys with %d collisions", cnt, cnt - hashSet.size());
+	        
+	        // edge case - NULL input not allowed
+	        boolean didRaiseError = false;
+	        try {
+				byte[] nullref = null;
+	        	hashAlgo.hash(nullref);
+	        }
+	        catch (IllegalArgumentException e){ didRaiseError = true; }
+	        catch (RuntimeException what) { fail("Unexpected runtime exception raised",what); }
+        	assertTrue(didRaiseError, "Expecting a raised exception for null input");
+	        
+	        // edge case - zero length input not allowed
+	        didRaiseError = false;
+	        try {
+				byte[] zerobytes = data.getRandomBytes(0);
+				hashAlgo.hash(zerobytes);
+	        }
+	        catch (IllegalArgumentException e){ didRaiseError = true; }
+	        catch (RuntimeException what) { fail("Unexpected runtime exception raised",what); }
+        	assertTrue(didRaiseError, "Expecting a raised exception for zero length input");
+        }
+        catch (ClientRuntimeException e) {
+	        fail("Required cryptographic algorithm (MD5) is not available", e);
+        }
+        catch (RuntimeException whatsthis){
+        	fail("Unexpected exception class thrown", whatsthis);
+        }
 	}
 }
