@@ -20,13 +20,10 @@ import static org.testng.Assert.fail;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Formatter;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
-import org.jredis.ri.cluster.DefaultClusterNodeSpec;
 
 /**
  * We'll use a singleton for our test data to minimize jvm heap impact
@@ -56,10 +53,15 @@ public class SuiteTestData {
 	// ------------------------------------------------------------------------
 	// General RI Test Suite test data
 	// ------------------------------------------------------------------------
-	public final Set<ClusterNodeSpec> clusterNodeSpecs = new HashSet<ClusterNodeSpec>();
-	public final ClusterNodeSpec[] clusterNodeSpecsArray;
-	public ClusterNodeSpec defaultRedisWithDb10ClusterNodeSpec;
-	public ClusterNodeSpec defaultRedisWithDb10ClusterNodeSpec_dup;
+//	public final Set<ClusterNodeSpec> clusterNodeSpecs = new HashSet<ClusterNodeSpec>();
+	public ConnectionSpec[] connSpecs;
+//	public final ClusterNodeSpec[] clusterNodeSpecsArray;
+	
+//	public ClusterNodeSpec defaultRedisWithDb10ClusterNodeSpec;
+//	public ClusterNodeSpec defaultRedisWithDb10ClusterNodeSpec_dup;
+
+	public ConnectionSpec defaultRedisWithDb10ConnSpec;
+	public ConnectionSpec defaultRedisWithDb10ConnSpec_dup;
 
 	// ------------------------------------------------------------------------
 	// Access
@@ -74,25 +76,27 @@ public class SuiteTestData {
 	// Const
 	// ------------------------------------------------------------------------
 	private SuiteTestData () {
-		ClusterNodeSpec nodeSpec = null;
+//		ClusterNodeSpec nodeSpec = null;
+		connSpecs = new ConnectionSpec[NODE_CNT];
 		for(int i=0;i<NODE_CNT; i++) {
 			InetAddress address = getInetAddressFor(CLUSTER_NODES_ADDRESS_BASE);
 			ConnectionSpec connSpec = getConnectionSpecFor(address, CLUSTER_NODES_PORT_BASE+i, db);
-			nodeSpec = new DefaultClusterNodeSpec (connSpec);
-			clusterNodeSpecs.add(nodeSpec);
+			connSpecs[i] = connSpec;
+//			nodeSpec = new DefaultClusterNodeSpec (connSpec);
+//			clusterNodeSpecs.add(nodeSpec);
 		}
 
 		// sets are a pain if you just want a member
-		clusterNodeSpecsArray = new ClusterNodeSpec[clusterNodeSpecs.size()];
-		clusterNodeSpecs.toArray(clusterNodeSpecsArray);
+//		clusterNodeSpecsArray = new ClusterNodeSpec[clusterNodeSpecs.size()];
+//		clusterNodeSpecs.toArray(clusterNodeSpecsArray);
 
 
-		defaultRedisWithDb10ClusterNodeSpec = new DefaultClusterNodeSpec(DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null));
-		defaultRedisWithDb10ClusterNodeSpec_dup = new DefaultClusterNodeSpec(DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null));
+		defaultRedisWithDb10ConnSpec = DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null);
+		defaultRedisWithDb10ConnSpec_dup = DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null);
 		
-		Log.log("clusterNodeSpecsArray: " + clusterNodeSpecsArray);
-		for(ClusterNodeSpec s : clusterNodeSpecsArray)
-			if (null == s) Log.log("NULL clusterNodeSpec: " + s);
+//		Log.log("clusterNodeSpecsArray: " + clusterNodeSpecsArray);
+//		for(ClusterNodeSpec s : clusterNodeSpecsArray)
+//			if (null == s) Log.log("NULL clusterNodeSpec: " + s);
 
 		Log.log("[ClusterSuiteTestData] Suite test data initialized");
 	}	

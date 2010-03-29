@@ -116,9 +116,12 @@ public class ClusterNodeSpecProviderTestBase extends RefImplTestSuiteBase<Cluste
 	@Test
 	public void testIdGeneration () {
 		Log.log("Testing ClusterNodeSpec.getId() ...");
-		Set<String> generatedIdSet = new HashSet<String>(data.clusterNodeSpecs.size());
-		Log.log("... cluster list member cnt: " + data.clusterNodeSpecs.size());
-		for(ClusterNodeSpec nodeSpec : data.clusterNodeSpecs){
+		
+		Set<String> generatedIdSet = new HashSet<String>(data.connSpecs.length);
+		Log.log("... testing a cluster with member cnt: " + data.connSpecs.length);
+		
+		for(ConnectionSpec connSpec : data.connSpecs){
+			ClusterNodeSpec nodeSpec = newProviderInstance(connSpec);
 			String nodeId = nodeSpec.getId();
 			assertTrue(generatedIdSet.add(nodeId), "generated ID should be unique but was not: " + nodeId);
 		}
@@ -134,9 +137,10 @@ public class ClusterNodeSpecProviderTestBase extends RefImplTestSuiteBase<Cluste
 		int nodeCnt = 100;
 		Log.log("Testing CHRange key uqniueness for "+instanceCnt+" instances in the ring... this will take a while! (TODO: cnt should be a parameter!)");
 		Set<String> chRangeKeys = new HashSet<String>(nodeCnt*instanceCnt);
-		Log.log("... cluster list member cnt: " + data.clusterNodeSpecs.size());
+
 		int n = 0;
-		for(ClusterNodeSpec nodeSpec : data.clusterNodeSpecs){
+		for(ConnectionSpec connSpec : data.connSpecs){
+			ClusterNodeSpec nodeSpec = newProviderInstance(connSpec);
 			for(int i=0; i<instanceCnt; i++) {
 				String nodeInstanceCHKey = nodeSpec.getKeyForReplicationInstance(i);
 				assertTrue(chRangeKeys.add(nodeInstanceCHKey), "generated ConsistentHash Key for node "+nodeSpec.getId()+" for instance "+i+" should be unique but was not: " + nodeInstanceCHKey);

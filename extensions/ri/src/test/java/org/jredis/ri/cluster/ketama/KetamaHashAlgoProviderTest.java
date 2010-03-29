@@ -16,8 +16,8 @@
 
 package org.jredis.ri.cluster.ketama;
 
-import org.jredis.cluster.HashAlgorithmProviderTestBase;
 import org.jredis.cluster.support.HashAlgorithm;
+import org.jredis.cluster.support.HashAlgorithmProviderTestBase;
 import org.jredis.ri.cluster.ketama.KetamaHashProvider;
 
 /**

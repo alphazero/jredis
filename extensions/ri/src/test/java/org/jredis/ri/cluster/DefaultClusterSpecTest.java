@@ -16,8 +16,10 @@
 
 package org.jredis.ri.cluster;
 
+import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
 import org.jredis.cluster.ClusterSpecProviderTestBase;
+import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.cluster.DefaultClusterSpec;
 
 /**
@@ -33,5 +35,11 @@ public class DefaultClusterSpecTest extends ClusterSpecProviderTestBase {
     @Override
     protected ClusterSpec newProviderInstance () {
 	    return new DefaultClusterSpec ();
+    }
+
+	/* (non-Javadoc) @see org.jredis.cluster.ClusterSpecProviderTestBase#newNodeSpec(org.jredis.connector.ConnectionSpec) */
+    @Override
+    protected ClusterNodeSpec newNodeSpec (ConnectionSpec connectionSpec) {
+	    return new DefaultClusterNodeSpec(connectionSpec);
     }
 }

@@ -16,6 +16,7 @@
 
 package org.jredis.cluster;
 
+import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 
 import org.testng.annotations.Test;
@@ -29,6 +30,12 @@ import static org.testng.Assert.*;
 @Test(suiteName="extensions-cluster-specs-2")
 abstract 
 public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpec> {
+
+	// ------------------------------------------------------------------------
+	// Extension point
+	// ------------------------------------------------------------------------
+	
+    protected abstract ClusterNodeSpec newNodeSpec (ConnectionSpec connectionSpec) ;
 
 	// ------------------------------------------------------------------------
 	// Specification Interface tested
@@ -47,14 +54,15 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 		Log.log("Testing ClusterSpec.addNodeSpec()");
 		ClusterSpec clusterSpec = newProviderInstance();
 		
-		Log.log("clusterNodeSpecsArray: " + data.clusterNodeSpecsArray);
 		try {
-			clusterSpec.addNode(data.clusterNodeSpecsArray[0]);
+			ClusterNodeSpec nodeSpec = newNodeSpec(data.connSpecs[0]);
+			clusterSpec.addNode(nodeSpec);
 		}
 		catch (Exception e){ fail("when adding a unique spec", e); }
 		
 		try {
-			clusterSpec.addNode(data.clusterNodeSpecsArray[1]);
+			ClusterNodeSpec nodeSpec = newNodeSpec(data.connSpecs[1]);
+			clusterSpec.addNode(nodeSpec);
 		}
 		catch (Exception e){ fail("when adding a unique spec", e); }
 		
@@ -64,9 +72,9 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 		// should not allow adding of duplicate ClusterNodeSpecs
 		didRaiseError = false;
 		
-		assertTrue(clusterSpec.addNode(data.defaultRedisWithDb10ClusterNodeSpec) == clusterSpec, "add of unique spec should be possible and must return the clusterSpec instance");
+		assertTrue(clusterSpec.addNode(newNodeSpec(data.defaultRedisWithDb10ConnSpec)) == clusterSpec, "add of unique spec should be possible and must return the clusterSpec instance");
 		try {
-			assertTrue(clusterSpec.addNode(data.defaultRedisWithDb10ClusterNodeSpec_dup) == clusterSpec, "add of duplicate spec is expected to raise a runtime exception");
+			assertTrue(clusterSpec.addNode(newNodeSpec(data.defaultRedisWithDb10ConnSpec_dup)) == clusterSpec, "add of duplicate spec is expected to raise a runtime exception");
 		}
 		catch (IllegalArgumentException e){
 			didRaiseError = true;
