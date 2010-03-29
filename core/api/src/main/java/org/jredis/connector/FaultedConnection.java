@@ -33,10 +33,12 @@ import org.jredis.protocol.Response;
  */
 public class FaultedConnection implements Connection {
 
-	private String	errorMsg;
+	final private String	errorMsg;
+	final private ConnectionSpec connSpec;
 
-	public FaultedConnection (String errMsg) {
+	public FaultedConnection (ConnectionSpec connSpec, String errMsg) {
 		this.errorMsg = errMsg;
+		this.connSpec = connSpec;
 	}
 //	@Override
 	public Modality getModality() 
@@ -44,6 +46,11 @@ public class FaultedConnection implements Connection {
 		throw new ClientRuntimeException (errorMsg);
 	}
 
+//@Override
+	public ConnectionSpec getSpec() {
+		return connSpec;
+	}
+	
 //	@Override
 	public Response serviceRequest(Command cmd, byte[]... args) throws RedisException, ClientRuntimeException,
 			ProviderException 
