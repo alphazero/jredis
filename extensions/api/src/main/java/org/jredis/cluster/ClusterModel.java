@@ -111,16 +111,11 @@ public interface ClusterModel {
 	 * @date    Mar 29, 2010
 	 * 
 	 */
-	public static class Event implements Serializable {
+	public static class Event extends org.jredis.Event<ClusterModel, ClusterModel.Event.Type, ClusterNodeSpec> {
+
 		/**  */
-        private static final long serialVersionUID = 3389330709728489795L;
-		/**  */
-		private final Type type;
-		/**  */
-		private final WeakReference<ClusterModel> srcRef;
-		/**  */
-		private final Object info;
-		
+        private static final long serialVersionUID = 1L;
+        
 		/** generated at Event construction time */
 		private final long	 timestamp;
 		/**
@@ -128,11 +123,9 @@ public interface ClusterModel {
 		 * @param type
 		 * @param info
 		 */
-		public Event (ClusterModel src, Type type, Object info) {
-			this.srcRef = new WeakReference<ClusterModel>(src);
-			this.type = type;
-			this.info = info;
-			this.timestamp = System.currentTimeMillis();
+		public Event (ClusterModel src, Type type, ClusterNodeSpec info) {
+			super(src, type, info);
+			timestamp = System.currentTimeMillis();
 		}
 		/**
 		 * @param src
@@ -143,26 +136,9 @@ public interface ClusterModel {
 		}
 		
 		/**
-		 * @return
-		 */
-		public Type getType () { return type; }
-		
-		/**
 		 * @return event approximate event generation time.
 		 */
 		public long getTimestamp () { return timestamp; }
-		/**
-		 * Note that this method may return null if the source {@link ClusterModel} has been garbage
-		 * collected.  
-		 * @return Source {@link ClusterModel} or null if event notification has effectively expired.
-		 */
-		public ClusterModel getSrc () { return srcRef.get(); }
-		
-		/**
-		 * Returned type/value depends on the event type, and could be null.
-		 * @return
-		 */
-		public Object getInfo () { return info; }
 		
 		/**
 		 * [TODO: document me!]
