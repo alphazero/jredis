@@ -17,8 +17,6 @@
 package org.jredis.cluster;
 
 import org.jredis.ri.alphazero.support.Log;
-import org.jredis.ri.cluster.ketama.KetamaHashProvider;
-import org.jredis.ri.cluster.ketama.deprecated.KetamaNodeMapper;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -43,34 +41,6 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 	// ------------------------------------------------------------------------
 	// Test general contract of SPECS for Cluster and its Nodes
 	// ------------------------------------------------------------------------
-	
-	@Test
-	public void testHashProviderAvailability() {
-		Log.log("Testing ClusterSpec.getHashAlgorithm()");
-		
-		// new (empty) ClusterSpec
-		ClusterSpec clusterSpec = newProviderInstance();
-		
-		// getHashProvider should return non-null results
-		assertTrue (clusterSpec.getHashAlgorithm() != null, "ClusterSpec.getHashAlgorithm should not be null");
-		
-		// getHashProvider should return an instance of KetamaHashProvider for the DefaultClusterSpec
-		assertTrue (clusterSpec.getHashAlgorithm() instanceof KetamaHashProvider, "Default ClusterSpec.getHashAlgorithm should be a Ketama algoritm");
-	}
-	
-	@Test
-	public void testNodeMappingAlgorithmAvailability() {
-		Log.log("Testing ClusterSpec.getNodeMappingAlgorithm()");
-		
-		// new (empty) ClusterSpec
-		ClusterSpec clusterSpec = newProviderInstance();
-		
-		// getHashProvider should return non-null results
-		assertTrue (clusterSpec.getNodeMapper() != null, "ClusterSpec.getNodeMappingAlgorithm should not be null");
-		
-		// getHashProvider should return an instance of KetamaHashProvider for the DefaultClusterSpec
-		assertTrue (clusterSpec.getNodeMapper() instanceof KetamaNodeMapper, "Default ClusterSpec.getNodeMappingAlgorithm should be a Ketama algoritm");
-	}
 	
 	@Test
 	public void testAddNodeSpec() {
