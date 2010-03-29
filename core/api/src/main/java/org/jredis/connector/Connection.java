@@ -28,6 +28,12 @@ import org.jredis.protocol.Response;
 public interface Connection {
 
 	/**
+	 * The {@link ConnectionSpec} of a Connection must be invariant during its life-cycle.
+	 * @return the associated {@link ConnectionSpec} for this Connection. 
+	 */
+	public ConnectionSpec getSpec ();
+	
+	/**
 	 * Enum for defining the operational modality of the protocol handlers.
 	 *   
 	 * @author  Joubin Houshyar (alphazero@sensesay.net)
@@ -86,4 +92,47 @@ public interface Connection {
 
 	public Future<Response> queueRequest (Command cmd,  byte[]...args) throws ClientRuntimeException, ProviderException;
 	
+	// ========================================================================
+	// Innner Types
+	// ========================================================================
+	
+	/**
+	 * [TODO: document me!]
+	 *
+	 * @author  Joubin Houshyar (alphazero@sensesay.net)
+	 * @version alpha.0, Mar 29, 2010
+	 * @since   alpha.0
+	 * 
+	 */
+	public interface Listener {
+		public void onEvent(Connection.Event event);
+	}
+	
+	/**
+	 * [TODO: document me!]
+	 *
+	 * @author  Joubin Houshyar (alphazero@sensesay.net)
+	 * @version alpha.0, Mar 29, 2010
+	 * @since   alpha.0
+	 * 
+	 */
+	@SuppressWarnings("serial")
+    final public static class Event extends org.jredis.Event<Connection, Event.Type, Object>{
+		/**
+         * @param src
+         * @param type
+         */
+        public Event (Connection src, Type type) {
+	        super(src, type);
+        }
+        public Event (Connection src, Type type, Object eventInfo) {
+	        super(src, type, eventInfo);
+        }
+
+		public enum Type {
+			Established,
+			Dropped,
+			Faulted
+		}
+	}
 }
