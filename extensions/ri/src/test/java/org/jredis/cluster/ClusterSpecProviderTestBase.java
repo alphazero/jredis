@@ -18,7 +18,7 @@ package org.jredis.cluster;
 
 import org.jredis.ri.alphazero.support.Log;
 import org.jredis.ri.cluster.ketama.KetamaHashProvider;
-import org.jredis.ri.cluster.ketama.KetamaNodeMapper;
+import org.jredis.ri.cluster.ketama.deprecated.KetamaNodeMapper;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;

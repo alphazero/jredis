@@ -20,7 +20,6 @@ import java.util.Collection;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
 import org.jredis.cluster.ClusterSpec.Support;
-import org.jredis.ri.cluster.ketama.KetamaConsitentHashCluster_reture;
 
 /**
  * The default ClusterSpec uses the {@link KetamaConsitentHashCluster_reture} as its {@link ClusterModel_deprecated}. 

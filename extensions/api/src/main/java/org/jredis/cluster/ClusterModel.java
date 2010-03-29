@@ -16,8 +16,6 @@
 
 package org.jredis.cluster;
 
-import java.io.Serializable;
-import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 import org.jredis.NotSupportedException;
@@ -163,7 +161,7 @@ public interface ClusterModel {
 		
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#addNode(org.jredis.cluster.ClusterNodeSpec) */
-        public void addNode (ClusterNodeSpec nodeSpec)
+        final public void addNode (ClusterNodeSpec nodeSpec)
                 throws IllegalArgumentException 
         {
         	synchronized (configLock) {
@@ -173,7 +171,7 @@ public interface ClusterModel {
         	notifyListeners(new ClusterModel.Event(this, ClusterModel.Event.Type.NodeAdded, nodeSpec));
         }
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#removeNode(org.jredis.cluster.ClusterNodeSpec) */
-        public void removeNode (ClusterNodeSpec nodeSpec) throws IllegalArgumentException {
+        final public void removeNode (ClusterNodeSpec nodeSpec) throws IllegalArgumentException {
         	if(!clusterSpec.getNodeSpecs().contains(nodeSpec)) throw new IllegalArgumentException("NodeSpec not part of cluster spec!");
         	synchronized (configLock) {
             	clusterSpec.removeNode(nodeSpec);
@@ -186,15 +184,15 @@ public interface ClusterModel {
         		l.onEvent(e);
         }
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#getSpec() */
-        public ClusterSpec getSpec () {
+        final public ClusterSpec getSpec () {
 	        return clusterSpec;
         }
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#addListener(org.jredis.cluster.ClusterModelListener) */
-        public boolean addListener (Listener modelListener) {
+        final public boolean addListener (Listener modelListener) {
         	return listeners.add(modelListener);
         }
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#removeListener(org.jredis.cluster.ClusterModelListener) */
-        public boolean removeListener (Listener modelListener) {
+        final public boolean removeListener (Listener modelListener) {
         	return listeners.remove(modelListener);
         }
         abstract protected boolean onNodeAddition(ClusterNodeSpec newNode);

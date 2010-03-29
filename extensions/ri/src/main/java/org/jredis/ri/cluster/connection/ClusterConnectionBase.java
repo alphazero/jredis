@@ -21,6 +21,7 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
+import org.jredis.connector.ConnectionSpec;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 
@@ -36,7 +37,6 @@ public class ClusterConnectionBase implements Connection {
 
 	/* (non-Javadoc) @see org.jredis.connector.Connection#getModality() */
 	public Modality getModality () {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -49,4 +49,9 @@ public class ClusterConnectionBase implements Connection {
 	public Response serviceRequest (Command cmd, byte[]... args) throws RedisException, ClientRuntimeException, ProviderException {
 		return null;
 	}
+
+	/* (non-Javadoc) @see org.jredis.connector.Connection#getSpec() */
+    public ConnectionSpec getSpec () {
+	    return null;
+    }
 }

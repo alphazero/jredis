@@ -18,6 +18,7 @@ package org.jredis.ri.cluster.ketama;
 
 import org.jredis.cluster.NodeMappingAlgorithmProviderTestBase;
 import org.jredis.cluster.deprecated.ClusterNodeMapper;
+import org.jredis.ri.cluster.ketama.deprecated.KetamaNodeMapper;
 
 /**
  * [TODO: document me!]
