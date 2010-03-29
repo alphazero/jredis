@@ -14,30 +14,27 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster;
-
-import org.jredis.JRedis;
-import org.jredis.JRedisFuture;
+package org.jredis.cluster.deprecated;
 
 /**
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 25, 2010
+ * @date    Mar 28, 2010
  * 
  */
 
-public interface JRedisCluster {
-	/**
-	 * @return
-	 */
-	ClusterSpec getClusterSpec();
-	/**
-	 * @return
-	 */
-	JRedis getSynchInterface();
-	/**
-	 * @return
-	 */
-	JRedisFuture getAsychInterface();
+// TODO: really need a connection listener and that doesn't belong here
+@Deprecated
+public interface ClusterListener {
+//	/**
+//	 * @param clusterSpec
+//	 * @param clusterNodeSpec
+//	 */
+//	public void notifyNodeAdded (ClusterSpec clusterSpec, ClusterNodeSpec clusterNodeSpec);
+//	/**
+//	 * @param clusterSpec
+//	 * @param clusterNodeSpec
+//	 */
+//	public void notifyNodeRemoved (ClusterSpec clusterSpec, ClusterNodeSpec clusterNodeSpec);
 }

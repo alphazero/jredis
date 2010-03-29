@@ -14,25 +14,35 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.cluster.ketama;
+package org.jredis.cluster.connector;
 
-import org.jredis.cluster.NodeMappingAlgorithmProviderTestBase;
-import org.jredis.cluster.deprecated.ClusterNodeMapper;
+import java.lang.ref.WeakReference;
+import org.jredis.connector.Connection;
 
 /**
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 27, 2010
+ * @date    Mar 29, 2010
  * 
  */
 
-public class KetamaNodeMappingAlgorithmProviderTest extends
-        NodeMappingAlgorithmProviderTestBase {
+public class ConnectorEvent {
 
-	/* (non-Javadoc) @see org.jredis.cluster.ProviderTestBase#newProviderInstance() */
-	@Override
-	protected ClusterNodeMapper newProviderInstance () {
-		return new KetamaNodeMapper ();
+	private final Type type;
+	private final WeakReference<Connection> connRef;
+	
+	public ConnectorEvent(Connection conn, Type type){
+		connRef = new WeakReference<Connection>(conn);
+		this.type = type;
+	}
+	
+	public Type getType() { return type ; }
+	public Connection getConnection() { return connRef.get(); }
+	
+	
+	public enum Type {
+		Established,
+		Dropped
 	}
 }

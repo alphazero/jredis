@@ -17,6 +17,7 @@
 package org.jredis.cluster;
 
 
+import org.jredis.cluster.deprecated.ClusterNodeMapper;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -29,14 +30,14 @@ import static org.testng.Assert.*;
  */
 
 abstract
-public class NodeMappingAlgorithmProviderTestBase extends RefImplTestSuiteBase<NodeMappingAlgorithm> {
+public class NodeMappingAlgorithmProviderTestBase extends RefImplTestSuiteBase<ClusterNodeMapper> {
 
 	// ------------------------------------------------------------------------
 	// Specification Interface tested
 	// ------------------------------------------------------------------------
 	
 	protected final Class<?> getSpecificationClass () {
-		return NodeMappingAlgorithm.class;
+		return ClusterNodeMapper.class;
 	}
 	
 	// ------------------------------------------------------------------------

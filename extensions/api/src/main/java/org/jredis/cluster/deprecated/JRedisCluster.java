@@ -14,25 +14,37 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.cluster.ketama;
+package org.jredis.cluster.deprecated;
 
-import org.jredis.cluster.NodeMappingAlgorithmProviderTestBase;
-import org.jredis.cluster.deprecated.ClusterNodeMapper;
+import org.jredis.JRedis;
+import org.jredis.JRedisFuture;
+import org.jredis.cluster.ClusterSpec;
 
 /**
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 27, 2010
+ * @date    Mar 25, 2010
  * 
  */
 
-public class KetamaNodeMappingAlgorithmProviderTest extends
-        NodeMappingAlgorithmProviderTestBase {
-
-	/* (non-Javadoc) @see org.jredis.cluster.ProviderTestBase#newProviderInstance() */
-	@Override
-	protected ClusterNodeMapper newProviderInstance () {
-		return new KetamaNodeMapper ();
-	}
+// NOT SURE if this is a meaningful interface - keep things simple
+public interface JRedisCluster {
+	/**
+	 * @return the stretegy used to distribute keys across the node space.
+	 */
+	public ClusterModel_deprecated  getModel();
+	
+	/**
+	 * @return
+	 */
+	ClusterSpec getClusterSpec();
+	/**
+	 * @return
+	 */
+	JRedis getSynchInterface();
+	/**
+	 * @return
+	 */
+	JRedisFuture getAsychInterface();
 }

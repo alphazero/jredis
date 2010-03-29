@@ -34,6 +34,7 @@ import org.jredis.connector.ConnectionSpec;
  * 
  */
 
+// this is just a data structure with a few methods - make it a class
 public interface ClusterNodeSpec {
 	/**
 	 * @return

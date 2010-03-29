@@ -26,7 +26,7 @@ import java.util.Set;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
-import org.jredis.ri.cluster.ClusterNodeSpecRI;
+import org.jredis.ri.cluster.DefaultClusterNodeSpec;
 
 /**
  * We'll use a singleton for our test data to minimize jvm heap impact
@@ -78,7 +78,7 @@ public class SuiteTestData {
 		for(int i=0;i<NODE_CNT; i++) {
 			InetAddress address = getInetAddressFor(CLUSTER_NODES_ADDRESS_BASE);
 			ConnectionSpec connSpec = getConnectionSpecFor(address, CLUSTER_NODES_PORT_BASE+i, db);
-			nodeSpec = new ClusterNodeSpecRI (connSpec);
+			nodeSpec = new DefaultClusterNodeSpec (connSpec);
 			clusterNodeSpecs.add(nodeSpec);
 		}
 
@@ -87,8 +87,8 @@ public class SuiteTestData {
 		clusterNodeSpecs.toArray(clusterNodeSpecsArray);
 
 
-		defaultRedisWithDb10ClusterNodeSpec = new ClusterNodeSpecRI(DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null));
-		defaultRedisWithDb10ClusterNodeSpec_dup = new ClusterNodeSpecRI(DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null));
+		defaultRedisWithDb10ClusterNodeSpec = new DefaultClusterNodeSpec(DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null));
+		defaultRedisWithDb10ClusterNodeSpec_dup = new DefaultClusterNodeSpec(DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null));
 		
 		Log.log("clusterNodeSpecsArray: " + clusterNodeSpecsArray);
 		for(ClusterNodeSpec s : clusterNodeSpecsArray)

@@ -23,6 +23,7 @@ import static org.testng.Assert.fail;
 import java.util.HashSet;
 import java.util.Set;
 import org.jredis.ClientRuntimeException;
+import org.jredis.cluster.support.HashAlgorithm;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.Test;
 
@@ -55,9 +56,6 @@ public class HashAlgorithmProviderTestBase extends RefImplTestSuiteBase<HashAlgo
 		Log.log("Testing HashAlgorithm hash(byte[])");
 		HashAlgorithm hashAlgo = newProviderInstance();
 		try {
-			byte[] data1 = data.getRandomBytes(255);
-	        long data1_hash = hashAlgo.hash(data1);
-	        
 	        int c = 2000;
 	        int cnt = (int) (10 * Math.log(c)) * c;
         	Log.log("Test hashing %d keys", cnt);

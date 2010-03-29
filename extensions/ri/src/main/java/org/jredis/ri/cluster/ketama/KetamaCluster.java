@@ -14,30 +14,40 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.cluster;
+package org.jredis.ri.cluster.ketama;
 
+import org.jredis.cluster.ClusterModel;
 import org.jredis.cluster.ClusterNodeSpec;
-import org.jredis.cluster.ClusterNodeSpecProviderTestBase;
-import org.jredis.connector.ConnectionSpec;
-import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
+import org.jredis.cluster.ClusterSpec;
 
 /**
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 27, 2010
+ * @date    Mar 28, 2010
  * 
  */
 
-public class ClusterNodeSpecImplTest extends ClusterNodeSpecProviderTestBase {
-	/* (non-Javadoc) @see org.jredis.ri.ProviderTestBase#newProviderInstance() */
-    @Override
-    final protected ClusterNodeSpec newProviderInstance () {
-	    return new DefaultClusterNodeSpec (DefaultConnectionSpec.newSpec());
+public class KetamaCluster extends ClusterModel.Support implements ClusterModel {
+
+	/**
+     * @param clusterSpec
+     */
+    public KetamaCluster (ClusterSpec clusterSpec) {
+	    super(clusterSpec);
     }
-    /* (non-Javadoc) @see org.jredis.cluster.ClusterNodeSpecProviderTestBase#newProviderInstance(org.jredis.connector.ConnectionSpec) */
+
     @Override
-    final protected ClusterNodeSpec newProviderInstance (ConnectionSpec connectionSpec) {
-	    return new DefaultClusterNodeSpec (connectionSpec);
+    protected boolean onNodeAddition (ClusterNodeSpec newNode) {
+	    return false;
+    }
+
+    @Override
+    protected boolean onNodeRemoval (ClusterNodeSpec newNode) {
+	    return false;
+    }
+
+    public ClusterNodeSpec getNodeForKey (byte[] key) {
+	    return null;
     }
 }

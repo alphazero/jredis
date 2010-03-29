@@ -16,15 +16,14 @@
 
 package org.jredis.ri.cluster;
 
+import java.util.Collection;
+import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
-import org.jredis.cluster.HashAlgorithm;
-import org.jredis.cluster.NodeMappingAlgorithm;
 import org.jredis.cluster.ClusterSpec.Support;
-import org.jredis.ri.cluster.ketama.KetamaHashProvider;
-import org.jredis.ri.cluster.ketama.KetamaNodeMappingAlgorithm;
+import org.jredis.ri.cluster.ketama.KetamaConsitentHashCluster_reture;
 
 /**
- * The default ClusterSpec uses the {@link KetamaHashProvider} as its {@link HashAlgorithm}. 
+ * The default ClusterSpec uses the {@link KetamaConsitentHashCluster_reture} as its {@link ClusterModel_deprecated}. 
  *
  * @author  joubin (alphazero@sensesay.net)
  * @date    Mar 25, 2010
@@ -33,8 +32,23 @@ import org.jredis.ri.cluster.ketama.KetamaNodeMappingAlgorithm;
 
 public class DefaultClusterSpec extends Support implements ClusterSpec {
 	
+	/** Default ClusterSpec.Type is {@link ClusterSpec.Type#ConsistentHash} */
+	public static final ClusterSpec.Type DEFAULT_CLUSTER_TYPE = ClusterSpec.Type.ConsistentHash;
+	
+	// ------------------------------------------------------------------------
+	// Constructor
+	// ------------------------------------------------------------------------
+	
 	public DefaultClusterSpec () {
+		this(null);
+	}
+
+	public DefaultClusterSpec (Collection<ClusterNodeSpec> nodeSpecs) {
 		super();
+		this.setType(DEFAULT_CLUSTER_TYPE);
+		if(null != nodeSpecs){
+			addAll(nodeSpecs);
+		}
 	}
 
 	// ------------------------------------------------------------------------
@@ -44,15 +58,4 @@ public class DefaultClusterSpec extends Support implements ClusterSpec {
 	// ------------------------------------------------------------------------
 	// super overrides
 	// ------------------------------------------------------------------------
-	/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec.Support#newHashProvider() */
-    @Override
-    protected HashAlgorithm newHashAlgorithm () {
-		return new KetamaHashProvider();
-    }
-
-	/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec.Support#newNodeMappingAlgorithm() */
-    @Override
-    protected NodeMappingAlgorithm newNodeMappingAlgorithm () {
-	    return new KetamaNodeMappingAlgorithm();
-    }
 }

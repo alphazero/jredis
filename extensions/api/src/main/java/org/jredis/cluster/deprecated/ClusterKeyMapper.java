@@ -14,11 +14,14 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster;
+package org.jredis.cluster.deprecated;
 
-import java.util.SortedMap;
+import org.jredis.cluster.ClusterNodeSpec;
+
 
 /**
+ * TODO: iterators, etc.
+ * 
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
@@ -26,13 +29,15 @@ import java.util.SortedMap;
  * 
  */
 
-public interface NodeMappingAlgorithm {
+public interface ClusterKeyMapper {
 	/**
-	 * The invoked method expects a compatible {@link HashAlgorithm} available from
-	 * {@link ClusterSpec#getHashAlgorithm()}.
-	 * 
-	 * @param clusterSpec
+	 * @param key
 	 * @return
 	 */
-	SortedMap<Long, ClusterNodeSpec> mapNodes(ClusterSpec clusterSpec);
+	public ClusterNodeSpec getPrimary(byte[] key);
+	/**
+	 * @param key
+	 * @return
+	 */
+	public ClusterNodeSpec getSecondary(byte[] key);
 }

@@ -14,25 +14,16 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.cluster.ketama;
-
-import org.jredis.cluster.NodeMappingAlgorithmProviderTestBase;
-import org.jredis.cluster.deprecated.ClusterNodeMapper;
+package org.jredis.cluster.support;
 
 /**
- * [TODO: document me!]
+ * silly me?  Remove this.
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 27, 2010
+ * @date    Mar 24, 2010
  * 
  */
 
-public class KetamaNodeMappingAlgorithmProviderTest extends
-        NodeMappingAlgorithmProviderTestBase {
-
-	/* (non-Javadoc) @see org.jredis.cluster.ProviderTestBase#newProviderInstance() */
-	@Override
-	protected ClusterNodeMapper newProviderInstance () {
-		return new KetamaNodeMapper ();
-	}
+public interface HashAlgorithm {
+	public long hash(byte[] kb);
 }

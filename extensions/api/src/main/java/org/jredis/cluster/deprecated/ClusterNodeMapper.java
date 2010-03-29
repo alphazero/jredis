@@ -14,16 +14,20 @@
  *   limitations under the License.
  */
 
-package org.jredis.cluster;
+package org.jredis.cluster.deprecated;
+
+import org.jredis.cluster.ClusterNodeSpec;
+
 
 /**
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 24, 2010
+ * @date    Mar 25, 2010
  * 
  */
-
-public interface HashAlgorithm {
-	public long hash(byte[] kb);
+@Deprecated
+public interface ClusterNodeMapper {
+	
+	public ClusterNodeSpec getNodeForKey (long keyHash);
 }

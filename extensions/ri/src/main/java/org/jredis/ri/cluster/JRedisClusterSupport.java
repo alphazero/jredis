@@ -16,12 +16,24 @@
 
 package org.jredis.ri.cluster;
 
-import java.util.SortedMap;
+import java.util.Map;
+import java.util.concurrent.Future;
+import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
 import org.jredis.JRedisFuture;
+import org.jredis.NotSupportedException;
+import org.jredis.ProviderException;
+import org.jredis.RedisException;
+import org.jredis.cluster.ClusterModel;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
-import org.jredis.cluster.JRedisCluster;
+import org.jredis.cluster.deprecated.ClusterModel_deprecated;
+import org.jredis.cluster.deprecated.JRedisCluster;
+import org.jredis.connector.Connection;
+import org.jredis.protocol.Command;
+import org.jredis.protocol.Response;
+import org.jredis.ri.alphazero.JRedisFutureSupport;
+import org.jredis.ri.alphazero.JRedisSupport;
 
 /**
  * [TODO: document me!]
@@ -31,58 +43,51 @@ import org.jredis.cluster.JRedisCluster;
  * 
  */
 
-public class JRedisClusterSupport implements JRedisCluster {
+public class JRedisClusterSupport extends JRedisSupport
+//	implements JRedisCluster 
+{
+	// constructor should take cluster spec, and cluster model
 
-	// ------------------------------------------------------------------------
-	// Properties
-	// ------------------------------------------------------------------------
+	/* (non-Javadoc) @see org.jredis.ri.alphazero.JRedisSupport#serviceRequest(org.jredis.protocol.Command, byte[][]) */
+    @Override
+    protected Response serviceRequest (Command cmd, byte[]... args)
+            throws RedisException, ClientRuntimeException, ProviderException 
+    {
+    	// filter out the unsupported commands
+    	//
+    	switch (cmd.requestType){
+			case BULK_SET:
+			case NO_ARG:
+			case VALUE:
+				// alternatively, a subset of the above can just be
+				// issued to a random server ?
+				throw new NotSupportedException(cmd.name());
 
-	/** {@link ClusterSpec} */
-	protected final ClusterSpec clusterSpec;
-	
-	/** Initialized at instantiation using the info/algos of associated ClusterSpec */
-	protected final SortedMap<Long, ClusterNodeSpec> clusterMap;
-	// ------------------------------------------------------------------------
-	// Constructors
-	// ------------------------------------------------------------------------
-	
-	protected JRedisClusterSupport (ClusterSpec clusterSpec) {
-		this.clusterSpec = clusterSpec;
-		this.clusterMap = clusterSpec.getNodeMappingAlgorithm().mapNodes(clusterSpec);
-	}
-	
-	// ------------------------------------------------------------------------
-	// Extension point(s)
-	/*
-	 * [TODO]
-	 */
-	// ------------------------------------------------------------------------
-	
-	// ???
-	
-	// ------------------------------------------------------------------------
-	// INTERFACE
-	// ========================================================== JRedisCluster
-	/*
-	 * TODO: doc this
-	 */
-	// ------------------------------------------------------------------------
-	
-	/* (non-Javadoc) @see org.jredis.cluster.JRedisCluster#getAsychInterface() */
-//	@Override
-	public JRedisFuture getAsychInterface () {
-		throw new RuntimeException("not implemented!");
-	}
-
-	/* (non-Javadoc) @see org.jredis.cluster.JRedisCluster#getClusterSpec() */
-//	@Override
-	final public ClusterSpec getClusterSpec () {
-		return this.clusterSpec;
-	}
-
-	/* (non-Javadoc) @see org.jredis.cluster.JRedisCluster#getSynchInterface() */
-//	@Override
-	public JRedis getSynchInterface () {
-		throw new RuntimeException("not implemented!");
-	}
+			case KEY:
+			case KEY_CNT_VALUE:
+			case KEY_IDX_VALUE:
+			case KEY_KEY:
+			case KEY_KEY_VALUE:
+			case KEY_NUM:
+			case KEY_NUM_NUM:
+			case KEY_NUM_NUM_OPTS:
+			case KEY_SPEC:
+			case KEY_VALUE:
+			case MULTI_KEY:
+				break;
+    	}
+    	// get key
+    	//
+		byte[] key = args[0];
+    	
+    	// find node and delegate request to associated connection
+    	//
+		ClusterModel cluster = null;
+		ClusterNodeSpec nodeSpec = cluster.getNodeForKey(key);
+		String nodeId = nodeSpec.getId();
+		Map<String, Connection> connections = null;
+		Connection conn = connections.get(nodeId);
+		
+		return conn.serviceRequest(cmd, args);
+    }
 }

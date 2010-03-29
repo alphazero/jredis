@@ -16,19 +16,21 @@
 
 package org.jredis.ri.cluster;
 
+import java.net.Socket;
 import java.util.Formatter;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 
 /**
- * [TODO: document me!]
- *
+ * TODO: the whole DB part is problematic and destined to be phased out for 2.0, so
+ * lets think about removing it all together...
  * @author  joubin (alphazero@sensesay.net)
  * @date    Mar 25, 2010
  * 
  */
 
-public class ClusterNodeSpecRI extends ClusterNodeSpec.Support implements ClusterNodeSpec {
+public class DefaultClusterNodeSpec extends ClusterNodeSpec.Support implements ClusterNodeSpec {
 	// ------------------------------------------------------------------------
 	// Attrs
 	// ------------------------------------------------------------------------
@@ -41,13 +43,22 @@ public class ClusterNodeSpecRI extends ClusterNodeSpec.Support implements Cluste
 	 * @param connSpec
 	 * @throws IllegalArgumentException 
 	 */
-	public ClusterNodeSpecRI(ConnectionSpec connSpec){
+	public DefaultClusterNodeSpec(ConnectionSpec connSpec){
 		super(connSpec);
 	}
 	// ------------------------------------------------------------------------
 	// Interface
 	// ------------------------------------------------------------------------
 	
+	public static ClusterNodeSpec getSpecFor(Socket conn){
+		return getSpecFor(conn, 0);
+	}
+	
+	public static ClusterNodeSpec getSpecFor(Socket conn, int db){
+		if(null == conn) throw new IllegalArgumentException("null arg [conn]");
+		ConnectionSpec connSpec = DefaultConnectionSpec.newSpec(conn.getInetAddress(), conn.getPort(), 0, null).setDatabase(db);
+		return new DefaultClusterNodeSpec(connSpec);
+	}
 	// ------------------------------------------------------------------------
 	// Identity
 	// ------------------------------------------------------------------------

@@ -16,6 +16,7 @@
 
 package org.jredis.cluster;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,31 +28,27 @@ import java.util.Set;
  * 
  */
 
+// this is just a datastructure with a few methods -- make it a class
 public interface ClusterSpec {
+
+	// ------------------------------------------------------------------------
+	// Node/Key space management and distribution 
+	// ------------------------------------------------------------------------
 	
-	/**
-	 * @return
-	 */
-	public HashAlgorithm getHashAlgorithm();
-	
-	/**
-	 * @return
-	 */
-	public NodeMappingAlgorithm getNodeMappingAlgorithm();
-	
+	// TODO: may wish to use a simple enum here to spec the cluster type (i.e. ConsistentHashing)
+	// and let the RIs supply a model to suite it.
+//	
 //	/**
-//	 * DOES THIS REALLY BELONG HERE?
-//	 * @return
+//	 * @return the stretegy used to distribute keys across the node space.
 //	 */
-//	public int  getNodeReplicationCount();
+//	public ClusterStrategy  getStrategy();
+//	
+	public Type getType ();
+	public ClusterSpec setType (Type clusterType);
 	
-//	/**
-//	 * @param hashProvider
-//	 * @return
-//	 */
-//	public ClusterSpec setHashProvider(HashProvider hashProvider);
-	
-	
+	// ------------------------------------------------------------------------
+	// Membership
+	// ------------------------------------------------------------------------
 	/**
 	 * @return
 	 */
@@ -62,49 +59,68 @@ public interface ClusterSpec {
 	 * @return
 	 * @throws IllegalArgumentException if nodeSpec provided is already present.
 	 */
-	public ClusterSpec addNodeSpec(ClusterNodeSpec nodeSpec);
+	public ClusterSpec addNode(ClusterNodeSpec nodeSpec);
 	
 	/**
-	 * @param nodeSpecs
+     * @param nodeSpec
+	 * @throws IllegalArgumentException if nodeSpec provided is already present.
+     */
+    public ClusterSpec removeNode (ClusterNodeSpec nodeSpec);
+    
+	/**
+	 * @param nodeSpecs is a {@link Collection} instead of a {@link Set} to 
+	 * relax the type requirements, but the required semantics remains set like,
+	 * and duplicate (per {@link ClusterNodeSpec#equals(Object)} elements will
+	 * be rejected.
 	 * @return
 	 */
-	public ClusterSpec addAll(Set<ClusterNodeSpec> nodeSpecs);
+	public ClusterSpec addAll(Collection<ClusterNodeSpec> nodeSpecs);
 	
+	// ========================================================================
+	// INNER CLASSES
+	// ========================================================================
+	
+	public enum Type {
+		ConsistentHash
+	}
 	// ------------------------------------------------------------------------
-	// Reference Implementation 
+	// Implementation Support 
 	// ------------------------------------------------------------------------
 	
 	public abstract static class Support implements ClusterSpec {
 
-		/**  */
-		final protected HashAlgorithm hashProvider;
-		
-		/**  */
-		final protected NodeMappingAlgorithm nodeMappingAlgorithm;
-		
 //		/**  */
-//		final protected int nodeReplicationCount;
+//		final protected ClusterModel distributionStrategy;
+		private Type type;
+		
 		/**  */
 		final protected Set<ClusterNodeSpec> nodeSpecs = new HashSet<ClusterNodeSpec>();
 		
-		public Support() {
-			this.hashProvider = newHashAlgorithm();
-			this.nodeMappingAlgorithm = newNodeMappingAlgorithm();
-			// TODO: mapping algo should recommend a replication count
-			// but wait: isn't that Ketama/CH specific?
-		}
+		// ------------------------------------------------------------------------
+		// constructor (template) 
+		// ------------------------------------------------------------------------
+		
+		protected Support () { }
+		
+		// ------------------------------------------------------------------------
+		// interface
+		// ------------------------------------------------------------------------
+		
+		public Type getType() { return type; }
+		public ClusterSpec setType(Type type) { this.type = type; return this; }
+		
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addAll(java.util.List) */
 //        @Override
-        public ClusterSpec addAll (Set<ClusterNodeSpec> nodeSpecs) {
+        public ClusterSpec addAll (Collection<ClusterNodeSpec> nodeSpecs) {
         	for(ClusterNodeSpec nodeSpec : nodeSpecs){
-        		addNodeSpec(nodeSpec);
+        		addNode(nodeSpec);
         	}
 	        return this;
         }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addNode(org.jredis.cluster.ClusterNodeSpec) */
 //        @Override
-        public ClusterSpec addNodeSpec (ClusterNodeSpec nodeSpec) {
+        public ClusterSpec addNode (ClusterNodeSpec nodeSpec) {
         	if(null == nodeSpec)
     			throw new IllegalArgumentException("null nodeSpec");
         	
@@ -114,30 +130,40 @@ public interface ClusterSpec {
     		return this;
         }
 
+        /* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#removeNode(org.jredis.cluster.ClusterNodeSpec) */
+        public ClusterSpec removeNode (ClusterNodeSpec nodeSpec) {
+        	if(null == nodeSpec)
+    			throw new IllegalArgumentException("null nodeSpec");
+        	
+    		if(!this.nodeSpecs.remove(nodeSpec))
+    			throw new IllegalArgumentException("nodeSpec [id: <"+nodeSpec.getId()+">] not part of this cluster spec");
+    		
+    		return this;
+        }
+
+		// ------------------------------------------------------------------------
+		// accessors
+		// ------------------------------------------------------------------------
+        
+//		
+//    	/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getDistributionStrategy() */
+//    	final public ClusterStrategy  getStrategy() {
+//    		return this.distributionStrategy;
+//    	}
+    	
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getNodes() */
 //        @Override
-        public Set<ClusterNodeSpec> getNodeSpecs () {
+        final public Set<ClusterNodeSpec> getNodeSpecs () {
         	Set<ClusterNodeSpec> set = new HashSet<ClusterNodeSpec>(nodeSpecs.size());
         	for(ClusterNodeSpec spec : nodeSpecs)
         		set.add(spec);
 	        return set;
         }
 
-		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getHashProvider() */
-//        @Override
-        public HashAlgorithm getHashAlgorithm () {
-	        return hashProvider;
-        }
-
-		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#getHashProvider() */
-//        @Override
-        public NodeMappingAlgorithm getNodeMappingAlgorithm () {
-	        return nodeMappingAlgorithm;
-        }
-		// ------------------------------------------------------------------------
-		// Extension points
-		// ------------------------------------------------------------------------
-        protected abstract HashAlgorithm newHashAlgorithm();
-        protected abstract NodeMappingAlgorithm newNodeMappingAlgorithm();
+//		// ------------------------------------------------------------------------
+//		// Extension points
+//		// ------------------------------------------------------------------------
+//        protected abstract ClusterModel newStrategy();
 	}
+
 }

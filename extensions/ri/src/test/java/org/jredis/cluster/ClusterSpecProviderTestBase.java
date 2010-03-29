@@ -18,7 +18,7 @@ package org.jredis.cluster;
 
 import org.jredis.ri.alphazero.support.Log;
 import org.jredis.ri.cluster.ketama.KetamaHashProvider;
-import org.jredis.ri.cluster.ketama.KetamaNodeMappingAlgorithm;
+import org.jredis.ri.cluster.ketama.KetamaNodeMapper;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -66,10 +66,10 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 		ClusterSpec clusterSpec = newProviderInstance();
 		
 		// getHashProvider should return non-null results
-		assertTrue (clusterSpec.getNodeMappingAlgorithm() != null, "ClusterSpec.getNodeMappingAlgorithm should not be null");
+		assertTrue (clusterSpec.getNodeMapper() != null, "ClusterSpec.getNodeMappingAlgorithm should not be null");
 		
 		// getHashProvider should return an instance of KetamaHashProvider for the DefaultClusterSpec
-		assertTrue (clusterSpec.getNodeMappingAlgorithm() instanceof KetamaNodeMappingAlgorithm, "Default ClusterSpec.getNodeMappingAlgorithm should be a Ketama algoritm");
+		assertTrue (clusterSpec.getNodeMapper() instanceof KetamaNodeMapper, "Default ClusterSpec.getNodeMappingAlgorithm should be a Ketama algoritm");
 	}
 	
 	@Test
@@ -79,12 +79,12 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 		
 		Log.log("clusterNodeSpecsArray: " + data.clusterNodeSpecsArray);
 		try {
-			clusterSpec.addNodeSpec(data.clusterNodeSpecsArray[0]);
+			clusterSpec.addNode(data.clusterNodeSpecsArray[0]);
 		}
 		catch (Exception e){ fail("when adding a unique spec", e); }
 		
 		try {
-			clusterSpec.addNodeSpec(data.clusterNodeSpecsArray[1]);
+			clusterSpec.addNode(data.clusterNodeSpecsArray[1]);
 		}
 		catch (Exception e){ fail("when adding a unique spec", e); }
 		
@@ -94,9 +94,9 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 		// should not allow adding of duplicate ClusterNodeSpecs
 		didRaiseError = false;
 		
-		assertTrue(clusterSpec.addNodeSpec(data.defaultRedisWithDb10ClusterNodeSpec) == clusterSpec, "add of unique spec should be possible and must return the clusterSpec instance");
+		assertTrue(clusterSpec.addNode(data.defaultRedisWithDb10ClusterNodeSpec) == clusterSpec, "add of unique spec should be possible and must return the clusterSpec instance");
 		try {
-			assertTrue(clusterSpec.addNodeSpec(data.defaultRedisWithDb10ClusterNodeSpec_dup) == clusterSpec, "add of duplicate spec is expected to raise a runtime exception");
+			assertTrue(clusterSpec.addNode(data.defaultRedisWithDb10ClusterNodeSpec_dup) == clusterSpec, "add of duplicate spec is expected to raise a runtime exception");
 		}
 		catch (IllegalArgumentException e){
 			didRaiseError = true;
@@ -107,7 +107,7 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 		didRaiseError = false;
 		ClusterNodeSpec nullRef = null;
 		try {
-			assertTrue(clusterSpec.addNodeSpec(nullRef) == clusterSpec, "add of null spec is expected to raise a runtime exception");
+			assertTrue(clusterSpec.addNode(nullRef) == clusterSpec, "add of null spec is expected to raise a runtime exception");
 		}
 		catch (IllegalArgumentException e){
 			didRaiseError = true;
