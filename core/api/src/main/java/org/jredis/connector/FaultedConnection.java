@@ -33,10 +33,12 @@ import org.jredis.protocol.Response;
  */
 public class FaultedConnection implements Connection {
 
-	private String	errorMsg;
+	private final String	errorMsg;
+	private final ConnectionSpec connSpec;
 
-	public FaultedConnection (String errMsg) {
+	public FaultedConnection (ConnectionSpec connSpec, String errMsg) {
 		this.errorMsg = errMsg;
+		this.connSpec = connSpec;
 	}
 //	@Override
 	public Modality getModality() 
@@ -57,4 +59,10 @@ public class FaultedConnection implements Connection {
 	{
 		throw new ClientRuntimeException (errorMsg);
 	}
+	/* (non-Javadoc)
+     * @see org.jredis.connector.Connection#getSpec()
+     */
+    public ConnectionSpec getSpec () {
+	    return connSpec;
+    }
 }

@@ -28,6 +28,11 @@ import org.jredis.protocol.Response;
 public interface Connection {
 
 	/**
+	 * @return
+	 */
+	public ConnectionSpec getSpec ();
+	
+	/**
 	 * Enum for defining the operational modality of the protocol handlers.
 	 *   
 	 * @author  Joubin Houshyar (alphazero@sensesay.net)
