@@ -28,7 +28,8 @@ import org.jredis.protocol.Response;
 public interface Connection {
 
 	/**
-	 * @return
+	 * The {@link ConnectionSpec} of a Connection must be invariant during its life-cycle.
+	 * @return the associated {@link ConnectionSpec} for this Connection. 
 	 */
 	public ConnectionSpec getSpec ();
 	
