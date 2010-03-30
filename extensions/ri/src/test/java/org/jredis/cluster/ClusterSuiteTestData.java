@@ -20,6 +20,8 @@ import static org.testng.Assert.fail;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
@@ -62,6 +64,7 @@ public class ClusterSuiteTestData {
 
 	public ConnectionSpec defRedisDb10Port7777ConnSpec;
 	public ConnectionSpec defRedisDb10Port7777ConnSpec_dup;
+	public Map<Object, Object>	dataMap = new HashMap<Object, Object>();
 
 	// ------------------------------------------------------------------------
 	// Access
@@ -70,6 +73,7 @@ public class ClusterSuiteTestData {
 	 * @return the singleton instance of  {@link ClusterSuiteTestData}
 	 */
 	public static ClusterSuiteTestData getInstance () {
+		Log.log("!!!!!! ClusterSuiteTestData.getInstance() called !!!!");
 		return instance;
 	}
 	// ------------------------------------------------------------------------

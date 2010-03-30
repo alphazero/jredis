@@ -83,6 +83,43 @@ public abstract class ClusterModelProviderTestBase extends RefImplTestSuiteBase<
 		
 		ClusterModel model = newProviderInstance();
 		assertNotNull(model, "newProviderInstance should not return null");
+	}
+	
+	@Test
+	public void testClusterSpecPropertyOps () {
+		Log.log("test ClusterSpec accessors");
+
+		// null spec arg on construct must raise an error
+		//
+		boolean didRaiseEx;
+		didRaiseEx = false;
+		try {
+			@SuppressWarnings("unused")
+            ClusterModel m = newClusterModel(null);
+		}
+		catch (IllegalArgumentException e) { didRaiseEx = true; }
+		catch (RuntimeException whatsthis) { fail("unexpected exception raised during op", whatsthis); }
+		assertTrue(didRaiseEx, "IllegalArgumentException raise is expected");
 		
+		// spec arg with no nodes on construct is not an error if 
+		// model supports reconfiguration
+		//
+		boolean supportsReconfig = newProviderInstance().supportsReconfiguration();
+		didRaiseEx = false;
+		try {
+			@SuppressWarnings("unused")
+			ClusterSpec s = newClusterSpec();
+			s.removeAll(s.getNodeSpecs());
+			assertTrue(s.getNodeSpecs().size() == 0, "cluster spec should have no node specs now");
+            ClusterModel m = newClusterModel(s);
+		}
+		catch (IllegalArgumentException e) { didRaiseEx = true; }
+		catch (RuntimeException whatsthis) { fail("unexpected exception raised during op", whatsthis); }
+		assertTrue(didRaiseEx && !supportsReconfig , "expected only if non reconfigurable");
+
+		ClusterSpec spec = newClusterSpec();
+		ClusterModel model = newClusterModel(spec);
+		assertNotNull(newProviderInstance().getSpec(), "clusterSpec property should be non-null");
+		assertEquals(model.getSpec(), spec, "expecting returned property to be the spec used in constructor");
 	}
 }

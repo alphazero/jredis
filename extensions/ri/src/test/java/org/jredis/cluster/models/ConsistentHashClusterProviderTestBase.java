@@ -40,6 +40,7 @@ public abstract class ConsistentHashClusterProviderTestBase extends ClusterModel
     public void compatibilityTest() {
     	
     	Log.log("Test provider support for Consistent Hashing");
+    	assertNotNull(provider, "provider is null!");
     	assertTrue(provider.supports(ClusterType.CONSISTENT_HASH), "A ConsistentHashCluster model must support Type.CONSISTENT_HASH");
     }
 }

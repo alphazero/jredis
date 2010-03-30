@@ -20,6 +20,7 @@ import org.jredis.ClientRuntimeException;
 //import org.jredis.JRedis;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.BeforeTest;
+import static org.testng.Assert.*;
 
 /**
  * Support for tests of interface <code>T</code> implementation providers.
@@ -49,8 +50,9 @@ public abstract class ProviderTestBase <T> {
 	public void initialize () {
 		try {
 			specClass = getSpecificationClass();
+			assertNotNull(specClass, "getSpecificationClass() returned null");
 			provider = newProviderInstance();
-			
+			assertNotNull(provider, "newProviderInstance() returned null");
 			Log.log("\n\nTEST: " +
 					"\n\t-----------------------------------------------\n" +
 					"\tSpec Interface: %s\n" +

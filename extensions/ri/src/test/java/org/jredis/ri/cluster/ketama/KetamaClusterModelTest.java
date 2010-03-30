@@ -17,10 +17,13 @@
 package org.jredis.ri.cluster.ketama;
 
 import org.jredis.cluster.ClusterModel;
+import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
 import org.jredis.cluster.ClusterType;
 import org.jredis.cluster.models.ConsistentHashClusterProviderTestBase;
+import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
+import org.jredis.ri.cluster.DefaultClusterNodeSpec;
 import org.jredis.ri.cluster.DefaultClusterSpec;
 
 import org.testng.annotations.Test;
@@ -46,13 +49,25 @@ public class KetamaClusterModelTest extends ConsistentHashClusterProviderTestBas
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModelProviderTestBase#newClusterModel(org.jredis.cluster.ClusterSpec) */
 	@Override
 	protected ClusterModel newClusterModel (ClusterSpec clusterSpec) {
-		return new KetamaClusterModel(clusterSpec);
+		ClusterModel model = null;
+		try {
+			model = new KetamaClusterModel(clusterSpec);
+		}
+		catch (RuntimeException e){
+			Log.error("NOTE: propagating error > " + e.getLocalizedMessage());
+			throw e;
+		}
+		return model;
 	}
 
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModelProviderTestBase#newClusterSpec() */
 	@Override
 	protected ClusterSpec newClusterSpec () {
 		ClusterSpec spec = new DefaultClusterSpec();
+		for(int i=0; i<100; i++){
+			ClusterNodeSpec node = new DefaultClusterNodeSpec(DefaultConnectionSpec.newSpec("localhost", 6379+i, 0, null));
+			spec.addNode(node);
+		}
 		return spec;
 	}
 
@@ -68,5 +83,6 @@ public class KetamaClusterModelTest extends ConsistentHashClusterProviderTestBas
     @Test
     public void fooTest() {
     	Log.log("Foo test for KetamaClusterModel");
+    	assertTrue(true);
     }
 }

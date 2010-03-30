@@ -25,6 +25,7 @@ import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
 import org.jredis.cluster.ClusterType;
 import org.jredis.cluster.model.ClusterNodeMap;
+import org.jredis.ri.alphazero.support.Log;
 import org.jredis.ri.cluster.support.CryptoHashUtils;
 
 /**
@@ -131,8 +132,10 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
 			for(ClusterNodeSpec node : nodes) {
 				mapNode(node);
 			}
-			if(nodeMap.size() != nodeReplicationCnt * nodes.size())
+			if(nodeMap.size() != (nodeReplicationCnt/4) * nodes.size() * 4) {
+				Log.error("nodeMap size: " + nodeMap.size() + " | expected: " + nodeReplicationCnt * nodes.size());
 				throw new ProviderException ("[BUG]: expecting node map size to be multiple of replication count * cluster node count");
+			}
 		}
 		catch (ClassCastException e) {
 			throw new ProviderException ("[BUG] KetamaNodeMappingAlgorithm requires a KetamaHashAlgorithm");

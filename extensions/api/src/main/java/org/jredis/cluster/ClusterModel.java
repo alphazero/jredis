@@ -159,6 +159,11 @@ public interface ClusterModel {
 		 * @param clusterSpec
 		 */
 		protected Support(ClusterSpec clusterSpec){
+			if(null == clusterSpec) 
+				throw new IllegalArgumentException("clusterSpec param is null");
+			if(!supportsReconfiguration() && clusterSpec.getNodeSpecs().size() == 0)
+				throw new IllegalArgumentException("clusterSpec has no ClusterNodeSpecs and this model can not be reconfigured.");
+			
 			this.clusterSpec = clusterSpec;
 			initializeModel();
 		}
