@@ -137,6 +137,9 @@ public interface ClusterNodeSpec {
         	return this.getId().hashCode();
         }
         
+        @Override
+        public String toString() { return this.getId(); }
+        
 		// ------------------------------------------------------------------------
 		// Extension points
 		// ------------------------------------------------------------------------

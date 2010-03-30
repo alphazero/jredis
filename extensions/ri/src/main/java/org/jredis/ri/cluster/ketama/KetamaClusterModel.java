@@ -23,8 +23,8 @@ import org.jredis.ProviderException;
 import org.jredis.cluster.ClusterModel;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
-import org.jredis.cluster.ClusterType;
 import org.jredis.cluster.model.ClusterNodeMap;
+import org.jredis.cluster.model.ConsistentHashCluster;
 import org.jredis.ri.alphazero.support.Log;
 import org.jredis.ri.cluster.support.CryptoHashUtils;
 
@@ -36,20 +36,13 @@ import org.jredis.ri.cluster.support.CryptoHashUtils;
  * 
  */
 
-public class KetamaClusterModel extends ClusterModel.Support implements ClusterModel {
+public class KetamaClusterModel extends ConsistentHashCluster.Support implements ConsistentHashCluster {
 
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
-	
-	/** what is a sensible value here? */
-	private static final double REPLICATION_CONST = 10;
 	/**  */
-	private ClusterNodeMap	nodeMap;
-	/**  */
-	private KetamaHashProvider ketamaHashAlgo;
-	/**  */
-	private int nodeReplicationCnt;
+	protected KetamaHashProvider hashAlgo;
 	
 	// ------------------------------------------------------------------------
 	// Properties
@@ -69,7 +62,7 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
     
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#getNodeForKey(byte[]) */
 	public ClusterNodeSpec getNodeForKey (byte[] key) {
-		long hash = ketamaHashAlgo.hash(key);
+		long hash = hashAlgo.hash(key);
 		final ClusterNodeSpec rv;
 		if(!nodeMap.containsKey(hash)) {
 			// Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
@@ -86,38 +79,45 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
 		return rv;
 	}
 	
+	/**
+	 * TODO: return the map or clone it?  WHY IS METHOD EVEN NECESSARY?
+	 * @see org.jredis.cluster.model.ConsistentHashCluster#getNodeMap()
+	 * @return ???
+	 */
+    public ClusterNodeMap getNodeMap () {
+	    return nodeMap;
+    }
+
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#supportsReconfiguration() */
     public boolean supportsReconfiguration () {
 	    return false;
     }
     
-    /* (non-Javadoc) @see org.jredis.cluster.ClusterModel#supports(org.jredis.cluster.ClusterType) */
-    final public boolean supports(ClusterType clusterType){
-    	return clusterType == ClusterType.CONSISTENT_HASH;
-    }
     // ------------------------------------------------------------------------
     // Inner Ops
     // ------------------------------------------------------------------------
     
 	/**
 	 * Per original paper on consistent hashing, the replication count of any given bucket is
-	 * k*log(C), where C is the number of buckets (i.e. nodes).  We're using {@link KetamaNodeMapper#REPLICATION_CONST}
+	 * k*log(C), where C is the number of buckets (i.e. nodes).  We're using {@link KetamaNodeMapper#DEFAULT_REPLICATION_CONST}
 	 * as k.
 	 * 
      * @param nodeCnt number of server nodes ("buckets" per original paper) in the Ketama cluster
      * @return
      */
-    static public int replicationCount(int nodeCnt){
-    	return (int) (Math.log(nodeCnt) * REPLICATION_CONST);    	
-    }
-
-	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel.Support#initializeModel() */
     @Override
-    protected void initializeModel () {
-    	this.ketamaHashAlgo = new KetamaHashProvider();
-		this.nodeMap = new NodeMap();
-    	nodeReplicationCnt = replicationCount(clusterSpec.getNodeSpecs().size());
-    	mapNodes();
+    final protected int replicationCount(){
+    	int nodeCnt = clusterSpec.getNodeSpecs().size();
+    	return (int) (Math.log(nodeCnt) * DEFAULT_REPLICATION_CONST);    	
+    }
+    
+    @Override
+    final protected ClusterNodeMap newClusterNodeMap() {return new NodeMap(); }
+    
+    @Override
+    final protected void initializeComponents() {
+    	super.initializeComponents();
+    	hashAlgo = new KetamaHashProvider();
     }
 
 	/**
@@ -125,7 +125,8 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
 	 * @see <a href="http://github.com/????????/">GIT HUB LINK HERE ...</a>
 	 */
 
-	private void mapNodes () 
+    @Override
+	final protected void mapNodes () 
 	{		
 		try {
 			Set<ClusterNodeSpec> 	nodes = clusterSpec.getNodeSpecs();
@@ -150,7 +151,7 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
 			for(int h=0;h<4;h++) {
 				// Joubin says: here's we're calling a KetamaHashProvider specific method that does the 
 				// Ketama chunking per above.  
-				nodeMap.put(ketamaHashAlgo.hash(digest, h), node);
+				nodeMap.put(hashAlgo.hash(digest, h), node);
 			}
 		}
 		return false;
@@ -180,6 +181,6 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
     @SuppressWarnings("serial")
 //    public static class NodeMap extends TreeMap<Long, ClusterNodeSpec> implements SortedMap<Long, ClusterNodeSpec>{
     public class NodeMap extends TreeMap<Long, ClusterNodeSpec> implements ClusterNodeMap{
-    	
+    	// TODO: iterator, etc.
     }
 }
