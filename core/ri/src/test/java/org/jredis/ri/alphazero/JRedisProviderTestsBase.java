@@ -628,7 +628,7 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			}
 			assertEquals(provider.hlen(keys.get(0)), 0, "hash should empty");
 			List<String> hkeys2 = provider.hkeys(keys.get(0));
-			assertEquals( hkeys2.size(), 0, "keys list should be empty");
+			assertEquals( hkeys2, null, "keys list should be null"); // this used to be an empty list - api change says it is null
 			
 			List<String> hkeys3 = provider.hkeys("no-such-hash");
 			assertEquals( hkeys3, null, "keys list of non-existent hash should be null.");
@@ -663,7 +663,7 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			}
 			assertEquals(provider.hlen(keys.get(0)), 0, "hash should empty");
 			List<byte[]> hvals2 = provider.hvals(keys.get(0));
-			assertEquals( hvals2.size(), 0, "keys list should be empty");
+			assertEquals( hvals2, null, "(api change) keys list should be null"); // this used to return an empty set
 			
 			List<byte[]> hvals3 = provider.hvals("no-such-hash");
 			assertEquals( hvals3, null, "values list of non-existent hash should be null.");
@@ -705,7 +705,7 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 				assertTrue(provider.hdel(keys.get(0), key), "deletion of existing key in hash should be true");
 			
 			Map<String, byte[]> hmap2 = provider.hgetall(keys.get(0));
-			assertEquals( hmap2.size(), 0, "hash map should be empty");
+			assertEquals( hmap2, null, "hash map should be null"); // used to be empty - api change says it will be null
 			
 			Map<String, byte[]> hmap3 = provider.hgetall("no-such-hash");
 			assertEquals( hmap3, null, "hgetall for non existent hash should be null");
@@ -2207,8 +2207,8 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			provider.srem(keys.get(2), dataList.get(0));
 			assertTrue(provider.scard(keys.get(2)) == 0, "set should be empty now");
 			members = provider.smembers(keys.get(2));
-			assertNotNull(members, "smembers should return an empty set, not null");
-			assertTrue(members.size() == 0, "smembers should have returned an empty list");
+			assertNull(members, "smembers should return a null"); // this used to be an empty set - api change
+//			assertTrue(members.size() == 0, "smembers should have returned an empty list");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 
@@ -2234,8 +2234,8 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			provider.srem(keys.get(2), stringList.get(0));
 			assertTrue(provider.scard(keys.get(2)) == 0, "set should be empty now");
 			members = toStr(provider.smembers(keys.get(2)));
-			assertNotNull(members, "smembers should return an empty set, not null");
-			assertTrue(members.size() == 0, "smembers should have returned an empty list");
+			assertNull(members, "smembers should return null for set that was fully emptied"); // api change.
+//			assertTrue(members.size() == 0, "smembers should have returned an empty list"); // api change - now it is null
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 
@@ -2261,8 +2261,8 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			provider.srem(keys.get(2), longList.get(0));
 			assertTrue(provider.scard(keys.get(2)) == 0, "set should be empty now");
 			members = toLong (provider.smembers(keys.get(2)));
-			assertNotNull(members, "smembers should return an empty set, not null");
-			assertTrue(members.size() == 0, "smembers should have returned an empty list");
+			assertNull(members, "smembers should return null"); // api change (also toLong changed to handle the null results).
+//			assertTrue(members.size() == 0, "smembers should have returned an empty list");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 
@@ -2288,8 +2288,8 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			provider.srem(keys.get(2), objectList.get(0));
 			assertTrue(provider.scard(keys.get(2)) == 0, "set should be empty now");
 			members = decode (provider.smembers(keys.get(2)));
-			assertNotNull(members, "smembers should return an empty set, not null");
-			assertTrue(members.size() == 0, "smembers should have returned an empty list");
+			assertNull(members, "smembers should return null"); // API change
+//			assertTrue(members.size() == 0, "smembers should have returned an empty list");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
