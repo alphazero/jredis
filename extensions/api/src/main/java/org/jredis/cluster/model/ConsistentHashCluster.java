@@ -33,8 +33,12 @@ import org.jredis.cluster.ClusterType;
  * @see [1]: <a href="http://www.akamai.com/dl/technical_publications/ConsistenHashingandRandomTreesDistributedCachingprotocolsforrelievingHotSpotsontheworldwideweb.pdf">Consistent Hashing and Random Trees</a>
  */
 
+// TODO: extend from a new super DynamicClusterModel and fold all NodeMap event/mod apis to that interface
+
 public interface ConsistentHashCluster extends ClusterModel {
+	
 	/**
+	 * TODO: move this to 
 	 * @return
 	 */
 	ClusterNodeMap getNodeMap ();

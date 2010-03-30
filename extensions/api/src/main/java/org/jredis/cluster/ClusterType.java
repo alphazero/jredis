@@ -26,5 +26,5 @@ package org.jredis.cluster;
  */
 public enum ClusterType {
 	CONSISTENT_HASH, 
-	STATIC_MODULO_HASH
+	STATIC_HASH
 }
