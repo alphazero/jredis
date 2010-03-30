@@ -78,10 +78,24 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 		// use the setter and test various requirements.
 		ClusterSpec chainedRes = clusterSpec.setType(clusterType);
 		testChainedResult(chainedRes, clusterSpec);
-//		assertNotNull(chainedRes, "fluent interface setters must return non null values");
-//		assertEquals(chainedRes, aClusterSpec, "setter result must be the same reference as the original");
 		
 		assertEquals(clusterSpec.getType(), clusterType, "getType() result must match the ref used for setType()");
+	}
+	
+	@Test
+	public void testRemoveNodeSpec() {
+		Log.log("Testing ClusterSpec.addNodeSpec()");
+		ClusterSpec clusterSpec = newProviderInstance();
+		
+		for(int i=0; i<10; i++){
+			ClusterNodeSpec nodeSpec = newNodeSpec(data.connSpecs[i]);
+			assertTrue(clusterSpec.addNode(nodeSpec));
+		}
+		
+		for(int i=0; i<10; i++){
+			ClusterNodeSpec nodeSpec = newNodeSpec(data.connSpecs[i]);
+			assertTrue(clusterSpec.removeNode(nodeSpec));
+		}
 	}
 	
 	@Test
@@ -89,18 +103,14 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 		Log.log("Testing ClusterSpec.addNodeSpec()");
 		ClusterSpec clusterSpec = newProviderInstance();
 		
-		try {
-			ClusterNodeSpec nodeSpec = newNodeSpec(data.connSpecs[0]);
-			ClusterSpec res = clusterSpec.addNode(nodeSpec);
-			testChainedResult(res, clusterSpec);
-		}
-		catch (Exception e){ fail("when adding a unique spec", e); }
+		ClusterNodeSpec nodeSpec = null;
 		
-		try {
-			ClusterNodeSpec nodeSpec = newNodeSpec(data.connSpecs[1]);
-			clusterSpec.addNode(nodeSpec);
-		}
-		catch (Exception e){ fail("when adding a unique spec", e); }
+		nodeSpec = newNodeSpec(data.connSpecs[0]);
+		assertTrue(clusterSpec.addNode(nodeSpec));
+		
+		nodeSpec = newNodeSpec(data.connSpecs[1]);
+		assertTrue(clusterSpec.addNode(nodeSpec));
+		
 		
 		// now lets raise some errors
 		boolean didRaiseError;
@@ -108,20 +118,14 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 		// should not allow adding of duplicate ClusterNodeSpecs
 		didRaiseError = false;
 		
-		assertTrue(clusterSpec.addNode(newNodeSpec(data.defRedisDb10Port7777ConnSpec)) == clusterSpec, "add of unique spec should be possible and must return the clusterSpec instance");
-		try {
-			assertTrue(clusterSpec.addNode(newNodeSpec(data.defRedisDb10Port7777ConnSpec_dup)) == clusterSpec, "add of duplicate spec is expected to raise a runtime exception");
-		}
-		catch (IllegalArgumentException e){
-			didRaiseError = true;
-		}
-		if(!didRaiseError) fail("Expecting an IllegalArgumentException raised for duplicate ClusterNodeSpec to add()");
+		assertTrue(clusterSpec.addNode(newNodeSpec(data.defRedisDb10Port7777ConnSpec)), "add of unique spec should be possible and must return the clusterSpec instance");
+		assertFalse(clusterSpec.addNode(newNodeSpec(data.defRedisDb10Port7777ConnSpec_dup)), "add of duplicate spec is expected to raise a runtime exception");
 		
 		// should not allow adding of null specs
 		didRaiseError = false;
 		ClusterNodeSpec nullRef = null;
 		try {
-			assertTrue(clusterSpec.addNode(nullRef) == clusterSpec, "add of null spec is expected to raise a runtime exception");
+			clusterSpec.addNode(nullRef);
 		}
 		catch (IllegalArgumentException e){
 			didRaiseError = true;

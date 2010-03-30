@@ -59,13 +59,13 @@ public interface ClusterSpec {
 	 * @return
 	 * @throws IllegalArgumentException if nodeSpec provided is already present.
 	 */
-	public ClusterSpec addNode(ClusterNodeSpec nodeSpec);
+	public boolean addNode(ClusterNodeSpec nodeSpec);
 	
 	/**
      * @param nodeSpec
 	 * @throws IllegalArgumentException if nodeSpec provided is already present.
      */
-    public ClusterSpec removeNode (ClusterNodeSpec nodeSpec);
+    public boolean removeNode (ClusterNodeSpec nodeSpec);
     
 	/**
 	 * @param nodeSpecs is a {@link Collection} instead of a {@link Set} to 
@@ -113,25 +113,19 @@ public interface ClusterSpec {
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addNode(org.jredis.cluster.ClusterNodeSpec) */
 //        @Override
-        public ClusterSpec addNode (ClusterNodeSpec nodeSpec) {
+        public boolean addNode (ClusterNodeSpec nodeSpec) {
         	if(null == nodeSpec)
     			throw new IllegalArgumentException("null nodeSpec");
         	
-    		if(!this.nodeSpecs.add(nodeSpec))
-    			throw new IllegalArgumentException("nodeSpec [id: <"+nodeSpec.getId()+">] is already present");
-    		
-    		return this;
+    		return this.nodeSpecs.add(nodeSpec);
         }
 
         /* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#removeNode(org.jredis.cluster.ClusterNodeSpec) */
-        public ClusterSpec removeNode (ClusterNodeSpec nodeSpec) {
+        public boolean removeNode (ClusterNodeSpec nodeSpec) {
         	if(null == nodeSpec)
     			throw new IllegalArgumentException("null nodeSpec");
         	
-    		if(!this.nodeSpecs.remove(nodeSpec))
-    			throw new IllegalArgumentException("nodeSpec [id: <"+nodeSpec.getId()+">] not part of this cluster spec");
-    		
-    		return this;
+    		return nodeSpecs.remove(nodeSpec);
         }
 
 		// ------------------------------------------------------------------------
