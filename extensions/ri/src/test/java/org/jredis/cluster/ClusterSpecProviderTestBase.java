@@ -16,6 +16,8 @@
 
 package org.jredis.cluster;
 
+import java.util.Collection;
+import java.util.HashSet;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 
@@ -81,6 +83,50 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 		
 		assertEquals(clusterSpec.getType(), clusterType, "getType() result must match the ref used for setType()");
 	}
+	
+	@Test
+	public void testAddAndRemoveAll() {
+		Log.log("Testing ClusterSpec addAll() | removeAll()");
+		ClusterSpec clusterSpec = newProviderInstance();
+		
+		Log.log("Test with cluster spec with %d node specs ..", clusterSpec.getNodeSpecs().size());
+		Collection<ClusterNodeSpec> nodes = new HashSet<ClusterNodeSpec>();
+		for(int i=0; i<10; i++){
+			nodes.add(newNodeSpec(data.connSpecs[i]));
+		}
+		assertTrue(clusterSpec.addAll(nodes), "addAll should return true");
+		assertFalse(clusterSpec.addAll(nodes), "dup addAll should return false");
+		
+		assertTrue(clusterSpec.removeAll(nodes), "removeAll should return true");
+		assertFalse(clusterSpec.removeAll(nodes), "second removeAll should return false");
+		
+		// test constraint against collections with a null member
+		nodes.clear();
+		assertTrue(nodes.add(null), "collection w null input");
+		for(int i=0; i<10; i++) {
+			nodes.add(newNodeSpec(data.connSpecs[i]));
+		}
+		assertTrue(nodes.contains(null), "collection has a null input");
+		boolean didRaiseEx;
+		didRaiseEx = false;
+		try {
+			clusterSpec.addAll(nodes);
+		}
+		catch (IllegalArgumentException e) { didRaiseEx = true; }
+		catch (RuntimeException whatsthis) { fail("unexpected exception raised during op", whatsthis); }
+		assertTrue(didRaiseEx, "IllegalArgumentException raise is expected");
+		
+		didRaiseEx = false;
+		try {
+			clusterSpec.removeAll(nodes);
+		}
+		catch (IllegalArgumentException e) { didRaiseEx = true; }
+		catch (RuntimeException whatsthis) { fail("unexpected exception raised during op", whatsthis); }
+		assertTrue(didRaiseEx, "IllegalArgumentException raise is expected");
+		
+		
+	}
+	
 	
 	@Test
 	public void testRemoveNodeSpec() {

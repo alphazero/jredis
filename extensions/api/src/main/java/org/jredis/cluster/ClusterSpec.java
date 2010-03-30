@@ -68,13 +68,25 @@ public interface ClusterSpec {
     public boolean removeNode (ClusterNodeSpec nodeSpec);
     
 	/**
+	 * Note that the collection must not include a null member.  
+	 * 
 	 * @param nodeSpecs is a {@link Collection} instead of a {@link Set} to 
 	 * relax the type requirements, but the required semantics remains set like,
 	 * and duplicate (per {@link ClusterNodeSpec#equals(Object)} elements will
 	 * be rejected.
-	 * @return
+	 * @throws IllegalArgumentException if collection includes a null member
+	 * @return per contract of {@link Set#addAll(Collection)}
 	 */
-	public ClusterSpec addAll(Collection<ClusterNodeSpec> nodeSpecs);
+	public boolean addAll(Collection<ClusterNodeSpec> nodeSpecs);
+	
+	/**
+	 * Note that the collection must not include a null member.  
+	 * 
+	 * @param nodeSpecs
+	 * @throws IllegalArgumentException if collection includes a null member
+	 * @return per contract of {@link Set#removeAll(Collection)}
+	 */
+	public boolean removeAll(Collection<ClusterNodeSpec> nodeSpecs);
 	
 	// ========================================================================
 	// INNER CLASSES
@@ -103,12 +115,17 @@ public interface ClusterSpec {
 		public ClusterSpec setType(ClusterType type) { this.type = type; return this; }
 		
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addAll(java.util.List) */
-//        @Override
-        public ClusterSpec addAll (Collection<ClusterNodeSpec> nodeSpecs) {
-        	for(ClusterNodeSpec nodeSpec : nodeSpecs){
-        		addNode(nodeSpec);
-        	}
-	        return this;
+//      @Override
+        public boolean addAll (Collection<ClusterNodeSpec> nodes) {
+        	if(nodes.contains(null)) throw new IllegalArgumentException("collection includes a null member");
+        	return  nodeSpecs.addAll(nodes);
+        }
+
+        /* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#removeAll(java.util.Collection) */
+//      @Override
+        public boolean removeAll (Collection<ClusterNodeSpec> nodes) {
+        	if(nodes.contains(null)) throw new IllegalArgumentException("collection includes a null member");
+        	return nodeSpecs.removeAll(nodes);
         }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addNode(org.jredis.cluster.ClusterNodeSpec) */
