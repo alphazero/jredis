@@ -159,13 +159,13 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel.Support#onNodeAddition(org.jredis.cluster.ClusterNodeSpec) */
     @Override
     protected boolean onNodeAddition (ClusterNodeSpec newNode) {
-	    return false;
+    	throw new ProviderException("[BUG] basic KetamaClusterModel does NOT support reconfiguration of nodes");
     }
 
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel.Support#onNodeRemoval(org.jredis.cluster.ClusterNodeSpec) */
     @Override
     protected boolean onNodeRemoval (ClusterNodeSpec newNode) {
-	    return false;
+    	throw new ProviderException("[BUG] basic KetamaClusterModel does NOT support reconfiguration of nodes");
     }
 
     

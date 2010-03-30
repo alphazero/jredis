@@ -16,7 +16,10 @@
 
 package org.jredis.cluster;
 
+import org.jredis.NotSupportedException;
+import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
+import org.jredis.ri.cluster.DefaultClusterNodeSpec;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -107,11 +110,10 @@ public abstract class ClusterModelProviderTestBase extends RefImplTestSuiteBase<
 		boolean supportsReconfig = newProviderInstance().supportsReconfiguration();
 		didRaiseEx = false;
 		try {
-			@SuppressWarnings("unused")
 			ClusterSpec s = newClusterSpec();
 			s.removeAll(s.getNodeSpecs());
 			assertTrue(s.getNodeSpecs().size() == 0, "cluster spec should have no node specs now");
-            ClusterModel m = newClusterModel(s);
+            newClusterModel(s);
 		}
 		catch (IllegalArgumentException e) { didRaiseEx = true; }
 		catch (RuntimeException whatsthis) { fail("unexpected exception raised during op", whatsthis); }
@@ -121,5 +123,71 @@ public abstract class ClusterModelProviderTestBase extends RefImplTestSuiteBase<
 		ClusterModel model = newClusterModel(spec);
 		assertNotNull(newProviderInstance().getSpec(), "clusterSpec property should be non-null");
 		assertEquals(model.getSpec(), spec, "expecting returned property to be the spec used in constructor");
+	}
+	
+	@Test
+	public void testReconfigOfNonReconfigurableModel () {
+		Log.log("test reconfiguration for static configuration models");
+		
+		// skip the test if not applicable to this provider
+		//
+		if(provider.supportsReconfiguration()) {
+			Log.log("Skipping test; not applicable.");
+			return;
+		}
+		
+		// create a new model, get its spec, and pick one node to remove
+		// this should raise an exception
+		ClusterModel model = newProviderInstance();
+		ClusterSpec clusterSpec = provider.getSpec();
+		ClusterNodeSpec nodeSpec = null;
+		for(ClusterNodeSpec n : clusterSpec.getNodeSpecs()){
+			nodeSpec = n;
+			break;
+		}
+		boolean didRaiseEx;
+		didRaiseEx = false;
+		try {
+			model.removeNode(nodeSpec);
+		}
+		catch (NotSupportedException e) { didRaiseEx = true; }
+		catch (RuntimeException whatsthis) { fail("unexpected exception raised during op", whatsthis); }
+		assertTrue(didRaiseEx, "NotSupportedException raise is expected");
+		
+		// so far so good.
+		// now lets add a node
+		didRaiseEx = false;
+		try {
+			model.addNode(new DefaultClusterNodeSpec(DefaultConnectionSpec.newSpec()));
+		}
+		catch (NotSupportedException e) { didRaiseEx = true; }
+		catch (RuntimeException whatsthis) { fail("unexpected exception raised during op", whatsthis); }
+		assertTrue(didRaiseEx, "NotSupportedException raise is expected");
+	}
+	@Test
+	public void testReconfigOfReconfigurableModel () {
+		Log.log("test reconfiguration for dynamic configuration models");
+		
+		// skip the test if not applicable to this provider
+		//
+		if(!provider.supportsReconfiguration()) {
+			Log.log("Skipping test; not applicable.");
+			return;
+		}
+		
+		// create a new model, get its spec, and pick one node to remove
+		//
+		ClusterModel model = newProviderInstance();
+		ClusterSpec clusterSpec = provider.getSpec();
+		ClusterNodeSpec nodeSpec = null;
+		for(ClusterNodeSpec n : clusterSpec.getNodeSpecs()){
+			nodeSpec = n;
+			break;
+		}
+		model.removeNode(nodeSpec);
+		
+		// now lets add a node
+		//
+		model.addNode(new DefaultClusterNodeSpec(DefaultConnectionSpec.newSpec().setPort(9999)));
 	}
 }
