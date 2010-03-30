@@ -23,8 +23,13 @@ import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 
 /**
- * TODO: the whole DB part is problematic and destined to be phased out for 2.0, so
- * lets think about removing it all together...
+ * A basic {@link ClusterNodeSpec} that uses the basic configuration information
+ * (address, port) to generate unique ids and replication instance keys.  Note that
+ * while {@link ConnectionSpec} as of JRedis 1.0 distinguishes between DBs, given
+ * that the the Redis 1.3.n compliant library will have stateful connections that would
+ * allow use of SELELCT to change the DB, this class also does NOT distinguish between
+ * two {@link ConnectionSpec}s that are identical but have different DB specification.
+ * 
  * @author  joubin (alphazero@sensesay.net)
  * @date    Mar 25, 2010
  * 
@@ -51,12 +56,8 @@ public class DefaultClusterNodeSpec extends ClusterNodeSpec.Support implements C
 	// ------------------------------------------------------------------------
 	
 	public static ClusterNodeSpec getSpecFor(Socket conn){
-		return getSpecFor(conn, 0);
-	}
-	
-	public static ClusterNodeSpec getSpecFor(Socket conn, int db){
 		if(null == conn) throw new IllegalArgumentException("null arg [conn]");
-		ConnectionSpec connSpec = DefaultConnectionSpec.newSpec(conn.getInetAddress(), conn.getPort(), 0, null).setDatabase(db);
+		ConnectionSpec connSpec = DefaultConnectionSpec.newSpec(conn.getInetAddress(), conn.getPort(), 0, null);
 		return new DefaultClusterNodeSpec(connSpec);
 	}
 	// ------------------------------------------------------------------------
@@ -69,7 +70,7 @@ public class DefaultClusterNodeSpec extends ClusterNodeSpec.Support implements C
     /**
      * Method is called once (and only once) by the constructor to set the
      * final {@link Support#id} field.  This (default) implementation simply
-     * creates a string of form <ip-address-string-rep>:<0-padded-5-digit-port-number>:<0 padded 2-digit-db-number.
+     * creates a string of form <ip-address-string-rep>:<0-padded-5-digit-port-number>.
      * <p>
      * ex:
      * <code>
@@ -81,10 +82,9 @@ public class DefaultClusterNodeSpec extends ClusterNodeSpec.Support implements C
      */
     protected String generateId () {
     	Formatter fmt = new Formatter();
-    	fmt.format("%s:%05d:%02d", 
+    	fmt.format("%s:%05d", 
     			this.connSpec.getAddress().getHostAddress(),
-    			this.connSpec.getPort(),
-    			this.connSpec.getDatabase()
+    			this.connSpec.getPort()
     		);
     	return fmt.toString();
     }

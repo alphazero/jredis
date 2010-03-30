@@ -72,16 +72,13 @@ public class ClusterNodeSpecProviderTestBase extends RefImplTestSuiteBase<Cluste
 		assertTrue(node2.equals(node1), "nodes must be considered equivalent [transitive test]");
 		
 		
-		// test enforcement of DB# of node's ConnectionSpec in identity tests
-		// these should all fail
-		// this will likely change in future when we open up Select but for now (as of 1.2.n) selected DB
-		// must be enforced.
-		// TODO: spell this out in the ClusterNodeSpec docs.
+		// test equivalence of DB# of node's ConnectionSpec in identity tests
+		// these should all pass
 		
-		assertFalse(node1.getId().equals(node3.getId()), "ids should NOT be identical");
-		assertFalse(node1.hashCode() == node3.hashCode(), "hashCodes should NOT be equal");
-		assertFalse(node1.equals(node3), "nodes must NOT be considered equivalent");
-		assertFalse(node3.equals(node1), "nodes must NOT be considered equivalent [transitive test]");
+		assertTrue(node1.getId().equals(node3.getId()), "ids should be identical");
+		assertTrue(node1.hashCode() == node3.hashCode(), "hashCodes should be equal");
+		assertTrue(node1.equals(node3), "nodes must be considered equivalent");
+		assertTrue(node3.equals(node1), "nodes must be considered equivalent [transitive test]");
 
 		// now lets raise some errors
 		boolean didRaiseError;
