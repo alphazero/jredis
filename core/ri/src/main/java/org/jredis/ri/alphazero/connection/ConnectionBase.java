@@ -151,6 +151,11 @@ public abstract class ConnectionBase implements Connection {
 	// ------------------------------------------------------------------------
 
 //	@Override
+	public ConnectionSpec getSpec() {
+		return spec;
+	}
+	
+//	@Override
 	public Response serviceRequest(Command cmd, byte[]... args)
 			throws RedisException, ClientRuntimeException, ProviderException 
 	{

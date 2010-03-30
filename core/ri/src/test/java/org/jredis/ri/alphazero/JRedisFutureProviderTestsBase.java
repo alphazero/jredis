@@ -134,7 +134,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				String emptyset = "empty-set";
 				provider.sadd(emptyset, "delete-me");
 				provider.srem(emptyset, "delete-me");
-				assertEquals (provider.smembers(emptyset).get().size(), 0, "size of empty set members should be zero");
+				assertEquals (provider.smembers(emptyset).get(), null, "smembers should return a null set"); // api change from empty to null
 				assertEquals (provider.srandmember(emptyset).get(), null, "random member of empty set should be null");
 				
 				// non existent key
@@ -320,9 +320,9 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				assertTrue(members.size() == scardResp.get().longValue(), "smembers should have returned a list of scard size");
 				
 				List<byte[]> members2 = smembersResp2.get();
-				assertTrue(scardResp2.get().longValue() == 0, "setkey2 should be an empty set");
-				assertTrue(members2.size() == 0, "smembers should have returned an empty list");
-				assertTrue(members2.size() == scardResp2.get().longValue(), "smembers should have returned a list of scard size");
+				assertTrue(scardResp2.get().longValue() == 0, "setkey2 should be zero"); // api change - empty keys are removed
+				assertEquals(members2, null, "smembers should have returned null"); // api change from empty to null
+//				assertTrue(members2.size() == scardResp2.get().longValue(), "smembers should have returned a list of scard size");
 				
 			}
 			catch(ExecutionException e){
@@ -1477,7 +1477,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				
 				List<String> hkeys = hkeysResp1.get(); 
 				assertEquals (hkeys.size(), 4, "keys list size should be 4");
-				assertEquals (hkeysResp2.get().size(), 0, "keys list size should be 0");
+				assertNull (hkeysResp2.get(), "result should be null"); // api change from empty to null
 				assertEquals (hkeysResp3.get(), null, "list of keys of non-existent hash should be null");
 
 			}
@@ -1527,7 +1527,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				
 				List<byte[]> hvals = hvalsResp1.get(); 
 				assertEquals (hvals.size(), 4, "values list size should be 4");
-				assertEquals (hvalsResp2.get().size(), 0, "values list size should be 0");
+				assertEquals (hvalsResp2.get(), null, "values list size should be null"); // used to be empty but api changed
 				assertEquals (hvalsResp3.get(), null, "list of values of non-existent hash should be null");
 
 			}
@@ -1590,7 +1590,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				assertEquals(DefaultCodec.decode(hmap.get(keys.get(4))), objectList.get(0), "Object value mapping should correspond to prior HSET");
 				
 				Map<String, byte[]> hmap2 = frHmap2.get();
-				assertEquals( hmap2.size(), 0, "hash map should be empty");
+				assertEquals( hmap2, null, "result should be null"); // api change from empty to null result
 				
 				Map<String, byte[]> hmap3 = frHmap3.get();
 				assertEquals( hmap3, null, "hgetall for non existent hash should be null");

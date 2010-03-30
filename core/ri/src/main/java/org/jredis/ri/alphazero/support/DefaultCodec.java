@@ -53,6 +53,7 @@ public class DefaultCodec {
 	 * @return
 	 */
 	public static final List<String> toStr (List<byte[]> bytearray) {
+		if(null == bytearray) return null;
 		List<String> list = new ArrayList<String>(bytearray.size());
 		for(byte[] b : bytearray) 
 			if(null!= b) 
@@ -65,7 +66,7 @@ public class DefaultCodec {
 	 * @param bytes
 	 * @return new {@link String#String(byte[])} or null if bytes is null. 
 	 */
-	public static final String toStr (byte[] bytes) { 
+	public static final String toStr (byte[] bytes) {
         String str = null;
         if(null != bytes) {
 			try {
@@ -115,6 +116,7 @@ public class DefaultCodec {
 	}
 	
 	public static final List<Long> toLong(List<byte[]> bytearray){
+		if(null == bytearray) return null;
 		List<Long> list = new ArrayList<Long>(bytearray.size());
 		for(byte[] b : bytearray) list.add(Convert.toLong(b));
 		return list;
@@ -128,6 +130,7 @@ public class DefaultCodec {
 	    return Convert.toDouble(bs);
     }
 	public static final List<Double> toDouble(List<byte[]> bytearray){
+		if(null == bytearray) return null;
 		List<Double> list = new ArrayList<Double>(bytearray.size());
 		for(byte[] b : bytearray) list.add(Convert.toDouble(b));
 		return list;
@@ -154,6 +157,7 @@ public class DefaultCodec {
 	@SuppressWarnings("unchecked")
 	public static final <T extends Serializable>  
 	List<T> decode (List<byte[]> byteList) {
+		if(null == byteList) return null;
 		List<T>		objectList = new ArrayList<T>(byteList.size());
 		for (byte[] bytes : byteList) {
 			if(null != bytes){
