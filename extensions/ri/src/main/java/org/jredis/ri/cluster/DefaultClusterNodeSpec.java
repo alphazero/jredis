@@ -71,13 +71,9 @@ public class DefaultClusterNodeSpec extends ClusterNodeSpec.Support implements C
      * Method is called once (and only once) by the constructor to set the
      * final {@link Support#id} field.  This (default) implementation simply
      * creates a string of form <ip-address-string-rep>:<0-padded-5-digit-port-number>.
+     * <p>ex: <code>"127.0.0.1:06379" </code>
      * <p>
-     * ex:
-     * <code>
-     * "127.0.0.1:06379:02" 
-     * </code>
-     * <p>
-     * Optional extension point.
+     * <b>Method is not finalized to allow further specializations</b>
      * @return
      */
     protected String generateId () {
