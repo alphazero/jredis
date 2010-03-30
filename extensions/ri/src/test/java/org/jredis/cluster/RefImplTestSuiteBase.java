@@ -48,7 +48,7 @@ public abstract class RefImplTestSuiteBase <T> extends ProviderTestBase <T>{
 	// ------------------------------------------------------------------------
 	
 	/** data holds the ref to a singleton class with all the test data */
-	protected SuiteTestData data;
+	protected ClusterSuiteTestData data;
 
 	@Parameters({ 
 //		"jredis.test.password", 
@@ -100,7 +100,7 @@ public abstract class RefImplTestSuiteBase <T> extends ProviderTestBase <T>{
 	 * singleton test data class.
 	 * @return
 	 */
-	private SuiteTestData setupTestSuiteData () {
-		return SuiteTestData.getInstance();
+	private ClusterSuiteTestData setupTestSuiteData () {
+		return ClusterSuiteTestData.getInstance();
 	}	
 }

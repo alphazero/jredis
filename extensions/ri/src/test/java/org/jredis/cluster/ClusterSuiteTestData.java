@@ -37,10 +37,10 @@ import org.jredis.ri.alphazero.support.Log;
  * @date    Mar 27, 2010
  */
 
-public class SuiteTestData {
+public class ClusterSuiteTestData {
 	
 	/** singleton instance - otherwise multiple test runs kill the jvm heap */
-	static private final SuiteTestData instance = new SuiteTestData();
+	static private final ClusterSuiteTestData instance = new ClusterSuiteTestData();
 	// ------------------------------------------------------------------------
 	// General RI Test Suite Parameters with default values to avoid XML
 	// ------------------------------------------------------------------------
@@ -67,15 +67,15 @@ public class SuiteTestData {
 	// Access
 	// ------------------------------------------------------------------------
 	/**
-	 * @return the singleton instance of  {@link SuiteTestData}
+	 * @return the singleton instance of  {@link ClusterSuiteTestData}
 	 */
-	public static SuiteTestData getInstance () {
+	public static ClusterSuiteTestData getInstance () {
 		return instance;
 	}
 	// ------------------------------------------------------------------------
 	// Const
 	// ------------------------------------------------------------------------
-	private SuiteTestData () {
+	private ClusterSuiteTestData () {
 //		ClusterNodeSpec nodeSpec = null;
 		connSpecs = new ConnectionSpec[NODE_CNT];
 		for(int i=0;i<NODE_CNT; i++) {
