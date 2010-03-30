@@ -1948,13 +1948,6 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			for(int i=0;i<SMALL_CNT-1; i++){
 				assertEquals(range.get(i), dataList.get(i), "expected value in the range by score missing");
 			}
-			
-                        long limit = SMALL_CNT - 2;
-			range = provider.zrangebyscore(setkey, 0, SMALL_CNT, 0, limit);
-			assertTrue(range.size() == limit, "should have exactly limit results for range by score here");
-			for(int i=0;i<limit-1; i++){
-				assertEquals(range.get(i), dataList.get(i), "expected value in the range by score missing");
-			}
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
