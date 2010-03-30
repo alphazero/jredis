@@ -42,14 +42,14 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
 	/** what is a sensible value here? */
 	private static final double REPLICATION_CONST = 10;
 
-	/**  */
-	private final ClusterSpec clusterSpec;
+//	/**  */
+//	private final ClusterSpec clusterSpec;
 	
 	/**  */
-	private final NodeMap	nodeMap;
+	private NodeMap	nodeMap;
 	
 	/**  */
-	private final KetamaHashProvider ketamaHashAlgo;
+	private KetamaHashProvider ketamaHashAlgo;
 	
 	/**  */
 	private int nodeReplicationCnt;
@@ -65,10 +65,6 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
      */
     public KetamaClusterModel (ClusterSpec clusterSpec) {
 	    super(clusterSpec);
-    	this.clusterSpec = clusterSpec;
-    	this.ketamaHashAlgo = new KetamaHashProvider();
-		this.nodeMap = new NodeMap();
-		initialize();
     }
 
 	// ------------------------------------------------------------------------
@@ -93,14 +89,37 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
 		rv = nodeMap.get(hash);
 		return rv;
 	}
+	
+	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#supportsReconfiguration() */
+    public boolean supportsReconfiguration () {
+	    return false;
+    }
     // ------------------------------------------------------------------------
     // Inner Ops
     // ------------------------------------------------------------------------
     
-    private void initialize () {
+	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel.Support#initializeModel() */
+    @Override
+    protected void initializeModel () {
+    	this.ketamaHashAlgo = new KetamaHashProvider();
+		this.nodeMap = new NodeMap();
     	nodeReplicationCnt = (int) (Math.log(clusterSpec.getNodeSpecs().size()) * REPLICATION_CONST);
     	mapNodes();
     }
+
+
+	/**
+	 * Per original paper on consistent hashing, the replication count of any given bucket is
+	 * k*log(C), where C is the number of buckets (i.e. nodes).  We're using {@link KetamaNodeMapper#REPLICATION_CONST}
+	 * as k.
+	 * 
+     * @param size
+     * @return
+     */
+    int getNodeReplicationCount (int nodeCnt) {
+	    return (int) (Math.log(nodeCnt) * REPLICATION_CONST);
+    }
+    
 	/**
 	 * This method is a slightly modified version of net.spy.memcached.KetamaNodeLocator's constructor.
 	 * @see <a href="http://github.com/????????/">GIT HUB LINK HERE ...</a>
@@ -134,23 +153,7 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
 		}
 		return false;
 	}
-
-	/**
-	 * Per original paper on consistent hashing, the replication count of any given bucket is
-	 * k*log(C), where C is the number of buckets (i.e. nodes).  We're using {@link KetamaNodeMapper#REPLICATION_CONST}
-	 * as k.
-	 * 
-     * @param size
-     * @return
-     */
-    int getNodeReplicationCount (int nodeCnt) {
-	    return (int) (Math.log(nodeCnt) * REPLICATION_CONST);
-    }
     
-	// ------------------------------------------------------------------------
-	// Super overrides
-	// ------------------------------------------------------------------------
-	
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel.Support#onNodeAddition(org.jredis.cluster.ClusterNodeSpec) */
     @Override
     protected boolean onNodeAddition (ClusterNodeSpec newNode) {
@@ -163,6 +166,7 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
 	    return false;
     }
 
+    
     // ========================================================================
     // Inner Types
     // ========================================================================
@@ -171,6 +175,9 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
 	// NodeMap
 	// ------------------------------------------------------------------------
 	
+    /**
+     * Saves me from the hassle of typing brackets for generics.
+     */
     @SuppressWarnings("serial")
     public static class NodeMap extends TreeMap<Long, ClusterNodeSpec> implements SortedMap<Long, ClusterNodeSpec>{
     	

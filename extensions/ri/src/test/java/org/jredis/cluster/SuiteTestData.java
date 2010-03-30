@@ -60,8 +60,8 @@ public class SuiteTestData {
 //	public ClusterNodeSpec defaultRedisWithDb10ClusterNodeSpec;
 //	public ClusterNodeSpec defaultRedisWithDb10ClusterNodeSpec_dup;
 
-	public ConnectionSpec defaultRedisWithDb10ConnSpec;
-	public ConnectionSpec defaultRedisWithDb10ConnSpec_dup;
+	public ConnectionSpec defRedisDb10Port7777ConnSpec;
+	public ConnectionSpec defRedisDb10Port7777ConnSpec_dup;
 
 	// ------------------------------------------------------------------------
 	// Access
@@ -91,8 +91,8 @@ public class SuiteTestData {
 //		clusterNodeSpecs.toArray(clusterNodeSpecsArray);
 
 
-		defaultRedisWithDb10ConnSpec = DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null);
-		defaultRedisWithDb10ConnSpec_dup = DefaultConnectionSpec.newSpec("127.0.0.1", 6379, db, null);
+		defRedisDb10Port7777ConnSpec = DefaultConnectionSpec.newSpec("127.0.0.1", 7777, db, null);
+		defRedisDb10Port7777ConnSpec_dup = DefaultConnectionSpec.newSpec("127.0.0.1", 7777, db, null);
 		
 //		Log.log("clusterNodeSpecsArray: " + clusterNodeSpecsArray);
 //		for(ClusterNodeSpec s : clusterNodeSpecsArray)

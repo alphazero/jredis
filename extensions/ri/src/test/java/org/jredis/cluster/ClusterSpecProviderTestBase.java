@@ -72,9 +72,9 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 		// should not allow adding of duplicate ClusterNodeSpecs
 		didRaiseError = false;
 		
-		assertTrue(clusterSpec.addNode(newNodeSpec(data.defaultRedisWithDb10ConnSpec)) == clusterSpec, "add of unique spec should be possible and must return the clusterSpec instance");
+		assertTrue(clusterSpec.addNode(newNodeSpec(data.defRedisDb10Port7777ConnSpec)) == clusterSpec, "add of unique spec should be possible and must return the clusterSpec instance");
 		try {
-			assertTrue(clusterSpec.addNode(newNodeSpec(data.defaultRedisWithDb10ConnSpec_dup)) == clusterSpec, "add of duplicate spec is expected to raise a runtime exception");
+			assertTrue(clusterSpec.addNode(newNodeSpec(data.defRedisDb10Port7777ConnSpec_dup)) == clusterSpec, "add of duplicate spec is expected to raise a runtime exception");
 		}
 		catch (IllegalArgumentException e){
 			didRaiseError = true;
