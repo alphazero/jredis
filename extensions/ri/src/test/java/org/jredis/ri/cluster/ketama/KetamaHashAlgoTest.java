@@ -28,7 +28,7 @@ import org.jredis.ri.cluster.ketama.KetamaHashProvider;
  * 
  */
 
-public class KetamaHashAlgoProviderTest extends HashAlgorithmProviderTestBase {
+public class KetamaHashAlgoTest extends HashAlgorithmProviderTestBase {
 
 	/* (non-Javadoc) @see org.jredis.cluster.ProviderTestBase#newProviderInstance() */
 	@Override
