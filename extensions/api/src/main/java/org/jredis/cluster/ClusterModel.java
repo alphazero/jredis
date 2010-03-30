@@ -34,6 +34,13 @@ import org.jredis.ProviderException;
 public interface ClusterModel {
 
 	/**
+	 * Indicates if the implementation supports the cluster type.  
+	 * @param type
+	 * @return
+	 */
+	public boolean supports(ClusterType type);
+	
+	/**
 	 * Indicates if the {@link ClusterModel} implementation supports dynamic cluster configurations,
 	 * @return true if yes, otherwise false.
 	 */

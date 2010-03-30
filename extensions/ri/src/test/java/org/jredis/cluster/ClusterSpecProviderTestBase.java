@@ -50,13 +50,49 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 	// ------------------------------------------------------------------------
 	
 	@Test
+	public void testGetType() {
+		Log.log("Testing ClusterSpec.getType()");
+		assertNotNull(provider.getType(), "getType() must never return null");
+	}
+	
+	@Test
+	public void testSetType() {
+		Log.log("Testing ClusterSpec.setType()");
+		
+		// Note: don't use provider instance as we are changing various settings here
+		// and don't want to break assumptions down the hierarchy chain.
+
+		ClusterType clusterType = null;
+		ClusterSpec clusterSpec = newProviderInstance();
+		ClusterType prevType = clusterSpec.getType();
+		assertNotNull(prevType, "getType() must never return null");
+		// just pick something else
+		for(ClusterType type : ClusterType.values()){
+			if(type != prevType){
+				clusterType = type;
+				break;
+			}
+		}
+		assertNotNull(clusterType, "[BUG] why couldn't we find another different type?");
+		
+		// use the setter and test various requirements.
+		ClusterSpec chainedRes = clusterSpec.setType(clusterType);
+		testChainedResult(chainedRes, clusterSpec);
+//		assertNotNull(chainedRes, "fluent interface setters must return non null values");
+//		assertEquals(chainedRes, aClusterSpec, "setter result must be the same reference as the original");
+		
+		assertEquals(clusterSpec.getType(), clusterType, "getType() result must match the ref used for setType()");
+	}
+	
+	@Test
 	public void testAddNodeSpec() {
 		Log.log("Testing ClusterSpec.addNodeSpec()");
 		ClusterSpec clusterSpec = newProviderInstance();
 		
 		try {
 			ClusterNodeSpec nodeSpec = newNodeSpec(data.connSpecs[0]);
-			clusterSpec.addNode(nodeSpec);
+			ClusterSpec res = clusterSpec.addNode(nodeSpec);
+			testChainedResult(res, clusterSpec);
 		}
 		catch (Exception e){ fail("when adding a unique spec", e); }
 		
@@ -91,5 +127,14 @@ public class ClusterSpecProviderTestBase extends RefImplTestSuiteBase<ClusterSpe
 			didRaiseError = true;
 		}
 		if(!didRaiseError) fail("Expecting an IllegalArgumentException raised for null input arg to add()");
+	}
+	
+	// ------------------------------------------------------------------------
+	// helper methods
+	// ------------------------------------------------------------------------
+	
+	private final void testChainedResult (ClusterSpec res, ClusterSpec expected) {
+		assertNotNull(res, "fluent interface setters must return non null values");
+		assertEquals(res, expected, "setter result must be the same reference as the original");
 	}
 }

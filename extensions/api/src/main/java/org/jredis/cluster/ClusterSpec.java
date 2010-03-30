@@ -43,8 +43,8 @@ public interface ClusterSpec {
 //	 */
 //	public ClusterStrategy  getStrategy();
 //	
-	public Type getType ();
-	public ClusterSpec setType (Type clusterType);
+	public ClusterType getType ();
+	public ClusterSpec setType (ClusterType clusterType);
 	
 	// ------------------------------------------------------------------------
 	// Membership
@@ -80,18 +80,11 @@ public interface ClusterSpec {
 	// INNER CLASSES
 	// ========================================================================
 	
-	public enum Type {
-		ConsistentHash
-	}
-	// ------------------------------------------------------------------------
-	// Implementation Support 
-	// ------------------------------------------------------------------------
-	
 	public abstract static class Support implements ClusterSpec {
 
 //		/**  */
 //		final protected ClusterModel distributionStrategy;
-		private Type type;
+		private ClusterType type;
 		
 		/**  */
 		final protected Set<ClusterNodeSpec> nodeSpecs = new HashSet<ClusterNodeSpec>();
@@ -106,8 +99,8 @@ public interface ClusterSpec {
 		// interface
 		// ------------------------------------------------------------------------
 		
-		public Type getType() { return type; }
-		public ClusterSpec setType(Type type) { this.type = type; return this; }
+		public ClusterType getType() { return type; }
+		public ClusterSpec setType(ClusterType type) { this.type = type; return this; }
 		
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterSpec#addAll(java.util.List) */
 //        @Override

@@ -41,8 +41,6 @@ public abstract class RefImplTestSuiteBase <T> extends ProviderTestBase <T>{
 	protected String 	CLUSTER_NODES_ADDRESS_BASE = "127.0.0.1";
 	protected int 		CLUSTER_NODES_PORT_BASE = 6379;
 	
-	protected T			provider;
-	
 	// ------------------------------------------------------------------------
 	// General RI Test Suite test data
 	// ------------------------------------------------------------------------

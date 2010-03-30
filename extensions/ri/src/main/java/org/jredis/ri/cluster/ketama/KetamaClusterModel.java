@@ -23,6 +23,8 @@ import org.jredis.ProviderException;
 import org.jredis.cluster.ClusterModel;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
+import org.jredis.cluster.ClusterType;
+import org.jredis.cluster.model.ClusterNodeMap;
 import org.jredis.ri.cluster.support.CryptoHashUtils;
 
 /**
@@ -41,26 +43,19 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
 	
 	/** what is a sensible value here? */
 	private static final double REPLICATION_CONST = 10;
-
-//	/**  */
-//	private final ClusterSpec clusterSpec;
-	
 	/**  */
-	private NodeMap	nodeMap;
-	
+	private ClusterNodeMap	nodeMap;
 	/**  */
 	private KetamaHashProvider ketamaHashAlgo;
-	
 	/**  */
 	private int nodeReplicationCnt;
-	
-
 	
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
 	
-	/**
+	/** 
+	 * Instantiate and initialize the node mape of a Ketama-based {@link ClusterModel}.
      * @param clusterSpec
      */
     public KetamaClusterModel (ClusterSpec clusterSpec) {
@@ -94,32 +89,36 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
     public boolean supportsReconfiguration () {
 	    return false;
     }
+    
+    /* (non-Javadoc) @see org.jredis.cluster.ClusterModel#supports(org.jredis.cluster.ClusterType) */
+    final public boolean supports(ClusterType clusterType){
+    	return clusterType == ClusterType.CONSISTENT_HASH;
+    }
     // ------------------------------------------------------------------------
     // Inner Ops
     // ------------------------------------------------------------------------
     
-	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel.Support#initializeModel() */
-    @Override
-    protected void initializeModel () {
-    	this.ketamaHashAlgo = new KetamaHashProvider();
-		this.nodeMap = new NodeMap();
-    	nodeReplicationCnt = (int) (Math.log(clusterSpec.getNodeSpecs().size()) * REPLICATION_CONST);
-    	mapNodes();
-    }
-
-
 	/**
 	 * Per original paper on consistent hashing, the replication count of any given bucket is
 	 * k*log(C), where C is the number of buckets (i.e. nodes).  We're using {@link KetamaNodeMapper#REPLICATION_CONST}
 	 * as k.
 	 * 
-     * @param size
+     * @param nodeCnt number of server nodes ("buckets" per original paper) in the Ketama cluster
      * @return
      */
-    int getNodeReplicationCount (int nodeCnt) {
-	    return (int) (Math.log(nodeCnt) * REPLICATION_CONST);
+    static public int replicationCount(int nodeCnt){
+    	return (int) (Math.log(nodeCnt) * REPLICATION_CONST);    	
     }
-    
+
+	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel.Support#initializeModel() */
+    @Override
+    protected void initializeModel () {
+    	this.ketamaHashAlgo = new KetamaHashProvider();
+		this.nodeMap = new NodeMap();
+    	nodeReplicationCnt = replicationCount(clusterSpec.getNodeSpecs().size());
+    	mapNodes();
+    }
+
 	/**
 	 * This method is a slightly modified version of net.spy.memcached.KetamaNodeLocator's constructor.
 	 * @see <a href="http://github.com/????????/">GIT HUB LINK HERE ...</a>
@@ -172,14 +171,12 @@ public class KetamaClusterModel extends ClusterModel.Support implements ClusterM
     // ========================================================================
     
 	// ------------------------------------------------------------------------
-	// NodeMap
+	// ClusterNodeMap impl.
 	// ------------------------------------------------------------------------
 	
-    /**
-     * Saves me from the hassle of typing brackets for generics.
-     */
     @SuppressWarnings("serial")
-    public static class NodeMap extends TreeMap<Long, ClusterNodeSpec> implements SortedMap<Long, ClusterNodeSpec>{
+//    public static class NodeMap extends TreeMap<Long, ClusterNodeSpec> implements SortedMap<Long, ClusterNodeSpec>{
+    public class NodeMap extends TreeMap<Long, ClusterNodeSpec> implements ClusterNodeMap{
     	
     }
 }

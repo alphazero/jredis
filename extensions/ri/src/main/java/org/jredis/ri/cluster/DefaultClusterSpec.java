@@ -19,6 +19,7 @@ package org.jredis.ri.cluster;
 import java.util.Collection;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
+import org.jredis.cluster.ClusterType;
 import org.jredis.cluster.ClusterSpec.Support;
 
 /**
@@ -31,8 +32,8 @@ import org.jredis.cluster.ClusterSpec.Support;
 
 public class DefaultClusterSpec extends Support implements ClusterSpec {
 	
-	/** Default ClusterSpec.Type is {@link ClusterSpec.Type#ConsistentHash} */
-	public static final ClusterSpec.Type DEFAULT_CLUSTER_TYPE = ClusterSpec.Type.ConsistentHash;
+	/** Default ClusterSpec.Type is {@link ClusterType#CONSISTENT_HASH} */
+	public static final ClusterType DEFAULT_CLUSTER_TYPE = ClusterType.CONSISTENT_HASH;
 	
 	// ------------------------------------------------------------------------
 	// Constructor

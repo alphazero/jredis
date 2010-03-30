@@ -14,29 +14,32 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.cluster.ketama;
+package org.jredis.cluster.models;
 
-import org.jredis.cluster.support.HashAlgorithm;
-import org.jredis.cluster.support.HashAlgorithmProviderTestBase;
-import org.jredis.ri.cluster.ketama.KetamaHashProvider;
+import org.jredis.cluster.ClusterModelProviderTestBase;
+import org.jredis.cluster.ClusterType;
+import org.jredis.ri.alphazero.support.Log;
+
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 /**
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 27, 2010
+ * @date    Mar 30, 2010
  * 
  */
 
-public class KetamaHashAlgoTest extends HashAlgorithmProviderTestBase {
+public abstract class ConsistentHashClusterProviderTestBase extends ClusterModelProviderTestBase {
 
 	// ------------------------------------------------------------------------
-	// super overrides
+	// ConsistentHashCluster specific tests
 	// ------------------------------------------------------------------------
-	
-	/* (non-Javadoc) @see org.jredis.cluster.ProviderTestBase#newProviderInstance() */
-	@Override
-	protected HashAlgorithm newProviderInstance () {
-		return new KetamaHashProvider();
-	}
+    @Test
+    public void compatibilityTest() {
+    	
+    	Log.log("Test provider support for Consistent Hashing");
+    	assertTrue(provider.supports(ClusterType.CONSISTENT_HASH), "A ConsistentHashCluster model must support Type.CONSISTENT_HASH");
+    }
 }

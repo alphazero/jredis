@@ -14,29 +14,17 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.cluster.ketama;
-
-import org.jredis.cluster.support.HashAlgorithm;
-import org.jredis.cluster.support.HashAlgorithmProviderTestBase;
-import org.jredis.ri.cluster.ketama.KetamaHashProvider;
+package org.jredis.cluster;
 
 /**
+ * We'll enumerate the various cluster types.
  * [TODO: document me!]
  *
  * @author  joubin (alphazero@sensesay.net)
- * @date    Mar 27, 2010
+ * @date    Mar 30, 2010
  * 
  */
-
-public class KetamaHashAlgoTest extends HashAlgorithmProviderTestBase {
-
-	// ------------------------------------------------------------------------
-	// super overrides
-	// ------------------------------------------------------------------------
-	
-	/* (non-Javadoc) @see org.jredis.cluster.ProviderTestBase#newProviderInstance() */
-	@Override
-	protected HashAlgorithm newProviderInstance () {
-		return new KetamaHashProvider();
-	}
+public enum ClusterType {
+	CONSISTENT_HASH, 
+	STATIC_MODULO_HASH
 }

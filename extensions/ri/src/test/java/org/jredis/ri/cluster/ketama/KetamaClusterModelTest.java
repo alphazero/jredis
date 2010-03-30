@@ -17,12 +17,19 @@
 package org.jredis.ri.cluster.ketama;
 
 import org.jredis.cluster.ClusterModel;
-import org.jredis.cluster.ClusterModelProviderTestBase;
 import org.jredis.cluster.ClusterSpec;
-import org.jredis.cluster.ClusterSpec.Type;
+import org.jredis.cluster.ClusterType;
+import org.jredis.cluster.models.ConsistentHashClusterProviderTestBase;
+import org.jredis.ri.alphazero.support.Log;
 import org.jredis.ri.cluster.DefaultClusterSpec;
 
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
+
 /**
+ * {@link KetamaClusterModel} specific tests.  All generic and C.H. specific tests are
+ * defined higher in the hierarchy chain.
+ * 
  * <p>Uses the {@link DefaultClusterSpec} for tests.
  *
  * @author  joubin (alphazero@sensesay.net)
@@ -30,8 +37,12 @@ import org.jredis.ri.cluster.DefaultClusterSpec;
  * 
  */
 
-public class KetamaClusterModelTest extends ClusterModelProviderTestBase {
+public class KetamaClusterModelTest extends ConsistentHashClusterProviderTestBase {
 
+	// ------------------------------------------------------------------------
+	// super overrides
+	// ------------------------------------------------------------------------
+	
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModelProviderTestBase#newClusterModel(org.jredis.cluster.ClusterSpec) */
 	@Override
 	protected ClusterModel newClusterModel (ClusterSpec clusterSpec) {
@@ -47,7 +58,15 @@ public class KetamaClusterModelTest extends ClusterModelProviderTestBase {
 
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModelProviderTestBase#getSupportedClusterType() */
     @Override
-    protected Type getSupportedClusterType () {
-	    return ClusterSpec.Type.ConsistentHash;
+    protected ClusterType getSupportedClusterType () {
+	    return ClusterType.CONSISTENT_HASH;
+    }
+    
+	// ------------------------------------------------------------------------
+	// Ketama specific tests
+	// ------------------------------------------------------------------------
+    @Test
+    public void fooTest() {
+    	Log.log("Foo test for KetamaClusterModel");
     }
 }

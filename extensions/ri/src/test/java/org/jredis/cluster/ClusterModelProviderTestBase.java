@@ -49,7 +49,7 @@ public abstract class ClusterModelProviderTestBase extends RefImplTestSuiteBase<
 	/**
 	 * @return the ClusterSpec.Type that the provider is supposed to support
 	 */
-	protected abstract ClusterSpec.Type getSupportedClusterType ();
+	protected abstract ClusterType getSupportedClusterType ();
 	// ------------------------------------------------------------------------
 	// Specification Interface tested
 	// ------------------------------------------------------------------------
@@ -73,7 +73,7 @@ public abstract class ClusterModelProviderTestBase extends RefImplTestSuiteBase<
 	public void metaTest (){
 		Log.log("[META] test the test suite assumptions!");
 
-		ClusterSpec.Type clusterType = getSupportedClusterType();
+		ClusterType clusterType = getSupportedClusterType();
 		assertNotNull(clusterType, "getSupportedClusterType");
 		
 		ClusterSpec testSpec = newClusterSpec();
