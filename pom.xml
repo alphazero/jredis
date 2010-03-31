@@ -97,14 +97,5 @@
       </roles>
       <timezone>UTC-5</timezone>
     </developer>
-    <developer>
-      <id>bryon</id>
-      <name>Bryon Jacob</name>
-      <email>bryon@jacobtx.net</email>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>UTC-6</timezone>
-    </developer>
   </developers>
 </project>
