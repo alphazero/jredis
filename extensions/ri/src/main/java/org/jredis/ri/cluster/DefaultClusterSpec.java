@@ -21,6 +21,8 @@ import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
 import org.jredis.cluster.ClusterType;
 import org.jredis.cluster.ClusterSpec.Support;
+import org.jredis.connector.ConnectionSpec;
+import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 
 /**
  * The default ClusterSpec uses the {@link KetamaConsitentHashCluster_reture} as its {@link ClusterModel_deprecated}. 
@@ -55,6 +57,26 @@ public class DefaultClusterSpec extends Support implements ClusterSpec {
 	// public interface
 	// ------------------------------------------------------------------------
 	
+	/**
+	 * @param host
+	 * @param firstPort
+	 * @param lastPort
+	 * @param templateConnSpec
+	 * @return
+	 */
+	public static ClusterSpec newSpecForRange (ConnectionSpec templateConnSpec, int firstPort, int lastPort) {
+		ClusterSpec spec = new DefaultClusterSpec();
+		for(int i=firstPort; i<=lastPort; i++){
+			ConnectionSpec connSpec = DefaultConnectionSpec.newSpec()
+				.setAddress(templateConnSpec.getAddress())
+				.setPort(i)
+				.setDatabase(templateConnSpec.getDatabase())
+				.setCredentials(templateConnSpec.getCredentials());
+			ClusterNodeSpec nodeSpec = new DefaultClusterNodeSpec(connSpec);
+			spec.addNode(nodeSpec);
+		}
+		return spec;
+	}
 	// ------------------------------------------------------------------------
 	// super overrides
 	// ------------------------------------------------------------------------
