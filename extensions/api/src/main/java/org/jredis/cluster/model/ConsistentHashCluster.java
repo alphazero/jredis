@@ -58,7 +58,7 @@ public interface ConsistentHashCluster extends ClusterModel {
 		// ------------------------------------------------------------------------
 		
 		/** what is a sensible value here? */
-		protected static final double DEFAULT_REPLICATION_CONST = 10;
+		protected static final double DEFAULT_REPLICATION_CONST = 100;
 		/**  */
 		protected ClusterNodeMap	nodeMap;
 		/**  */

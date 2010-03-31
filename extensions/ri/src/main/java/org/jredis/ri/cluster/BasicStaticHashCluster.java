@@ -39,7 +39,7 @@ public class BasicStaticHashCluster extends StaticHashCluster.Support implements
 	/**
      * @param clusterSpec
      */
-    protected BasicStaticHashCluster (ClusterSpec clusterSpec) {
+    public BasicStaticHashCluster (ClusterSpec clusterSpec) {
 	    super(clusterSpec);
     }
 
