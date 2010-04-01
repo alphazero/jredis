@@ -149,7 +149,7 @@ public class SynchConnection extends ConnectionBase implements Connection {
 			Log.problem ("serviceRequest() -- ClientRuntimeException  => " + cre.getLocalizedMessage());
 			reconnect();
 			
-			throw new ConnectionResetException ("Connection re-established but last request not processed:  " + cre.getCause().getLocalizedMessage());
+			throw new ConnectionResetException ("Connection re-established but last request not processed:  " + (cre.getCause() != null ? cre.getCause().getLocalizedMessage() : cre.getLocalizedMessage()));
 		}
 		catch (RuntimeException e){
 			e.printStackTrace();
