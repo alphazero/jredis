@@ -21,7 +21,7 @@
  */
 
 
-package org.jredis.ri.cluster.ketama;
+package org.jredis.ri.cluster.model;
 
 import org.jredis.ClientRuntimeException;
 import org.jredis.cluster.support.HashAlgorithm;

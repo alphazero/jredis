@@ -39,7 +39,7 @@ import static org.testng.Assert.*;
 public abstract class ConsistentHashClusterProviderTestBase extends ClusterModelProviderTestBase {
 
 	// ------------------------------------------------------------------------
-	// ConsistentHashCluster specific tests
+	// ConsistentHashCluster generic tests
 	// ------------------------------------------------------------------------
     @Test
     public void compatibilityTest() {

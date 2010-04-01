@@ -165,7 +165,7 @@ public interface ClusterModel {
 				throw new IllegalArgumentException("clusterSpec has no ClusterNodeSpecs and this model can not be reconfigured.");
 			
 			this.clusterSpec = clusterSpec;
-			initializeModel();
+			initialize();
 		}
 
 		// --------------------------------------------------------------------
@@ -219,6 +219,13 @@ public interface ClusterModel {
 		// --------------------------------------------------------------------
 		// Internal ops
 		// --------------------------------------------------------------------
+		private final void initialize () {
+			initializeModel();
+			//  isn't this silly?  Unless we allow for spec of listeners in the ClusterSpec, 
+			// there aren't gonna be any listeners ..
+			//
+//			notifyListeners(new Event(this, Event.Type.Initialized, null));
+		}
 		private final void notifyListeners(ClusterModel.Event e) {
 			for(ClusterModel.Listener l : listeners)
 				l.onEvent(e);
@@ -287,6 +294,7 @@ public interface ClusterModel {
 
 		/** ClusterModel.Event.Types */
 		public enum Type {
+			Initialized,
 			NodeAdded,
 			NodeRemoved
 		}

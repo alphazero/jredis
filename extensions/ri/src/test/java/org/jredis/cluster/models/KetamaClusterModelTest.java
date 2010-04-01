@@ -14,17 +14,17 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.cluster.ketama;
+package org.jredis.cluster.models;
 
 import org.jredis.cluster.ClusterModel;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
 import org.jredis.cluster.ClusterType;
-import org.jredis.cluster.models.ConsistentHashClusterProviderTestBase;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 import org.jredis.ri.cluster.DefaultClusterNodeSpec;
 import org.jredis.ri.cluster.DefaultClusterSpec;
+import org.jredis.ri.cluster.model.KetamaClusterModel;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;

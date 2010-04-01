@@ -14,11 +14,11 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.cluster.ketama;
+package org.jredis.cluster.models;
 
 import org.jredis.cluster.support.HashAlgorithm;
 import org.jredis.cluster.support.HashAlgorithmProviderTestBase;
-import org.jredis.ri.cluster.ketama.KetamaHashProvider;
+import org.jredis.ri.cluster.model.KetamaHashProvider;
 
 /**
  * [TODO: document me!]
