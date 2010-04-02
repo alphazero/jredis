@@ -16,6 +16,7 @@
 
 package org.jredis;
 
+
 /**
  * Base class for all non-Redis exceptions relating to client runtime.  Implementations
  * must only throw this type of exception when the problem(s) encountered are neither Redis usage errors, nor 
@@ -33,17 +34,12 @@ public class ClientRuntimeException extends RuntimeException {
 
 	/**  */
 	private static final long	serialVersionUID	= _specification.Version.major;
-
-	/**
-	 * 
-	 */
-	public ClientRuntimeException() { }
-
+	
 	/**
 	 * @param message
 	 */
 	public ClientRuntimeException(String message) {
-		super(message);
+		super (message);
 	}
 
 	/**
@@ -53,4 +49,33 @@ public class ClientRuntimeException extends RuntimeException {
 	public ClientRuntimeException(String message, Throwable cause) {
 		super(message, cause);
 	}
+	
+	// ------------------------------------------------------------------------
+	//	Super overrides
+	// ------------------------------------------------------------------------
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Throwable#getLocalizedMessage()
+	 */
+	@Override
+    final public String getLocalizedMessage () {
+		return this.getMessage();
+    }
+
+	/* (non-Javadoc)
+	 * @see java.lang.Throwable#getMessage()
+	 */
+	@Override
+    final public String getMessage () {
+		StringBuffer buff = new StringBuffer();
+		
+		String message = super.getMessage();
+		if(null == message) buff.append("[BUG: null message]");
+		else buff.append(message);
+		
+		Throwable cause = getCause();
+		if(null != cause) buff.append(" cause: => [").append(cause.getClass().getSimpleName()).append(": ").append(cause.getMessage()).append("]");
+		
+		return buff.toString();
+    }
 }

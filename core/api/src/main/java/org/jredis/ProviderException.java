@@ -38,12 +38,12 @@ public class ProviderException extends ClientRuntimeException {
 	/**  */
 	private static final long	serialVersionUID	= _specification.Version.major;
 	
-	/**
-	 * 
-	 */
-	public ProviderException() {
-		// TODO Auto-generated constructor stub
-	}
+//	/**
+//	 * 
+//	 */
+//	public ProviderException() {
+//		// TODO Auto-generated constructor stub
+//	}
 
 	/**
 	 * @param message
@@ -61,5 +61,4 @@ public class ProviderException extends ClientRuntimeException {
 		super(message, cause);
 		// TODO Auto-generated constructor stub
 	}
-
 }

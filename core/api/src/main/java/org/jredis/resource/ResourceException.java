@@ -13,12 +13,12 @@ import org.jredis.ClientRuntimeException;
  */
 public class ResourceException extends ClientRuntimeException {
 
-	/**
-	 * 
-	 */
-	public ResourceException() {
-		super();
-	}
+//	/**
+//	 * 
+//	 */
+//	public ResourceException() {
+//		super();
+//	}
 
 	/**
 	 * @param message

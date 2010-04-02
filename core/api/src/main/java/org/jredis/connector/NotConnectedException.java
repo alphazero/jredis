@@ -40,5 +40,5 @@ public class NotConnectedException extends ClientRuntimeException {
 	public NotConnectedException (String msg) {
 		super (msg);
 	}
-	public NotConnectedException () {super ();}
+//	public NotConnectedException () {super ();}
 }

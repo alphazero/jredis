@@ -114,7 +114,7 @@ public final class PendingRequest implements Future<Response> {
 					throw new ExecutionException ("Client Runtime Exception", cre);
 			}
 			else {
-				throw new ExecutionException ("Bug -- Request processing encountered exceptions but CRE is null", new ProviderException());
+				throw new ExecutionException ("Bug -- Request processing encountered exceptions but CRE is null", new ProviderException("unknown cause"));
 			}
 		}
 		// check for Redis Errors
