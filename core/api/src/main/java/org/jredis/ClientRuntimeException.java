@@ -16,9 +16,15 @@
 
 package org.jredis;
 
+
 /**
- * [TODO: document me!]
- * -
+ * Base class for all non-Redis exceptions relating to client runtime.  Implementations
+ * must only throw this type of exception when the problem(s) encountered are neither Redis usage errors, nor 
+ * unexpected code segment execution.
+ * <p>
+ * For example, failure to establish a connection, or losing the connection, should raise this type of exception.  But
+ * encountering parse errors in Redis responses streams is a bug and should be noted by raising a {@link ProviderException}.
+ * 
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09
  * @since   alpha.0
@@ -28,20 +34,12 @@ public class ClientRuntimeException extends RuntimeException {
 
 	/**  */
 	private static final long	serialVersionUID	= _specification.Version.major;
-
-	/**
-	 * 
-	 */
-	public ClientRuntimeException() {
-		// TODO Auto-generated constructor stub
-	}
-
+	
 	/**
 	 * @param message
 	 */
 	public ClientRuntimeException(String message) {
-		super(message);
-		// TODO Auto-generated constructor stub
+		super (message);
 	}
 
 	/**
@@ -50,7 +48,34 @@ public class ClientRuntimeException extends RuntimeException {
 	 */
 	public ClientRuntimeException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
+	
+	// ------------------------------------------------------------------------
+	//	Super overrides
+	// ------------------------------------------------------------------------
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Throwable#getLocalizedMessage()
+	 */
+	@Override
+    final public String getLocalizedMessage () {
+		return this.getMessage();
+    }
 
+	/* (non-Javadoc)
+	 * @see java.lang.Throwable#getMessage()
+	 */
+	@Override
+    final public String getMessage () {
+		StringBuffer buff = new StringBuffer();
+		
+		String message = super.getMessage();
+		if(null == message) buff.append("[BUG: null message]");
+		else buff.append(message);
+		
+		Throwable cause = getCause();
+		if(null != cause) buff.append(" cause: => [").append(cause.getClass().getSimpleName()).append(": ").append(cause.getMessage()).append("]");
+		
+		return buff.toString();
+    }
 }
