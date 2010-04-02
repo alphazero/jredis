@@ -35,7 +35,7 @@ import static org.testng.Assert.*;
  * @date    Mar 31, 2010
  * 
  */
-
+@Test(suiteName="basic static hash")
 public class BasicStaticHashClusterTest extends StaticHashClusterProviderTestBase {
 
 	// ------------------------------------------------------------------------

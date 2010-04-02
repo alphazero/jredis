@@ -31,7 +31,7 @@ import static org.testng.Assert.*;
  * @date    Mar 29, 2010
  * 
  */
-@Test(suiteName="extensions-cluster-model")
+//@Test(suiteName="extensions-cluster-model")
 public abstract class ClusterModelProviderTestBase extends RefImplTestSuiteBase<ClusterModel> {
 
 	// ------------------------------------------------------------------------

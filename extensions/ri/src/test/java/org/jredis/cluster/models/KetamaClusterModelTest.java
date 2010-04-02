@@ -19,7 +19,6 @@ package org.jredis.cluster.models;
 import org.jredis.cluster.ClusterModel;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
-import org.jredis.cluster.ClusterType;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 import org.jredis.ri.cluster.DefaultClusterNodeSpec;
@@ -40,6 +39,7 @@ import static org.testng.Assert.*;
  * 
  */
 
+@Test(suiteName="ketama")
 public class KetamaClusterModelTest extends ConsistentHashClusterProviderTestBase {
 
 	// ------------------------------------------------------------------------
@@ -71,11 +71,11 @@ public class KetamaClusterModelTest extends ConsistentHashClusterProviderTestBas
 		return spec;
 	}
 
-	/* (non-Javadoc) @see org.jredis.cluster.ClusterModelProviderTestBase#getSupportedClusterType() */
-    @Override
-    protected ClusterType getSupportedClusterType () {
-	    return ClusterType.CONSISTENT_HASH;
-    }
+//	/* (non-Javadoc) @see org.jredis.cluster.ClusterModelProviderTestBase#getSupportedClusterType() */
+//    @Override
+//    protected ClusterType getSupportedClusterType () {
+//	    return ClusterType.CONSISTENT_HASH;
+//    }
     
 	// ------------------------------------------------------------------------
 	// Ketama specific tests

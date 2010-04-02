@@ -38,6 +38,11 @@ import static org.testng.Assert.*;
 
 public abstract class ConsistentHashClusterProviderTestBase extends ClusterModelProviderTestBase {
 
+	/* (non-Javadoc) @see org.jredis.cluster.ClusterModelProviderTestBase#getSupportedClusterType() */
+    @Override
+    protected ClusterType getSupportedClusterType () {
+	    return ClusterType.CONSISTENT_HASH;
+    }
 	// ------------------------------------------------------------------------
 	// ConsistentHashCluster generic tests
 	// ------------------------------------------------------------------------
