@@ -21,7 +21,6 @@ import org.jredis.cluster.ClusterModelProviderTestBase;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
 import org.jredis.cluster.ClusterType;
-import org.jredis.cluster.model.ClusterNodeMap;
 import org.jredis.cluster.model.ConsistentHashCluster;
 import org.jredis.ri.alphazero.support.Log;
 
@@ -64,7 +63,7 @@ public abstract class ConsistentHashClusterProviderTestBase extends ClusterModel
     	ClusterSpec spec = model.getSpec();
     	assertNotNull(spec, "spec should not be null");
     	
-    	ClusterNodeMap nodeMap = model.getNodeMap();
+    	ConsistentHashCluster.NodeMap nodeMap = model.getNodeMap();
     	assertNotNull(nodeMap, "node map should not be null");
     	
     	Collection<ClusterNodeSpec> nodes = nodeMap.values();

@@ -17,10 +17,8 @@
 package org.jredis.ri.cluster.model;
 
 import java.util.Set;
-import java.util.TreeMap;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
-import org.jredis.cluster.model.ClusterNodeMap;
 import org.jredis.cluster.model.StaticHashCluster;
 import org.jredis.cluster.support.HashAlgorithm;
 
@@ -63,9 +61,9 @@ public class BasicStaticHashCluster extends StaticHashCluster.Support implements
     	nodes = nodeSpecs.toArray(nodes);
     }
 
-	/* (non-Javadoc) @see org.jredis.cluster.model.StaticHashCluster.Support#newClusterNodeMap() */
-    @Override
-    protected ClusterNodeMap newClusterNodeMap () { return new NodeMap(); }
+//	/* (non-Javadoc) @see org.jredis.cluster.model.StaticHashCluster.Support#newClusterNodeMap() */
+//    @Override
+//    protected ClusterNodeMap newClusterNodeMap () { return new NodeMap(); }
 
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#getNodeForKey(byte[]) */
     public ClusterNodeSpec getNodeForKey (byte[] key) {
@@ -80,8 +78,8 @@ public class BasicStaticHashCluster extends StaticHashCluster.Support implements
 	// ClusterNodeMap impl.
 	// ------------------------------------------------------------------------
 	
-    @SuppressWarnings("serial")
-    public class NodeMap extends TreeMap<Long, ClusterNodeSpec> implements ClusterNodeMap{
-    }
+//    @SuppressWarnings("serial")
+//    public class NodeMap extends TreeMap<Long, ClusterNodeSpec> implements ClusterNodeMap{
+//    }
 
 }

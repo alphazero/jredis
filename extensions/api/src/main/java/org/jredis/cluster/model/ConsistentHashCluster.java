@@ -16,6 +16,7 @@
 
 package org.jredis.cluster.model;
 
+import java.util.SortedMap;
 import org.jredis.cluster.ClusterModel;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
@@ -38,14 +39,17 @@ import org.jredis.cluster.ClusterType;
 public interface ConsistentHashCluster extends ClusterModel {
 	
 	/**
-	 * TODO: move this to 
 	 * @return
 	 */
-	ClusterNodeMap getNodeMap ();
+	NodeMap getNodeMap ();
 	
 	// ========================================================================
 	// Inner Types
 	// ========================================================================
+	
+	public interface NodeMap extends SortedMap<Long, ClusterNodeSpec> {
+
+	}
 	
 	// ------------------------------------------------------------------------
 	// Support
@@ -60,7 +64,7 @@ public interface ConsistentHashCluster extends ClusterModel {
 		/** what is a sensible value here? */
 		protected static final double DEFAULT_REPLICATION_CONST = 100;
 		/**  */
-		protected ClusterNodeMap	nodeMap;
+		protected NodeMap	nodeMap;
 		/**  */
 		protected int nodeReplicationCnt;
 		
@@ -81,7 +85,7 @@ public interface ConsistentHashCluster extends ClusterModel {
          * @return a new (un-initialized) instance of {@link ClusterNodeMap}.  This instance
          * will be installed as the class's nodeMap attribute.
          */
-        abstract protected ClusterNodeMap newClusterNodeMap();
+        abstract protected NodeMap newClusterNodeMap();
         
         /**
          * The meats and potatoes of this type of model. Invocation of this method

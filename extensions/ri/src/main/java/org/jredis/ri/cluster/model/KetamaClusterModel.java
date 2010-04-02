@@ -23,7 +23,7 @@ import org.jredis.ProviderException;
 import org.jredis.cluster.ClusterModel;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
-import org.jredis.cluster.model.ClusterNodeMap;
+//import org.jredis.cluster.model.ClusterNodeMap;
 import org.jredis.cluster.model.ConsistentHashCluster;
 import org.jredis.ri.alphazero.support.Log;
 import org.jredis.ri.cluster.support.CryptoHashUtils;
@@ -84,7 +84,7 @@ public class KetamaClusterModel extends ConsistentHashCluster.Support implements
 	 * @see org.jredis.cluster.model.ConsistentHashCluster#getNodeMap()
 	 * @return ???
 	 */
-    public ClusterNodeMap getNodeMap () {
+    public NodeMap getNodeMap () {
 	    return nodeMap;
     }
 
@@ -112,7 +112,7 @@ public class KetamaClusterModel extends ConsistentHashCluster.Support implements
     }
     
     @Override
-    final protected ClusterNodeMap newClusterNodeMap() {return new NodeMap(); }
+    final protected NodeMap newClusterNodeMap() {return new KetamaNodeMap(); }
     
     @Override
     final protected void initializeComponents() {
@@ -180,7 +180,7 @@ public class KetamaClusterModel extends ConsistentHashCluster.Support implements
 	
     @SuppressWarnings("serial")
 //    public static class NodeMap extends TreeMap<Long, ClusterNodeSpec> implements SortedMap<Long, ClusterNodeSpec>{
-    public class NodeMap extends TreeMap<Long, ClusterNodeSpec> implements ClusterNodeMap{
+    public class KetamaNodeMap extends TreeMap<Long, ClusterNodeSpec> implements ConsistentHashCluster.NodeMap {
     	// TODO: iterator, etc.
     }
 }

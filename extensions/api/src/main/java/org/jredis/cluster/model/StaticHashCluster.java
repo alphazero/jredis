@@ -50,8 +50,8 @@ public interface StaticHashCluster extends ClusterModel {
 		/** */
 		protected HashAlgorithm hashAlgo;
 		
-		/**  */
-		protected ClusterNodeMap	nodeMap;
+//		/**  */
+//		protected ClusterNodeMap	nodeMap;
 		
 		/**
          * @param clusterSpec
@@ -63,11 +63,11 @@ public interface StaticHashCluster extends ClusterModel {
 		// ------------------------------------------------------------------------
 		// Extension points
 		// ------------------------------------------------------------------------
-        /**
-         * @return a new (un-initialized) instance of {@link ClusterNodeMap}.  This instance
-         * will be installed as the class's nodeMap attribute.
-         */
-        abstract protected ClusterNodeMap newClusterNodeMap();
+//        /**
+//         * @return a new (un-initialized) instance of {@link ClusterNodeMap}.  This instance
+//         * will be installed as the class's nodeMap attribute.
+//         */
+//        abstract protected ClusterNodeMap newClusterNodeMap();
         
         /**
          * Extensions are expected to plugin their specific {@link HashAlgorithm} here.
@@ -86,7 +86,7 @@ public interface StaticHashCluster extends ClusterModel {
          * first statement in the overriding method.
          */
         protected void initializeComponents () {
-        	nodeMap = newClusterNodeMap();
+//        	nodeMap = newClusterNodeMap();
         	hashAlgo = newHashAlgorithm ();
         }
 
@@ -104,13 +104,13 @@ public interface StaticHashCluster extends ClusterModel {
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel.Support#onNodeAddition(org.jredis.cluster.ClusterNodeSpec) */
         @Override
         final protected boolean onNodeAddition (ClusterNodeSpec newNode) {
-        	throw new NotSupportedException ("n/a");
+        	throw new NotSupportedException ("node addition");
         }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel.Support#onNodeRemoval(org.jredis.cluster.ClusterNodeSpec) */
         @Override
         final protected boolean onNodeRemoval (ClusterNodeSpec newNode) {
-        	throw new NotSupportedException ("n/a");
+        	throw new NotSupportedException ("nodeRemoval");
         }
 
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#supports(org.jredis.cluster.ClusterType) */
