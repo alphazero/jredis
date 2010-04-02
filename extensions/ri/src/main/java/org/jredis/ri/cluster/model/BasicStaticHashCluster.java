@@ -16,7 +16,6 @@
 
 package org.jredis.ri.cluster.model;
 
-import java.util.Set;
 import org.jredis.cluster.ClusterNodeSpec;
 import org.jredis.cluster.ClusterSpec;
 import org.jredis.cluster.model.StaticHashCluster;
@@ -32,8 +31,9 @@ import org.jredis.cluster.support.HashAlgorithm;
 
 public class BasicStaticHashCluster extends StaticHashCluster.Support implements StaticHashCluster {
 	
-	private int nodeCnt;
-	private ClusterNodeSpec[] nodes;
+	// ------------------------------------------------------------------------
+	// Constructor
+	// ------------------------------------------------------------------------
 	/**
      * @param clusterSpec
      */
@@ -41,6 +41,10 @@ public class BasicStaticHashCluster extends StaticHashCluster.Support implements
 	    super(clusterSpec);
     }
 
+	// ------------------------------------------------------------------------
+	// super overrides
+	// ------------------------------------------------------------------------
+    
 	/* (non-Javadoc) @see org.jredis.cluster.model.StaticHashCluster.Support#newHashAlgorithm() */
     @Override
     protected HashAlgorithm newHashAlgorithm () {
@@ -52,34 +56,9 @@ public class BasicStaticHashCluster extends StaticHashCluster.Support implements
 	    };
     }
 
-	/* (non-Javadoc) @see org.jredis.cluster.model.StaticHashCluster.Support#mapNodes() */
-    @Override
-    final protected void mapNodes () {
-    	Set<ClusterNodeSpec> nodeSpecs = clusterSpec.getNodeSpecs();
-    	nodeCnt = nodeSpecs.size();
-    	nodes = new ClusterNodeSpec[nodeCnt];
-    	nodes = nodeSpecs.toArray(nodes);
-    }
-
-//	/* (non-Javadoc) @see org.jredis.cluster.model.StaticHashCluster.Support#newClusterNodeMap() */
-//    @Override
-//    protected ClusterNodeMap newClusterNodeMap () { return new NodeMap(); }
-
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#getNodeForKey(byte[]) */
     public ClusterNodeSpec getNodeForKey (byte[] key) {
 	    int nodeIdx = (int) (hashAlgo.hash(key)%nodeCnt);
 	    return nodes[nodeIdx];
     }
-    // ========================================================================
-    // Inner Types
-    // ========================================================================
-    
-	// ------------------------------------------------------------------------
-	// ClusterNodeMap impl.
-	// ------------------------------------------------------------------------
-	
-//    @SuppressWarnings("serial")
-//    public class NodeMap extends TreeMap<Long, ClusterNodeSpec> implements ClusterNodeMap{
-//    }
-
 }

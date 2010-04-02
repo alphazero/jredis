@@ -39,7 +39,9 @@ import org.jredis.cluster.ClusterType;
 public interface ConsistentHashCluster extends ClusterModel {
 	
 	/**
+	 * Return the consistent hash node map.  Semantics of the this map are per the consistent hashing strategy paper and Ketama's implementation.
 	 * @return
+	 * @see ConsistentHashCluster.NodeMap
 	 */
 	NodeMap getNodeMap ();
 	
@@ -69,7 +71,7 @@ public interface ConsistentHashCluster extends ClusterModel {
 		protected int nodeReplicationCnt;
 		
 		// ------------------------------------------------------------------------
-		// Properties
+		// Constructor
 		// ------------------------------------------------------------------------
 		/**
          * @param clusterSpec
@@ -104,9 +106,11 @@ public interface ConsistentHashCluster extends ClusterModel {
          * Can be overriden, but extending classes MUST call super.initializeComponents() as the
          * first statement in the overriding method.
          */
-        protected void initializeComponents () {
-        	nodeMap = newClusterNodeMap();
-        }
+        abstract protected void initializeComponents () ;
+//        protected void initializeComponents () {
+//        	nodeReplicationCnt = replicationCount();
+//        	nodeMap = newClusterNodeMap();
+//        }
         
 		// ------------------------------------------------------------------------
 		// Inner ops
@@ -123,7 +127,9 @@ public interface ConsistentHashCluster extends ClusterModel {
         @Override
         final protected void initializeModel () {
         	initializeComponents();
+//        	hashAlgo = new KetamaHashProvider();
         	nodeReplicationCnt = replicationCount();
+        	nodeMap = newClusterNodeMap();
         	mapNodes();
         }
 
@@ -139,23 +145,18 @@ public interface ConsistentHashCluster extends ClusterModel {
         	throw new RuntimeException("not implemented");        
         }
 
-//		/* (non-Javadoc) @see org.jredis.cluster.model.ConsistentHashCluster#getNodeMap() */
-//        public ClusterNodeMap getNodeMap () {
-//        	// THINK: not sure if returning the actual node map is a hot idea.
-//        	// in fact, not sure if this is really a necessary method.
-//        	// TODO: think.
-//        	throw new RuntimeException("not implemented");        
-//        }
+    	/**
+    	 * TODO: return the map or clone it?  WHY IS METHOD EVEN NECESSARY?
+    	 * @see org.jredis.cluster.model.ConsistentHashCluster#getNodeMap()
+    	 * @return ???
+    	 */
+        public NodeMap getNodeMap () {
+    	    return nodeMap;
+        }
         
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#supports(org.jredis.cluster.ClusterType) */
         final public boolean supports (ClusterType type) {
         	return type == ClusterType.CONSISTENT_HASH;
         }
-
-        // TODO: SHOULD IT BE YES?
-//		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#supportsReconfiguration() */
-//        public boolean supportsReconfiguration () {
-//	        return false;
-//        }
 	}
 }

@@ -16,6 +16,7 @@
 
 package org.jredis.cluster.model;
 
+import java.util.Set;
 import org.jredis.NotSupportedException;
 import org.jredis.cluster.ClusterModel;
 import org.jredis.cluster.ClusterNodeSpec;
@@ -47,12 +48,19 @@ public interface StaticHashCluster extends ClusterModel {
 
 	public abstract static class Support extends ClusterModel.Support implements StaticHashCluster {
 
+		// ------------------------------------------------------------------------
+		// Props
+		// ------------------------------------------------------------------------
 		/** */
 		protected HashAlgorithm hashAlgo;
+		/**  */
+		protected int nodeCnt;
+		/**  */
+		protected ClusterNodeSpec[] nodes;
 		
-//		/**  */
-//		protected ClusterNodeMap	nodeMap;
-		
+		// ------------------------------------------------------------------------
+		// Constructor
+		// ------------------------------------------------------------------------
 		/**
          * @param clusterSpec
          */
@@ -63,11 +71,6 @@ public interface StaticHashCluster extends ClusterModel {
 		// ------------------------------------------------------------------------
 		// Extension points
 		// ------------------------------------------------------------------------
-//        /**
-//         * @return a new (un-initialized) instance of {@link ClusterNodeMap}.  This instance
-//         * will be installed as the class's nodeMap attribute.
-//         */
-//        abstract protected ClusterNodeMap newClusterNodeMap();
         
         /**
          * Extensions are expected to plugin their specific {@link HashAlgorithm} here.
@@ -75,32 +78,20 @@ public interface StaticHashCluster extends ClusterModel {
          */
         abstract protected HashAlgorithm newHashAlgorithm();
         
-        /**
-         * The meats and potatoes of this type of model. Invocation of this method
-         * means a complete computation of the node map per the current {@link ClusterSpec}. 
-         */
-        abstract protected void mapNodes();
+		// ------------------------------------------------------------------------
+		// finalized super overrides
+		// ------------------------------------------------------------------------
         
-        /**
-         * Can be overriden, but extending classes MUST call super.initializeComponents() as the
-         * first statement in the overriding method.
-         */
-        protected void initializeComponents () {
-//        	nodeMap = newClusterNodeMap();
-        	hashAlgo = newHashAlgorithm ();
-        }
-
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel.Support#initializeModel() */
         @Override
-        protected void initializeModel () {
-        	initializeComponents();
-        	mapNodes();
+        final protected void initializeModel () {
+        	hashAlgo = newHashAlgorithm ();
+        	Set<ClusterNodeSpec> nodeSpecs = clusterSpec.getNodeSpecs();
+        	nodeCnt = nodeSpecs.size();
+        	nodes = new ClusterNodeSpec[nodeCnt];
+        	nodes = nodeSpecs.toArray(nodes);
         }
 
-		// ------------------------------------------------------------------------
-		// finalized
-		// ------------------------------------------------------------------------
-        
 		/* (non-Javadoc) @see org.jredis.cluster.ClusterModel.Support#onNodeAddition(org.jredis.cluster.ClusterNodeSpec) */
         @Override
         final protected boolean onNodeAddition (ClusterNodeSpec newNode) {

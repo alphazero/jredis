@@ -79,14 +79,14 @@ public class KetamaClusterModel extends ConsistentHashCluster.Support implements
 		return rv;
 	}
 	
-	/**
-	 * TODO: return the map or clone it?  WHY IS METHOD EVEN NECESSARY?
-	 * @see org.jredis.cluster.model.ConsistentHashCluster#getNodeMap()
-	 * @return ???
-	 */
-    public NodeMap getNodeMap () {
-	    return nodeMap;
-    }
+//	/**
+//	 * TODO: return the map or clone it?  WHY IS METHOD EVEN NECESSARY?
+//	 * @see org.jredis.cluster.model.ConsistentHashCluster#getNodeMap()
+//	 * @return ???
+//	 */
+//    public NodeMap getNodeMap () {
+//	    return nodeMap;
+//    }
 
 	/* (non-Javadoc) @see org.jredis.cluster.ClusterModel#supportsReconfiguration() */
     public boolean supportsReconfiguration () {
@@ -116,7 +116,7 @@ public class KetamaClusterModel extends ConsistentHashCluster.Support implements
     
     @Override
     final protected void initializeComponents() {
-    	super.initializeComponents();
+//    	super.initializeComponents();
     	hashAlgo = new KetamaHashProvider();
     }
 

@@ -105,6 +105,59 @@ public interface ClusterModel {
 	// Inner Types
 	// ========================================================================
 
+
+	// ------------------------------------------------------------------------
+	// EventListener
+	// ------------------------------------------------------------------------
+	/**
+	 * Your basic ClusterModel.Event Listener.
+	 *
+	 * @author  joubin (alphazero@sensesay.net)
+	 * @date    Mar 29, 2010
+	 * 
+	 */
+	public interface Listener {
+		public void onEvent(ClusterModel.Event event);
+	}
+
+	// ------------------------------------------------------------------------
+	// Model Events
+	// ------------------------------------------------------------------------
+	/**
+	 * Optional event interface for dynamic models which support event
+	 * generation.
+	 * 
+	 * @author  joubin (alphazero@sensesay.net)
+	 * @date    Mar 29, 2010
+	 * 
+	 */
+	public static class Event extends org.jredis.Event<ClusterModel, ClusterModel.Event.Type, ClusterNodeSpec> {
+
+		/**  */
+		private static final long serialVersionUID = 1L;
+		/** generated at Event construction time */
+		private final long	 timestamp;
+		/**
+		 * @param src
+		 * @param type
+		 * @param info
+		 */
+		public Event (ClusterModel src, Type type, ClusterNodeSpec info) {
+			super(src, type, info);
+			timestamp = System.currentTimeMillis();
+		}
+		
+		/** @return event approximate event generation time. */
+		public long getTimestamp () { return timestamp; }
+
+		/** ClusterModel.Event.Types */
+		public enum Type {
+			Initialized,
+			NodeAdded,
+			NodeRemoved
+		}
+	}
+	
 	// ------------------------------------------------------------------------
 	// Support base
 	// ------------------------------------------------------------------------
@@ -221,11 +274,8 @@ public interface ClusterModel {
 		// --------------------------------------------------------------------
 		private final void initialize () {
 			initializeModel();
-			//  isn't this silly?  Unless we allow for spec of listeners in the ClusterSpec, 
-			// there aren't gonna be any listeners ..
-			//
-//			notifyListeners(new Event(this, Event.Type.Initialized, null));
 		}
+		
 		private final void notifyListeners(ClusterModel.Event e) {
 			for(ClusterModel.Listener l : listeners)
 				l.onEvent(e);
@@ -247,56 +297,5 @@ public interface ClusterModel {
 		 * 
 		 */
 		abstract protected void initializeModel();
-	}
-	// ------------------------------------------------------------------------
-	// EventListener
-	// ------------------------------------------------------------------------
-	/**
-	 * Your basic ClusterModel.Event Listener.
-	 *
-	 * @author  joubin (alphazero@sensesay.net)
-	 * @date    Mar 29, 2010
-	 * 
-	 */
-	public interface Listener {
-		public void onEvent(ClusterModel.Event event);
-	}
-
-	// ------------------------------------------------------------------------
-	// Model Events
-	// ------------------------------------------------------------------------
-	/**
-	 * Optional event interface for dynamic models which support event
-	 * generation.
-	 * 
-	 * @author  joubin (alphazero@sensesay.net)
-	 * @date    Mar 29, 2010
-	 * 
-	 */
-	public static class Event extends org.jredis.Event<ClusterModel, ClusterModel.Event.Type, ClusterNodeSpec> {
-
-		/**  */
-		private static final long serialVersionUID = 1L;
-		/** generated at Event construction time */
-		private final long	 timestamp;
-		/**
-		 * @param src
-		 * @param type
-		 * @param info
-		 */
-		public Event (ClusterModel src, Type type, ClusterNodeSpec info) {
-			super(src, type, info);
-			timestamp = System.currentTimeMillis();
-		}
-		
-		/** @return event approximate event generation time. */
-		public long getTimestamp () { return timestamp; }
-
-		/** ClusterModel.Event.Types */
-		public enum Type {
-			Initialized,
-			NodeAdded,
-			NodeRemoved
-		}
 	}
 }
