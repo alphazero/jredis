@@ -96,18 +96,9 @@ public interface Connection {
 	// Innner Types
 	// ========================================================================
 	
-	/**
-	 * [TODO: document me!]
-	 *
-	 * @author  Joubin Houshyar (alphazero@sensesay.net)
-	 * @version alpha.0, Mar 29, 2010
-	 * @since   alpha.0
-	 * 
-	 */
 	public interface Listener {
 		public void onEvent(Connection.Event event);
 	}
-	
 	/**
 	 * [TODO: document me!]
 	 *
