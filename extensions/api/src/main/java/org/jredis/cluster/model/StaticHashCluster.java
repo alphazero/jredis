@@ -35,8 +35,6 @@ import org.jredis.cluster.support.HashAlgorithm;
  * <li> must return <b>false</b> for {@link ClusterModel#supports(org.jredis.cluster.ClusterType)} for all other {@link ClusterType}s.
  * <li> must throw {@link NotSupportedException} for {@link ClusterModel#addNode(org.jredis.cluster.ClusterNodeSpec)}
  * <li> must throw {@link NotSupportedException} for {@link ClusterModel#removeNode(org.jredis.cluster.ClusterNodeSpec)}
- * <li> must throw {@link NotSupportedException} for {@link ClusterModel#addListener(org.jredis.cluster.ClusterModel.Listener)}
- * <li> must throw {@link NotSupportedException} for {@link ClusterModel#removeListener(org.jredis.cluster.ClusterModel.Listener)}
  * 
  * @author  joubin (alphazero@sensesay.net)
  * @date    Mar 30, 2010
