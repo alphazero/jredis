@@ -73,7 +73,8 @@ public abstract class ConcurrentJRedisProviderTestsBase extends JRedisProviderTe
 		Log.log("CONCURRENT TEST: %s resp type command | key: %s", cmd, key);
 		try {
 			provider.set (key, threadName);
-			assertTrue (provider.del (key), "del response should be OK");
+//			assertTrue (provider.del (key), "del response should be OK");
+			assertEquals (provider.del(key), 1, "del response should be 1 for one key deleted");
 			assertFalse (provider.exists(key), "deleted key response should not exist");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }

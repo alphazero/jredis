@@ -1400,15 +1400,23 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
-	public boolean del(String key) throws RedisException {
-		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
-			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+	public long del(String ...keys ) throws RedisException {
+		
+		if(null == keys || keys.length == 0) throw new IllegalArgumentException("no keys specified");
+		byte[] keydata = null;
+		byte[][] keybytes = new byte[keys.length][];
+		int i=0;
+		for(String k : keys) {
+			if((keydata = getKeyBytes(k)) == null) 
+				throw new IllegalArgumentException ("invalid key => ["+k+"] @ index: " + i);
+			
+			keybytes[i++] = keydata;
+		}
 
-		boolean resvalue = false;
+		long resvalue = -1;
 		try {
 			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.DEL, keybytes);
-			resvalue = valResponse.getBooleanValue();
+			resvalue = valResponse.getLongValue();
 		}
 		catch (ClassCastException e){
 			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);

@@ -210,8 +210,8 @@ public class PipelineInAction {
     		String key = "pipeKey";
     		byte[] data = new byte[size];
     		(new Random()).nextBytes(data);
-			Future<Boolean> futureBool = pipeline.del(key);
-			futureBool.get();
+			Future<Long> futureLong = pipeline.del(key);
+			futureLong.get();
     		do {
 	    		int cnt = 0;
 	    		Util.Timer timer = Timer.startNewTimer();
@@ -265,8 +265,8 @@ public class PipelineInAction {
     		String key = "pipeKey";
     		byte[] data = new byte[size];
     		(new Random()).nextBytes(data);
-			Future<Boolean> futureBool = pipeline.del(key);
-			futureBool.get();
+			Future<Long> futureLong = pipeline.del(key);
+			futureLong.get();
     		do {
 	    		int cnt = 0;
 	    		Util.Timer timer = Timer.startNewTimer();
@@ -315,8 +315,8 @@ public class PipelineInAction {
     	long iters = 0;
     	try {
     		String key = "pipeCounter";
-			Future<Boolean> futureBool = pipeline.del(key);
-			futureBool.get();
+			Future<Long> futureDelCnt = pipeline.del(key);
+			futureDelCnt.get();
     		do {
 	    		int cnt = 0;
 	    		Util.Timer timer = Timer.startNewTimer();

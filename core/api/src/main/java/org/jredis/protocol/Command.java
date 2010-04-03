@@ -55,7 +55,7 @@ public enum Command {
 	DECR		(RequestType.KEY, 			ResponseType.NUMBER), 
 	DECRBY		(RequestType.KEY_NUM,		ResponseType.NUMBER),  
 	EXISTS		(RequestType.KEY, 			ResponseType.BOOLEAN), 
-	DEL			(RequestType.KEY, 			ResponseType.BOOLEAN), 
+	DEL			(RequestType.MULTI_KEY, 	ResponseType.NUMBER), 
 	TYPE		(RequestType.KEY, 			ResponseType.STRING),
 
 	// "Commands operating on the key space"

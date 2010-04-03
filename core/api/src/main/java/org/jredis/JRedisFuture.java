@@ -233,10 +233,10 @@ public interface JRedisFuture {
 
 	/**
 	 * @Redis DEL
-	 * @param key
-	 * @return
+	 * @param keys one or more, non-null, non-zero-length, keys to be deleted
+	 * @return Future<Long> of number keys actually deleted.
 	 */
-	public Future<Boolean> del (String key);
+	public Future<Long> del (String ... keys);
 
 	/**
 	 * @Redis TYPE
