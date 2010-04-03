@@ -720,17 +720,16 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	/* ------------------------------- commands returning Lists --------- */
 
 //	@Override
-	public Future<List<byte[]>> mget(String key, String... moreKeys) {
+	public Future<List<byte[]>> mget(String ... keys) {
 
+		if(null == keys || keys.length == 0) throw new IllegalArgumentException("no keys specified");
 		byte[] keydata = null;
-		if((keydata = getKeyBytes(key)) == null) 
-			throw new IllegalArgumentException ("invalid key => ["+key+"]");
-
-		byte[][] keybytes = new byte[1+moreKeys.length][];
-		int i=0; keybytes[i++] = keydata;
-		for(String k : moreKeys) {
+		byte[][] keybytes = new byte[keys.length][];
+		int i=0;
+		for(String k : keys) {
 			if((keydata = getKeyBytes(k)) == null) 
-				throw new IllegalArgumentException ("invalid key => ["+k+"]");
+				throw new IllegalArgumentException ("invalid key => ["+k+"] @ index: " + i);
+			
 			keybytes[i++] = keydata;
 		}
 		return new FutureByteArrayList(this.queueRequest(Command.MGET, keybytes));

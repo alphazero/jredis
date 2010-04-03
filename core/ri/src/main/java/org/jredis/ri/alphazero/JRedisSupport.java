@@ -1112,17 +1112,16 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
-	public List<byte[]> mget(String key, String... moreKeys) throws RedisException {
+	public List<byte[]> mget(String...keys) throws RedisException {
 
+		if(null == keys || keys.length == 0) throw new IllegalArgumentException("no keys specified");
 		byte[] keydata = null;
-		if((keydata = getKeyBytes(key)) == null) 
-			throw new IllegalArgumentException ("invalid key => ["+key+"]");
-
-		byte[][] keybytes = new byte[1+moreKeys.length][];
-		int i=0; keybytes[i++] = keydata;
-		for(String k : moreKeys) {
+		byte[][] keybytes = new byte[keys.length][];
+		int i=0;
+		for(String k : keys) {
 			if((keydata = getKeyBytes(k)) == null) 
-				throw new IllegalArgumentException ("invalid key => ["+k+"]");
+				throw new IllegalArgumentException ("invalid key => ["+k+"] @ index: " + i);
+			
 			keybytes[i++] = keydata;
 		}
 		
