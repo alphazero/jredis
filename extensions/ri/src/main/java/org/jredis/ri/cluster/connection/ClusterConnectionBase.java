@@ -16,14 +16,17 @@
 
 package org.jredis.ri.cluster.connection;
 
-import java.util.concurrent.Future;
+import static org.jredis.ri.alphazero.support.Assert.*;
+import java.util.Collection;
+
 import org.jredis.ClientRuntimeException;
+import org.jredis.NotSupportedException;
 import org.jredis.ProviderException;
-import org.jredis.RedisException;
-import org.jredis.connector.Connection;
+import org.jredis.cluster.ClusterModel;
+import org.jredis.cluster.ClusterNodeSpec;
+import org.jredis.cluster.ClusterSpec;
+import org.jredis.cluster.connector.ClusterConnection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.protocol.Command;
-import org.jredis.protocol.Response;
 
 /**
  * [TODO: document me!]
@@ -33,25 +36,83 @@ import org.jredis.protocol.Response;
  * 
  */
 
-public class ClusterConnectionBase implements Connection {
+abstract public class ClusterConnectionBase implements ClusterConnection {
 
-	/* (non-Javadoc) @see org.jredis.connector.Connection#getModality() */
-	public Modality getModality () {
-		return null;
+	// ------------------------------------------------------------------------
+	// Properties
+	// ------------------------------------------------------------------------
+	final protected ClusterModel model;
+
+	// ------------------------------------------------------------------------
+	// Constructor
+	// ------------------------------------------------------------------------
+	/**
+	 * Convenience form for default immediate connection to the nodes.
+	 * @param model
+	 * @throws ClientRuntimeException
+	 * @see {@link ClusterConnectionBase#ClusterConnectionBase(ClusterModel, boolean)}
+	 */
+	protected ClusterConnectionBase (ClusterModel model) 
+	throws ClientRuntimeException
+	{
+		this(model, true);
 	}
 
-	/* (non-Javadoc) @see org.jredis.connector.Connection#queueRequest(org.jredis.protocol.Command, byte[][]) */
-	public Future<Response> queueRequest (Command cmd, byte[]... args) throws ClientRuntimeException, ProviderException {
-		return null;
+	/**
+	 * @param model
+	 * @param connectImmediately
+	 * @throws ClientRuntimeException
+	 */
+	protected ClusterConnectionBase (ClusterModel model, boolean connectImmediately) 
+	throws ClientRuntimeException
+	{
+		this.model = notNull(model, "ClusterModel param for constructor", ClientRuntimeException.class); 
+		
+		// model integrity checks
+		//
+		ClusterSpec spec = notNull(model.getSpec(), "ClusterModel's ClusterSpec property", ClientRuntimeException.class); 
+		Collection<ClusterNodeSpec> nodeSpecs = notNull(spec.getNodeSpecs(), "ClusterSpec's nodes", ClientRuntimeException.class);
+		isTrue(nodeSpecs.size() > 1, "ClusterSpec node count", ClientRuntimeException.class);
+		
+		// initialize cluster's connections
+		initialize();
 	}
 
-	/* (non-Javadoc) @see org.jredis.connector.Connection#serviceRequest(org.jredis.protocol.Command, byte[][]) */
-	public Response serviceRequest (Command cmd, byte[]... args) throws RedisException, ClientRuntimeException, ProviderException {
-		return null;
-	}
+	// ------------------------------------------------------------------------
+	// Interface
+	// ===================================================== ClusterConnection
+	/*
+	 * General methods of the interface are supported in this base class and the
+	 * rest left for the specialized extensions.
+	 */
+	// ------------------------------------------------------------------------
+	
+	/* (non-Javadoc) @see org.jredis.cluster.connector.ClusterConnection#getClusterModel() */
+	final public ClusterModel getClusterModel () { return model; }
+
+	/* (non-Javadoc) @see org.jredis.cluster.connector.ClusterConnection#getClusterSpec() */
+	final public ClusterSpec getClusterSpec () { return model.getSpec(); }
 
 	/* (non-Javadoc) @see org.jredis.connector.Connection#getSpec() */
-    public ConnectionSpec getSpec () {
-	    return null;
-    }
+	final public ConnectionSpec getSpec () {
+		throw new NotSupportedException ("Per specification -- see org.jredis.cluster.ClusterConnection's specification.");
+	}
+	
+	// ------------------------------------------------------------------------
+	// Internal ops
+	// ------------------------------------------------------------------------
+	
+	final protected void initialize () throws ClientRuntimeException, ProviderException {
+		initializeComponents();
+	}
+
+	// ------------------------------------------------------------------------
+	// Internal ops : Extension points
+	// ------------------------------------------------------------------------
+	
+	/**
+     * Extension point for subclasses.  This method is guaranteed to be called
+     * exactly once during the instantiation process. 
+     */
+    abstract protected void initializeComponents () ;
 }
