@@ -55,7 +55,7 @@ public enum Command {
 	DECR		(RequestType.KEY, 			ResponseType.NUMBER), 
 	DECRBY		(RequestType.KEY_NUM,		ResponseType.NUMBER),  
 	EXISTS		(RequestType.KEY, 			ResponseType.BOOLEAN), 
-	DEL			(RequestType.KEY, 			ResponseType.BOOLEAN), 
+	DEL			(RequestType.MULTI_KEY, 	ResponseType.NUMBER), 
 	TYPE		(RequestType.KEY, 			ResponseType.STRING),
 	SUBSTR		(RequestType.KEY_NUM_NUM,	ResponseType.BULK),
 	APPEND		(RequestType.KEY_VALUE, 	ResponseType.NUMBER),

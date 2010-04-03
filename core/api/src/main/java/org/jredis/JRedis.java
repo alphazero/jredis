@@ -261,11 +261,12 @@ public interface JRedis {
 
 	/**
 	 * @Redis DEL
-	 * @param key
-	 * @return
+	 * @param keys one or more non-null, non-zero-length, keys to be deleted
+	 * @return number of keys actually deleted
 	 * @throws RedisException
 	 */
-	public boolean del (String key) throws RedisException;
+//	public boolean del (String key) throws RedisException;
+	public long del (String ... keys) throws RedisException;
 
 	/**
 	 * @Redis TYPE

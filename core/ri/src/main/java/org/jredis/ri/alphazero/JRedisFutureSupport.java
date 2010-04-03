@@ -1076,13 +1076,20 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Boolean> del(String key) {
-		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
-			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+	public Future<Long> del(String ... keys) {
+		if(null == keys || keys.length == 0) throw new IllegalArgumentException("no keys specified");
+		byte[] keydata = null;
+		byte[][] keybytes = new byte[keys.length][];
+		int i=0;
+		for(String k : keys) {
+			if((keydata = getKeyBytes(k)) == null) 
+				throw new IllegalArgumentException ("invalid key => ["+k+"] @ index: " + i);
+			
+			keybytes[i++] = keydata;
+		}
 
 		Future<Response> futureResponse = this.queueRequest(Command.DEL, keybytes);
-		return new FutureBoolean(futureResponse);
+		return new FutureLong(futureResponse);
 	}
 
 

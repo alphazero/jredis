@@ -1315,12 +1315,69 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			String key = this.keys.get(0);
 			provider.set (key, dataList.get(0));
 			Future<Boolean> existsResp1 = provider.exists(key); 
-			provider.del(key);
+			Future<Long> delResp = provider.del(key);
 			Future<Boolean> existsResp2 = provider.exists(key); 
-			
+
 			try {
+				assertEquals(delResp.get().longValue(), 1, "one key should been deleted");
 				assertTrue (existsResp1.get(), "After set key should exist");
 				assertFalse (existsResp2.get(), "After del key should not exist");
+				
+				// delete many keys
+				provider.flushdb();
+				for(int i=0; i<SMALL_CNT; i++) provider.set(stringList.get(i), dataList.get(i));
+
+				String[] keysToDel = new String[SMALL_CNT];
+				for(int i=0; i<SMALL_CNT; i++) keysToDel[i] = stringList.get(i);
+
+				Future<Long> delCnt1 = provider.del(keysToDel);
+				for(int i=0; i<SMALL_CNT; i++) assertFalse (provider.exists(stringList.get(i)).get(), "key should have been deleted");
+				assertEquals(delCnt1.get().longValue(), SMALL_CNT, "SMALL_CNT keys were deleted");
+				
+				// delete many keys but also spec one non existent keys - delete result should be less than key cnt
+				provider.flushdb();
+				for(int i=0; i<SMALL_CNT-1; i++) provider.set(stringList.get(i), dataList.get(i));
+
+				keysToDel = new String[SMALL_CNT];
+				for(int i=0; i<SMALL_CNT; i++) keysToDel[i] = stringList.get(i);
+
+				Future<Long> delCnt2 = provider.del(keysToDel);
+				for(int i=0; i<SMALL_CNT; i++) assertFalse (provider.exists(stringList.get(i)).get(), "key should have been deleted");
+				assertEquals(delCnt2.get().longValue(), SMALL_CNT-1, "SMALL_CNT-1 keys were actually deleted");
+
+				// edge cases
+				// all should through exceptions
+				boolean didRaiseEx;
+				didRaiseEx = false;
+				try {
+					String[] keys = null;
+					provider.del(keys).get();
+				}
+				catch (IllegalArgumentException e) {didRaiseEx = true;}
+				catch (Throwable whatsthis) { fail ("unexpected exception raised", whatsthis);}
+				if(!didRaiseEx){ fail ("Expected exception not raised."); }
+
+				didRaiseEx = false;
+				try {
+					String[] keys = new String[0];
+					provider.del(keys).get();
+				}
+				catch (IllegalArgumentException e) {didRaiseEx = true;}
+				catch (Throwable whatsthis) { fail ("unexpected exception raised", whatsthis);}
+				if(!didRaiseEx){ fail ("Expected exception not raised."); }
+
+				didRaiseEx = false;
+				try {
+					String[] keys = new String[3];
+					keys[0] = stringList.get(0);
+					keys[1] = null;
+					keys[2] = stringList.get(2);
+					provider.del(keys).get();
+				}
+				catch (IllegalArgumentException e) {didRaiseEx = true;}
+				catch (Throwable whatsthis) { fail ("unexpected exception raised", whatsthis);}
+				if(!didRaiseEx){ fail ("Expected exception not raised."); }
+
 			}
 			catch(ExecutionException e){
 				Throwable cause = e.getCause();
