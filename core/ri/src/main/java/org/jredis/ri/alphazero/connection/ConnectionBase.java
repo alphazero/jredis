@@ -39,6 +39,7 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.Connection.Event.Type;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Response;
@@ -233,6 +234,7 @@ public abstract class ConnectionBase implements Connection {
     	if (spec.isReliable()){
 	    	heartbeat.notifyConnected();
     	}
+    	notifyListeners(new Event(this, Type.CONNECTED));
     }
     /**
      * Extension point -- callback on this method when {@link ConnectionBase} has disconnected from server.
@@ -243,6 +245,7 @@ public abstract class ConnectionBase implements Connection {
     	if (spec.isReliable()){
 	    	heartbeat.notifyDisconnected();
     	}
+    	notifyListeners(new Event(this, Type.DISCONNECTED));
     }
     /**
      * Extension point:  child classes may override to return specific {@link Protocol} implementations per their requirements.

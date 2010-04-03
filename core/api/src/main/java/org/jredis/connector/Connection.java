@@ -137,8 +137,8 @@ public interface Connection {
         }
 
 		public enum Type {
-			Established,
-			Dropped,
+			CONNECTED,
+			DISCONNECTED,
 			Faulted
 		}
 	}

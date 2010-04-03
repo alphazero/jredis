@@ -170,9 +170,9 @@ abstract public class ClusterConnectionBase implements ClusterConnection, Connec
 		// TODO: deal with it!
 		Connection.Event.Type type = event.getType();
 		switch (type) {
-		case Dropped:
+		case DISCONNECTED:
 			break;
-		case Established:
+		case CONNECTED:
 			break;
 		case Faulted:
 			break;
