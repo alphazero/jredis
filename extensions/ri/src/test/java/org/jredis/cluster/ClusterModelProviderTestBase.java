@@ -16,11 +16,15 @@
 
 package org.jredis.cluster;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.jredis.NotSupportedException;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 import org.jredis.ri.cluster.DefaultClusterNodeSpec;
+import org.jredis.test.util.RunningAverage;
 import org.testng.annotations.Test;
+import static org.jredis.cluster.ClusterSuiteTestData.*;
 import static org.testng.Assert.*;
 
 
@@ -189,5 +193,50 @@ public abstract class ClusterModelProviderTestBase extends RefImplTestSuiteBase<
 		// now lets add a node
 		//
 		model.addNode(new DefaultClusterNodeSpec(DefaultConnectionSpec.newSpec().setPort(9999)));
+	}
+	@Test
+	public void testKeyDistribution (){
+		long keycnt = data.LARGE_CNT;
+		Log.log("test key distribution with " + keycnt + " keys");
+
+		// get the node for a number of keys and check the distribution
+		// across the nodes.  Very difficult to have a definitive tests here
+		// without spec'ing distribution metric (e.g. limits on std-dev), but
+		// at least all nodes should have keys asigned to them, as a general start.
+		
+		Map<ClusterNodeSpec, Long> distribution = new HashMap<ClusterNodeSpec, Long>();
+		
+		ClusterModel model = newProviderInstance();
+		assertNotNull(model, "newProviderInstance should not return null");
+		
+		// we simply count the keys assigned to each node
+		// 
+		for(int i=0; i<keycnt; i++){
+			String key = getRandomAsciiString(512);
+			byte[] keybytes = key.getBytes();
+			ClusterNodeSpec nodeSpec = model.getNodeForKey(keybytes);
+			Long cnt = distribution.get(nodeSpec);
+			cnt = cnt == null ? 1 : cnt.longValue()+1;
+			distribution.put(nodeSpec, cnt);
+		}
+
+		// and now lets do some basic analysis
+		// we'll need the ClusterSpec to get the nodes
+		
+		ClusterSpec clusterSpec = provider.getSpec();
+		assertNotNull(clusterSpec, "cluster spec must not be null");
+		
+		RunningAverage avg = new RunningAverage();
+		int nodeCnt = clusterSpec.getNodeSpecs().size();
+		Number[] data = new Number[nodeCnt];
+		int i = 0;
+		for(ClusterNodeSpec n : clusterSpec.getNodeSpecs()){
+			Long cnt = distribution.get(n);
+			avg.onMeasure(cnt);
+			data[i++] = cnt;
+		}
+		assertTrue(avg.getMin() > 0, "No node should have zero keys assigned to it");
+		assertTrue(avg.getMax() > 0, "No node should have zero keys assigned to it");
+		Log.log("Distributed %d keys in a %d node cluster:\n\t Key/node distribution -- AVG: %d - MIN: %d - MAX: %d\n", keycnt, nodeCnt, avg.get(), avg.getMin(), avg.getMax());
 	}
 }

@@ -47,10 +47,21 @@ public class ClusterSuiteTestData {
 	// General RI Test Suite Parameters with default values to avoid XML
 	// ------------------------------------------------------------------------
 	
-	protected int		NODE_CNT =  1000;
-	protected String 	CLUSTER_NODES_ADDRESS_BASE = "127.0.0.1";
-	protected int 		CLUSTER_NODES_PORT_BASE = 6379;
-	protected int		db = 10;
+	// data size
+	final public int	SMALL_DATA =  128;
+	final public int	MEDIUM_DATA = 1024 * 2;
+	final public int	LARGE_DATA =  1024 * 512;
+	
+	// iterations
+	final public int	SMALL_CNT 	= 100;
+	final public int	MEDIUM_CNT 	= 10000;
+	final public int	LARGE_CNT 	= 1000000;
+	
+	final public int 	NODE_CNT	= MEDIUM_CNT;
+	
+	final public String CLUSTER_NODES_ADDRESS_BASE = "127.0.0.1";
+	final public int 	CLUSTER_NODES_PORT_BASE = 6379;
+	final public int	db = 10;
 	
 	// ------------------------------------------------------------------------
 	// General RI Test Suite test data
