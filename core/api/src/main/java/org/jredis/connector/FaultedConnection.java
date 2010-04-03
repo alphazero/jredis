@@ -18,6 +18,7 @@ package org.jredis.connector;
 
 import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
+import org.jredis.NotSupportedException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.protocol.Command;
@@ -64,5 +65,17 @@ public class FaultedConnection implements Connection {
      */
     public ConnectionSpec getSpec () {
 	    return connSpec;
+    }
+	/* (non-Javadoc)
+     * @see org.jredis.connector.Connection#addListener(org.jredis.connector.Connection.Listener)
+     */
+    public boolean addListener (Listener connListener) {
+    	throw new NotSupportedException("Events not supported");
+    }
+	/* (non-Javadoc)
+     * @see org.jredis.connector.Connection#removeListener(org.jredis.connector.Connection.Listener)
+     */
+    public boolean removeListener (Listener connListener) {
+    	throw new NotSupportedException("Events not supported");
     }
 }

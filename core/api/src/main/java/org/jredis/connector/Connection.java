@@ -92,6 +92,22 @@ public interface Connection {
 
 	public Future<Response> queueRequest (Command cmd,  byte[]...args) throws ClientRuntimeException, ProviderException;
 
+	// ------------------------------------------------------------------------
+	// Event management
+
+	/**
+	 * Optional
+	 * @param connListener
+	 * @return
+	 */
+	public boolean addListener(Listener connListener);
+
+	/**
+	 * Optional
+	 * @param connListener
+	 * @return
+	 */
+	public boolean removeListener(Listener connListener);
 	// ========================================================================
 	// Innner Types
 	// ========================================================================

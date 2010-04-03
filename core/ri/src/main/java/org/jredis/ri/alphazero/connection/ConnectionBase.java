@@ -29,6 +29,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
@@ -83,6 +85,9 @@ public abstract class ConnectionBase implements Connection {
 	
 	/** PINGs for heartbeat */
 	private HeartbeatJinn			heartbeat;
+
+	/** Connector Listeners */
+	final private Set<Connection.Listener> listeners = new HashSet<Connection.Listener>();
 
 	// ------------------------------------------------------------------------
 	// Internal use fields
@@ -174,6 +179,27 @@ public abstract class ConnectionBase implements Connection {
 	}
 	
 	// ------------------------------------------------------------------------
+	// Event management
+
+	/**
+	 * Optional
+	 * @param connListener
+	 * @return
+	 */
+	final public boolean addListener(Listener connListener){
+		return listeners.add(connListener);
+	}
+
+	/**
+	 * Optional
+	 * @param connListener
+	 * @return
+	 */
+	final public boolean removeListener(Listener connListener){
+		return listeners.remove(connListener);
+	}
+	
+	// ------------------------------------------------------------------------
 	// Internal ops : Extension points
 	// ------------------------------------------------------------------------
 	/**
@@ -244,9 +270,16 @@ public abstract class ConnectionBase implements Connection {
     protected OutputStream newOutputStream(OutputStream socketOutputStream) { return socketOutputStream; }
     
 	// ------------------------------------------------------------------------
+	// Inner ops: event management
+	// ------------------------------------------------------------------------
+	final protected void notifyListeners(Connection.Event e) {
+		for(Connection.Listener l : listeners)
+			l.onEvent(e);
+	}
+
+	// ------------------------------------------------------------------------
 	// Inner ops: socket and connection management
 	// ------------------------------------------------------------------------
-
 	/** @return connected status*/
 	protected final boolean isConnected () { return isConnected; }
 	

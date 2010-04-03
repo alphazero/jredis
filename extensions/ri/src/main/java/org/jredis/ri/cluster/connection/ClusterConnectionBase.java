@@ -51,9 +51,14 @@ abstract public class ClusterConnectionBase implements ClusterConnection, Connec
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
+	/**  */
 	final protected ClusterModel model;
+	/**  */
 	final private Set<Command> supportedCmds = new HashSet<Command>();
+	/**  */
 	final private Map<String, Connection> connections = new HashMap<String, Connection>();
+	/** Connector Listeners */
+	final private Set<Connection.Listener> listeners = new HashSet<Connection.Listener>();
 
 	// ------------------------------------------------------------------------
 	// Constructor
@@ -134,6 +139,18 @@ abstract public class ClusterConnectionBase implements ClusterConnection, Connec
     {
 		byte[] key = verifyAndGetKeyForRequest(cmd, args);
 		return getConnectionForKey(key).serviceRequest(cmd, args);
+	}
+	// ------------------------------------------------------------------------
+	// Event management
+
+	/* (non-Javadoc) @see org.jredis.connector.Connection#addListener(org.jredis.connector.Connection.Listener) */
+	final public boolean addListener(Listener connListener){
+		return listeners.add(connListener);
+	}
+
+	/* (non-Javadoc) @see org.jredis.connector.Connection#removeListener(org.jredis.connector.Connection.Listener) */
+	final public boolean removeListener(Listener connListener){
+		return listeners.remove(connListener);
 	}
 
 	// ------------------------------------------------------------------------
