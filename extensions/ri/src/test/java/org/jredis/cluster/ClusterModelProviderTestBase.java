@@ -196,7 +196,7 @@ public abstract class ClusterModelProviderTestBase extends RefImplTestSuiteBase<
 	}
 	@Test
 	public void testKeyDistribution (){
-		long keycnt = data.LARGE_CNT;
+		long keycnt = data.MEDIUM_CNT;
 		Log.log("test key distribution with " + keycnt + " keys");
 
 		// get the node for a number of keys and check the distribution
