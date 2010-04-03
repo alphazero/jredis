@@ -1202,6 +1202,40 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				assertEquals(values.size(), 3, "3 values expected");
 				for(int i=0; i<3; i++)
 					assertEquals(values.get(i), null, "nonexistent key value in list should be null");
+				
+				// edge cases
+				// all should through exceptions
+				boolean didRaiseEx;
+				didRaiseEx = false;
+				try {
+					String[] keys = null;
+					provider.mget(keys).get();
+				}
+				catch (IllegalArgumentException e) {didRaiseEx = true;}
+				catch (Throwable whatsthis) { fail ("unexpected exception raised", whatsthis);}
+				if(!didRaiseEx){ fail ("Expected exception not raised."); }
+
+				didRaiseEx = false;
+				try {
+					String[] keys = new String[0];
+					provider.mget(keys).get();
+				}
+				catch (IllegalArgumentException e) {didRaiseEx = true;}
+				catch (Throwable whatsthis) { fail ("unexpected exception raised", whatsthis);}
+				if(!didRaiseEx){ fail ("Expected exception not raised."); }
+
+				didRaiseEx = false;
+				try {
+					String[] keys = new String[3];
+					keys[0] = stringList.get(0);
+					keys[1] = null;
+					keys[2] = stringList.get(2);
+					provider.mget(keys).get();
+				}
+				catch (IllegalArgumentException e) {didRaiseEx = true;}
+				catch (Throwable whatsthis) { fail ("unexpected exception raised", whatsthis);}
+				if(!didRaiseEx){ fail ("Expected exception not raised."); }
+				
 			}
 			catch(ExecutionException e){
 				Throwable cause = e.getCause();

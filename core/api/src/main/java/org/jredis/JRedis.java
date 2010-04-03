@@ -144,7 +144,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public List<byte[]> mget(String key, String...moreKeys) throws RedisException;
+	public List<byte[]> mget(String ... keys) throws RedisException;
 
 	/**
 	 * @Redis MSET

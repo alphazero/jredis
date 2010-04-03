@@ -166,7 +166,7 @@ public interface JRedisFuture {
 	 * @param moreKeys
 	 * @return
 	 */
-	public Future<List<byte[]>> mget(String key, String...moreKeys);
+	public Future<List<byte[]>> mget(String...keys);
 
 	/**
 	 * @Redis MSET
