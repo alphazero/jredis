@@ -139,7 +139,7 @@ public interface Connection {
 		public enum Type {
 			CONNECTED,
 			DISCONNECTED,
-			Faulted
+			FAULTED
 		}
 	}
 }

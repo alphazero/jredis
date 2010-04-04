@@ -121,7 +121,8 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 		catch (ClientRuntimeException e) {
 			String msg = e.getMessage() + "\nMake sure your server is running.";
 			Log.error ("Error creating connection -> " + e.getLocalizedMessage());
-			setConnection(new FaultedConnection(connectionSpec, msg));
+//			setConnection(new FaultedConnection(connectionSpec, msg));
+			synchConnection = new FaultedConnection(connectionSpec, msg);
 		}
 		return synchConnection;
 	}

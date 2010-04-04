@@ -19,6 +19,7 @@ package org.jredis.ri.alphazero.connection;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.Connection.Event;
 import org.jredis.connector.Connection.Modality;
 import org.jredis.protocol.Command;
 import org.jredis.ri.alphazero.support.Log;
@@ -35,7 +36,7 @@ import org.jredis.ri.alphazero.support.Log;
  * @since   alpha.0
  * 
  */
-public class HeartbeatJinn extends Thread{
+public class HeartbeatJinn extends Thread implements Connection.Listener{
 
 	/**  */
 	AtomicBoolean connected;
@@ -61,19 +62,22 @@ public class HeartbeatJinn extends Thread{
 		this.connected = new AtomicBoolean(false);
 		this.mustBeat = new AtomicBoolean(true);
 	}
-	public void notifyDisconnected () {
-		connected.set(false);
-	}
-	public void notifyConnected () {
-		connected.set(true);
-	}
+	// using Connection.Listener callback instead
+//	public void notifyDisconnected () {
+//		connected.set(false);
+//	}
+	// using Connection.Listener callback instead
+//	public void notifyConnected () {
+//		connected.set(true);
+//	}
 	// TODO: no one is calling this method (yet) and we're relying on daemon status to
 	// avoid the jvm hanging around but this ain't right.
 	public void exit() {
 		mustBeat.set(false);
+		this.interrupt();
 	}
 	public void run () {
-//		Log.log("HeartbeatJinn thread <%s> started.", getName());
+		Log.log("HeartbeatJinn thread <%s> started.", Thread.currentThread().getName());
 		while (mustBeat.get()) {
 			try {
 				if(connected.get()){  // << buggy.
@@ -101,7 +105,10 @@ public class HeartbeatJinn extends Thread{
 				}
 				sleep (period);	// sleep regardless - 
 			}
-			catch (InterruptedException e) { break; }
+			catch (InterruptedException e) { 
+				Log.log("HeartbeatJinn thread <%s> interrupted.", Thread.currentThread().getName());
+				break; 
+			}
 		}
 		Log.log("HeartbeatJinn thread <%s> stopped.", Thread.currentThread().getName());
 	}
@@ -109,4 +116,25 @@ public class HeartbeatJinn extends Thread{
 	public void interrupt () {
 		super.interrupt();
 	}
+	/* (non-Javadoc)
+     * @see org.jredis.connector.Connection.Listener#onEvent(org.jredis.connector.Connection.Event)
+     */
+    public void onEvent (Event event) {
+    	switch (event.getType()){
+			case CONNECTED:
+//				System.out.println ("********** GOT    CONNECTED EVENT CALLBACK **************");
+				connected.set(true);
+				break;
+			case DISCONNECTED:
+//				System.out.println ("********** GOT DISCONNECTED EVENT CALLBACK **************");
+				connected.set(false);
+				break;
+			case FAULTED:
+//				System.out.println ("********** GOT      FAULTED EVENT CALLBACK **************");
+				exit();
+//				mustBeat.set(false);
+				break;
+    	
+    	}
+    }
 }

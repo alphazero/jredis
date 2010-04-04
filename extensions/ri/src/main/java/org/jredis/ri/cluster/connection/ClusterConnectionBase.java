@@ -174,7 +174,7 @@ abstract public class ClusterConnectionBase implements ClusterConnection, Connec
 			break;
 		case CONNECTED:
 			break;
-		case Faulted:
+		case FAULTED:
 			break;
 		}
 		throw new ProviderException("[BUG] lazy programmer -- TODOs here!");

@@ -84,7 +84,6 @@ public class ClusterSuiteTestData {
 	 * @return the singleton instance of  {@link ClusterSuiteTestData}
 	 */
 	public static ClusterSuiteTestData getInstance () {
-		Log.log("!!!!!! ClusterSuiteTestData.getInstance() called !!!!");
 		return instance;
 	}
 	// ------------------------------------------------------------------------

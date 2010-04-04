@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Formatter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -220,7 +221,8 @@ public abstract class ConnectionBase implements Connection {
 		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
 
 		if(spec.isReliable()){
-	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), "connection [" + hashCode() + "] heartbeat");
+	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), " [" + this + "] heartbeat");
+	    	addListener(heartbeat);
 	    	heartbeat.start();
 		}
     }
@@ -231,9 +233,9 @@ public abstract class ConnectionBase implements Connection {
      * heartbeats) is required!.
      */
     protected void notifyConnected () {
-    	if (spec.isReliable()){
-	    	heartbeat.notifyConnected();
-    	}
+//    	if (spec.isReliable()){
+//	    	heartbeat.notifyConnected();
+//    	}
     	notifyListeners(new Event(this, Type.CONNECTED));
     }
     /**
@@ -242,10 +244,14 @@ public abstract class ConnectionBase implements Connection {
      * heartbeats) is required!.
      */
     protected void notifyDisconnected () {
-    	if (spec.isReliable()){
-	    	heartbeat.notifyDisconnected();
-    	}
+//    	if (spec.isReliable()){
+//	    	heartbeat.notifyDisconnected();
+//    	}
     	notifyListeners(new Event(this, Type.DISCONNECTED));
+    }
+    
+    protected void notifyFaulted (String info) {
+    	notifyListeners(new Event(this, Type.FAULTED, info));
     }
     /**
      * Extension point:  child classes may override to return specific {@link Protocol} implementations per their requirements.
@@ -304,12 +310,23 @@ public abstract class ConnectionBase implements Connection {
 			catch (RuntimeException e){
 				Log.error("while attempting reconnect: " + e.getMessage());
 				if(++attempts == spec.getReconnectCnt()) {
-					Log.problem("Retry limit exceeded attempting reconnect.");
-					throw new ClientRuntimeException ("Failed to reconnect to the server.");
+//					Log.problem("Retry limit exceeded attempting reconnect.");
+					
+					onConnectionFault("Reconnect retry limit exceeded.  Failed to reconnect to the server after " + attempts + " reconnect attempts");
+//					throw new ClientRuntimeException ("Failed to reconnect to the server.");
 				}
 			}
 		}
 	}
+	/**
+	 * @throws IllegalStateException
+	 */
+	protected final void onConnectionFault (String fault) throws ClientRuntimeException {
+		notifyFaulted(fault);
+		Log.problem("Connection Fault ["+this+"]: " + fault);
+		throw new ClientRuntimeException(fault);
+	}
+
 	/**
 	 * @throws IOException
 	 * @throws IllegalStateException
@@ -324,8 +341,9 @@ public abstract class ConnectionBase implements Connection {
 			newSocketConnect();
 		} 
 		catch (IOException e) {
-			throw new ClientRuntimeException(
-				"Socket connect failed -- make sure the server is running at " + spec.getAddress().getHostName(), e);
+			onConnectionFault("Socket connect failed [cause: "+e+"] -- make sure the server is running at " + spec.getAddress().getHostName());
+//			throw new ClientRuntimeException(
+//				"Socket connect failed -- make sure the server is running at " + spec.getAddress().getHostName(), e);
 		}
 		
 		// get the streams
@@ -494,6 +512,12 @@ public abstract class ConnectionBase implements Connection {
         }
     }
 	
+    @Override
+    public String toString() {
+    	Formatter fmt = new Formatter();
+    	fmt.format("%s Connection <host: %s, port: %d, db: %d>", getModality(), spec.getAddress(), spec.getPort(), spec.getDatabase());
+    	return fmt.toString();
+    }
 	// ------------------------------------------------------------------------
 	// Property accessors
 	// ------------------------------------------------------------------------
