@@ -26,6 +26,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
+import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.NotConnectedException;
 import org.jredis.connector.ConnectionSpec.SocketProperty;
@@ -40,7 +41,15 @@ import org.jredis.ri.alphazero.support.FastBufferedInputStream;
 import org.jredis.ri.alphazero.support.Log;
 
 /**
- * [TODO: document me!]
+ * Abstract base for all Pipeline connections, providing basically all of the
+ * required functionality for a pipeline with asynchronous semantics.  
+ * 
+ * The asynch extensions merely need to provide support for 
+ * {@link Connection#getModality()}.  Synchronous pipelines can simply call
+ * the {@link PipelineConnectionBase#queueRequest(Command, byte[])} method
+ * in their implementation of the synchronous {@link Connection#serviceRequest(Command, byte[])} 
+ * method and block on {@link Future#get()} to realize the blocking semantics 
+ * and results required.
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Sep 7, 2009
@@ -227,14 +236,34 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	// ------------------------------------------------------------------------
     /**
      * Provides the response processing logic as a {@link Runnable}.
+     * <p>
+     * TODD: Needs to have a more regulated operating cycle.  Right now its just
+     * infinite loop until something goes boom.  Not good.
      * 
      * @author  Joubin Houshyar (alphazero@sensesay.net)
      * @version alpha.0, Oct 18, 2009
      * @since   alpha.0
      * 
      */
-    public final class ResponseHandler implements Runnable {
+    public final class ResponseHandler implements Runnable, Connection.Listener {
 
+    	// ------------------------------------------------------------------------
+    	// Constructor
+    	// ------------------------------------------------------------------------
+    	
+    	/**
+         * Adds self to the listeners of the enclosing {@link Connection} instance.
+         */
+        public ResponseHandler () {
+        	PipelineConnectionBase.this.addListener(this);
+        } 
+        
+    	// ------------------------------------------------------------------------
+    	// INTERFACE
+    	/* ====================================================== Thread (Runnable)
+    	 * 
+    	 */
+    	// ------------------------------------------------------------------------
     	/**
     	 * Keeps processing the {@link PendingRequest}s in the pending {@link Queue}
 		 * until a QUIT is encountered in the pending queue.  Thread will stop after
@@ -244,7 +273,9 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	 * <p>
     	 * TODO: socket Reconnect in the context of pipelining is non-trivial, and maybe
     	 * not even practically possible.  (e.g. request n is sent but pipe breaks on
-    	 * some m (m!=n) response.  non trivial.
+    	 * some m (m!=n) response.  non trivial.  Perhaps its best to assume broken connection
+    	 * means faulted server, specially given the fact that a pipeline has a heartbeat
+    	 * so the issue can not be timeout.
     	 */
 //        @Override
         public void run () {
@@ -302,6 +333,36 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
         	}
 			Log.log("Pipeline <%s> thread for <%s> stopped.", Thread.currentThread().getName(), PipelineConnectionBase.this);
 //			Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
+        }
+
+    	// ------------------------------------------------------------------------
+    	// INTERFACE
+    	/* =================================================== Connection.Listener
+    	 * 
+    	 * hooks for integrating the response handler thread's state with the 
+    	 * wrapping connection's state through event callbacks. 
+    	 */
+    	// ------------------------------------------------------------------------
+        
+		/**
+		 * Needs to be hooked up.
+		 * TODO: zood tond foree saree!
+		 * 
+         * @see org.jredis.connector.Connection.Listener#onEvent(org.jredis.connector.Connection.Event)
+         */
+        public void onEvent (Event event) {
+        	if(event.getSource() != PipelineConnectionBase.this) {
+        		// BUG: what to do about it?
+        	}
+        	switch (event.getType()){
+				case CONNECTED:
+					break;
+				case DISCONNECTED:
+					break;
+				case FAULTED:
+					break;
+        	
+        	}
         }
     }
 }

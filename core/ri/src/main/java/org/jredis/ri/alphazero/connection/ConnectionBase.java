@@ -222,7 +222,6 @@ public abstract class ConnectionBase implements Connection {
 
 		if(spec.isReliable()){
 	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), " [" + this + "] heartbeat");
-	    	addListener(heartbeat);
 	    	heartbeat.start();
 		}
     }
