@@ -17,6 +17,7 @@
 package org.jredis.ri.alphazero.connection;
 
 import java.io.InputStream;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -193,6 +194,34 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 		return pendingResponse;
     }
 
+    private void onResponseHandlerError (ClientRuntimeException cre, PendingRequest request) {
+    	Log.error("Pipeline response handler encountered an error: " + cre.getMessage());
+    	
+    	// signal fault
+    	onConnectionFault(cre.getMessage(), false);
+    	
+    	// set execution error for future object
+    	request.setCRE(cre);
+    	
+		// BEST:
+		// 1 - block the request phase
+		// 2 - try reconnect
+		// 3-ok: 		reconnected, resume processing
+		// 2-not ok: 	close shop, and set all pendings to error
+    	
+		// for now .. flush the remaining pending resposes from queue
+    	// with execution error
+    	//
+		PendingRequest pending = null;
+		while(true){
+			try {
+				pending = pendingResponseQueue.remove();
+				pending.setCRE(cre);
+				Log.log("set pending %s response to error with CRE", pending.cmd);
+			}
+			catch (NoSuchElementException empty){ break; }
+		}
+    }
 	// ------------------------------------------------------------------------
 	// Inner Class
 	// ------------------------------------------------------------------------
@@ -219,7 +248,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	 */
 //        @Override
         public void run () {
-			Log.log("Pipeline thread <%s> started.", Thread.currentThread().getName());
+			Log.log("Pipeline <%s> thread for <%s> started.", Thread.currentThread().getName(), PipelineConnectionBase.this);
         	PendingRequest pending = null;
         	while(true){
         		Response response = null;
@@ -235,21 +264,27 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 						}
 
 					}
+					
+					// this exception handling as of now is basically broken and fairly useless
+					// really, what we want is making a distinction between bugs and runtime problems
+					// and in case of connection issues, signal the retry mechanism.
+					// in the interim, all incoming requests must be rejected (e.g. PipelineReconnecting ...)
+					// and all remaining pending responses must be set to error.
+					// major TODO
+					
 					catch (ProviderException bug){
-						Log.error ("ProviderException: " + bug.getLocalizedMessage());
-						bug.printStackTrace();
-						pending.setCRE(bug);
+						Log.bug ("ProviderException: " + bug.getMessage());
+						onResponseHandlerError(bug, pending);
+						break;
 					}
 					catch (ClientRuntimeException cre) {
-						Log.error ("ClientRuntimeException: " + cre.getLocalizedMessage());
-						cre.printStackTrace();
-						pending.setCRE(cre);
+						Log.problem ("ClientRuntimeException: " + cre.getMessage());
+						onResponseHandlerError(cre, pending);
+						break;
 					}
 					catch (RuntimeException e){
-						Log.error ("Unexpected (and not handled) RuntimeException: " + e.getLocalizedMessage());
-						e.printStackTrace();
-						pending.setCRE(new ProviderException("Unexpected runtime exception in response handler"));
-						pending.setResponse(null);
+						Log.problem ("Unexpected (and not handled) RuntimeException: " + e.getMessage());
+						onResponseHandlerError(new ClientRuntimeException("Unexpected (and not handled) RuntimeException", e), pending);
 						break;
 					}
 					
@@ -265,7 +300,8 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	                e1.printStackTrace();
                 }
         	}
-			Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
+			Log.log("Pipeline <%s> thread for <%s> stopped.", Thread.currentThread().getName(), PipelineConnectionBase.this);
+//			Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
         }
     }
 }

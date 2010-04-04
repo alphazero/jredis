@@ -109,9 +109,9 @@ public final class PendingRequest implements Future<Response> {
 		if(excepted) {
 			if(cre != null) {
 				if(cre instanceof ProviderException)
-					throw new ExecutionException ("Provider Exception", cre);
+					throw new ExecutionException ("Provider Exception" + cre.getMessage(), cre);
 				else if( cre instanceof ClientRuntimeException)
-					throw new ExecutionException ("Client Runtime Exception", cre);
+					throw new ExecutionException ("Client Runtime Exception: " + cre.getMessage(), cre);
 			}
 			else {
 				throw new ExecutionException ("Bug -- Request processing encountered exceptions but CRE is null", new ProviderException("unknown cause"));

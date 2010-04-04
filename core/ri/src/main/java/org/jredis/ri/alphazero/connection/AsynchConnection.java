@@ -173,16 +173,15 @@ public class AsynchConnection extends ConnectionBase implements Connection {
 						if(pending.response.getStatus().isError()) {
 							Log.error ("(Asynch) Error response for " + pending.cmd.code + " => " + pending.response.getStatus().message());
 						}
-
 					}
 					catch (ProviderException bug){
-						Log.error ("ProviderException: " + bug.getLocalizedMessage());
 						bug.printStackTrace();
+						Log.error ("ProviderException: " + bug.getLocalizedMessage());
 						pending.setCRE(bug);
 					}
 					catch (ClientRuntimeException cre) {
-						Log.error ("ClientRuntimeException: " + cre.getLocalizedMessage());
 						cre.printStackTrace();
+						Log.error ("ClientRuntimeException: " + cre.getLocalizedMessage());
 						pending.setCRE(cre);
 					}
 					catch (RuntimeException e){

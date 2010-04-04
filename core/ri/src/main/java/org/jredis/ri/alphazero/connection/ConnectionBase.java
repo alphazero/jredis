@@ -319,12 +319,20 @@ public abstract class ConnectionBase implements Connection {
 		}
 	}
 	/**
+	 * Will throw a {@link ClientRuntimeException}
 	 * @throws IllegalStateException
 	 */
 	protected final void onConnectionFault (String fault) throws ClientRuntimeException {
+		onConnectionFault(fault, true);
+	}
+	/**
+	 * Will throw a {@link ClientRuntimeException} if raiseEx is true
+	 * @throws IllegalStateException
+	 */
+	protected final void onConnectionFault (String fault, boolean raiseEx) throws ClientRuntimeException {
 		notifyFaulted(fault);
 		Log.problem("Connection Fault ["+this+"]: " + fault);
-		throw new ClientRuntimeException(fault);
+ 		if(raiseEx) throw new ClientRuntimeException(fault);
 	}
 
 	/**
