@@ -76,6 +76,8 @@ public enum Command {
 	RPUSHXAFTER	(RequestType.BULK_SET,		ResponseType.STATUS),
 	LDELETE	(RequestType.KEY_VALUE,		ResponseType.STATUS), 
 	LPUSH		(RequestType.KEY_VALUE,		ResponseType.STATUS),
+	LPUSHX		(RequestType.KEY_VALUE,		ResponseType.STATUS),
+	LPUSHXAFTER	(RequestType.BULK_SET,		ResponseType.STATUS),
 	LLEN		(RequestType.KEY,			ResponseType.NUMBER), 
 	LRANGE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK), 
 	LTRIM		(RequestType.KEY_NUM_NUM,	ResponseType.STATUS),
