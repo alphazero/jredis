@@ -242,7 +242,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 					}
 					catch (ClientRuntimeException cre) {
 						Log.error ("ClientRuntimeException: " + cre.getLocalizedMessage());
-						cre.printStackTrace();
+//						cre.printStackTrace();
 						pending.setCRE(cre);
 					}
 					catch (RuntimeException e){
