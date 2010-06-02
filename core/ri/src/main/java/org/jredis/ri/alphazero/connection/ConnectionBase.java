@@ -325,6 +325,10 @@ public abstract class ConnectionBase implements Connection {
 		socketClose();
 		isConnected = false;
 
+    if (heartbeat != null) {
+      heartbeat.exit();
+    }
+
 		notifyDisconnected();
 //		Log.log("RedisConnection - disconnected");
 	}
