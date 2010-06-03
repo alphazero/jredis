@@ -71,6 +71,7 @@ public class HeartbeatJinn extends Thread{
 	// avoid the jvm hanging around but this ain't right.
 	public void exit() {
 		mustBeat.set(false);
+		interrupt();
 	}
 	public void run () {
 //		Log.log("HeartbeatJinn thread <%s> started.", getName());

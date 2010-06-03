@@ -138,10 +138,18 @@ public abstract class ConnectionBase implements Connection {
 		catch (Exception e) {
 			throw new ProviderException("Unexpected error on initialize -- BUG", e);
 		} 
-		
-		if(connectImmediately) { connect (); }
+
+    if (connectImmediately) {
+      try {
+        connect ();
+      } catch (ClientRuntimeException e) {
+        // if connecting failed, clean up on our way out.
+        cleanup();
+        throw e;
+      }
+    }
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// Interface
 	// ============================================================ Connection
@@ -196,6 +204,12 @@ public abstract class ConnectionBase implements Connection {
 	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), "connection [" + hashCode() + "] heartbeat");
 	    	heartbeat.start();
 		}
+    }
+
+    protected void cleanup () {
+      if (heartbeat != null) {
+        heartbeat.exit();
+      }
     }
 
     /**
@@ -325,10 +339,7 @@ public abstract class ConnectionBase implements Connection {
 		socketClose();
 		isConnected = false;
 
-    if (heartbeat != null) {
-      heartbeat.exit();
-    }
-
+    cleanup();
 		notifyDisconnected();
 //		Log.log("RedisConnection - disconnected");
 	}

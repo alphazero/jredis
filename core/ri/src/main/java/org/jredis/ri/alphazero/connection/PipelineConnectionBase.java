@@ -114,6 +114,12 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     }
     
     @Override
+    protected void cleanup () {
+      super.cleanup();
+      respHandlerThread.interrupt();
+    }
+
+    @Override
     protected void notifyConnected () {
     	super.notifyConnected();
 		Log.log("Pipeline <%s> connected", this);
@@ -262,7 +268,9 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 					}
                 }
                 catch (InterruptedException e1) {
-	                e1.printStackTrace();
+                  Log.log("Pipeline thread interrupted.");
+                  break;
+	                //e1.printStackTrace();
                 }
         	}
 			Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
