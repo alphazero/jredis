@@ -71,12 +71,11 @@ public enum Command {
 	TTL			(RequestType.KEY,			ResponseType.NUMBER),
 	
 	// Commands operating on lists
-	RPUSH		(RequestType.KEY_VALUE,		ResponseType.STATUS), 
-	RPUSHX	(RequestType.KEY_VALUE,		ResponseType.STATUS), 
-	RPUSHXAFTER	(RequestType.BULK_SET,		ResponseType.STATUS),
-	LPUSH		(RequestType.KEY_VALUE,		ResponseType.STATUS),
-	LPUSHX		(RequestType.KEY_VALUE,		ResponseType.STATUS),
-	LPUSHXAFTER	(RequestType.BULK_SET,		ResponseType.STATUS),
+	RPUSH		(RequestType.KEY_VALUE,		ResponseType.NUMBER), 
+	RPUSHX	(RequestType.KEY_VALUE,		ResponseType.NUMBER), 
+	LPUSH		(RequestType.KEY_VALUE,		ResponseType.NUMBER),
+	LPUSHX		(RequestType.KEY_VALUE,		ResponseType.NUMBER),
+	LINSERT	(RequestType.BULK_SET,		ResponseType.NUMBER),
 	LLEN		(RequestType.KEY,			ResponseType.NUMBER), 
 	LRANGE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK), 
 	LTRIM		(RequestType.KEY_NUM_NUM,	ResponseType.STATUS),
