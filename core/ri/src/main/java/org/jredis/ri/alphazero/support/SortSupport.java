@@ -44,11 +44,10 @@ public abstract class SortSupport implements Sort {
 	public Sort DESC() { sortSpec = Command.Options.DESC.name() + WSPAD; return this;}
 	public Sort BY(String pattern) { bySpec = Command.Options.BY.name() + WSPAD + pattern; return this; }
 	public Sort GET(String pattern) { getSpec = Command.Options.GET.name() + WSPAD + pattern + " "; return this; }
-	public Sort LIMIT(long from, long to) {
-		// TODO: validate here
-		Assert.inRange(to, 0, Long.MAX_VALUE, "from in LIMIT clause", ClientRuntimeException.class);
-		Assert.inRange(to, from, Long.MAX_VALUE, "to in LIMIT clause (when from=" + from + ")", ClientRuntimeException.class);
-		limitSpec = Command.Options.LIMIT.name() + WSPAD + from + " " + to;
+	public Sort LIMIT(long from, long count) {
+		if(from < 0) throw new ClientRuntimeException("from in LIMIT clause: " + from);
+		if(count <= 0) throw new ClientRuntimeException("count in LIMIT clause: " + from);
+		limitSpec = Command.Options.LIMIT.name() + WSPAD + from + " " + count;
 		return this;
 	}
 	private final byte[] getSortSpec() {
