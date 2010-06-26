@@ -67,7 +67,11 @@ public interface Sort extends Query {
 	/** specifies the GET clause */
 	Sort GET   (String pattern);
 	
-	/** specifies the LIMIT class: from is the intial index, count is the number of results */
+	/** 
+	 * Specifies the LIMIT class: from is the initial index, count is the number of results 
+	 * @param from  limit sort results to element at index 'from'
+	 * @param count limit sort results to count - results will be result[from] to result[from+count], inclusve.
+	 */
 	Sort LIMIT (long from, long count);
 	
 	/** default sort is ASCending -- use this in your sort to specify DESC sort */

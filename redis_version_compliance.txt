@@ -1,2 +1,2 @@
 compliance:      Redis 1.3.n
-tested with:     Redis 1.3.7 : commit 44efe66ef2ff2d6ae7df7363fb1e62df3b16f4ab
+tested with:     Redis 1.3.8 : commit d6cc8867b7e9d5372ff4f926a89ae9b17803df80

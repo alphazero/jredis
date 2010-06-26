@@ -1842,11 +1842,12 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	public void testSort() {
 		cmd = Command.SORT.code;
 		Log.log("TEST: %s command", cmd);
+		
+		final String setkey = "set-key";
+		final String listkey = "list-key";
 		try {
 			provider.flushdb();
 			
-			String setkey = "set-key";
-			String listkey = "list-key";
 			for(int i=0; i<MEDIUM_CNT; i++){
 				provider.sadd(setkey, stringList.get(i));
 				provider.lpush(listkey, stringList.get(i));
@@ -1854,11 +1855,23 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 
 			List<String> sorted = null;
 			
-			Log.log("TEST: SORTED LIST ");
-//			sorted = toStr(jredis.sort(listkey).ALPHA().LIMIT(0, 100).BY("*A*").exec());
-			sorted = toStr(provider.sort(listkey).ALPHA().LIMIT(0, 555).DESC().exec());
+			Log.log("TEST: SORTED LIST [t.1]");
+			sorted = toStr(provider.sort(listkey).ALPHA().LIMIT(0, MEDIUM_CNT).DESC().exec());
+			assertEquals(sorted.size(), MEDIUM_CNT, "expecting sort results of size MEDIUM_CNT");
 			for(String s : sorted)
-				System.out.format("%s\n", s);
+				System.out.format("[t.1]: %s\n", s);
+			
+			Log.log("TEST: SORTED LIST [t.2]");
+			sorted = toStr(provider.sort(listkey).ALPHA().LIMIT(10, 9).DESC().exec());
+			assertEquals(sorted.size(), 9, "expecting sort results of size 9");
+			for(String s : sorted)
+				System.out.format("[t.2]: %s\n", s);
+			
+			Log.log("TEST: SORTED LIST [t.3]");
+			sorted = toStr(provider.sort(listkey).ALPHA().LIMIT(MEDIUM_CNT-1, 1).DESC().exec());
+			assertEquals(sorted.size(), 1, "expecting sort results of size 1");
+			for(String s : sorted)
+				System.out.format("[t.3]: %s\n", s);
 			
 			Log.log("TEST: SORTED SET ");
 //			sorted = toStr(jredis.sort(setkey).ALPHA().LIMIT(0, 100).BY("*BB*").exec());
@@ -1868,6 +1881,26 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+		
+		// force errors
+		
+		// count can't be zero
+		Runnable invalidLimitSpec = new Runnable() {
+			public void run() {
+				try { provider.sort(listkey).ALPHA().LIMIT(0, 0).DESC().exec(); }
+                catch (Throwable t) { throw new RuntimeException ("", t); }
+			}
+		};
+		assertDidRaiseRuntimeError(invalidLimitSpec, RuntimeException.class);
+		
+		// LIMIT from must be positive, {0...n}
+		Runnable invalidLimitSpec2 = new Runnable() {
+			public void run() {
+				try { provider.sort(listkey).ALPHA().LIMIT(-1, 1).DESC().exec(); }
+                catch (Throwable t) { throw new RuntimeException ("", t); }
+			}
+		};
+		assertDidRaiseRuntimeError(invalidLimitSpec2, RuntimeException.class);
 	}
 
 	

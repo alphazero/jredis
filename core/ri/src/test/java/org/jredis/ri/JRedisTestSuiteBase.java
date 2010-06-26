@@ -16,6 +16,7 @@
 
 package org.jredis.ri;
 
+import static org.testng.Assert.fail;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -270,6 +271,18 @@ public abstract class JRedisTestSuiteBase<T> extends ProviderTestBase<T>{
 		return buff;
 	}
 
+	protected final <FAULT extends RuntimeException> void assertDidRaiseRuntimeError (Runnable test, Class<FAULT> errtype){
+		boolean didRaiseError = false;
+		try { test.run(); }
+		catch (RuntimeException t){
+			if(errtype.isAssignableFrom(t.getClass()))
+				didRaiseError = true; 
+		}
+		catch (Exception e){ fail("Unexpected exception", e); }
+		finally {
+			if(!didRaiseError) { fail("Failed to raise expected RuntimeError " + errtype.getCanonicalName()); }
+		}
+	}
 	// ------------------------------------------------------------------------
 	// INNER TYPES USED FOR TESTING
 	// ============================================================== TestBean

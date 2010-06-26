@@ -751,23 +751,39 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		cmd = Command.SORT.code;
 		Log.log("TEST: %s command", cmd);
 
+		final String setkey = "set-key";
+		final String listkey = "list-key";
 		try {
 			provider.flushdb();
 			
-			String setkey = "set-key";
-			String listkey = "list-key";
 			for(int i=0; i<MEDIUM_CNT; i++){
 				provider.sadd(setkey, stringList.get(i));
 				provider.lpush(listkey, stringList.get(i));
 			}
 			
-			Future<List<byte[]>> sortListResp = provider.sort(listkey).ALPHA().LIMIT(0, 555).DESC().execAsynch();
+			int cnt1 = MEDIUM_CNT, cnt2 = 9, cnt3 = 1;
+			Future<List<byte[]>> sortListResp1 = provider.sort(listkey).ALPHA().LIMIT(0, cnt1).DESC().execAsynch();
+			Future<List<byte[]>> sortListResp2 = provider.sort(listkey).ALPHA().LIMIT(10, cnt2).DESC().execAsynch();
+			Future<List<byte[]>> sortListResp3 = provider.sort(listkey).ALPHA().LIMIT(MEDIUM_CNT-1, cnt3).DESC().execAsynch();
+			
 			Future<List<byte[]>> sortSetResp = provider.sort(setkey).ALPHA().LIMIT(0, 555).DESC().execAsynch();
 			
 			try {
+				assertEquals(sortListResp1.get().size(), cnt1, "expecting sort results of size MEDIUM_CNT");
+				assertEquals(sortListResp2.get().size(), cnt2, "expecting sort results of size 9");
+				assertEquals(sortListResp3.get().size(), cnt3, "expecting sort results of size 1");
+				
 				Log.log("TEST: SORTED LIST ");
-				for(String s : toStr(sortListResp.get()))
-					System.out.format("%s\n", s);
+				for(String s : toStr(sortListResp1.get()))
+					System.out.format("[t.1] %s\n", s);
+				
+				Log.log("TEST: SORTED LIST ");
+				for(String s : toStr(sortListResp2.get()))
+					System.out.format("[t.1] %s\n", s);
+				
+				Log.log("TEST: SORTED LIST ");
+				for(String s : toStr(sortListResp3.get()))
+					System.out.format("[t.1] %s\n", s);
 				
 				Log.log("TEST: SORTED SET ");
 				for(String s : toStr(sortSetResp.get()))
@@ -779,6 +795,27 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			}
 		} 
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+		
+		// force errors
+		
+		// count can't be zero
+		Runnable invalidLimitSpec = new Runnable() {
+			public void run() {
+				try { provider.sort(listkey).ALPHA().LIMIT(0, 0).DESC().exec(); }
+                catch (Throwable t) { throw new RuntimeException ("", t); }
+			}
+		};
+		assertDidRaiseRuntimeError(invalidLimitSpec, RuntimeException.class);
+		
+		// LIMIT from must be positive, {0...n}
+		Runnable invalidLimitSpec2 = new Runnable() {
+			public void run() {
+				try { provider.sort(listkey).ALPHA().LIMIT(-1, 1).DESC().exec(); }
+                catch (Throwable t) { throw new RuntimeException ("", t); }
+			}
+		};
+		assertDidRaiseRuntimeError(invalidLimitSpec2, RuntimeException.class);
+		
 	}
 	
 	@Test
