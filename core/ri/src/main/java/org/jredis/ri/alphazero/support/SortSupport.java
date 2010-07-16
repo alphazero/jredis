@@ -33,22 +33,21 @@ public abstract class SortSupport implements Sort {
 		this.key = key;
 		this.keyBytes = validatedKeyBytes;
 	}
-	static final String WSPAD = " ";
-	String alphaSpec = "";
-	String sortSpec = "";
-	String  getSpec = "";
-	String  bySpec = "";
-	String  limitSpec = "";
+	private static final String NO_OP_SPEC = "";
+	private String alphaSpec = NO_OP_SPEC;
+	private String sortSpec = NO_OP_SPEC;
+	private String getSpec = NO_OP_SPEC;
+	private String bySpec = NO_OP_SPEC;
+	private String limitSpec = NO_OP_SPEC;
 	
-	public Sort ALPHA() { alphaSpec = Command.Options.ALPHA.name() + WSPAD; return this;}
-	public Sort DESC() { sortSpec = Command.Options.DESC.name() + WSPAD; return this;}
-	public Sort BY(String pattern) { bySpec = Command.Options.BY.name() + WSPAD + pattern; return this; }
-	public Sort GET(String pattern) { getSpec = Command.Options.GET.name() + WSPAD + pattern + " "; return this; }
-	public Sort LIMIT(long from, long to) {
-		// TODO: validate here
-		Assert.inRange(to, 0, Long.MAX_VALUE, "from in LIMIT clause", ClientRuntimeException.class);
-		Assert.inRange(to, from, Long.MAX_VALUE, "to in LIMIT clause (when from=" + from + ")", ClientRuntimeException.class);
-		limitSpec = Command.Options.LIMIT.name() + WSPAD + from + " " + to;
+	public Sort ALPHA() {  alphaSpec = String.format("%s ", Command.Options.ALPHA.name()); return this; }
+	public Sort DESC() { sortSpec = String.format("%s ", Command.Options.DESC.name()); return this;}
+	public Sort BY(String pattern) { bySpec = String.format("%s %s ", Command.Options.BY.name(), pattern); return this; }
+	public Sort GET(String pattern) { getSpec = String.format("%s %s ", Command.Options.GET.name(), pattern); return this; }
+	public Sort LIMIT(long from, long count) {
+		if(from < 0) throw new ClientRuntimeException("from in LIMIT clause: " + from);
+		if(count <= 0) throw new ClientRuntimeException("count in LIMIT clause: " + from);
+		limitSpec = String.format("%s %d %d ", Command.Options.LIMIT.name(), from, count);
 		return this;
 	}
 	private final byte[] getSortSpec() {
