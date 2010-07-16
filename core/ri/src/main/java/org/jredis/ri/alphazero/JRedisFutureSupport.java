@@ -803,7 +803,6 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArrayList(this.queueRequest(Command.ZREVRANGE, keybytes, fromBytes, toBytes));
 	}
 
-	// TODO: NOTIMPLEMENTED:
 //	@Override
 	public Sort sort(final String key) {
 		byte[] keybytes = null;
