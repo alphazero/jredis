@@ -942,7 +942,6 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureZSetList(this.queueRequest(Command.ZREVRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Options.WITHSCORES.bytes));
 	}
 	
-	// TODO: NOTIMPLEMENTED:
 //	@Override
 	public Sort sort(final String key) {
 		byte[] keybytes = null;
