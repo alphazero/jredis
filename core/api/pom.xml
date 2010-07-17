@@ -6,13 +6,13 @@
   <parent>
     <groupId>org.jredis</groupId>
     <artifactId>jredis-core</artifactId>
-    <version>1.0-rc1</version>
+    <version>1.0-rc2</version>
   </parent>
 
   <!-- production | jar -->
   <name>JRedis - Core - API</name>
   <groupId>org.jredis</groupId>
   <artifactId>jredis-core-api</artifactId>
-  <version>1.0-rc1</version>
+  <version>1.0-rc2</version>
   <packaging>jar</packaging>
 </project>
