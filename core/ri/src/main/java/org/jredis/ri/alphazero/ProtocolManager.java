@@ -23,13 +23,12 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.NotSupportedException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ProtocolFactory;
+import org.jredis.connector.Connection.Modality;
 import org.jredis.ProviderException;
 import org.jredis.protocol.Protocol;
 import org.jredis.ri.alphazero.protocol.SynchProtocol;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Log;
-
-import com.sun.corba.se.pept.protocol.ProtocolHandler;
 
 
 /**
@@ -65,11 +64,11 @@ public class ProtocolManager implements ProtocolFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.alphazero.jredis.protocol.ProtocolHandlerFactory#createProtocolHandler(java.lang.String)
+	 * @see com.alphazero.jredis.protocol.ProtocolFactory#createProtocol(java.lang.String)
 	 */
 //	@Override
 	@SuppressWarnings("unchecked")
-	public Protocol createProtocolHandler (Connection.Modality modality, String redisVersionId) 
+	public Protocol createProtocol (Connection.Modality modality, String redisVersionId) 
 		throws NotSupportedException, ClientRuntimeException, IllegalArgumentException
 	{
 		// filter out garbage
@@ -92,18 +91,18 @@ public class ProtocolManager implements ProtocolFactory {
 
 		// create the handler
 		//
-		Class<ProtocolHandler>  handlerClass = null;
+		Class<Protocol>  handlerClass = null;
 //		Protocol handler = null;
 		switch (modality){
 		case Asynchronous:
-//			handler = createAsynchProtocolHandler(version);
-			handlerClass = (Class<ProtocolHandler>) Assert.notNull(
+//			handler = createAsynchProtocol(version);
+			handlerClass = (Class<Protocol>) Assert.notNull(
 					synchHandlers.get(version), "registered protocol handler for version " + version.id, 
 					NotSupportedException.class);
 			break;
 		case Synchronous:
-//			handler = createSynchProtocolHandler(version);
-			handlerClass = (Class<ProtocolHandler>) Assert.notNull(
+//			handler = createSynchProtocol(version);
+			handlerClass = (Class<Protocol>) Assert.notNull(
 					asynchHandlers.get(version), "registered protocol handler for version " + version.id, 
 					NotSupportedException.class);
 			break;
@@ -131,5 +130,10 @@ public class ProtocolManager implements ProtocolFactory {
 
 		// done.
 		return Assert.notNull(handler, "how did this happen??", ProviderException.class);
+	}
+
+	@Override
+	public Protocol createProtocolHandler(Modality modality, String redisVersion) throws NotSupportedException {
+		return null;
 	}
 }

@@ -16,19 +16,19 @@
 
 package org.jredis.ri.alphazero.support;
 
+import org.apache.commons.logging.LogFactory;
 
 /**
  * TODO: deprecate this and use a standard logger (jdk or log4j ...)
  * 
- * yes -- yet another logger.  This is to keep down the dependencies
- * you can add your own later ... 
- *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Apr 02, 2009
  * @since   alpha.0
  * 
  */
 public class Log {
+	public static org.apache.commons.logging.Log logger = LogFactory.getLog("JREDIS");
+//	public static final Logger logger = LoggerFactory.getLogger("-- JREDIS --");
 	public enum Category { INFO, ERROR, PROBLEM, BUG }
 	
 	public static final void log (String msg)   { _loginfo (msg); }
@@ -40,14 +40,11 @@ public class Log {
 		_loginfo (format, args); 
 	}
 	private static final void _log (Category cat, String msg) {
-		System.err.format("-- JREDIS -- %s: %s\n", cat, msg).flush();
+//		System.err.format("-- JREDIS -- %s: %s\n", cat, msg).flush();
+		logger.error(String.format("%s: %s", cat, msg));
 	}
 	private static final void _loginfo (String format, Object...args) {
-		System.out.format("-- JREDIS -- INFO: "+format+" \n", args).flush();
+//		System.out.format("-- JREDIS -- INFO: "+format+" \n", args).flush();
+		logger.info(String.format(format, args));
 	}
-//	private static final String format(String format, Object...args){
-//		Formatter formatter = new Formatter();
-//		formatter.format(format, args);
-//		return formatter.toString();
-//	}
 }
