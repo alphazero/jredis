@@ -24,8 +24,8 @@
     <module>bench</module>
     <module>all</module>
   </modules>
-  
-  <!-- core specific surefire testrunner-->
+
+   <!-- core specific surefire testrunner-->
   <build>
     <plugins>
       <plugin>

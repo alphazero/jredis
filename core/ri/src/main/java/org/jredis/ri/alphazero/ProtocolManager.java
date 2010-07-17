@@ -29,7 +29,6 @@ import org.jredis.ri.alphazero.protocol.SynchProtocol;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Log;
 
-import com.sun.corba.se.pept.protocol.ProtocolHandler;
 
 
 /**
@@ -92,18 +91,18 @@ public class ProtocolManager implements ProtocolFactory {
 
 		// create the handler
 		//
-		Class<ProtocolHandler>  handlerClass = null;
+		Class<Protocol>  handlerClass = null;
 //		Protocol handler = null;
 		switch (modality){
 		case Asynchronous:
 //			handler = createAsynchProtocolHandler(version);
-			handlerClass = (Class<ProtocolHandler>) Assert.notNull(
+			handlerClass = (Class<Protocol>) Assert.notNull(
 					synchHandlers.get(version), "registered protocol handler for version " + version.id, 
 					NotSupportedException.class);
 			break;
 		case Synchronous:
 //			handler = createSynchProtocolHandler(version);
-			handlerClass = (Class<ProtocolHandler>) Assert.notNull(
+			handlerClass = (Class<Protocol>) Assert.notNull(
 					asynchHandlers.get(version), "registered protocol handler for version " + version.id, 
 					NotSupportedException.class);
 			break;
