@@ -16,12 +16,14 @@
 
 package org.jredis.ri.alphazero.connection;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.Connection.Event;
 import org.jredis.connector.Connection.Modality;
 import org.jredis.protocol.Command;
+import org.jredis.protocol.Response;
 import org.jredis.ri.alphazero.support.Log;
 
 /**
@@ -104,13 +106,21 @@ public class HeartbeatJinn extends Thread implements Connection.Listener{
 			try {
 				if(connected.get()){  // << buggy.
 					try {
+						Response response = null;
 						switch (modality){
 						case Asynchronous:
-							conn.queueRequest(Command.PING);
+							Future<Response> fResponse = conn.queueRequest(Command.PING);
+							response = fResponse.get();
 							break;
 						case Synchronous:
-							conn.serviceRequest(Command.PING);
+							response = conn.serviceRequest(Command.PING);
 							break;
+						}
+						if(!response.isError()){ 
+							Log.debug (String.format("connection <%s> is alive", conn)); 
+						}
+						else {
+							Log.error("Error response on PING: " + response.getStatus().toString());
 						}
 					}
 					catch (Exception e) {

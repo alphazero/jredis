@@ -28,23 +28,28 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Log {
 	public static org.apache.commons.logging.Log logger = LogFactory.getLog("JREDIS");
-//	public static final Logger logger = LoggerFactory.getLogger("-- JREDIS --");
-	public enum Category { INFO, ERROR, PROBLEM, BUG }
-	
+	//	public static final Logger logger = LoggerFactory.getLogger("-- JREDIS --");
+	public enum Category { INFO, DEBUG, ERROR, PROBLEM, BUG }
+
 	public static final void log (String msg)   { _loginfo (msg); }
-	public static final void error (String msg)   { _log (Category.ERROR, msg); }
-	public static final void problem (String msg) { _log (Category.PROBLEM, msg); }
-	public static final void bug (String msg)     { _log (Category.BUG, msg); }
-	
+	public static final void error (String msg)   { _error (Category.ERROR, msg); }
+	public static final void problem (String msg) { _error (Category.PROBLEM, msg); }
+	public static final void bug (String msg)     { _error (Category.BUG, msg); }
+	public static final void debug (String msg) { _debug(msg); }
+
 	public static final void log (String format, Object...args)   { 
 		_loginfo (format, args); 
 	}
-	private static final void _log (Category cat, String msg) {
-//		System.err.format("-- JREDIS -- %s: %s\n", cat, msg).flush();
-		logger.error(String.format("%s: %s", cat, msg));
+	private static final void _error (Category cat, String msg) {
+		if(cat.equals(Category.ERROR))
+			logger.error(String.format("%s", msg));
+		else
+			logger.error(String.format("%s: %s", cat, msg));
+	}
+	private static final void _debug (String msg) {
+		logger.debug(String.format("%s", msg));
 	}
 	private static final void _loginfo (String format, Object...args) {
-//		System.out.format("-- JREDIS -- INFO: "+format+" \n", args).flush();
 		logger.info(String.format(format, args));
 	}
 }
