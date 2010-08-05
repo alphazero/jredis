@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.ObjectInfo;
+import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.ZSetEntry;
 import org.jredis.protocol.Command;
@@ -1560,12 +1561,11 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	@Test
 	public void testSetAndFlushdbAndExistsAndKeys() throws InterruptedException {
 		cmd = 
-			Command.FLUSHDB.code + " | " +
 			Command.SET.code + " | " +
-			Command.EXISTS.code + " | " +
 			Command.FLUSHDB.code + " | " +
+			Command.EXISTS.code + " | " +
 			Command.KEYS.code;
-			
+
 		Log.log("TEST: %s commands", cmd);
 		try {
 			key = "woof";
@@ -1588,6 +1588,10 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
 			}
 		} 
+		catch (ProviderException e) { 
+			// errors in request time
+			fail(cmd + " Runtime BUG => " + e.getLocalizedMessage(), e); 
+		}
 		catch (ClientRuntimeException e) { 
 			// errors in request time
 			fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e); 

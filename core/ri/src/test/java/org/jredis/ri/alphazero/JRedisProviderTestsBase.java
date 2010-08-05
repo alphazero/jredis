@@ -252,10 +252,9 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 	@Test
 	public void testSetAndFlushdbAndExistsAndKeys() {
 		cmd = 
-			Command.FLUSHDB.code + " | " +
 			Command.SET.code + " | " +
-			Command.EXISTS.code + " | " +
 			Command.FLUSHDB.code + " | " +
+			Command.EXISTS.code + " | " +
 			Command.KEYS.code;
 			
 		Log.log("TEST: %s commands", cmd);
