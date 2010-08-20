@@ -61,4 +61,13 @@ public interface Query {
 	// TODO: why illegal state?
 	public List<byte[]> exec () throws IllegalStateException, RedisException;	
 	public Future<List<byte[]>> execAsynch ();	
+	
+	public static class Support {
+		public static long unpackValue (List<byte[]> queryResult){
+			long value;
+			if(null == queryResult) throw new ClientRuntimeException("queryResult is null");
+			if(queryResult.size() < 1) throw new ClientRuntimeException("queryResult must have at least 1 entry");
+			return Long.parseLong(new String(queryResult.get(0)));
+		}
+	}
 }

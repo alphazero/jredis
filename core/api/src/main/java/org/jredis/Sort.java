@@ -80,6 +80,25 @@ public interface Sort extends Query {
 	/** sort is be default numeric -- use this to indicate lexiographic alphanumeric sort */
 	Sort ALPHA ();
 	
-//	/** TODO: store the sort results in another key */
-//	Sort STORE (String destKey);
+	/** 
+	 * Store the sort results in another key.
+	 * <p>
+	 * <b>This command alters the semantics of the {@link Query#exec()} (or  {@link Query#execAsynch()()}</b>
+	 * to return a list of size 1, with the single entry being the long value representing the size
+	 * of the created (store destination) list.  
+	 * <p>
+	 * <pre>
+	 *	// NOTE: this is a Long List - javadoc doesn't print the brackets.
+	 *	//
+	 *	List<Long> storeResult = DefaultCodec.toLong(jredis.sort(srcSet).DESC().STORE(destKey).exec());
+	 *
+	 *	// the STORE() option changes result semantics -- now we expect our list to have a single entry
+	 *	// for the size of the stored list
+	 *	//
+	 *	size = sortedSet.get(0);
+	 * 
+	 * 	System.out.format("Sorted list (size: %d):\n", size);
+	 * </pre>
+ 	 */
+	Sort STORE (String destKey);
 }

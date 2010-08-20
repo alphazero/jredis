@@ -117,7 +117,7 @@ public class HeartbeatJinn extends Thread implements Connection.Listener{
 							break;
 						}
 						if(!response.isError()){ 
-							Log.debug (String.format("connection <%s> is alive", conn)); 
+//							Log.debug (String.format("connection <%s> is alive", conn)); 
 						}
 						else {
 							Log.error("Error response on PING: " + response.getStatus().toString());

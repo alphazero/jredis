@@ -815,7 +815,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 			protected Future<List<byte[]>> execAsynchSort(byte[] keyBytes, byte[] sortSpecBytes) {
 				return new FutureByteArrayList(client.queueRequest(Command.SORT, keyBytes, sortSpecBytes));
 			}
+			protected Future<List<byte[]>> execAsynchSortStore(byte[] keyBytes, byte[] sortSpecBytes) {
+				Future<Response> fResp = client.queueRequest(Command.SORT$STORE, keyBytes, sortSpecBytes);
+				new FutureLong(fResp);
+				return null;
+			}
 			protected List<byte[]> execSort(byte[] keyBytes, byte[] sortSpecBytes) {
+				throw new IllegalStateException("JRedisFuture does not support synchronous sort.");
+			}
+			protected List<byte[]> execSortStore(byte[] keyBytes, byte[] sortSpecBytes) {
 				throw new IllegalStateException("JRedisFuture does not support synchronous sort.");
 			}
 		};
@@ -1383,6 +1391,28 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         {
         	BulkResponse resp = (BulkResponse) pendingRequest.get(timeout, unit);
         	return resp.getBulkData();
+        }
+	}
+	public static class FutureSortStoreResp extends FutureResultBase implements Future<List<byte[]>>{
+		
+        protected FutureSortStoreResp (Future<Response> pendingRequest) { super(pendingRequest); }
+		
+        public List<byte[]> get () throws InterruptedException, ExecutionException {
+        	ValueResponse resp = (ValueResponse) pendingRequest.get();
+        	return packValueResult(resp.getLongValue());
+        }
+		
+        public List<byte[]> get (long timeout, TimeUnit unit)
+		throws InterruptedException, ExecutionException, TimeoutException 
+        {
+        	ValueResponse resp = (ValueResponse) pendingRequest.get(timeout, unit);
+        	return packValueResult(resp.getLongValue());
+        }
+        private static List<byte[]> packValueResult(long number) {
+        	List<byte[]> list = new ArrayList<byte[]>(1);
+			list.add(Convert.toBytes(number));
+			
+        	return list;
         }
 	}
 	public static class FutureByteArrayList extends FutureResultBase implements Future<List<byte[]>>{

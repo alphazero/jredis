@@ -29,6 +29,22 @@ import java.util.Formatter;
  */
 public class Assert {
 
+	public static final <E extends RuntimeException>
+	String isNotBlank(String s, Class<E> clazz) {
+		return isNotBlank(s, String.format("input <%s> is purewhitespace"), clazz);
+	}
+	public static final <E extends RuntimeException>
+	String isNotBlank(String s, String msg, Class<E> clazz) {
+		boolean res = false;
+		for(char c : s.toCharArray()){
+			if(Character.isWhitespace(c)) {
+				res = true; break;
+			}
+		}
+		if(!res)
+			throwIt(msg, clazz);
+		return s;
+	}
 	/**
 	 * assert identical based on content.
 	 * @param <E>
