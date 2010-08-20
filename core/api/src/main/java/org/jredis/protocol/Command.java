@@ -62,6 +62,7 @@ public enum Command {
 
 	// "Commands operating on the key space"
 	KEYS		(RequestType.KEY, 			ResponseType.MULTI_BULK), 
+  KEYSTOLIST		(RequestType.KEY_KEY, 			ResponseType.NUMBER), 
 	RANDOMKEY	(RequestType.NO_ARG,		ResponseType.STRING),
 	RENAME		(RequestType.KEY_KEY, 		ResponseType.STATUS), 
 	RENAMENX	(RequestType.KEY_KEY, 		ResponseType.BOOLEAN), 

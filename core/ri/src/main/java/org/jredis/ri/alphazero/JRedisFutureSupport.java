@@ -863,6 +863,17 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureKeyList(futureResponse);
 	}
 
+	public Future<Long> keystolist(String pattern, String listname) {
+		byte[] keydata = null;
+		if((keydata = getKeyBytes(pattern)) == null) 
+			throw new IllegalArgumentException ("null key.");
+		byte[] listnamedata = null;
+		if((listnamedata = getKeyBytes(listname)) == null) 
+			throw new IllegalArgumentException ("null list name.");
+
+		return new FutureLong(this.queueRequest(Command.KEYSTOLIST, keydata, listnamedata));
+	}
+
 //	@Override
 	public Future<List<byte[]>> lrange(String key, long from, long to) {
 		byte[] keybytes = null;
