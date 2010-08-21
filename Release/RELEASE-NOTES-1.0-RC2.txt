@@ -1,0 +1,61 @@
+Release: JRedis 1.0 RC 2
+
+ABOUT:
+
+This is the final release of JRedis 1.0 (1.2.n) using the old connection mechanism.  Final release of 1.0 will introduce fault tolerant connectors for JRedis.  This release is intended to get all the fixes and enhancements to you while that work is finalized.
+
+REQUIREMENTS:
+
+* Requires Redis server 1.2.n.  (Developed and tested for Redis 1.2.6)
+  Please note that this release is _NOT_ compatible with either Redis 1.000 or 2.n (antirez@github master branch).  
+
+  As of this note, you can download Redis 1.2.6 here: <http://code.google.com/p/redis/downloads/detail?name=redis-1.2.6.tar.gz&can=2&q=>
+  Redis downloads are here: <http://code.google.com/p/redis/downloads/list>
+
+JARS:
+
+* A single (binary only) jar <jredis-1.0-rc1.jar> is all you need to use JRedis and the reference implementations in your application.
+
+* The full distribution under /Release includes all installed jars as before, if you need sources and/or benchmark and example modules as well.  
+
+COMMITS:
+
+* Commit logs for changes since 1.0 RC 1
+
+begin: http://github.com/alphazero/jredis/commit/4331a33d249ddf9c8e42303ff721f4776f591136
+end: http://github.com/alphazero/jredis/commit/bfe9dc4a313070b490b22093eb3ba99c820b8b7a
+
+NEW FEATURES:
+
+* see commit logs for full list of added commands.
+* Added missing Sort features (and bug fixes for the same)
+* Log wraps apache logger - you can switch to log4j if you so please (I don't ))
+* Extensions module (WIP) added.
+* Extensions module for Clustering and distribution support (WIP) added.
+
+See:
+http://github.com/alphazero/jredis/commits/1.2.n
+
+BUG FIX:
+
+* Various bugs closed.
+
+See: 
+http://github.com/alphazero/jredis/issues/ 
+http://github.com/alphazero/jredis/issues/closed 
+
+
+INTERNALS:
+
+Checkout the Extensions module.  You have fairly substantial support for using a distributed set of Redis servers. Key migration and various other hairy matters remain, but the wip artifacts here provide the canonical (or preferred) way to integrate distribution with JRedis core.  Of course you can also cherry pick and build up your own distribution framework around JRedis core.
+
+ROAD MAP:
+
+* Fault tolerant connectors, to the extend logically possible.
+* All further work only on JRedis 2.0 (Redis 2.0 compatible client) in "master" branch.
+
+/enjoy
+
+08-21-2010 
+NYC
+
