@@ -20,49 +20,39 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
 import org.jredis.JRedisFuture;
 import org.jredis.KeyValueSet;
+import org.jredis.ProviderException;
 import org.jredis.RedisException;
-import org.jredis.connector.ConnectionSpec;
 import org.jredis.protocol.ResponseStatus;
 import org.jredis.ri.alphazero.BulkSetMapping;
-import org.jredis.ri.alphazero.JRedisAsynchClient;
-import org.jredis.ri.alphazero.JRedisClient;
-import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 
 /**
  * Demonstrates using the bulk commands and helper classes to marshall data.
- * <b>Note that the example flushes DB 10.</b>
+ * <b>Note that the example flushes DB 10.</b>  Demonstrates use of both 
+ * {@link JRedis} and {@link JRedisFuture} interfaces.
  * 
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Nov 25, 2009
  * @since   alpha.0 | Redis 1.07
  */
 
-public class UsingBulkCommands {
+public class UsingBulkCommands extends UsingCommandBase{
 	public static void main (String[] args) {
-		usingSyncClient();
-		usingAsyncClient();
+		new UsingBulkCommands().run();
 	}
-	
-	/**
-	 * Using the synchronous interface 
-	 */
-	public static void usingSyncClient () {
-		ConnectionSpec spec = DefaultConnectionSpec.newSpec()
-		.setCredentials("jredis".getBytes())
-		.setDatabase(10);
-
-		JRedis jredis = new JRedisClient(spec);
-
-		System.out.println ("\nusing the SyncClient: \n\n");
-		
+	public void usingSyncSemantics(JRedis jredis) throws ClientRuntimeException, ProviderException
+	{
 		useMSet (jredis);
 		useMSetNX (jredis);
-		jredis.quit();
 	}
-
+	public void usingAsyncSemantics(JRedisFuture jredis) throws ClientRuntimeException, ProviderException{
+		useMSet(jredis);
+		useMSetNX (jredis);
+	}
+	
 	private static void useMSet (JRedis jredis) {
 		// BulkSetMapping provides a set of static methods to create new specific
 		// flavors of KeyValueSet<T> for the JRedis.mset(..) method.
@@ -111,25 +101,7 @@ public class UsingBulkCommands {
         }
         catch (RedisException e) { e.printStackTrace(); }
 	}
-	
-	
-	/**
-	 * Using the asynchronous interface 
-	 */
-	public static void usingAsyncClient () {
-		ConnectionSpec spec = DefaultConnectionSpec.newSpec()
-		.setCredentials("jredis".getBytes())
-		.setDatabase(10);
 
-		JRedisFuture jredis = new JRedisAsynchClient(spec);
-
-		System.out.println ("\nusing the AsyncClient: \n\n");
-		useMSet(jredis);
-		useMSetNX (jredis);
-		
-        jredis.quit();
-
-	}
 	private static void useMSetNX (JRedisFuture jredis) {
 		
 		Map<String, byte[]> kvMap = new HashMap<String, byte[]>();

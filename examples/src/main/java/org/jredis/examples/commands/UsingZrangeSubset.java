@@ -20,73 +20,48 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
 import org.jredis.JRedisFuture;
+import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.RedisType;
 import org.jredis.ZSetEntry;
-import org.jredis.connector.ConnectionSpec;
 import org.jredis.protocol.Command;
-import org.jredis.ri.alphazero.JRedisAsynchClient;
-import org.jredis.ri.alphazero.JRedisClient;
-import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.DefaultCodec;
 
 /**
- * [TODO: document me!]
- *
+ * The z[rev]rangeSubset commands return non-standard results types (see {@link ZSetEntry}).  Nothing
+ * that unexpected as far as the semantics are concerned, but just in case it is not perfectly clear, this
+ * example illustrates its intended use.
+ * <b>
+ * So here we'll flush the db, {@link Command#ZADD} a few (scored) entries to a {@link RedisType#zset}, and
+ * then use {@link JRedis#zrangeSubset(String, long, long)} and {@link JRedis#zrevrangeSubset(String, long, long)}
+ * and dump the results to console.  We do the same also using the {@link JRedisFuture} interface.
+ *  
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Mar 20, 2010
  * @since   alpha.0
  * 
  */
 
-public class UsingZrangeSubset {
+public class UsingZrangeSubset extends UsingCommandBase{
 	
 	static final String zset = "example-sorted-set";
-	static final Random rand = new Random(System.currentTimeMillis());
 	
 	public static void main (String[] args) {
-		usingSyncClient();
-		usingAsyncClient();
+		new UsingZrangeSubset().run();
 	}
-	
-	/**
-	 * Using the synchronous interface 
-	 */
-	public static void usingSyncClient () {
-		ConnectionSpec spec = DefaultConnectionSpec.newSpec()
-		.setCredentials("jredis".getBytes())
-		.setDatabase(10);
-
-		JRedis jredis = new JRedisClient(spec);
-
-		System.out.println ("** using JRedis **");
-		
-		useZRangeSubset (jredis);
-		
-		jredis.quit();
-	}
-
-	/**
-	 * Using the asynchronous interface 
-	 */
-	public static void usingAsyncClient () {
-		ConnectionSpec spec = DefaultConnectionSpec.newSpec()
-		.setCredentials("jredis".getBytes())
-		.setDatabase(10);
-
-		JRedisFuture jredis = new JRedisAsynchClient(spec);
-
-		System.out.println ("\n\n** using JRedisFuture **");
+	public void usingSyncSemantics(JRedis jredis) throws ClientRuntimeException, ProviderException
+	{
 		useZRangeSubset(jredis);
-		
-        jredis.quit();
-
+	}
+	public void usingAsyncSemantics(JRedisFuture jredis) throws ClientRuntimeException, ProviderException{
+		useZRangeSubset(jredis);
 	}
 	
 	/**
-	 * The z[rev]rangeSubset commands return non-standard results tpes (see {@link ZSetEntry}).  Nothing
+	 * The z[rev]rangeSubset commands return non-standard results types (see {@link ZSetEntry}).  Nothing
 	 * that unexpected as far as the semantics are concerned, but just in case it is not perfectly clear, this
 	 * example illustrates its intended use.
 	 * <b>
