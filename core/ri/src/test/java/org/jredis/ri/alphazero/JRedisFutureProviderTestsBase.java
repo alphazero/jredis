@@ -32,7 +32,9 @@ import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.ObjectInfo;
+import org.jredis.Query;
 import org.jredis.RedisException;
+import org.jredis.RedisType;
 import org.jredis.ZSetEntry;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.ResponseStatus;
@@ -789,6 +791,17 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				Log.log("TEST: SORTED SET ");
 				for(String s : toStr(sortSetResp.get()))
 					System.out.format("%s\n", s);
+				
+				String destKey = String.format("%s_store", listkey);
+				List<byte[]> ssres = provider.sort(listkey).ALPHA().LIMIT(0, MEDIUM_CNT).DESC().STORE(destKey).execAsynch().get();
+				assertNotNull(ssres, "result of srot with STORE should be non-null");
+				assertEquals(ssres.size(), 1, "result of sort with STORE should be a list of single entry (the stored list's size)");
+				long sortedListSize = Query.Support.unpackValue(ssres);
+				assertEquals(sortedListSize, MEDIUM_CNT);
+				RedisType type = provider.type(destKey).get();
+				assertEquals(type, RedisType.list, "dest key of SORT .. STORE should be a LIST");
+				long sslistSize = provider.llen(destKey).get();
+				assertEquals(sslistSize, sortedListSize, "result of SORT ... STORE and LLEN of destkey list should be same");
 			}
 			catch(ExecutionException e){
 				Throwable cause = e.getCause();

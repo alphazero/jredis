@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Houshyar
+ *   Copyright 2009-2010 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -1406,7 +1406,6 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 
-	// TODO: NOTIMPLEMENTED:
 //	@Override
 	public Sort sort(final String key) {
 		byte[] keybytes = null;
@@ -1421,8 +1420,8 @@ public abstract class JRedisSupport implements JRedis {
 				
 				List<byte[]> multiBulkData= null;
 				try {
-					MultiBulkResponse MultiBulkResponse = (MultiBulkResponse) client.serviceRequest(Command.SORT, keyBytes, sortSpecBytes);
-					multiBulkData = MultiBulkResponse.getMultiBulkData();
+					MultiBulkResponse multiBulkResponse = (MultiBulkResponse) client.serviceRequest(Command.SORT, keyBytes, sortSpecBytes);
+					multiBulkData = multiBulkResponse.getMultiBulkData();
 				}
 				catch (ClassCastException e){
 					throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
@@ -1430,8 +1429,27 @@ public abstract class JRedisSupport implements JRedis {
 				return multiBulkData;
 			}
 
+			protected List<byte[]> execSortStore(byte[] keyBytes, byte[] sortSpecBytes) 
+			throws IllegalStateException, RedisException {
+				
+				List<byte[]> multiBulkData= new ArrayList<byte[]>(1);
+				try {
+					ValueResponse valueResp = (ValueResponse) client.serviceRequest(Command.SORT$STORE, keyBytes, sortSpecBytes);
+					long resSize = valueResp.getLongValue();
+					multiBulkData.add(Convert.toBytes(resSize));
+				}
+				catch (ClassCastException e){
+					throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+				}
+				return multiBulkData;
+			}
+
 			@Override
 	        protected Future<List<byte[]>> execAsynchSort (byte[] keyBytes, byte[] sortSpecBytes) {
+				throw new IllegalStateException("JRedis does not support asynchronous sort.");
+	        }
+			@Override
+	        protected Future<List<byte[]>> execAsynchSortStore (byte[] keyBytes, byte[] sortSpecBytes) {
 				throw new IllegalStateException("JRedis does not support asynchronous sort.");
 	        }
 		};

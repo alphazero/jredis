@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Houshyar
+ *   Copyright 2009-2010 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -142,6 +142,7 @@ public enum Command {
 	
 	// Sorting
 	SORT		(RequestType.KEY_SPEC,		ResponseType.MULTI_BULK),
+	SORT$STORE  (RequestType.KEY_SPEC,		ResponseType.NUMBER),
 	
 	// Persistence control commands
 	SAVE		(RequestType.NO_ARG,		ResponseType.STATUS), 
@@ -175,7 +176,7 @@ public enum Command {
 	Command (RequestType reqType, ResponseType respType) { 
 		this.code = this.name();
 		
-		if(code.indexOf("$OPT") > 0) 
+		if(code.indexOf("$") > 0) 
 			this.bytes = code.substring(0, code.indexOf('$')).getBytes();
 		else
 			this.bytes = code.getBytes();

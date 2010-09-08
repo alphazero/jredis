@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import org.jredis.JRedis;
 import org.jredis.ObjectInfo;
+import org.jredis.Query;
 import org.jredis.RedisException;
 import org.jredis.RedisInfo;
 import org.jredis.RedisType;
@@ -1857,6 +1858,17 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			assertEquals(sorted.size(), MEDIUM_CNT, "expecting sort results of size MEDIUM_CNT");
 			for(String s : sorted)
 				System.out.format("[t.1]: %s\n", s);
+			
+			String destKey = String.format("%s_store", listkey);
+			List<byte[]> ssres = provider.sort(listkey).ALPHA().LIMIT(0, MEDIUM_CNT).DESC().STORE(destKey).exec();
+			assertNotNull(ssres, "result of srot with STORE should be non-null");
+			assertEquals(ssres.size(), 1, "result of sort with STORE should be a list of single entry (the stored list's size)");
+			long sortedListSize = Query.Support.unpackValue(ssres);
+			assertEquals(sortedListSize, MEDIUM_CNT);
+			RedisType type = provider.type(destKey);
+			assertEquals(type, RedisType.list, "dest key of SORT .. STORE should be a LIST");
+			long sslistSize = provider.llen(destKey);
+			assertEquals(sslistSize, sortedListSize, "result of SORT ... STORE and LLEN of destkey list should be same");
 			
 			Log.log("TEST: SORTED LIST [t.2]");
 			sorted = toStr(provider.sort(listkey).ALPHA().LIMIT(10, 9).DESC().exec());
