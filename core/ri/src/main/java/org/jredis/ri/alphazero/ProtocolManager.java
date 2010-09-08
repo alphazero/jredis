@@ -132,7 +132,7 @@ public class ProtocolManager implements ProtocolFactory {
 		return Assert.notNull(handler, "how did this happen??", ProviderException.class);
 	}
 
-	@Override
+//	@Override
 	public Protocol createProtocolHandler(Modality modality, String redisVersion) throws NotSupportedException {
 		return null;
 	}
