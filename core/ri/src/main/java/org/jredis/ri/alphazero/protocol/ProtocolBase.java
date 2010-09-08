@@ -228,8 +228,7 @@ public abstract class ProtocolBase implements Protocol {
 			break;
 			
 			case BULK_SET:
-				Assert.isTrue(args.length%2==0, "args length should be an even number and expected to be seq of tuple {key, value}", ProviderException.class);
-				Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX, "Only MSET/NX bulk commands are supported", NotSupportedException.class);
+				Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX || cmd == Command.RPUSHXAFTER, "Only MSET/NX/RPUSHXAFTER bulk commands are supported", NotSupportedException.class);
 
 				byte[] setCmdLenBytes = Convert.toBytes(cmd.bytes.length);
 				byte[] bulkSetLineCntBytes = Convert.toBytes(args.length+1);
@@ -244,25 +243,18 @@ public abstract class ProtocolBase implements Protocol {
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
 				
-				for(int s=0; s<args.length; s+=2){
+				for(int s=0; s<args.length; s++){
 					buffer.write(SIZE_BYTE);
-					buffer.write(Convert.toBytes(args[s].length));
-					buffer.write(CRLF);
-					buffer.write(args[s]);
-					buffer.write(CRLF);
-					
-					buffer.write(SIZE_BYTE);
-					if(null != args[s+1]) {
-						buffer.write(Convert.toBytes(args[s+1].length));
-						buffer.write(CRLF);
-						buffer.write(args[s+1]);
-						buffer.write(CRLF);
-					}
-					else {
+					if (args[s] != null) {
+  					buffer.write(Convert.toBytes(args[s].length));
+  					buffer.write(CRLF);
+  					buffer.write(args[s]);
+  					buffer.write(CRLF);
+  				} else {
 						buffer.write(ASCII_ZERO);
 						buffer.write(CRLF);
 						buffer.write(CRLF);
-					}
+  				}
 				}
 				break;
 			
