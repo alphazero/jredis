@@ -97,14 +97,24 @@
   </licenses>
   <developers>
     <developer>
-      <id>joubin</id>
+      <id>alphazero</id>
       <name>Joubin Houshyar</name>
       <email>alphazero@sensesay.net</email>
-      <url>http://www.sensesay.net</url>
+      <url>http://github.com/alphazero</url>
       <roles>
         <role>ReleaseManager</role>
         <role>Designer</role>
         <role>Developer</role>
+      </roles>
+      <timezone>UTC-5</timezone>
+    </developer>
+    <developer>
+      <id>gv0tch0</id>
+      <name>Nik Kovel</name>
+      <email>alphazero@sensesay.net</email>
+      <url>http://github.com/gv0tch0</url>
+      <roles>
+        <role>Contributor</role>
       </roles>
       <timezone>UTC-5</timezone>
     </developer>
