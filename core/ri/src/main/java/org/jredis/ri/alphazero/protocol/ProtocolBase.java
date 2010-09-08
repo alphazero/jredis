@@ -228,7 +228,7 @@ public abstract class ProtocolBase implements Protocol {
 			break;
 			
 			case BULK_SET:
-				Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX || cmd == Command.RPUSHXAFTER, "Only MSET/NX/RPUSHXAFTER bulk commands are supported", NotSupportedException.class);
+				Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX || cmd == Command.RPUSHXAFTER || cmd == Command.LPUSHXAFTER, "Only MSET/NX, L/RPUSHXAFTER bulk commands are supported", NotSupportedException.class);
 
 				byte[] setCmdLenBytes = Convert.toBytes(cmd.bytes.length);
 				byte[] bulkSetLineCntBytes = Convert.toBytes(args.length+1);
