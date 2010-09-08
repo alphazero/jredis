@@ -244,17 +244,6 @@ public class DefaultCodec {
 			e.printStackTrace();
 			throw new RuntimeException("Error serializing object"+obj+" => " + e);
 		}
-		// this for development phase only -- will be removed.  (A bit of performance hit.)
-//		finally {
-//			// test it!
-//			try {
-//				T decoded = decode(bytes);  // we want this compile warning to remember to remove this in future.
-//			}
-//			catch (Exception e) {
-//				e.printStackTrace();
-//				System.err.format("error in verifying the decoding of the encoded object %s", obj.getClass().getName());
-//			}
-//		}
 		return bytes;
 	}
 }

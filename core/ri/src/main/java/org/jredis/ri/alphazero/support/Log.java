@@ -19,7 +19,6 @@ package org.jredis.ri.alphazero.support;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO: deprecate this and use a standard logger (jdk or log4j ...)
  * 
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Apr 02, 2009
@@ -28,23 +27,33 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Log {
 	public static org.apache.commons.logging.Log logger = LogFactory.getLog("JREDIS");
-//	public static final Logger logger = LoggerFactory.getLogger("-- JREDIS --");
-	public enum Category { INFO, ERROR, PROBLEM, BUG }
-	
-	public static final void log (String msg)   { _loginfo (msg); }
-	public static final void error (String msg)   { _log (Category.ERROR, msg); }
-	public static final void problem (String msg) { _log (Category.PROBLEM, msg); }
-	public static final void bug (String msg)     { _log (Category.BUG, msg); }
-	
+	public enum Category { INFO, DEBUG, ERROR, PROBLEM, BUG }
+
+	// the various 'just FYI's ...
+	public static final void log (String msg)   { log (msg, (Object[])null); }
 	public static final void log (String format, Object...args)   { 
-		_loginfo (format, args); 
+		logger.info(String.format(format, args)); 
 	}
-	private static final void _log (Category cat, String msg) {
-//		System.err.format("-- JREDIS -- %s: %s\n", cat, msg).flush();
-		logger.error(String.format("%s: %s", cat, msg));
+	public static final void debug (String msg) { debug(msg, (Object[])null); }
+	public static final void debug (String format, Object...args) { 
+		logger.debug(String.format(format, args)); 
 	}
-	private static final void _loginfo (String format, Object...args) {
-//		System.out.format("-- JREDIS -- INFO: "+format+" \n", args).flush();
-		logger.info(String.format(format, args));
+	
+	// the various 'error! run for covers', ... 
+	public static final void error (String msg)   { _error (Category.ERROR, msg); }
+	public static final void error (String msg, Object...args) { _error (Category.ERROR, msg, args); }
+	
+	public static final void problem (String msg) { _error (Category.PROBLEM, msg); }
+	public static final void problem (String msg, Object...args) { _error (Category.PROBLEM, msg, args); }
+	
+	public static final void bug (String msg)     { _error (Category.BUG, msg); }
+	public static final void bug (String msg, Object...args) { _error (Category.BUG, msg, args); }
+	
+	private static final void _error (Category cat, String msg, Object...args) {
+		msg = String.format(msg, args);
+		if(cat.equals(Category.ERROR))
+			logger.error(String.format("%s", msg));
+		else
+			logger.error(String.format("%s: %s", cat, msg));
 	}
 }

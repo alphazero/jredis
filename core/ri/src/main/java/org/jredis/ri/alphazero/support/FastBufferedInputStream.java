@@ -84,7 +84,7 @@ public final class FastBufferedInputStream extends java.io.InputStream {
 				buffer = newbuffer;
 			}
 			else {// should never happen per contract of inputstream ...
-				System.out.format("ZERO! <= %d\n", c);
+				Log.bug (String.format("ZERO! <= %d\n", c));
 				throw new IOException ("input stream read return 0 bytes!");
 			}
 		}
