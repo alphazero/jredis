@@ -72,9 +72,8 @@ public enum Command {
 	
 	// Commands operating on lists
 	RPUSH		(RequestType.KEY_VALUE,		ResponseType.STATUS), 
-	RPUSHX	(RequestType.KEY_VALUE,		ResponseType.STATUS), 
+	RPUSHX		(RequestType.KEY_VALUE,		ResponseType.STATUS), 
 	RPUSHXAFTER	(RequestType.BULK_SET,		ResponseType.STATUS),
-	LDELETE	(RequestType.KEY_VALUE,		ResponseType.STATUS), 
 	LPUSH		(RequestType.KEY_VALUE,		ResponseType.STATUS),
 	LPUSHX		(RequestType.KEY_VALUE,		ResponseType.STATUS),
 	LPUSHXAFTER	(RequestType.BULK_SET,		ResponseType.STATUS),
@@ -163,8 +162,6 @@ public enum Command {
 	/** semantic sugar */
 	public final String code;
 	public final byte[] bytes;
-//	public final int length;
-//	public final int arg_cnt;
 	public final RequestType requestType;
 	public final ResponseType responseType;
 	

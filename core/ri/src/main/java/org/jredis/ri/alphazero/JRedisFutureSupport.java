@@ -234,17 +234,6 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.LPUSHXAFTER, bulk));
 	}
 
-	public FutureStatus ldelete(String key, byte[] value) {
-		byte[] keybytes = null;
-		if ((keybytes = getKeyBytes(key)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+key+"]");
-
-		if (value == null)
-			throw new IllegalArgumentException ("null value");
-
-		return new FutureStatus(this.queueRequest(Command.LDELETE, keybytes, value));
-	}
-
 //	@Override
 	public FutureByteArray rpoplpush (String srcList, String destList)  {
 		byte[] srckeybytes = null;
