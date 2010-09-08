@@ -894,7 +894,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	
 //	@Override
-	public Future<Long> zremrangebyrank(String key, double minRank, double maxRank) {
+	public Future<Long> zremrangebyrank(String key, long minRank, long maxRank) {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");

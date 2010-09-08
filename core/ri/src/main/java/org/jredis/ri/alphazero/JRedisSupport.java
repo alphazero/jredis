@@ -1013,11 +1013,14 @@ public abstract class JRedisSupport implements JRedis {
 		/* ValueRespose */
 		String stringValue = null;
 		try {
-			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.RANDOMKEY);
-			stringValue = valResponse.getStringValue();
+			BulkResponse valResponse = (BulkResponse) this.serviceRequest(Command.RANDOMKEY);
+			byte[] bulkData = valResponse.getBulkData();
+			if (null != bulkData) {
+			  stringValue = new String(bulkData);
+			}
 		}
 		catch (ClassCastException e){
-			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
 		}
 		return stringValue;
 	}
@@ -1292,7 +1295,7 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
-	public long zremrangebyrank (String key, double minRank, double maxRank) throws RedisException {
+	public long zremrangebyrank (String key, long minRank, long maxRank) throws RedisException {
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");

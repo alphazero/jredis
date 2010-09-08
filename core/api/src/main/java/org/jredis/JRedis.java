@@ -770,7 +770,7 @@ public interface JRedis {
 	 * @return number of removed elements
 	 * @throws RedisException
 	 */
-	public long zremrangebyrank (String setkey, double minRank, double maxRank) throws RedisException; 
+	public long zremrangebyrank (String setkey, long minRank, long maxRank) throws RedisException; 
 
 	/**
 	 * @Redis ZINCRBY

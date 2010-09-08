@@ -736,7 +736,7 @@ public interface JRedisFuture {
 	 * @param to
 	 * @return number of removed elements
 	 */
-	public Future<Long> zremrangebyrank (String setkey, double minRank, double maxRank); 
+	public Future<Long> zremrangebyrank (String setkey, long minRank, long maxRank); 
 	
 	
 	// ------------------------------------------------------------------------

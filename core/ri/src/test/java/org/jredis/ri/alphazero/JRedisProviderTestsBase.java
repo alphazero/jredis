@@ -25,6 +25,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.jredis.JRedis;
@@ -46,7 +47,7 @@ import org.testng.annotations.Test;
 
 //TODO: get rid of NG in class name
 
-public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedis>{
+public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis>{
 
 	// ------------------------------------------------------------------------
 	// Properties
@@ -213,20 +214,16 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			provider.set(keyToExpire, dataList.get(0));
 			assertTrue (provider.exists(keyToExpire));
 			
-			long expireTime = System.currentTimeMillis() + 500;
 			Log.log("TEST: %s with expire time 1000 msecs in future", Command.EXPIREAT);
-			assertTrue(provider.expireat(keyToExpire, expireTime), "expireat for existing key should be true");
-			assertTrue(!provider.expireat("no-such-key", expireTime), "expireat for non-existant key should be false");
-			assertTrue (provider.exists(keyToExpire));
-			
+			assertTrue(provider.expireat(keyToExpire, System.currentTimeMillis() + 2000), "expireat for existing key should be true");
+      assertTrue (provider.exists(keyToExpire));
+			assertTrue(!provider.expireat("no-such-key", System.currentTimeMillis() + 500), "expireat for non-existant key should be false");
 			
 			// NOTE: IT SIMPLY WON'T WORK WITHOUT GIVING REDIS A CHANCE
 			// could be network latency, or whatever, but the expire command is NOT
 			// that precise, so we need to wait a bit longer
-			
-			Thread.sleep(2000);
+			Thread.sleep(5000);
 			assertTrue (!provider.exists(keyToExpire), "key should have expired by now");
-			
 		} 
 		catch (RedisException e) {
 			fail(cmd + " with password: " + password, e);
@@ -628,10 +625,10 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			}
 			assertEquals(provider.hlen(keys.get(0)), 0, "hash should empty");
 			List<String> hkeys2 = provider.hkeys(keys.get(0));
-			assertEquals( hkeys2, null, "keys list should be null"); // this used to be an empty list - api change says it is null
+			assertEquals(hkeys2, Collections.EMPTY_LIST, "keys list should be empty");
 			
 			List<String> hkeys3 = provider.hkeys("no-such-hash");
-			assertEquals( hkeys3, null, "keys list of non-existent hash should be null.");
+			assertEquals(hkeys3, Collections.EMPTY_LIST, "keys list of non-existent hash should be empty.");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
@@ -663,10 +660,10 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			}
 			assertEquals(provider.hlen(keys.get(0)), 0, "hash should empty");
 			List<byte[]> hvals2 = provider.hvals(keys.get(0));
-			assertEquals( hvals2, null, "(api change) keys list should be null"); // this used to return an empty set
+			assertEquals(hvals2, Collections.EMPTY_LIST, "keys list should be empty");
 			
 			List<byte[]> hvals3 = provider.hvals("no-such-hash");
-			assertEquals( hvals3, null, "values list of non-existent hash should be null.");
+			assertEquals(hvals3, Collections.EMPTY_LIST, "values list of non-existent hash should be empty.");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
@@ -705,10 +702,10 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 				assertTrue(provider.hdel(keys.get(0), key), "deletion of existing key in hash should be true");
 			
 			Map<String, byte[]> hmap2 = provider.hgetall(keys.get(0));
-			assertEquals( hmap2, null, "hash map should be null"); // used to be empty - api change says it will be null
+			assertEquals(hmap2, Collections.EMPTY_MAP, "hash map should be empty");
 			
 			Map<String, byte[]> hmap3 = provider.hgetall("no-such-hash");
-			assertEquals( hmap3, null, "hgetall for non existent hash should be null");
+			assertEquals(hmap3, Collections.EMPTY_MAP, "hgetall for non existent hash should be empty");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
@@ -2329,10 +2326,9 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			// empty set
 			provider.sadd(keys.get(2), dataList.get(0));
 			provider.srem(keys.get(2), dataList.get(0));
-			assertTrue(provider.scard(keys.get(2)) == 0, "set should be empty now");
+			assertEquals(provider.scard(keys.get(2)), 0, "set cardinality for an empty set should be 0");
 			members = provider.smembers(keys.get(2));
-			assertNull(members, "smembers should return a null"); // this used to be an empty set - api change
-//			assertTrue(members.size() == 0, "smembers should have returned an empty list");
+			assertEquals(members, Collections.EMPTY_LIST,"smembers should return an empty list");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 
@@ -2358,8 +2354,8 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			provider.srem(keys.get(2), stringList.get(0));
 			assertTrue(provider.scard(keys.get(2)) == 0, "set should be empty now");
 			members = toStr(provider.smembers(keys.get(2)));
-			assertNull(members, "smembers should return null for set that was fully emptied"); // api change.
-//			assertTrue(members.size() == 0, "smembers should have returned an empty list"); // api change - now it is null
+			//assertNull(members, "smembers should return null for set that was fully emptied"); // api change.
+			assertEquals(members.size(), 0, "smembers should have returned an empty list"); // api change - now it is null
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 
@@ -2385,8 +2381,8 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			provider.srem(keys.get(2), longList.get(0));
 			assertTrue(provider.scard(keys.get(2)) == 0, "set should be empty now");
 			members = toLong (provider.smembers(keys.get(2)));
-			assertNull(members, "smembers should return null"); // api change (also toLong changed to handle the null results).
-//			assertTrue(members.size() == 0, "smembers should have returned an empty list");
+			//assertNull(members, "smembers should return null"); // api change (also toLong changed to handle the null results).
+			assertEquals(members.size(), 0, "smembers should have returned an empty list");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 
@@ -2412,8 +2408,8 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 			provider.srem(keys.get(2), objectList.get(0));
 			assertTrue(provider.scard(keys.get(2)) == 0, "set should be empty now");
 			members = decode (provider.smembers(keys.get(2)));
-			assertNull(members, "smembers should return null"); // API change
-//			assertTrue(members.size() == 0, "smembers should have returned an empty list");
+			//assertNull(members, "smembers should return null"); // API change
+			assertEquals(members.size(), 0, "smembers should have returned an empty list");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
@@ -2896,11 +2892,10 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase <JRedi
 		Log.log("TEST: %s command", cmd);
 		try {
 			provider.flushdb();
-			
-			assertTrue (provider.dbsize() == 0);
+			assertTrue(provider.dbsize() == 0);
 			
 			String iamempty = provider.randomkey();
-			assertEquals(0, iamempty.length(), "randomkey of an empty db should be a zero length result");
+			assertNull(iamempty, "randomkey of an empty db should be null, but instead it was: " + iamempty);
 			
 			for (int i=0; i<MEDIUM_CNT; i++)
 				provider.set(keys.get(i), dataList.get(i));
