@@ -190,50 +190,6 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.RPUSH, keybytes, value));
 	}
 
-	public FutureStatus rpushx(String key, byte[] value) {
-		byte[] keybytes = null;
-		if ((keybytes = getKeyBytes(key)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+key+"]");
-
-		if (value == null)
-			throw new IllegalArgumentException ("null value");
-
-		return new FutureStatus(this.queueRequest(Command.RPUSHX, keybytes, value));
-	}
-
-	public FutureStatus rpushxafter(String key, byte[] oldvalue, byte[] newvalue) {
-		byte[] keybytes = null;
-		if ((keybytes = getKeyBytes(key)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+key+"]");
-    byte[][] bulk = new byte[3][];
-    bulk[0] = keybytes;
-    bulk[1] = oldvalue;
-    bulk[2] = newvalue;
-		return new FutureStatus(this.queueRequest(Command.RPUSHXAFTER, bulk));
-	}
-
-	public FutureStatus lpushx(String key, byte[] value) {
-		byte[] keybytes = null;
-		if ((keybytes = getKeyBytes(key)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+key+"]");
-
-		if (value == null)
-			throw new IllegalArgumentException ("null value");
-
-		return new FutureStatus(this.queueRequest(Command.LPUSHX, keybytes, value));
-	}
-
-	public FutureStatus lpushxafter(String key, byte[] oldvalue, byte[] newvalue) {
-		byte[] keybytes = null;
-		if ((keybytes = getKeyBytes(key)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+key+"]");
-    byte[][] bulk = new byte[3][];
-    bulk[0] = keybytes;
-    bulk[1] = oldvalue;
-    bulk[2] = newvalue;
-		return new FutureStatus(this.queueRequest(Command.LPUSHXAFTER, bulk));
-	}
-
 //	@Override
 	public FutureByteArray rpoplpush (String srcList, String destList)  {
 		byte[] srckeybytes = null;
