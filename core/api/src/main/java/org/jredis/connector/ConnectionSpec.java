@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Houshyar
+ *   Copyright 2009-2010 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@ import org.jredis.protocol.Command;
 
 
 /**
- * Connection specification for getting (creating) {@link Connection} objects.
+ * ConnectionSpec specifies the parameters used in the creation and
+ * runtime operation of JRedis connections.
+ * 
  * @author joubin (alphazero@sensesay.net)
  *
  * @see ConnectionFactory#getConnection(ConnectionSpec)
@@ -32,7 +34,6 @@ import org.jredis.protocol.Command;
  * 
  */
 public interface ConnectionSpec {
-	
 	/**
 	 * @return
 	 */
@@ -51,7 +52,6 @@ public interface ConnectionSpec {
      * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setPort(int port);
-	
 	/**
 	 * @return the password (if any) for the connection.  Used on (re-)connect to authenticate 
 	 * the client after connectivity has been established
@@ -64,7 +64,6 @@ public interface ConnectionSpec {
      * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setCredentials(byte[] credentials);
-	
 	/**
 	 * @return the database selected for the connection.  Used on (re-)connect to select the db 
 	 * after network connectivity has been established.
@@ -78,30 +77,33 @@ public interface ConnectionSpec {
 	 */
 	public ConnectionSpec setDatabase(int database);
 	/**
+	 * Get the {@link SocketFlag} for the {@link ConnectionSpec}
 	 * @param flag
 	 * @return the specified TCP socket flag used for the connection.
 	 * @see SocketFlag
 	 */
 	public boolean getSocketFlag (ConnectionSpec.SocketFlag flag);
 	/**
+	 * Set the {@link SocketFlag} for the {@link ConnectionSpec}
 	 * @param flag
 	 * @param value
-     * @return the {@link ConnectionSpec}
+	 * @return {@link ConnectionSpec} this
 	 */
 	public ConnectionSpec setSocketFlag(ConnectionSpec.SocketFlag flag, Boolean value);
 	/**
+	 * Get the {@link SocketProperty} for the {@link ConnectionSpec}
 	 * @param property
 	 * @return the specified socket property used for the connection.
 	 * @see SocketFlag
 	 */
 	public Integer getSocketProperty (ConnectionSpec.SocketProperty property);
 	/**
+	 * Set the {@link SocketProperty} for the {@link ConnectionSpec}
 	 * @param property
 	 * @param value
-     * @return the {@link ConnectionSpec}
+	 * @return the previous value (if any).  Null if none existed, per {@link Map#put(Object, Object)} semantics.
 	 */
 	public ConnectionSpec setSocketProperty(ConnectionSpec.SocketProperty property, Integer value);
-
 	/**
 	 * @return
 	 */
@@ -111,44 +113,36 @@ public interface ConnectionSpec {
      * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setReconnectCnt(int cnt);
-
 	/**
      * @return
      */
     public boolean isReliable ();
-
 	/**
      * @return the {@link ConnectionSpec}
      */
     public ConnectionSpec isReliable (boolean flag);
-    
     /**
      * @return
      */
     public boolean isShared ();
-    
     /**
      * @return the heartbeat period in seconds
      */
     public int	getHeartbeat();
-    
     /**
      * @param seconds heartbeat period
      * @return the {@link ConnectionSpec}
      */
     public ConnectionSpec setHeartbeat(int seconds);
-
     /**
      * @param flag
      * @return the {@link ConnectionSpec}
      */
     public ConnectionSpec isShared(boolean flag);
-
     /**
      * @return
      */
     public boolean isPipeline();
-    
     /**
      * @param flag
      * @return
@@ -220,32 +214,18 @@ public interface ConnectionSpec {
 		 */
 		SO_PREF_BANDWIDTH,
 	}
-// 2much - keep it simple: the getters above are sufficient - this serves not additional purpose.
-//	/**
-//	 * @see SocketFlag
-//	 * @see ConnectionSpec#getSocketFlag(SocketFlag)
-//	 * 
-//	 * @return the socket flag map.  Whether this is a copy or the reference to underlying references
-//	 * is un-Specified.  What is specified is that changes to this set after connection has been established are
-//	 * of no effect.
-//	 */
-//	public Map<SocketFlag, Boolean> getSocketFlags();
-//	
-//	/**
-//	 * @see SocketProperty
-//	 * @see ConnectionSpec#getSocketProperty(SocketProperty)
-//	 * 
-//	 * @return the socket property map.  Whether this is a copy or the reference to underlying references
-//	 * is un-Specified.  What is specified is that changes to this set after connection has been established are
-//	 * of no effect.
-//	 */
-//	public Map<SocketProperty, Integer> getSocketProperties();
+
 	// ------------------------------------------------------------------------
 	// Reference Implementation 
 	// ------------------------------------------------------------------------
 
 	/**
-	 * [TODO: document me!]
+	 * Reference implementation of {@link ConnectionSpec}.
+	 * <p>
+	 * This implementation is a read/write implementation providing no default
+	 * values of any kind.  It can be used as is and initialized as required,
+	 * or (as it is intended) it will provide support for various connection
+	 * profiles (e.g. server connectors), etc.
 	 *
 	 * @author  joubin (alphazero@sensesay.net)
 	 * @version alpha.0, Aug 23, 2009
@@ -257,8 +237,10 @@ public interface ConnectionSpec {
 		// ------------------------------------------------------------------------
 		// Attrs
 		// ------------------------------------------------------------------------
+		
 		/** redis server address */
 		InetAddress  	address;
+		
         /** redis server port */
 		int			port;
 
@@ -288,6 +270,7 @@ public interface ConnectionSpec {
 		
 		/** heartbeat period in milliseconds */
 		private int heartbeat;
+		
 		// ------------------------------------------------------------------------
 		// Constructor(s)
 		// ------------------------------------------------------------------------
@@ -295,166 +278,128 @@ public interface ConnectionSpec {
 		// ------------------------------------------------------------------------
 		// Interface
 		// ------------------------------------------------------------------------
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getAddress() */
 //		@Override
-		public InetAddress getAddress () {
+		final public InetAddress getAddress () {
 			return address;
 		}
-
-		/* (non-Javadoc)
-		 * @see org.jredis.connector.ConnectionSpec#getCredentials()
-		 */
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getCredentials() */
 //		@Override
-		public byte[] getCredentials () {
+		final public byte[] getCredentials () {
 			return credentials;
 		}
-
-		/* (non-Javadoc)
-		 * @see org.jredis.connector.ConnectionSpec#getDatabase()
-		 */
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getDatabase() */
 //		@Override
-		public int getDatabase () {
+		final public int getDatabase () {
 			return database;
 		}
-
-		/* (non-Javadoc)
-		 * @see org.jredis.connector.ConnectionSpec#getPort()
-		 */
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getPort() */
 //		@Override
-		public int getPort () {
+		final public int getPort () {
 			return port;
 		}
-
-		/* (non-Javadoc)
-		 * @see org.jredis.connector.ConnectionSpec#getReconnectCnt()
-		 */
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getReconnectCnt() */
 //		@Override
-		public int getReconnectCnt () {
+		final public int getReconnectCnt () {
 			return this.reconnectCnt;
 		}
-
-		/* (non-Javadoc)
-		 * @see org.jredis.connector.ConnectionSpec#getSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag)
-		 */
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag) */
 //		@Override
-		public boolean getSocketFlag (SocketFlag flag) {
+		final public boolean getSocketFlag (SocketFlag flag) {
 			return socketFlags.get(flag);
 		}
-
-		/* (non-Javadoc)
-		 * @see org.jredis.connector.ConnectionSpec#getSocketProperty(org.jredis.connector.ConnectionSpec.SocketProperty)
-		 */
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getSocketProperty(org.jredis.connector.ConnectionSpec.SocketProperty) */
 //		@Override
-		public Integer getSocketProperty (SocketProperty property) {
+		final public Integer getSocketProperty (SocketProperty property) {
 			return socketProperties.get(property);
 		}
-		
 		// ------------------------------------------------------------------------
 		// Property Setters
 		// ------------------------------------------------------------------------
-		/**  @param address the address to set */
-//		@Override
-        public ConnectionSpec setAddress (InetAddress address) {
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setAddress(java.net.InetAddress) */
+		final public ConnectionSpec setAddress (InetAddress address) {
         	this.address = address;
         	return this;
         }
-
-		/**  @param port the port to set */
-//        @Override
-        public ConnectionSpec setPort (int port) {
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setPort(int) */
+//		@Override
+		final public ConnectionSpec setPort (int port) {
         	this.port = port;
         	return this;
         }
-
-		/**  @param credentials the credentials to set */
-//        @Override
-        public ConnectionSpec setCredentials (byte[] credentials) {
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setCredentials(byte[]) */
+//      @Override
+		final public ConnectionSpec setCredentials (byte[] credentials) {
         	this.credentials = credentials;
         	return this;
         }
-
-		/**  @param database the database to set */
-//        @Override
-        public ConnectionSpec setDatabase (int database) {
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setDatabase(int) */
+//      @Override
+		final public ConnectionSpec setDatabase (int database) {
         	this.database = database;
         	return this;
         }
-
-		/**  @param reconnectCnt the reconnectCnt to set */
-//        @Override
-        public ConnectionSpec setReconnectCnt (int reconnectCnt) {
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setReconnectCnt(int) */
+//      @Override
+		final public ConnectionSpec setReconnectCnt (int reconnectCnt) {
         	this.reconnectCnt = reconnectCnt;
         	return this;
         }
-
-		/**
-		 * Set the {@link SocketFlag} for the {@link ConnectionSpec}
-		 * @param flag
-		 * @param value
-		 * @return {@link ConnectionSpec} this
-		 */
-//        @Override
-		public ConnectionSpec setSocketFlag(SocketFlag flag, Boolean value){
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag, java.lang.Boolean) */
+//      @Override
+		final public ConnectionSpec setSocketFlag(SocketFlag flag, Boolean value){
 			socketFlags.put(flag, value);
 			return this;
 		}
-		/**
-		 * Set the {@link SocketProperty} for the {@link ConnectionSpec}.
-		 * @param property
-		 * @param value
-		 * @return the previous value (if any).  Null if none existed, per {@link Map#put(Object, Object)} semantics.
-		 */
-//        @Override
-		public ConnectionSpec setSocketProperty(SocketProperty property, Integer value){
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setSocketProperty(org.jredis.connector.ConnectionSpec.SocketProperty, java.lang.Integer) */
+//      @Override
+		final public ConnectionSpec setSocketProperty(SocketProperty property, Integer value){
 			socketProperties.put(property, value);
 			return this;
 		}
-
-		/* (non-Javadoc)
-         * @see org.jredis.connector.ConnectionSpec#isReliable()
-         */
-        public boolean isReliable () {
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isReliable() */
+//      @Override
+		final public boolean isReliable () {
 	        return isReliable;
         }
-
-		/* (non-Javadoc)
-         * @see org.jredis.connector.ConnectionSpec#isReliable(boolean)
-         */
-        public ConnectionSpec isReliable (boolean flag) {
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isReliable(boolean) */
+//      @Override
+		final public ConnectionSpec isReliable (boolean flag) {
         	isReliable = flag;
         	return this;
         }
-        
-        public boolean isShared () {
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isShared() */
+//      @Override
+		final public boolean isShared () {
         	return isShared;
         }
-        
-        public ConnectionSpec isShared(boolean flag){
+        /* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isShared(boolean) */
+//      @Override
+		final public ConnectionSpec isShared(boolean flag){
         	this.isShared = flag;
         	return this;
         }
-        public boolean isPipeline() {
+        /* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isPipeline() */
+//      @Override
+		final public boolean isPipeline() {
         	return isPipeline;
         }
-        
-        public ConnectionSpec isPipeline(boolean flag) {
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isPipeline(boolean) */
+//      @Override
+		final public ConnectionSpec isPipeline(boolean flag) {
         	isPipeline = flag;
         	return this;
         }
-        
-        /**
-         * @return the heartbeat period in seconds
-         */
-        public int	getHeartbeat() {
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getHeartbeat() */
+//      @Override
+		final public int	getHeartbeat() {
         	return heartbeat/1000;
         }
-        
-        /**
-         * @param seconds heartbeat period
-         */
-        public ConnectionSpec setHeartbeat(int seconds) {
+ 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setHeartbeat(int) */
+//      @Override
+		final public ConnectionSpec setHeartbeat(int seconds) {
         	this.heartbeat = seconds * 1000;
         	return this;
         }
-
 	}
 }
