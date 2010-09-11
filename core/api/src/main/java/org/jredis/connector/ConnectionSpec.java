@@ -120,7 +120,7 @@ public interface ConnectionSpec {
 	/**
      * @return
      */
-    public void isReliable (boolean flag);
+    public ConnectionSpec isReliable (boolean flag);
     
     /**
      * @return
@@ -135,15 +135,15 @@ public interface ConnectionSpec {
     /**
      * @param seconds heartbeat period
      */
-    public void setHeartbeat(int seconds);
+    public ConnectionSpec setHeartbeat(int seconds);
     /**
      * @param flag
      */
-    public void isShared(boolean flag);
+    public ConnectionSpec isShared(boolean flag);
 
     public boolean isPipeline();
     
-    public void isPipeline(boolean flag);
+    public ConnectionSpec isPipeline(boolean flag);
     
 	// ------------------------------------------------------------------------
 	// Associated (inner) types
@@ -409,23 +409,26 @@ public interface ConnectionSpec {
 		/* (non-Javadoc)
          * @see org.jredis.connector.ConnectionSpec#isReliable(boolean)
          */
-        public void isReliable (boolean flag) {
+        public ConnectionSpec isReliable (boolean flag) {
         	isReliable = flag;
+        	return this;
         }
         
         public boolean isShared () {
         	return isShared;
         }
         
-        public void isShared(boolean flag){
+        public ConnectionSpec isShared(boolean flag){
         	this.isShared = flag;
+        	return this;
         }
         public boolean isPipeline() {
         	return isPipeline;
         }
         
-        public void isPipeline(boolean flag) {
+        public ConnectionSpec isPipeline(boolean flag) {
         	isPipeline = flag;
+        	return this;
         }
         
         /**
@@ -438,8 +441,9 @@ public interface ConnectionSpec {
         /**
          * @param seconds heartbeat period
          */
-        public void setHeartbeat(int seconds) {
+        public ConnectionSpec setHeartbeat(int seconds) {
         	this.heartbeat = seconds * 1000;
+        	return this;
         }
 
 	}
