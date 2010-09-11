@@ -21,6 +21,7 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.ConnectionSpec.ConnectionFlag;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 import org.jredis.ri.alphazero.connection.AsynchConnection;
@@ -51,7 +52,7 @@ public class JRedisAsynchClient extends JRedisFutureSupport {
 	 */
 	public JRedisAsynchClient (ConnectionSpec connectionSpec) {
 		// note: using a shared connection mod
-		connectionSpec.isReliable(true);
+		connectionSpec.setConnectionFlag(ConnectionFlag.RELIABLE, true);
 		connection = new AsynchConnection(connectionSpec, true);
 	}
 	

@@ -27,6 +27,7 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.NotConnectedException;
+import org.jredis.connector.ConnectionSpec.ConnectionFlag;
 import org.jredis.connector.ConnectionSpec.SocketProperty;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
@@ -95,10 +96,9 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     @Override
     protected void initializeComponents () {
     	
-    	spec.isReliable(true);
-    	spec.isPipeline(true);
-    	spec.isShared(true);
-    	
+    	spec.setConnectionFlag(ConnectionFlag.RELIABLE, true);
+    	spec.setConnectionFlag(ConnectionFlag.PIPELINE, true);
+    	spec.setConnectionFlag(ConnectionFlag.SHARED, true);
     	super.initializeComponents();
     	
     	serviceLock = new Object();

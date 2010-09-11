@@ -125,18 +125,18 @@ public interface ConnectionSpec {
      * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setReconnectCnt(int cnt);
-	/**
-     * @return
-     */
-    public boolean isReliable ();
-	/**
-     * @return the {@link ConnectionSpec}
-     */
-    public ConnectionSpec isReliable (boolean flag);
-    /**
-     * @return
-     */
-    public boolean isShared ();
+//	/**
+//     * @return
+//     */
+//    public boolean isReliable ();
+//	/**
+//     * @return the {@link ConnectionSpec}
+//     */
+//    public ConnectionSpec isReliable (boolean flag);
+//    /**
+//     * @return
+//     */
+//    public boolean isShared ();
     /**
      * @return the heartbeat period in seconds
      */
@@ -146,20 +146,20 @@ public interface ConnectionSpec {
      * @return the {@link ConnectionSpec}
      */
     public ConnectionSpec setHeartbeat(int seconds);
-    /**
-     * @param flag
-     * @return the {@link ConnectionSpec}
-     */
-    public ConnectionSpec isShared(boolean flag);
-    /**
-     * @return
-     */
-    public boolean isPipeline();
-    /**
-     * @param flag
-     * @return
-     */
-    public ConnectionSpec isPipeline(boolean flag);
+//    /**
+//     * @param flag
+//     * @return the {@link ConnectionSpec}
+//     */
+//    public ConnectionSpec isShared(boolean flag);
+//    /**
+//     * @return
+//     */
+//    public boolean isPipeline();
+//    /**
+//     * @param flag
+//     * @return
+//     */
+//    public ConnectionSpec isPipeline(boolean flag);
     
 	// ------------------------------------------------------------------------
 	// Associated (inner) types
@@ -399,39 +399,39 @@ public interface ConnectionSpec {
 			connectionFlags.put(flag, value);
 			return this;
 		}
-		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isReliable() */
-//      @Override
-		final public boolean isReliable () {
-	        return isReliable;
-        }
-		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isReliable(boolean) */
-//      @Override
-		final public ConnectionSpec isReliable (boolean flag) {
-        	isReliable = flag;
-        	return this;
-        }
-		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isShared() */
-//      @Override
-		final public boolean isShared () {
-        	return isShared;
-        }
-        /* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isShared(boolean) */
-//      @Override
-		final public ConnectionSpec isShared(boolean flag){
-        	this.isShared = flag;
-        	return this;
-        }
-        /* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isPipeline() */
-//      @Override
-		final public boolean isPipeline() {
-        	return isPipeline;
-        }
-		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isPipeline(boolean) */
-//      @Override
-		final public ConnectionSpec isPipeline(boolean flag) {
-        	isPipeline = flag;
-        	return this;
-        }
+//		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isReliable() */
+////      @Override
+//		final public boolean isReliable () {
+//	        return isReliable;
+//        }
+//		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isReliable(boolean) */
+////      @Override
+//		final public ConnectionSpec isReliable (boolean flag) {
+//        	isReliable = flag;
+//        	return this;
+//        }
+//		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isShared() */
+////      @Override
+//		final public boolean isShared () {
+//        	return isShared;
+//        }
+//        /* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isShared(boolean) */
+////      @Override
+//		final public ConnectionSpec isShared(boolean flag){
+//        	this.isShared = flag;
+//        	return this;
+//        }
+//        /* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isPipeline() */
+////      @Override
+//		final public boolean isPipeline() {
+//        	return isPipeline;
+//        }
+//		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isPipeline(boolean) */
+////      @Override
+//		final public ConnectionSpec isPipeline(boolean flag) {
+//        	isPipeline = flag;
+//        	return this;
+//        }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getHeartbeat() */
 //      @Override
 		final public int	getHeartbeat() {

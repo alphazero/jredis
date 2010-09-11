@@ -7,6 +7,7 @@ import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_PREF_LATENCY
 import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_RCVBUF;
 import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_SNDBUF;
 import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_TIMEOUT;
+import static org.jredis.connector.ConnectionSpec.ConnectionFlag.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.jredis.ClientRuntimeException;
@@ -109,9 +110,10 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
     	setSocketProperty(SO_PREF_CONN_TIME, DEFAULT_SO_PREF_CONN_TIME);
     	setSocketProperty(SO_PREF_LATENCY, DEFAULT_SO_PREF_LATENCY);
     	
-    	isReliable(DEFAULT_IS_RELIABLE);
-    	isShared(DEFAULT_IS_SHARED);
-    	isPipeline(DEFAULT_IS_PIPELINE);
+    	setConnectionFlag(RELIABLE, DEFAULT_IS_RELIABLE);
+    	setConnectionFlag(SHARED, DEFAULT_IS_SHARED);
+    	setConnectionFlag(PIPELINE, DEFAULT_IS_PIPELINE);
+    	
     	setHeartbeat(DEFAULT_HEARTBEAT_SEC);
     }
 	// ------------------------------------------------------------------------

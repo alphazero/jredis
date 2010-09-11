@@ -37,6 +37,7 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.ConnectionSpec.ConnectionFlag;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Response;
@@ -192,7 +193,7 @@ public abstract class ConnectionBase implements Connection {
     protected void initializeComponents () {
 		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
 
-		if(spec.isReliable()){
+		if(spec.getConnectionFlag(ConnectionFlag.RELIABLE)){
 	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), "connection [" + hashCode() + "] heartbeat");
 	    	heartbeat.start();
 		}
@@ -204,7 +205,7 @@ public abstract class ConnectionBase implements Connection {
      * heartbeats) is required!.
      */
     protected void notifyConnected () {
-    	if (spec.isReliable()){
+    	if (spec.getConnectionFlag(ConnectionFlag.RELIABLE)){
 	    	heartbeat.notifyConnected();
     	}
     }
@@ -214,7 +215,7 @@ public abstract class ConnectionBase implements Connection {
      * heartbeats) is required!.
      */
     protected void notifyDisconnected () {
-    	if (spec.isReliable()){
+    	if (spec.getConnectionFlag(ConnectionFlag.RELIABLE)){
 	    	heartbeat.notifyDisconnected();
     	}
     }
@@ -223,7 +224,7 @@ public abstract class ConnectionBase implements Connection {
      * @return
      */
     protected Protocol newProtocolHandler () {
-		return spec.isShared() ? new ConcurrentSynchProtocol() : new SynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
+		return spec.getConnectionFlag(ConnectionFlag.SHARED) ? new ConcurrentSynchProtocol() : new SynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
     }
     
     /**
