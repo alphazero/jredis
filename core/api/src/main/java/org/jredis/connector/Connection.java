@@ -97,8 +97,8 @@ public interface Connection {
 	// ========================================================================
 	
 	/**
-	 * [TODO: document me!]
-	 *
+	 * {@link Connection} listeners' callback API.
+	 * @optional
 	 * @author  Joubin Houshyar (alphazero@sensesay.net)
 	 * @version alpha.0, Mar 29, 2010
 	 * @since   alpha.0
@@ -109,8 +109,9 @@ public interface Connection {
 	}
 	
 	/**
-	 * [TODO: document me!]
-	 *
+	 * Events raised by the {@link Connection}.
+	 * <br>Events are typed and may have optional event info (Objects).
+	 * @optional
 	 * @author  Joubin Houshyar (alphazero@sensesay.net)
 	 * @version alpha.0, Mar 29, 2010
 	 * @since   alpha.0
@@ -129,6 +130,13 @@ public interface Connection {
 	        super(src, type, eventInfo);
         }
 
+		/**
+		 * Connection.Event.Types
+		 *
+		 * @author  joubin (alphazero@sensesay.net)
+		 * @date    Sep 11, 2010
+		 * 
+		 */
 		public enum Type {
 			Established,
 			Dropped,
