@@ -20,7 +20,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
-import org.jredis.protocol.Command;
 
 
 /**
@@ -104,6 +103,19 @@ public interface ConnectionSpec {
 	 * @return the previous value (if any).  Null if none existed, per {@link Map#put(Object, Object)} semantics.
 	 */
 	public ConnectionSpec setSocketProperty(ConnectionSpec.SocketProperty property, Integer value);
+ 	/**
+	 * @param flag
+	 * @return the {@link ConnectionFlag}
+	 * @see SocketFlag
+	 */
+	public boolean getConnectionFlag (ConnectionSpec.ConnectionFlag flag);
+	/**
+	 * Sets the specified {@link ConnectionFlag}
+	 * @param flag
+	 * @param value
+	 * @return the referenced {@link ConnectionSpec}
+	 */
+	public ConnectionSpec setConnectionFlag(ConnectionSpec.ConnectionFlag flag, Boolean value);
 	/**
 	 * @return
 	 */
@@ -152,7 +164,23 @@ public interface ConnectionSpec {
 	// ------------------------------------------------------------------------
 	// Associated (inner) types
 	// ------------------------------------------------------------------------
-	
+    public enum ConnectionFlag {
+    	/**  */
+    	CONNECT_IMMEDIATELY,
+    	/**  */
+    	TRANSPARENT_RECONNECT,
+    	/**  */
+    	RETRY_AFTER_RESET, 
+    	/**  */
+    	PIPELINE,
+    	/**  */
+    	SHARED,
+    	/**  */
+    	RELIABLE,
+    	/**  */
+    	TRACE
+    }
+
 	/**
 	 * Flag keys for SocketFlag settings of the connection specification.
 	 * @see ConnectionSpec#getSocketFlag(SocketFlag)
@@ -259,6 +287,9 @@ public interface ConnectionSpec {
 		/** {@link Map} of the {@link SocketProperty}s of the {@link ConnectionSpec} */
 		Map<SocketProperty, Integer> socketProperties = new HashMap<SocketProperty, Integer>();
 		
+		/** {@link Map} of the {@link ConnectionFlag}s of the {@link ConnectionSpec} */
+		Map<ConnectionFlag, Boolean> connectionFlags = new HashMap<ConnectionFlag, Boolean>();
+		
 		/**  */
 		private boolean isReliable;
 		
@@ -355,6 +386,17 @@ public interface ConnectionSpec {
 //      @Override
 		final public ConnectionSpec setSocketProperty(SocketProperty property, Integer value){
 			socketProperties.put(property, value);
+			return this;
+		}
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getConnectionFlag(org.jredis.connector.ConnectionSpec.ConnectionFlag) */
+//      @Override
+		final public boolean getConnectionFlag (ConnectionSpec.ConnectionFlag flag){
+			return connectionFlags.get(flag);
+		}
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setConnectionFlag(org.jredis.connector.ConnectionSpec.ConnectionFlag, java.lang.Boolean) */
+//      @Override
+		final public ConnectionSpec setConnectionFlag(ConnectionSpec.ConnectionFlag flag, Boolean value){
+			connectionFlags.put(flag, value);
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#isReliable() */
