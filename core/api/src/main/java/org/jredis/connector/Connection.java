@@ -80,6 +80,19 @@ public interface Connection {
 	public Future<Response> queueRequest (Command cmd,  byte[]...args) throws ClientRuntimeException, ProviderException;
 	
 	// ------------------------------------------------------------------------
+	// State management -- optional
+	public enum State {
+		/** Connection is initialized and ready. Will connect on demand */
+		INITIALIZED,
+		/** Connection is established. */
+		CONNECTED,
+		/** Not connected to remote server.  Can connect on demand. */
+		DISCONNECTED,
+		/** Connection is shutdown and can be disposed. */
+		TERMINATED
+	}
+	
+	// ------------------------------------------------------------------------
 	// Event management -- optional
 	 
 	 	/**
@@ -152,16 +165,28 @@ public interface Connection {
         }
 
 		/**
-		 * Connection.Event.Types
-		 *
-		 * @author  joubin (alphazero@sensesay.net)
-		 * @date    Sep 11, 2010
-		 * 
+		 * Connector.Event types.
 		 */
 		public enum Type {
-			Established,
-			Dropped,
-			Faulted
+			INITIALIZING,
+			INITIALIZED,
+			/** Raised when Connector is about to initiate the connect protocol */
+			CONNECTING,
+			/** Raised when Connector has established connectivity to the remote server */
+			CONNECTED,
+			/** Raised when Connector is about to initiate the dis-connect protocol */
+			DISCONNECTING,
+			/** Raised when Connector has disconnected from the remote server */
+			DISCONNECTED,
+			/** Raised when the Connector encounters a {@link ClientRuntimeException} or {@link ProviderException}.  */
+			FAULTED,
+			/** 
+			 * Raised to signal the beginning of the shutdown sequence (commences after listerners are notified.  
+			 * Cease all activity on receipt 
+			 * */
+			SHUTTING_DOWN,
+			/** Raised when Connector is terminated.  Dispose of your references on receipt. */
+			SHUTDOWN
 		}
 	}
 }

@@ -39,6 +39,7 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.Connection.Event.Type;
 import org.jredis.connector.ConnectionSpec.ConnectionFlag;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
@@ -79,27 +80,21 @@ public abstract class ConnectionBase implements Connection {
 	final 
 	protected ConnectionSpec  	spec;
 	
+	private boolean 			isConnected = false;
+	/** socket reference -- a new instance obtained in {@link ConnectionBase#newSocketConnect()} */
+	private Socket	socket;
 	private InputStream		    instream;
 	private OutputStream	    outstream;
-
-	private boolean 			isConnected = false;
 	
-	/** PINGs for heartbeat */
-	private HeartbeatJinn			heartbeat;
-
 	/** Connector Listeners */
 	final private Set<Connection.Listener> listeners = new HashSet<Connection.Listener>();
-	
-	// ------------------------------------------------------------------------
-	// Internal use fields
-	// ------------------------------------------------------------------------
-	
-	
+
+	/** Keep-alive heartbeat daemon thread  */
+	private HeartbeatJinn			heartbeat;
+
 	/** address of the socket connection */
 	private final InetSocketAddress  	socketAddress;
 	
-	/** socket reference -- a new instance obtained in {@link ConnectionBase#newSocketConnect()} */
-	private Socket	socket;
 	
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -157,8 +152,8 @@ public abstract class ConnectionBase implements Connection {
 	// ------------------------------------------------------------------------
 
 //	@Override
-	public ConnectionSpec getSpec() {
-		return spec;
+	public ConnectionSpec getSpec () {
+		return this.spec;
 	}
 	
 //	@Override
@@ -179,20 +174,27 @@ public abstract class ConnectionBase implements Connection {
 				"Object , Command, byte[]...) is not supported.");
 	}
 	
- 	// ------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
 	// Event management
 
-	/* (non-Javadoc) @see org.jredis.connector.Connection#addListener(org.jredis.connector.Connection.Listener) */
-//	@Override
+	/**
+	 * Optional
+	 * @param connListener
+	 * @return
+	 */
 	final public boolean addListener(Listener connListener){
 		return listeners.add(connListener);
 	}
 
-	/* (non-Javadoc) @see org.jredis.connector.Connection#removeListener(org.jredis.connector.Connection.Listener) */
-//	@Override
+	/**
+	 * Optional
+	 * @param connListener
+	 * @return
+	 */
 	final public boolean removeListener(Listener connListener){
 		return listeners.remove(connListener);
 	}
+	
 	// ------------------------------------------------------------------------
 	// Internal ops : Extension points
 	// ------------------------------------------------------------------------
@@ -213,7 +215,7 @@ public abstract class ConnectionBase implements Connection {
 		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
 
 		if(spec.getConnectionFlag(ConnectionFlag.RELIABLE)){
-	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), "connection [" + hashCode() + "] heartbeat");
+	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), " [" + this + "] heartbeat");
 	    	heartbeat.start();
 		}
     }
@@ -224,9 +226,10 @@ public abstract class ConnectionBase implements Connection {
      * heartbeats) is required!.
      */
     protected void notifyConnected () {
-    	if (spec.getConnectionFlag(ConnectionFlag.RELIABLE)){
-	    	heartbeat.notifyConnected();
-    	}
+//    	if (spec.isReliable()){
+//	    	heartbeat.notifyConnected();
+//    	}
+    	notifyListeners(new Event(this, Type.CONNECTED));
     }
     /**
      * Extension point -- callback on this method when {@link ConnectionBase} has disconnected from server.
@@ -234,9 +237,17 @@ public abstract class ConnectionBase implements Connection {
      * heartbeats) is required!.
      */
     protected void notifyDisconnected () {
-    	if (spec.getConnectionFlag(ConnectionFlag.RELIABLE)){
-	    	heartbeat.notifyDisconnected();
-    	}
+//    	if (spec.isReliable()){
+//	    	heartbeat.notifyDisconnected();
+//    	}
+    	notifyListeners(new Event(this, Type.DISCONNECTED));
+    }
+    
+    protected void notifyFaulted (String info) {
+    	notifyListeners(new Event(this, Type.FAULTED, info));
+    }
+    protected void notifyShutingDown () {
+    	notifyListeners(new Event(this, Type.SHUTDOWN));
     }
     /**
      * Extension point:  child classes may override to return specific {@link Protocol} implementations per their requirements.
@@ -263,13 +274,14 @@ public abstract class ConnectionBase implements Connection {
      */
     protected OutputStream newOutputStream(OutputStream socketOutputStream) { return socketOutputStream; }
     
- 	// ------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
 	// Inner ops: event management
-     	// ------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
 	final protected void notifyListeners(Connection.Event e) {
 		for(Connection.Listener l : listeners)
 			l.onEvent(e);
 	}
+
 	// ------------------------------------------------------------------------
 	// Inner ops: socket and connection management
 	// ------------------------------------------------------------------------
@@ -294,12 +306,32 @@ public abstract class ConnectionBase implements Connection {
 			catch (RuntimeException e){
 				Log.error("while attempting reconnect: " + e.getMessage());
 				if(++attempts == spec.getReconnectCnt()) {
-					Log.problem("Retry limit exceeded attempting reconnect.");
-					throw new ClientRuntimeException ("Failed to reconnect to the server.");
+//					Log.problem("Retry limit exceeded attempting reconnect.");
+					
+					onConnectionFault("Reconnect retry limit exceeded.  Failed to reconnect to the server after " + attempts + " reconnect attempts");
+//					throw new ClientRuntimeException ("Failed to reconnect to the server.");
 				}
 			}
 		}
 	}
+	/**
+	 * Will throw a {@link ClientRuntimeException}
+	 * @throws IllegalStateException
+	 */
+	protected final void onConnectionFault (String fault) throws ClientRuntimeException {
+		onConnectionFault(fault, true);
+	}
+	/**
+	 * Will throw a {@link ClientRuntimeException} if raiseEx is true
+	 * @throws IllegalStateException
+	 */
+	protected final void onConnectionFault (String fault, boolean raiseEx) throws ClientRuntimeException {
+		notifyFaulted(fault);
+		Log.problem("Conn FAULT: %s - %s", fault, this);
+ 		if(raiseEx) 
+ 			throw new ClientRuntimeException(fault);
+	}
+
 	/**
 	 * @throws IOException
 	 * @throws IllegalStateException
@@ -314,8 +346,9 @@ public abstract class ConnectionBase implements Connection {
 			newSocketConnect();
 		} 
 		catch (IOException e) {
-			throw new ClientRuntimeException(
-				"Socket connect failed -- make sure the server is running at " + spec.getAddress().getHostName(), e);
+			onConnectionFault("Socket connect failed [cause: "+e+"] -- make sure the server is running at " + spec.getAddress().getHostName());
+//			throw new ClientRuntimeException(
+//				"Socket connect failed -- make sure the server is running at " + spec.getAddress().getHostName(), e);
 		}
 		
 		// get the streams
@@ -338,7 +371,7 @@ public abstract class ConnectionBase implements Connection {
         	throw new IllegalArgumentException("Failed to connect -- check credentials and/or database settings for the connection spec", e);
         }
 		
-//		Log.log("RedisConnection - connected");
+		Log.debug ("CONNECTED | conn: %s", toString());
 		notifyConnected();
 	}
 
@@ -352,7 +385,14 @@ public abstract class ConnectionBase implements Connection {
 		isConnected = false;
 
 		notifyDisconnected();
-//		Log.log("RedisConnection - disconnected");
+		Log.debug ("DISCONNECTED | conn: %s", toString());
+	}
+	
+	/**
+	 * @throws IllegalStateException
+	 */
+	protected final void shutdown () throws IllegalStateException {
+		notifyShutingDown();
 	}
 	
 	/**
@@ -484,6 +524,11 @@ public abstract class ConnectionBase implements Connection {
         }
     }
 	
+    @Override
+    public String toString() {
+//    	String selfdesc = String.format("%s@%d", getClass().getSimpleName(), hashCode());
+    	return String.format("Connection: %-12s %s:%d db:%d | %s@%d", getModality().name().toUpperCase(), spec.getAddress(), spec.getPort(), spec.getDatabase(), getClass().getSimpleName(), hashCode());
+    }
 	// ------------------------------------------------------------------------
 	// Property accessors
 	// ------------------------------------------------------------------------
