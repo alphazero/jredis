@@ -927,7 +927,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		byte[] fromBytes = Convert.toBytes(from);
 		byte[] toBytes = Convert.toBytes(to);
 
-		return new FutureZSetList(this.queueRequest(Command.ZRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Options.WITHSCORES.bytes));
+		return new FutureZSetList(this.queueRequest(Command.ZRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Option.WITHSCORES.bytes));
 	}
 
 //	@Override
@@ -939,7 +939,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		byte[] fromBytes = Convert.toBytes(from);
 		byte[] toBytes = Convert.toBytes(to);
 
-		return new FutureZSetList(this.queueRequest(Command.ZREVRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Options.WITHSCORES.bytes));
+		return new FutureZSetList(this.queueRequest(Command.ZREVRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Option.WITHSCORES.bytes));
 	}
 	
 //	@Override

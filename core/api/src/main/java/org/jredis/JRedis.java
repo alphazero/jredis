@@ -711,7 +711,7 @@ public interface JRedis {
 	public List<byte[]> zrevrange (String setkey, long from, long to) throws RedisException; 
 
 	/**
-	 * Equivalent to {@link JRedis#zrange(String, long, long)} with the {@link Command.Options#WITHSCORES}.
+	 * Equivalent to {@link JRedis#zrange(String, long, long)} with the {@link Option.Options#WITHSCORES}.
 	 * Unlike the general ZRANGE command that only returns the values, this method returns both
 	 * values and associated scores for the specified range.
 	 *  
@@ -727,7 +727,7 @@ public interface JRedis {
 	public List<ZSetEntry> zrangeSubset (String setkey, long from, long to) throws RedisException; 
 
 	/**
-	 * Equivalent to {@link JRedis#zrevrange(String, long, long)} with the {@link Command.Options#WITHSCORES}.
+	 * Equivalent to {@link JRedis#zrevrange(String, long, long)} with the {@link Option.Options#WITHSCORES}.
 	 * Unlike the general ZREVRANGE command that only returns the values, this method returns both
 	 * values and associated scores for the specified range.
 	 *  

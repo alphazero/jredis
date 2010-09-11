@@ -1,18 +1,41 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <!-- parent -->
-  <parent>
-    <groupId>org.jredis</groupId>
-    <artifactId>jredis-core</artifactId>
-    <version>a.0-SNAPSHOT</version>
-  </parent>
+	<!-- parent -->
+	<parent>
+		<groupId>org.jredis</groupId>
+		<artifactId>jredis-core</artifactId>
+		<version>a.0-SNAPSHOT</version>
+	</parent>
 
-  <!-- production | jar -->
-  <name>JRedis - Core - API</name>
-  <groupId>org.jredis</groupId>
-  <artifactId>jredis-core-api</artifactId>
-  <version>a.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+	<!-- production | jar -->
+	<name>JRedis - Core - API</name>
+	<groupId>org.jredis</groupId>
+	<artifactId>jredis-core-api</artifactId>
+	<version>a.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<dependencies>
+		<!-- unit testing -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>5.8</version>
+			<scope>test</scope>
+			<classifier>jdk15</classifier>
+		</dependency>
+		<!--  logging -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.12</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+	</dependencies>
+
 </project>

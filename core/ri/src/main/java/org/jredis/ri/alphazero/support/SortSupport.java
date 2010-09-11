@@ -42,21 +42,21 @@ public abstract class SortSupport implements Sort {
 	private String limitSpec = NO_OP_SPEC;
 	private String storeSpec = NO_OP_SPEC;
 	
-	public Sort ALPHA() {  alphaSpec = String.format("%s%s", Command.Options.ALPHA.name(), PAD); return this; }
-	public Sort DESC() { sortSpec = String.format("%s%s", Command.Options.DESC.name(), PAD); return this;}
-	public Sort BY(String pattern) { bySpec = String.format("%s %s%s", Command.Options.BY.name(), pattern, PAD); return this; }
-	public Sort GET(String pattern) { getSpec = String.format("%s %s%s", Command.Options.GET.name(), pattern, PAD); return this; }
+	public Sort ALPHA() {  alphaSpec = String.format("%s%s", Command.Option.ALPHA.name(), PAD); return this; }
+	public Sort DESC() { sortSpec = String.format("%s%s", Command.Option.DESC.name(), PAD); return this;}
+	public Sort BY(String pattern) { bySpec = String.format("%s %s%s", Command.Option.BY.name(), pattern, PAD); return this; }
+	public Sort GET(String pattern) { getSpec = String.format("%s %s%s", Command.Option.GET.name(), pattern, PAD); return this; }
 	public Sort LIMIT(long from, long count) {
 		if(from < 0) throw new ClientRuntimeException("from in LIMIT clause: " + from);
 		if(count <= 0) throw new ClientRuntimeException("count in LIMIT clause: " + from);
-		limitSpec = String.format("%s %d %d%s", Command.Options.LIMIT.name(), from, count, PAD);
+		limitSpec = String.format("%s %d %d%s", Command.Option.LIMIT.name(), from, count, PAD);
 		return this;
 	}
 	/** Store the sort results in another key */
 	public Sort STORE (String destKey) {
 		Assert.notNull(destKey, "deskKey is null", ClientRuntimeException.class);
 		// TODO: check for whitespaces
-		storeSpec = String.format("%s %s%s", Command.Options.STORE, destKey, PAD);
+		storeSpec = String.format("%s %s%s", Command.Option.STORE, destKey, PAD);
 		stores = true;
 		return this;
 	}

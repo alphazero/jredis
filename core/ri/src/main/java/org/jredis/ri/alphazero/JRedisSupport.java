@@ -1364,7 +1364,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		List<ZSetEntry> list= null;
 		try {
-			MultiBulkResponse multiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.ZRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Options.WITHSCORES.bytes);
+			MultiBulkResponse multiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.ZRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Option.WITHSCORES.bytes);
 			List<byte[]> bulkData = multiBulkResponse.getMultiBulkData();
 			if(null != bulkData){
 				list = new ArrayList<ZSetEntry>(bulkData.size()/2);
@@ -1390,7 +1390,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		List<ZSetEntry> list= null;
 		try {
-			MultiBulkResponse multiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.ZREVRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Options.WITHSCORES.bytes);
+			MultiBulkResponse multiBulkResponse = (MultiBulkResponse) this.serviceRequest(Command.ZREVRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Option.WITHSCORES.bytes);
 			List<byte[]> bulkData = multiBulkResponse.getMultiBulkData();
 			if(null != bulkData){
 				list = new ArrayList<ZSetEntry>(bulkData.size()/2);

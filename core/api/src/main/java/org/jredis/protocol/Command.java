@@ -34,7 +34,6 @@ import org.jredis.Redis;
  */
 @Redis(versions="1.3")
 public enum Command {
-	
 	// security
 	AUTH 		(RequestType.KEY, 			ResponseType.STATUS),
 	
@@ -154,14 +153,19 @@ public enum Command {
 	// Remote server control commands
 	INFO		(RequestType.NO_ARG, 		ResponseType.BULK), 
 	MONITOR	    (RequestType.NO_ARG, 		ResponseType.VIRTUAL), 
-	SLAVEOF		(RequestType.KEY_KEY, 		ResponseType.STATUS);
+	SLAVEOF		(RequestType.KEY_KEY, 		ResponseType.STATUS),
+	
+	;// -- end --
 	
 	/** semantic sugar */
 	public final String code;
 	public final byte[] bytes;
 	public final RequestType requestType;
 	public final ResponseType responseType;
+	private final int flags_bitset;
 	
+	/** internal */
+	static final public String OPTCODE = "$";
 	/**
 	 * Each enum member directly corresponds to a Redis command, per
 	 * specification.  Command semantics is specified by the element
@@ -169,18 +173,31 @@ public enum Command {
 	 * @param reqType the {@link RequestType} of the Command
 	 * @param respType the {@link ResponseType} of the Command
 	 */
-	Command (RequestType reqType, ResponseType respType) { 
+	Command (RequestType reqType, ResponseType respType, Flag... flags) { 
 		this.code = this.name();
 		
-		if(code.indexOf("$") > 0) 
-			this.bytes = code.substring(0, code.indexOf('$')).getBytes();
+		if(code.indexOf(OPTCODE) > 0) 
+			this.bytes = code.substring(0, code.indexOf(OPTCODE)).getBytes();
 		else
 			this.bytes = code.getBytes();
 		
-//		this.length = code.length();
 		this.requestType = reqType;
 		this.responseType = respType;
-//		this.arg_cnt = -1; // to raise exception -- make sure we don't miss any
+		
+		if(flags != null && flags.length > 0)
+			this.flags_bitset = Flag.bitset(flags);
+		else
+			this.flags_bitset = Flag.OPAQUE_BITMASK;
+	}
+
+	/**
+	 * Tests if the specified flag is set for the command.
+	 * @param flag the flag
+	 * @return true if flag is set.
+	 * @see Command.Flag
+	 */
+	final public boolean isSet(Flag flag) {
+		return (flags_bitset & flag.bitmask) != Flag.OPAQUE_BITMASK;
 	}
 
 	// ------------------------------------------------------------------------
@@ -195,7 +212,7 @@ public enum Command {
 	 * @since   alpha.0
 	 * 
 	 */
-	public enum Options {
+	public enum Option {
 		WITHSCORES,
 		BY,
 		LIMIT,
@@ -206,11 +223,35 @@ public enum Command {
 		STORE;
 		/** semantic sugar */
 		public final byte[] bytes;
-		Options () {
+		Option () {
 			this.bytes = name().getBytes();
 		}
 	}
 	
+	/**
+	 * Defines (32 bit) flags for {@link Command}
+	 *
+	 * @author  joubin (alphazero@sensesay.net)
+	 * @date    Sep 10, 2010
+	 * 
+	 */
+	public enum Flag {
+		;// -- end --
+		public final int bitmask;
+		static final int OPAQUE_BITMASK = 0x0000;
+		Flag (){
+			this.bitmask = (int)Math.pow(2, ordinal());
+		}
+		static final public int bitset(Flag...flags){
+			int bitset = OPAQUE_BITMASK;
+			for(Flag f : flags)
+				bitset = bitset | f.bitmask;
+			return bitset;
+		}
+		public static boolean isSet(long bitset, Flag flag) {
+			return (bitset & flag.bitmask) > OPAQUE_BITMASK;
+		}
+	}
     /**
      * Broad Request Type categorization of the Redis Command per the request's
      * argument signature.  These categories are a more differentiated than the
