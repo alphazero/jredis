@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Houshyar
+ *   Copyright 2009-2010 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -27,19 +27,6 @@ import org.jredis.protocol.Response;
 
 public interface Connection {
 
-	/**
-	 * Enum for defining the operational modality of the protocol handlers.
-	 *   
-	 * @author  Joubin Houshyar (alphazero@sensesay.net)
-	 * @version alpha.0, 04/02/09
-	 * @since   alpha.0
-	 * 
-	 */
-	public enum Modality {
-		Synchronous,
-		Asynchronous
-	}
-	
 	/**
 	 * The {@link ConnectionSpec} of a Connection must be invariant during its life-cycle.
 	 * @return the associated {@link ConnectionSpec} for this Connection. 
@@ -92,9 +79,43 @@ public interface Connection {
 
 	public Future<Response> queueRequest (Command cmd,  byte[]...args) throws ClientRuntimeException, ProviderException;
 	
+	// ------------------------------------------------------------------------
+	// Event management -- optional
+	 
+	 	/**
+		 * Connection.Event propagation.
+		 * @optional  
+	 	 * @param connListener
+		 * @return true if listener was successfully added.
+	 	 */
+	 	public boolean addListener(Listener connListener);
+	 
+	/**
+	 * <b>Optional</b> event propagation method.  Removes the specified listenr
+	 * from the list of {@link Connection.Listener}s.
+	 * @param connListener
+	 * @return true if the listener was actually present and was removed.
+	 */
+	public boolean removeListener(Listener connListener);
+
 	// ========================================================================
 	// Innner Types
 	// ========================================================================
+	
+	/**
+	 * Enum for defining the operational modality of the protocol handlers.
+	 *   
+	 * @author  Joubin Houshyar (alphazero@sensesay.net)
+	 * @version alpha.0, 04/02/09
+	 * @since   alpha.0
+	 * 
+	 */
+	public enum Modality {
+		/**  */
+		Synchronous,
+		/**  */
+		Asynchronous
+	}
 	
 	/**
 	 * {@link Connection} listeners' callback API.
