@@ -39,7 +39,7 @@ public interface ConnectionSpec {
 	public InetAddress getAddress();
 	/**
 	 * @param address
-	 * @return
+     * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setAddress(InetAddress address);
 	/**
@@ -48,7 +48,7 @@ public interface ConnectionSpec {
 	public int getPort ();
 	/**
 	 * @param port
-	 * @return
+     * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setPort(int port);
 	
@@ -61,7 +61,7 @@ public interface ConnectionSpec {
 	public byte[] getCredentials();
 	/**
 	 * @param credentials
-	 * @return
+     * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setCredentials(byte[] credentials);
 	
@@ -74,7 +74,7 @@ public interface ConnectionSpec {
 	public int getDatabase ();
 	/**
 	 * @param database
-	 * @return
+     * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setDatabase(int database);
 	/**
@@ -86,7 +86,7 @@ public interface ConnectionSpec {
 	/**
 	 * @param flag
 	 * @param value
-	 * @return
+     * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setSocketFlag(ConnectionSpec.SocketFlag flag, Boolean value);
 	/**
@@ -98,7 +98,7 @@ public interface ConnectionSpec {
 	/**
 	 * @param property
 	 * @param value
-	 * @return
+     * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setSocketProperty(ConnectionSpec.SocketProperty property, Integer value);
 
@@ -108,7 +108,7 @@ public interface ConnectionSpec {
 	public int	getReconnectCnt ();
 	/**
 	 * @param cnt
-	 * @return
+     * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setReconnectCnt(int cnt);
 
@@ -118,7 +118,7 @@ public interface ConnectionSpec {
     public boolean isReliable ();
 
 	/**
-     * @return
+     * @return the {@link ConnectionSpec}
      */
     public ConnectionSpec isReliable (boolean flag);
     
@@ -134,15 +134,25 @@ public interface ConnectionSpec {
     
     /**
      * @param seconds heartbeat period
+     * @return the {@link ConnectionSpec}
      */
     public ConnectionSpec setHeartbeat(int seconds);
+
     /**
      * @param flag
+     * @return the {@link ConnectionSpec}
      */
     public ConnectionSpec isShared(boolean flag);
 
+    /**
+     * @return
+     */
     public boolean isPipeline();
     
+    /**
+     * @param flag
+     * @return
+     */
     public ConnectionSpec isPipeline(boolean flag);
     
 	// ------------------------------------------------------------------------
