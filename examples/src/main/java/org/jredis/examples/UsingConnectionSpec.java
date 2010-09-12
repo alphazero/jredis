@@ -16,16 +16,19 @@
 
 package org.jredis.examples;
 
+import static org.jredis.connector.Connection.Socket.Property.SO_PREF_BANDWIDTH;
+import static org.jredis.connector.Connection.Socket.Property.SO_PREF_CONN_TIME;
+import static org.jredis.connector.Connection.Socket.Property.SO_PREF_LATENCY;
+import static org.jredis.connector.Connection.Socket.Property.SO_RCVBUF;
+import static org.jredis.connector.Connection.Socket.Property.SO_SNDBUF;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.jredis.RedisException;
+import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.ConnectionSpec.SocketFlag;
-import org.jredis.connector.ConnectionSpec.SocketProperty;
 import org.jredis.ri.alphazero.JRedisClient;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
-
 /**
  * Illustrates using the {@link ConnectionSpec} as a parameter when creating the {@link JRedisClient}.
  * @author  Joubin (alphazero@sensesay.net)
@@ -68,7 +71,7 @@ public class UsingConnectionSpec {
 		    	connectionSpec
 		    		// to be or not to be -- you decide
 		    		//
-		    		.setSocketFlag(SocketFlag.SO_KEEP_ALIVE, false)				// DO NOT keep socket allive
+		    		.setSocketFlag(Connection.Socket.Flag.SO_KEEP_ALIVE, false)				// DO NOT keep socket allive
 
 		    		// connect retries on connection breaks
 		    		//
@@ -76,17 +79,17 @@ public class UsingConnectionSpec {
 
 		    		// TCP algorithm preferences
 		    		//
-		    		.setSocketProperty(SocketProperty.SO_PREF_CONN_TIME, 0) 	// connection time is highester pref
-		    		.setSocketProperty(SocketProperty.SO_PREF_LATENCY, 1)		// latency is 2nd pref
-		    		.setSocketProperty(SocketProperty.SO_PREF_BANDWIDTH, 2)	// bandwith is 3rd pref
+		    		.setSocketProperty(SO_PREF_CONN_TIME, 0) 	// connection time is highester pref
+		    		.setSocketProperty(SO_PREF_LATENCY, 1)		// latency is 2nd pref
+		    		.setSocketProperty(SO_PREF_BANDWIDTH, 2)	// bandwith is 3rd pref
 		    	
 		    		// TCP buffer sizes -- more than likely your platform's default settings are quite large
 		    		// but if you are itching to try your own settings, please do.  Remember:  connections
 		    		// will use whatever is the larger value: you OS's TCP buffer sizes or your ConnectionSpecs
 		    		// so you can NOT use these settings to shrink the SND and RCV buffer sizes.
 		    		//
-		    		.setSocketProperty(SocketProperty.SO_RCVBUF, 1024 * 128)  // set RCV buffer to 128KB
-		    		.setSocketProperty(SocketProperty.SO_SNDBUF, 1024 * 128) // set SND buffer to 128KB
+		    		.setSocketProperty(SO_RCVBUF, 1024 * 128)  // set RCV buffer to 128KB
+		    		.setSocketProperty(SO_SNDBUF, 1024 * 128) // set SND buffer to 128KB
 		    		
 		    		// obviously we can still set the basic props as well ..
 		    		//

@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Houshyar
+ *   Copyright 2009-2010 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,19 +16,17 @@
 
 package org.jredis.ri.alphazero.connection;
 
-import static org.jredis.connector.ConnectionSpec.SocketFlag.SO_KEEP_ALIVE;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_PREF_BANDWIDTH;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_PREF_CONN_TIME;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_PREF_LATENCY;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_RCVBUF;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_SNDBUF;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_TIMEOUT;
+import static org.jredis.connector.Connection.Socket.Property.SO_PREF_BANDWIDTH;
+import static org.jredis.connector.Connection.Socket.Property.SO_PREF_CONN_TIME;
+import static org.jredis.connector.Connection.Socket.Property.SO_PREF_LATENCY;
+import static org.jredis.connector.Connection.Socket.Property.SO_RCVBUF;
+import static org.jredis.connector.Connection.Socket.Property.SO_SNDBUF;
+import static org.jredis.connector.Connection.Socket.Property.SO_TIMEOUT;
 import static org.jredis.ri.alphazero.support.Assert.notNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -81,7 +79,7 @@ public abstract class ConnectionBase implements Connection {
 	
 	private boolean 			isConnected = false;
 	/** socket reference -- a new instance obtained in {@link ConnectionBase#newSocketConnect()} */
-	private Socket	socket;
+	private java.net.Socket		socket;
 	private InputStream		    instream;
 	private OutputStream	    outstream;
 	
@@ -408,10 +406,10 @@ public abstract class ConnectionBase implements Connection {
 	private final void newSocketConnect () 
 		throws IOException 
 	{
-		socket = new Socket ();
+		socket = new java.net.Socket ();
 		
 		socket.setKeepAlive (
-				spec.getSocketFlag (SO_KEEP_ALIVE));
+				spec.getSocketFlag (Connection.Socket.Flag.SO_KEEP_ALIVE));
 		
 		socket.setPerformancePreferences(
 				spec.getSocketProperty (SO_PREF_CONN_TIME),

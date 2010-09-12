@@ -26,7 +26,6 @@ import org.jredis.ProviderException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.NotConnectedException;
-import org.jredis.connector.ConnectionSpec.SocketProperty;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Request;
@@ -106,7 +105,7 @@ public class AsynchConnection extends ConnectionBase implements Connection {
     	InputStream in = super.newInputStream(socketInputStream);
     	if(!(in instanceof FastBufferedInputStream)){
     		Log.log(String.format("WARN: input was: %s\n", in.getClass().getCanonicalName()));
-    		in = new FastBufferedInputStream (in, spec.getSocketProperty(SocketProperty.SO_RCVBUF));
+    		in = new FastBufferedInputStream (in, spec.getSocketProperty(Connection.Socket.Property.SO_RCVBUF));
     	}
     	return in;
     }

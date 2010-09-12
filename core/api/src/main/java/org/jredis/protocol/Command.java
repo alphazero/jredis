@@ -18,18 +18,24 @@ package org.jredis.protocol;
 
 import org.jredis.Redis;
 
-
-
-
 /**
- * Redis commands, verbatim. Each member of the Command enum maps to a 
- * corresponding (protocol level) command in Redis.  
+ * Redis commands, (~) verbatim. Each member of the Command enum maps to a 
+ * corresponding (protocol level) command in Redis.  Commands with optional
+ * semantics are further distinguished: optional variants include 
+ * embedded '$').
  * 
  * <p><b>specification</b> <code>Redis 1.00</code>
  * 
  * @author  Joubin (alphazero@sensesay.net)
  * @version alpha.0, 04/02/09
  * @since   alpha.0
+ * 
+ */
+/**
+ * [TODO: document me!]
+ *
+ * @author  joubin (alphazero@sensesay.net)
+ * @date    Sep 12, 2010
  * 
  */
 @Redis(versions="1.3")
@@ -105,8 +111,10 @@ public enum Command {
 	ZRANK		(RequestType.KEY_VALUE,		ResponseType.NUMBER),
 	ZREVRANK	(RequestType.KEY_VALUE,		ResponseType.NUMBER),
 	ZRANGE			(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
+	/** ZRANGE with OPTIONS  */
 	ZRANGE$OPTS		(RequestType.KEY_NUM_NUM_OPTS,	ResponseType.MULTI_BULK),
 	ZREVRANGE		(RequestType.KEY_NUM_NUM,		ResponseType.MULTI_BULK),
+	/** ZREVRANGE with OPTIONS  */
 	ZREVRANGE$OPTS	(RequestType.KEY_NUM_NUM_OPTS,	ResponseType.MULTI_BULK),
 	ZINCRBY		(RequestType.KEY_IDX_VALUE, ResponseType.BULK),
 	ZRANGEBYSCORE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK),
@@ -137,6 +145,7 @@ public enum Command {
 	
 	// Sorting
 	SORT		(RequestType.KEY_SPEC,		ResponseType.MULTI_BULK),
+	/** SORT...STORE */
 	SORT$STORE  (RequestType.KEY_SPEC,		ResponseType.NUMBER),
 	
 	// Persistence control commands
@@ -187,7 +196,7 @@ public enum Command {
 		if(flags != null && flags.length > 0)
 			this.flags_bitset = Flag.bitset(flags);
 		else
-			this.flags_bitset = Flag.OPAQUE_BITMASK;
+			this.flags_bitset = Flag.OPAQUE_BITMASK_32;
 	}
 
 	/**
@@ -197,7 +206,7 @@ public enum Command {
 	 * @see Command.Flag
 	 */
 	final public boolean isSet(Flag flag) {
-		return (flags_bitset & flag.bitmask) != Flag.OPAQUE_BITMASK;
+		return (flags_bitset & flag.bitmask) != Flag.OPAQUE_BITMASK_32;
 	}
 
 	// ------------------------------------------------------------------------
@@ -236,20 +245,28 @@ public enum Command {
 	 * 
 	 */
 	public enum Flag {
+		TEST,
+		FOO,
+		BAR,
 		;// -- end --
 		public final int bitmask;
-		static final int OPAQUE_BITMASK = 0x0000;
+		private static final int OPAQUE_BITMASK_32 = 0x0000;
 		Flag (){
 			this.bitmask = (int)Math.pow(2, ordinal());
 		}
 		static final public int bitset(Flag...flags){
-			int bitset = OPAQUE_BITMASK;
-			for(Flag f : flags)
-				bitset = bitset | f.bitmask;
+			return bitset(OPAQUE_BITMASK_32, flags);
+		}
+		static final public int bitset(int bitset, Flag...flags){
+			for(Flag f : flags) bitset = bitset | f.bitmask;
 			return bitset;
 		}
 		public static boolean isSet(long bitset, Flag flag) {
-			return (bitset & flag.bitmask) > OPAQUE_BITMASK;
+			return (bitset & flag.bitmask) > OPAQUE_BITMASK_32;
+		}
+		static final public int bitclear(int bitset, Flag...flags){
+			for(Flag f : flags) bitset = bitset ^ f.bitmask;
+			return bitset;
 		}
 	}
     /**

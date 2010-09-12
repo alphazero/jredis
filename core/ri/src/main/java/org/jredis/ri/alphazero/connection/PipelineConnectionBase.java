@@ -16,6 +16,7 @@
 
 package org.jredis.ri.alphazero.connection;
 
+import static org.jredis.connector.Connection.Socket.Property.SO_RCVBUF;
 import java.io.InputStream;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -28,8 +29,6 @@ import org.jredis.ProviderException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.NotConnectedException;
-import org.jredis.connector.Connection.Flag;
-import org.jredis.connector.ConnectionSpec.SocketProperty;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Request;
@@ -148,7 +147,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	InputStream in = super.newInputStream(socketInputStream);
     	if(!(in instanceof FastBufferedInputStream)){
     		Log.log(String.format("WARN: input was: %s\n", in.getClass().getCanonicalName()));
-    		in = new FastBufferedInputStream (in, spec.getSocketProperty(SocketProperty.SO_RCVBUF));
+    		in = new FastBufferedInputStream (in, spec.getSocketProperty(SO_RCVBUF));
     	}
     	return in;
     }

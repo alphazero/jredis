@@ -124,10 +124,15 @@ public interface Connection {
 	 * 
 	 */
 	public enum Modality {
-		/**  */
+		/** blocking request/reply semantics */
 		Synchronous,
+		/** non-blocking request/future-response semantics */
+		Asynchronous,
 		/**  */
-		Asynchronous
+		PubSub,
+		/**  */
+		Monitor,
+		;
 	}
 	
 	/**
@@ -207,9 +212,96 @@ public interface Connection {
     	/**  */
     	RELIABLE,
     	/**  */
-    	TRACE
+    	TRACE,
+    	;
+		public final int bitmask;
+		static final int OPAQUE_BITMASK = 0x0000;
+		Flag (){
+			this.bitmask = (int)Math.pow(2, ordinal());
+		}
+		static final public int bitset(Flag...flags){
+			int bitset = OPAQUE_BITMASK;
+			return bitset(bitset, flags);
+		}
+		static final public int bitset(int bitset, Flag...flags){
+			for(Flag f : flags) bitset = bitset | f.bitmask;
+			return bitset;
+		}
+		static final public int bitclear(int bitset, Flag...flags){
+			for(Flag f : flags) bitset = bitset ^ f.bitmask;
+			return bitset;
+		}
+		public static boolean isSet(int bitset, Flag flag) {
+			return (bitset & flag.bitmask) > OPAQUE_BITMASK;
+		}
     }
     
+	// ------------------------------------------------------------------------
+    // Connection.Socket
+    // ------------------------------------------------------------------------
+    public interface Socket {
+    	/**
+    	 * Flag keys for SocketFlag settings of the connection specification.
+    	 * @see ConnectionSpec#getSocketFlag(SocketFlag)
+    	 * @author Joubin Houshyar (alphazero@sensesay.net)
+    	 *
+    	 */
+    	public enum Flag {
+    		/** Corresponds to SO_KEEP_ALIVE flag of {@link Socket}.  @see {@link Socket#setSoTimeout(int)} */
+    		SO_KEEP_ALIVE,
+    		;
+    	}
+    	/**
+    	 * Property keys for SocketProperty settings of the connection specification.
+    	 * @see ConnectionSpec#getSocketProperty(SocketProperty)
+    	 * @author Joubin Houshyar (alphazero@sensesay.net)
+    	 *
+    	 */
+    	public enum Property {
+    		/** 
+    		 * Corresponds to <code><b>SO_SNDBUF</b></code> flag. see {@link Socket#setSendBufferSize(int)} 
+    		 * <p>expected value is an <b><code>int</code></b> or an {@link Integer}.
+    		 */
+    		SO_SNDBUF,
+    		
+    		/** 
+    		 * corresponds to SO_RCVBUF flag. see {@link Socket#setReceiveBufferSize(int)} 
+    		 */
+    		SO_RCVBUF,
+    		
+    		/** 
+    		 * corresponds to SO_TIMEOUT flag.  see {@link Socket#setSoTimeout(int)} 
+    		 */
+    		SO_TIMEOUT,
+    		
+    		/**
+    		 * Socket performance preferences.
+    		 * <p> This property will be used in conjunction with other associated properties.
+    		 * @See {@link SocketProperty#latency}
+    		 * @See {@link SocketProperty#bandwidth}
+    		 * @See {@link Socket#setPerformancePreferences(int, int, int)} for details.
+    		 */
+    		SO_PREF_CONN_TIME,
+
+    		/**
+    		 * Socket performance preferences.
+    		 * <p> This property will be used in conjunction with other associated properties.
+    		 * @See {@link SocketProperty#bandwidth}
+    		 * @See {@link SocketProperty#connection_time}
+    		 * @See {@link Socket#setPerformancePreferences(int, int, int)} for details.
+    		 */
+    		SO_PREF_LATENCY,
+
+    		/**
+    		 * Socket performance preferences.
+    		 * <p> This property will be used in conjunction with other associated properties.
+    		 * @See {@link SocketProperty#latency}
+    		 * @See {@link SocketProperty#connection_time}
+    		 * @See {@link Socket#setPerformancePreferences(int, int, int)} for details.
+    		 */
+    		SO_PREF_BANDWIDTH,
+    	}
+    }
 	// ------------------------------------------------------------------------
     // Connection.Factor
     // ------------------------------------------------------------------------

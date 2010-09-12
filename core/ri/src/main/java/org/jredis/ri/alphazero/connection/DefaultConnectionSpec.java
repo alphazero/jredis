@@ -1,23 +1,27 @@
 package org.jredis.ri.alphazero.connection;
 
-import static org.jredis.connector.ConnectionSpec.SocketFlag.SO_KEEP_ALIVE;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_PREF_BANDWIDTH;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_PREF_CONN_TIME;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_PREF_LATENCY;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_RCVBUF;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_SNDBUF;
-import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_TIMEOUT;
-import static org.jredis.connector.Connection.Flag.*;
+import static org.jredis.connector.Connection.Flag.PIPELINE;
+import static org.jredis.connector.Connection.Flag.RELIABLE;
+import static org.jredis.connector.Connection.Flag.SHARED;
+import static org.jredis.connector.Connection.Socket.Property.SO_PREF_BANDWIDTH;
+import static org.jredis.connector.Connection.Socket.Property.SO_PREF_CONN_TIME;
+import static org.jredis.connector.Connection.Socket.Property.SO_PREF_LATENCY;
+import static org.jredis.connector.Connection.Socket.Property.SO_RCVBUF;
+import static org.jredis.connector.Connection.Socket.Property.SO_SNDBUF;
+import static org.jredis.connector.Connection.Socket.Property.SO_TIMEOUT;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.jredis.ClientRuntimeException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.Connection.Modality;
 import org.jredis.ri.alphazero.support.Assert;
 
 /**
  * Default connection spec provides the following default values for a connection.  See
  * {@link ConnectionSpec} for details of these properties and flags.
+ * <p>
+ * The default {@link Modality} for the {@link Connection} is {@link Modality#Synchronous}.
  * <p>
  * This {@link ConnectionSpec} is configured to prefer bandwidth and relatively large (48K)
  * buffers (which is probably less than your OS's default buffer sizes anyway, but you never know).
@@ -58,9 +62,14 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	/** thrid priority pref is connection time */
 	private static final int DEFAULT_SO_PREF_CONN_TIME = 2;
 	
+	/** def value: <code>true</code> */
 	private static final boolean DEFAULT_IS_SHARED = true;
+	/** def value: <code>false</code> */
 	private static final boolean DEFAULT_IS_RELIABLE = false;
+	/** def value: <code>false</code> */
 	private static final boolean DEFAULT_IS_PIPELINE = false;
+	/** def value: <code>Modality.Synchronous</code> */
+	private static final Modality DEFAULT_CONN_MODALITY = Modality.Synchronous;
 	
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -100,7 +109,7 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
     	setReconnectCnt(DEFAULT_RECONNECT_CNT);
     	
     	//  tcp socket flags
-    	setSocketFlag(SO_KEEP_ALIVE, true);
+    	setSocketFlag(Connection.Socket.Flag.SO_KEEP_ALIVE, true);
     	
     	// tcp socket flags
     	setSocketProperty(SO_TIMEOUT, DEFAULT_READ_TIMEOUT_MSEC);
@@ -113,6 +122,8 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
     	setConnectionFlag(RELIABLE, DEFAULT_IS_RELIABLE);
     	setConnectionFlag(SHARED, DEFAULT_IS_SHARED);
     	setConnectionFlag(PIPELINE, DEFAULT_IS_PIPELINE);
+    	
+    	setConnectionProperty(Modality.class, DEFAULT_CONN_MODALITY);
     	
     	setHeartbeat(DEFAULT_HEARTBEAT_SEC);
     }

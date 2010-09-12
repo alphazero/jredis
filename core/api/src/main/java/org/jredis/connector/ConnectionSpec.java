@@ -17,7 +17,6 @@
 package org.jredis.connector;
 
 import java.net.InetAddress;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,28 +80,28 @@ public interface ConnectionSpec {
 	 * @return the specified TCP socket flag used for the connection.
 	 * @see SocketFlag
 	 */
-	public boolean getSocketFlag (ConnectionSpec.SocketFlag flag);
+	public boolean getSocketFlag (Connection.Socket.Flag flag);
 	/**
-	 * Set the {@link SocketFlag} for the {@link ConnectionSpec}
+	 * Set the {@link Connection.Socket.Flag} for the {@link ConnectionSpec}
 	 * @param flag
 	 * @param value
 	 * @return {@link ConnectionSpec} this
 	 */
-	public ConnectionSpec setSocketFlag(ConnectionSpec.SocketFlag flag, Boolean value);
+	public ConnectionSpec setSocketFlag(Connection.Socket.Flag flag, Boolean value);
 	/**
-	 * Get the {@link SocketProperty} for the {@link ConnectionSpec}
+	 * Get the {@link Connection.Socket.Property} for the {@link ConnectionSpec}
 	 * @param property
 	 * @return the specified socket property used for the connection.
 	 * @see SocketFlag
 	 */
-	public Integer getSocketProperty (ConnectionSpec.SocketProperty property);
+	public Integer getSocketProperty (Connection.Socket.Property property);
 	/**
 	 * Set the {@link SocketProperty} for the {@link ConnectionSpec}
 	 * @param property
 	 * @param value
 	 * @return the previous value (if any).  Null if none existed, per {@link Map#put(Object, Object)} semantics.
 	 */
-	public ConnectionSpec setSocketProperty(ConnectionSpec.SocketProperty property, Integer value);
+	public ConnectionSpec setSocketProperty(Connection.Socket.Property property, Integer value);
  	/**
 	 * @param flag
 	 * @return the {@link Connection.Flag}
@@ -116,6 +115,19 @@ public interface ConnectionSpec {
 	 * @return the referenced {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setConnectionFlag(Connection.Flag flag, Boolean value);
+	/**
+	 * @param <T>
+	 * @param proptype
+	 * @return
+	 */
+	public <T> T getConnectionProperty(Class<T> proptype);
+	/**
+	 * @param <T>
+	 * @param property
+	 * @param value
+	 * @return
+	 */
+	public <T> ConnectionSpec setConnectionProperty(Class<T> property, T value);
 	/**
 	 * @return
 	 */
@@ -134,68 +146,6 @@ public interface ConnectionSpec {
      * @return the {@link ConnectionSpec}
      */
     public ConnectionSpec setHeartbeat(int seconds);
-
-	/**
-	 * Flag keys for SocketFlag settings of the connection specification.
-	 * @see ConnectionSpec#getSocketFlag(SocketFlag)
-	 * @author Joubin Houshyar (alphazero@sensesay.net)
-	 *
-	 */
-	public enum SocketFlag {
-		/** Corresponds to SO_KEEP_ALIVE flag of {@link Socket}.  @see {@link Socket#setSoTimeout(int)} */
-		SO_KEEP_ALIVE
-	}
-	
-	/**
-	 * Property keys for SocketProperty settings of the connection specification.
-	 * @see ConnectionSpec#getSocketProperty(SocketProperty)
-	 * @author Joubin Houshyar (alphazero@sensesay.net)
-	 *
-	 */
-	public enum SocketProperty {
-		/** 
-		 * Corresponds to <code><b>SO_SNDBUF</b></code> flag. see {@link Socket#setSendBufferSize(int)} 
-		 * <p>expected value is an <b><code>int</code></b> or an {@link Integer}.
-		 */
-		SO_SNDBUF,
-		
-		/** 
-		 * corresponds to SO_RCVBUF flag. see {@link Socket#setReceiveBufferSize(int)} 
-		 */
-		SO_RCVBUF,
-		
-		/** 
-		 * corresponds to SO_TIMEOUT flag.  see {@link Socket#setSoTimeout(int)} 
-		 */
-		SO_TIMEOUT,
-		
-		/**
-		 * Socket performance preferences.
-		 * <p> This property will be used in conjunction with other associated properties.
-		 * @See {@link SocketProperty#latency}
-		 * @See {@link SocketProperty#bandwidth}
-		 * @See {@link Socket#setPerformancePreferences(int, int, int)} for details.
-		 */
-		SO_PREF_CONN_TIME,
-
-		/**
-		 * Socket performance preferences.
-		 * <p> This property will be used in conjunction with other associated properties.
-		 * @See {@link SocketProperty#bandwidth}
-		 * @See {@link SocketProperty#connection_time}
-		 * @See {@link Socket#setPerformancePreferences(int, int, int)} for details.
-		 */
-		SO_PREF_LATENCY,
-
-		/**
-		 * Socket performance preferences.
-		 * <p> This property will be used in conjunction with other associated properties.
-		 * @See {@link SocketProperty#latency}
-		 * @See {@link SocketProperty#connection_time}
-		 * @See {@link Socket#setPerformancePreferences(int, int, int)} for details.
-		 */
-		SO_PREF_BANDWIDTH,
-	}
 
 	// ------------------------------------------------------------------------
 	// Reference Implementation 
@@ -236,13 +186,17 @@ public interface ConnectionSpec {
 		int 	reconnectCnt;
 		
 		/** {@link Map} of the {@link SocketFlag}s of the {@link ConnectionSpec} */
-		Map<SocketFlag, Boolean> socketFlags = new HashMap<SocketFlag, Boolean>();
+		Map<Connection.Socket.Flag, Boolean> socketFlags = new HashMap<Connection.Socket.Flag, Boolean>();
 		
 		/** {@link Map} of the {@link SocketProperty}s of the {@link ConnectionSpec} */
-		Map<SocketProperty, Integer> socketProperties = new HashMap<SocketProperty, Integer>();
+		Map<Connection.Socket.Property, Integer> socketProperties = new HashMap<Connection.Socket.Property, Integer>();
+		
+//		/** {@link Map} of the {@link Connection.Flag}s of the {@link ConnectionSpec} */
+//		Map<Connection.Flag, Boolean> connectionFlags = new HashMap<Connection.Flag, Boolean>();
+		int		connectionFlagBitmask;
 		
 		/** {@link Map} of the {@link Connection.Flag}s of the {@link ConnectionSpec} */
-		Map<Connection.Flag, Boolean> connectionFlags = new HashMap<Connection.Flag, Boolean>();
+		Map<Class<?>, Object> connectionProperties = new HashMap<Class<?>, Object>();
 		
 		/** heartbeat period in milliseconds */
 		private int heartbeat;
@@ -281,14 +235,24 @@ public interface ConnectionSpec {
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag) */
 //		@Override
-		final public boolean getSocketFlag (SocketFlag flag) {
+		final public boolean getSocketFlag (Connection.Socket.Flag flag) {
 			return socketFlags.get(flag);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getSocketProperty(org.jredis.connector.ConnectionSpec.SocketProperty) */
 //		@Override
-		final public Integer getSocketProperty (SocketProperty property) {
+		final public Integer getSocketProperty (Connection.Socket.Property property) {
 			return socketProperties.get(property);
 		}
+		@SuppressWarnings("unchecked") // puts are strictly checked.
+        final public <T> T getConnectionProperty(Class<T> proptype){
+			return (T) connectionProperties.get(proptype);			
+		}
+		final public <T> ConnectionSpec setConnectionProperty(Class<T> property, T value){
+			try {  connectionProperties.put(property, (T) value); }
+			catch (ClassCastException e){ throw new IllegalArgumentException("value type", e);}
+			return this;
+		}
+
 		// ------------------------------------------------------------------------
 		// Property Setters
 		// ------------------------------------------------------------------------
@@ -323,25 +287,25 @@ public interface ConnectionSpec {
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag, java.lang.Boolean) */
 //      @Override
-		final public ConnectionSpec setSocketFlag(SocketFlag flag, Boolean value){
+		final public ConnectionSpec setSocketFlag(Connection.Socket.Flag flag, Boolean value){
 			socketFlags.put(flag, value);
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setSocketProperty(org.jredis.connector.ConnectionSpec.SocketProperty, java.lang.Integer) */
 //      @Override
-		final public ConnectionSpec setSocketProperty(SocketProperty property, Integer value){
+		final public ConnectionSpec setSocketProperty(Connection.Socket.Property property, Integer value){
 			socketProperties.put(property, value);
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getConnectionFlag(org.jredis.connector.ConnectionSpec.ConnectionFlag) */
 //      @Override
 		final public boolean getConnectionFlag (Connection.Flag flag){
-			return connectionFlags.get(flag);
+			return Connection.Flag.isSet(connectionFlagBitmask, flag);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setConnectionFlag(org.jredis.connector.ConnectionSpec.ConnectionFlag, java.lang.Boolean) */
 //      @Override
 		final public ConnectionSpec setConnectionFlag(Connection.Flag flag, Boolean value){
-			connectionFlags.put(flag, value);
+			Connection.Flag.bitset(connectionFlagBitmask, flag);
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getHeartbeat() */

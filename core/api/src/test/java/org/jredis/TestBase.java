@@ -16,10 +16,9 @@
 
 package org.jredis;
 
+import static org.testng.Assert.fail;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.testng.annotations.Test;
-import static org.testng.Assert.fail;
 
 /**
  * [TODO: document me!]
@@ -56,9 +55,5 @@ public class TestBase {
 		finally {
 			if(!didRaiseError) { fail("Failed to raise expected RuntimeError " + errtype.getCanonicalName()); }
 		}
-	}
-	@Test
-	public void testMe () {
-		log.info("Hello there world!");
 	}
 }
