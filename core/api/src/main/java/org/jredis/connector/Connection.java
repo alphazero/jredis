@@ -189,4 +189,40 @@ public interface Connection {
 			SHUTDOWN
 		}
 	}
+
+	// ------------------------------------------------------------------------
+    // Connection.Flag
+    // ------------------------------------------------------------------------
+    public enum Flag {
+    	/**  */
+    	CONNECT_IMMEDIATELY,
+    	/**  */
+    	TRANSPARENT_RECONNECT,
+    	/**  */
+    	RETRY_AFTER_RESET, 
+    	/**  */
+    	PIPELINE,
+    	/**  */
+    	SHARED,
+    	/**  */
+    	RELIABLE,
+    	/**  */
+    	TRACE
+    }
+    
+	// ------------------------------------------------------------------------
+    // Connection.Factor
+    // ------------------------------------------------------------------------
+    public interface Factory {
+    	/**
+    	 * Gets a connection to a redis server using the specified connection attributes.  
+    	 * 
+    	 * @param connectionSpecification
+    	 * @return
+    	 * @throws JRedisException
+    	 * 
+    	 * @see {@link Factory#newConnection()}
+    	 */
+    	public Connection newConnection (ConnectionSpec connectionSpecification) throws ClientRuntimeException;
+    }
 }

@@ -22,7 +22,7 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.ConnectionSpec.ConnectionFlag;
+import org.jredis.connector.Connection.Flag;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
@@ -74,7 +74,7 @@ public class JRedisPipelineService extends SynchJRedisBase {
 	 */
 	public JRedisPipelineService (ConnectionSpec connectionSpec) {
 		this.connectionSpec = connectionSpec;
-		connectionSpec.setConnectionFlag(ConnectionFlag.SHARED, true);
+		connectionSpec.setConnectionFlag(Connection.Flag.SHARED, true);
 		connection = new SynchPipelineConnection(connectionSpec);
 	}
 	

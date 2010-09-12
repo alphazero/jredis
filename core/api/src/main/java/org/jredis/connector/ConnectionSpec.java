@@ -28,7 +28,7 @@ import java.util.Map;
  * 
  * @author joubin (alphazero@sensesay.net)
  *
- * @see ConnectionFactory#getConnection(ConnectionSpec)
+ * @see Factory#newConnection(ConnectionSpec)
  * @see java.resource.cci.ConnectionSpec
  * 
  */
@@ -105,17 +105,17 @@ public interface ConnectionSpec {
 	public ConnectionSpec setSocketProperty(ConnectionSpec.SocketProperty property, Integer value);
  	/**
 	 * @param flag
-	 * @return the {@link ConnectionFlag}
+	 * @return the {@link Connection.Flag}
 	 * @see SocketFlag
 	 */
-	public boolean getConnectionFlag (ConnectionSpec.ConnectionFlag flag);
+	public boolean getConnectionFlag (Connection.Flag flag);
 	/**
-	 * Sets the specified {@link ConnectionFlag}
+	 * Sets the specified {@link Connection.Flag}
 	 * @param flag
 	 * @param value
 	 * @return the referenced {@link ConnectionSpec}
 	 */
-	public ConnectionSpec setConnectionFlag(ConnectionSpec.ConnectionFlag flag, Boolean value);
+	public ConnectionSpec setConnectionFlag(Connection.Flag flag, Boolean value);
 	/**
 	 * @return
 	 */
@@ -134,26 +134,6 @@ public interface ConnectionSpec {
      * @return the {@link ConnectionSpec}
      */
     public ConnectionSpec setHeartbeat(int seconds);
-
-	// ------------------------------------------------------------------------
-	// Associated (inner) types
-	// ------------------------------------------------------------------------
-    public enum ConnectionFlag {
-    	/**  */
-    	CONNECT_IMMEDIATELY,
-    	/**  */
-    	TRANSPARENT_RECONNECT,
-    	/**  */
-    	RETRY_AFTER_RESET, 
-    	/**  */
-    	PIPELINE,
-    	/**  */
-    	SHARED,
-    	/**  */
-    	RELIABLE,
-    	/**  */
-    	TRACE
-    }
 
 	/**
 	 * Flag keys for SocketFlag settings of the connection specification.
@@ -261,8 +241,8 @@ public interface ConnectionSpec {
 		/** {@link Map} of the {@link SocketProperty}s of the {@link ConnectionSpec} */
 		Map<SocketProperty, Integer> socketProperties = new HashMap<SocketProperty, Integer>();
 		
-		/** {@link Map} of the {@link ConnectionFlag}s of the {@link ConnectionSpec} */
-		Map<ConnectionFlag, Boolean> connectionFlags = new HashMap<ConnectionFlag, Boolean>();
+		/** {@link Map} of the {@link Connection.Flag}s of the {@link ConnectionSpec} */
+		Map<Connection.Flag, Boolean> connectionFlags = new HashMap<Connection.Flag, Boolean>();
 		
 		/** heartbeat period in milliseconds */
 		private int heartbeat;
@@ -355,12 +335,12 @@ public interface ConnectionSpec {
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getConnectionFlag(org.jredis.connector.ConnectionSpec.ConnectionFlag) */
 //      @Override
-		final public boolean getConnectionFlag (ConnectionSpec.ConnectionFlag flag){
+		final public boolean getConnectionFlag (Connection.Flag flag){
 			return connectionFlags.get(flag);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setConnectionFlag(org.jredis.connector.ConnectionSpec.ConnectionFlag, java.lang.Boolean) */
 //      @Override
-		final public ConnectionSpec setConnectionFlag(ConnectionSpec.ConnectionFlag flag, Boolean value){
+		final public ConnectionSpec setConnectionFlag(Connection.Flag flag, Boolean value){
 			connectionFlags.put(flag, value);
 			return this;
 		}

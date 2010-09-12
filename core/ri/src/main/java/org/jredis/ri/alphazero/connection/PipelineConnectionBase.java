@@ -25,9 +25,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
+import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.NotConnectedException;
-import org.jredis.connector.ConnectionSpec.ConnectionFlag;
+import org.jredis.connector.Connection.Flag;
 import org.jredis.connector.ConnectionSpec.SocketProperty;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
@@ -96,9 +97,9 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     @Override
     protected void initializeComponents () {
     	
-    	spec.setConnectionFlag(ConnectionFlag.RELIABLE, true);
-    	spec.setConnectionFlag(ConnectionFlag.PIPELINE, true);
-    	spec.setConnectionFlag(ConnectionFlag.SHARED, true);
+    	spec.setConnectionFlag(Connection.Flag.RELIABLE, true);
+    	spec.setConnectionFlag(Connection.Flag.PIPELINE, true);
+    	spec.setConnectionFlag(Connection.Flag.SHARED, true);
     	super.initializeComponents();
     	
     	serviceLock = new Object();
@@ -173,7 +174,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 			throw new NotConnectedException ("Not connected!");
 		
 		PendingRequest pendingResponse = null;
-		synchronized (serviceLock) {
+		synchronized (serviceLock) {	// << get rid of this thing!
 			if(pendingQuit) 
 				throw new ClientRuntimeException("Pipeline shutting down: Quit in progess; no further requests are accepted.");
 			

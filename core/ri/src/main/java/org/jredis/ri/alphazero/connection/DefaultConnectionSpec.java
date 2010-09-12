@@ -7,7 +7,7 @@ import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_PREF_LATENCY
 import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_RCVBUF;
 import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_SNDBUF;
 import static org.jredis.connector.ConnectionSpec.SocketProperty.SO_TIMEOUT;
-import static org.jredis.connector.ConnectionSpec.ConnectionFlag.*;
+import static org.jredis.connector.Connection.Flag.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.jredis.ClientRuntimeException;

@@ -39,8 +39,8 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.Connection.Flag;
 import org.jredis.connector.Connection.Event.Type;
-import org.jredis.connector.ConnectionSpec.ConnectionFlag;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Response;
@@ -214,7 +214,7 @@ public abstract class ConnectionBase implements Connection {
     protected void initializeComponents () {
 		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
 
-		if(spec.getConnectionFlag(ConnectionFlag.RELIABLE)){
+		if(spec.getConnectionFlag(Connection.Flag.RELIABLE)){
 	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), " [" + this + "] heartbeat");
 	    	heartbeat.start();
 		}
@@ -254,7 +254,7 @@ public abstract class ConnectionBase implements Connection {
      * @return
      */
     protected Protocol newProtocolHandler () {
-		return spec.getConnectionFlag(ConnectionFlag.SHARED) ? new ConcurrentSynchProtocol() : new SynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
+		return spec.getConnectionFlag(Connection.Flag.SHARED) ? new ConcurrentSynchProtocol() : new SynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
     }
     
     /**

@@ -24,7 +24,7 @@ import org.jredis.Redis;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.ConnectionSpec.ConnectionFlag;
+import org.jredis.connector.Connection.Flag;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
@@ -89,7 +89,7 @@ public class JRedisClient extends SynchJRedisBase  {
 
 	public JRedisClient (ConnectionSpec connectionSpec){
 		// note: using a non shared connection mod
-		connectionSpec.setConnectionFlag(ConnectionFlag.RELIABLE, true);
+		connectionSpec.setConnectionFlag(Connection.Flag.RELIABLE, true);
 		Connection synchConnection = createSynchConnection (connectionSpec, false, RedisVersion.current_revision);
 		setConnection (synchConnection);
 	}

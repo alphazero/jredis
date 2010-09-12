@@ -51,13 +51,13 @@ public class PipelineInAction {
     	final ConnectionSpec spec = DefaultConnectionSpec.newSpec();
     	spec.setCredentials("jredis".getBytes());
     	spec.setDatabase(13);
-    	spec.setSocketProperty(SocketProperty.SO_RCVBUF, 1024 * 512);
-    	spec.setSocketProperty(SocketProperty.SO_SNDBUF, 1024 * 512);
+    	spec.setSocketProperty(SocketProperty.SO_RCVBUF, 1024 * 24);
+    	spec.setSocketProperty(SocketProperty.SO_SNDBUF, 1024 * 24);
     	
     	usingSynchSemantics(spec);
     	final boolean forever = true;
     	
-    	runJRedisPipelineSET (spec, 10000, 3, forever);
+    	runJRedisPipelineSET (spec, 100000, 3, forever);
 	}
     /**
      * @param spec
