@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Houshyar
+ *   Copyright 2010 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -14,31 +14,31 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.alphazero.connection;
+package org.jredis.connector;
 
-import org.jredis.connector.ConnectionException;
-import org.jredis.ri.alphazero._specification;
-
+import java.net.SocketException;
+import org.jredis._specification;
 
 /**
  * [TODO: document me!]
  *
- * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, Apr 15, 2009
- * @since   alpha.0
+ * @author  joubin (alphazero@sensesay.net)
+ * @date    Sep 12, 2010
  * 
  */
 
-public class UnexpectedEOFException extends ConnectionException {
-	/**
-	 * @param msg
-	 * @param e
-	 */
-	public UnexpectedEOFException(String msg) {
-		super(msg);
-	}
-
+public class ConnectionFault extends ConnectionException {
 	/**  */
 	private static final long serialVersionUID = _specification.Version.major;
 
+	/**
+	 * @param string
+	 * @param e
+	 */
+	public ConnectionFault(String msg, SocketException e) {
+		super(msg, e);
+	}
+	public ConnectionFault(String msg) {
+		super(msg);
+	}
 }

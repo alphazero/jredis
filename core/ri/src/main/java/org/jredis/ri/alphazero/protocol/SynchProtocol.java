@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
+import org.jredis.connector.ConnectionReset;
 import org.jredis.protocol.BulkResponse;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.MultiBulkResponse;
@@ -34,7 +35,6 @@ import org.jredis.protocol.Response;
 import org.jredis.protocol.ResponseStatus;
 import org.jredis.protocol.StatusResponse;
 import org.jredis.protocol.ValueResponse;
-import org.jredis.ri.alphazero.connection.ConnectionResetException;
 import org.jredis.ri.alphazero.connection.UnexpectedEOFException;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.Log;
@@ -250,7 +250,7 @@ public class SynchProtocol extends ProtocolBase {
 			}
 			catch (SocketException e) {
 				// on connection reset
-				throw new ConnectionResetException("SocketException in readLine.  Command: " + cmd.code, e);
+				throw new ConnectionReset("SocketException in readLine.  Command: " + cmd.code, e);
 			}
 			catch (IOException e) {
 				e.printStackTrace();

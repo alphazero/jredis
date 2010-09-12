@@ -14,12 +14,12 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.alphazero.connection;
+package org.jredis.connector;
 
 import java.net.SocketException;
 
 import org.jredis.ClientRuntimeException;
-import org.jredis.ri.alphazero._specification;
+import org.jredis._specification;
 
 /**
  * [TODO: document me!]
@@ -30,7 +30,7 @@ import org.jredis.ri.alphazero._specification;
  * 
  */
 
-public class ConnectionException extends ClientRuntimeException{
+abstract public class ConnectionException extends ClientRuntimeException{
 
 	/**  */
 	private static final long serialVersionUID = _specification.Version.major;

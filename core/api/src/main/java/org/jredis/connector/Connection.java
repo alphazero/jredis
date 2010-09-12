@@ -25,6 +25,103 @@ import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Response;
 
+/**
+ * {@link Connection} defines the general (required) and optional 
+ * contract of a JRedis connection.
+ * <p>
+ * Redis protocol does not provide for request sequencing (for a
+ * variety of good reasons) and guaranteed delivery semantics are
+ * supported only by multi-exec (redis transaction) protocol.  Accordingly,
+ * {@link Connection} is not required (given that it can not) to support
+ * fault-tolerant semantics.  
+ * <p>
+ * If a connection <i>faults</i> during an interaction with the server 
+ * (e.g. anytime during send and receive) it must raise one of the following:
+ * <ul>
+ * <li>{@link ConnectionReset} - connection faulted but connection re-established
+ * <li>{@link ConnectionFault} - connection faulted and reconnect not possible.
+ * </ul>  
+ * In the former case, the specific request that was being processed will not
+ * be transparently re-issued by the connector.  The application layer must
+ * determine what course of action to take.  
+ * <p>
+ * In either case, it should be noted that there exists a tiny (but possible)
+ * window where even with append logging on the server, where the server received
+ * and processed the request but never could reply (e.g. the server crashes for
+ * whatever reason).  These considerations are irrelevant to read only commands,
+ * but are significant in context of write ops (e.g. INCR).  If you require
+ * guarantees on writes, you must use redis transactions (e.g. multi-bulk).
+ * 
+ * <p>
+ * That said, the {@link Connection}'s optional event and state management
+ * do provide sufficient support for a softer set of guarantees for 
+ * transparent connection management (on fault detection, connect on demand,
+ * etc.).
+ * 
+ *<hr>
+ * <h3>Optional state management and event generation</h3>
+ * <br>Implementations that support state and event management must support
+ * the following state transition semantics and associated events:
+ *  <pre>
+                +-------------+
+                | >>> E_0     |
+                | INITIALIZED |
+                +-------------+
+                       |
+                       x-- TC-0 {}
+                       |
+                       |  
+                      ---................................>>> E_1 
+                       V                       
+                +--------------+
+                |  >>> E_2     |
+                |  CONNECTED   |<----------+
+                +--------------+           |
+                       |                   |
+                       x-- TC-1{}         ---........... >>> E_1 
+                       |                   |
+   E_3 <<<............---                  |
+                       V                   x-- TC-2{}   
+                +------*-------+           |
+                |  >>> E_4     |
+                | DISCONNECTED |-----------+
+                +--------------+
+                       |
+                       x-- TC-3{}
+                       |
+                      ---............................... >>> E_5
+                       V                       
+                +--------------+
+                |  >>> E_6     |
+                |  TERMINATED  |
+                +--------------+
+ *   </pre>  
+ *   with transition conditions, where:
+ *   <ul>
+ *   <li><code>TC-0</code></li>: transits on {connect, startup w/({@link Connection.Flag#CONNECT_IMMEDIATELY}), Service startup w/{@link Connection.Flag#TRANSPARENT_RECONNECT} }
+ *   <li><code>TC-1</code></li>: transits on {disconnect, connection reset}
+ *   <li><code>TC-2</code></li>: transits on {reconnect}
+ *   <li><code>TC-2</code></li>: transits on {shutdown, fault}
+ *   </ul>
+ *   and associated events, where:
+ *   <ul>
+ *   <li><code>TC-0</code></li>: {@link Connection.Event.Type#INITIALIZED}
+ *   <li><code>TC-1</code></li>: {@link Connection.Event.Type#CONNECTING}
+ *   <li><code>TC-2</code></li>: {@link Connection.Event.Type#CONNECTED}
+ *   <li><code>TC-3</code></li>: {@link Connection.Event.Type#DISCONNECTING}
+ *   <li><code>TC-4</code></li>: {@link Connection.Event.Type#DISCONNECTED}
+ *   <li><code>TC-5</code></li>: {@link Connection.Event.Type#SHUTTING_DOWN}
+ *   <li><code>TC-5</code></li>: {@link Connection.Event.Type#SHUTDOWN}
+ *   </ul>
+ * 
+ * <b>Note that</b> all {@link Connection.Listener}s must (minimally) consume the event
+ * raised before the {@link Connection} transitions to the new state.
+ * 
+ * <br> 
+ * @author  joubin (alphazero@sensesay.net)
+ * @date    Sep 12, 2010
+ * 
+ */
 public interface Connection {
 
 	/**
@@ -81,6 +178,8 @@ public interface Connection {
 	
 	// ------------------------------------------------------------------------
 	// State management -- optional
+	/**
+	 */
 	public enum State {
 		/** Connection is initialized and ready. Will connect on demand */
 		INITIALIZED,
@@ -170,16 +269,16 @@ public interface Connection {
         }
 
 		/**
+		 * 
 		 * Connector.Event types.
 		 */
 		public enum Type {
-			INITIALIZING,
 			INITIALIZED,
 			/** Raised when Connector is about to initiate the connect protocol */
 			CONNECTING,
 			/** Raised when Connector has established connectivity to the remote server */
 			CONNECTED,
-			/** Raised when Connector is about to initiate the dis-connect protocol */
+			/** Raised when Connector is about to initiate the disconnect protocol */
 			DISCONNECTING,
 			/** Raised when Connector has disconnected from the remote server */
 			DISCONNECTED,

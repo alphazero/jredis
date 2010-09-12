@@ -14,16 +14,15 @@
  *   limitations under the License.
  */
 
-package org.jredis.ri.alphazero.connection;
+package org.jredis.connector;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 
-import org.jredis.connector.Connection;
+import org.jredis._specification;
 import org.jredis.protocol.Command;
-import org.jredis.ri.alphazero._specification;
 
 /**
  * This exception is thrown by a {@link Connection} to indicate that the connection to redis was
@@ -46,7 +45,7 @@ import org.jredis.ri.alphazero._specification;
  * 
  */
 
-public class ConnectionResetException extends ConnectionException {
+public class ConnectionReset extends ConnectionException {
 
 	/**  */
 	private static final long serialVersionUID = _specification.Version.major;
@@ -55,10 +54,10 @@ public class ConnectionResetException extends ConnectionException {
 	 * @param string
 	 * @param e
 	 */
-	public ConnectionResetException(String msg, SocketException e) {
+	public ConnectionReset(String msg, SocketException e) {
 		super(msg, e);
 	}
-	public ConnectionResetException(String msg) {
+	public ConnectionReset(String msg) {
 		super(msg);
 	}
 }

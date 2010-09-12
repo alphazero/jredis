@@ -20,6 +20,7 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
+import org.jredis.connector.ConnectionReset;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.NotConnectedException;
 import org.jredis.protocol.Command;
@@ -149,7 +150,7 @@ public class SynchConnection extends ConnectionBase implements Connection {
 			Log.problem ("serviceRequest() -- ClientRuntimeException  => " + cre.getLocalizedMessage());
 			reconnect();
 			
-			throw new ConnectionResetException ("Connection re-established but last request not processed:  " + cre.getLocalizedMessage());
+			throw new ConnectionReset ("Connection re-established but last request not processed:  " + cre.getLocalizedMessage());
 		}
 		catch (RuntimeException e){
 			e.printStackTrace();
