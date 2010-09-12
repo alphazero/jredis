@@ -39,13 +39,12 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.Connection.Flag;
 import org.jredis.connector.Connection.Event.Type;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Response;
-import org.jredis.ri.alphazero.protocol.SynchProtocol;
 import org.jredis.ri.alphazero.protocol.ConcurrentSynchProtocol;
+import org.jredis.ri.alphazero.protocol.SynchProtocol;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.FastBufferedInputStream;
@@ -363,7 +362,7 @@ public abstract class ConnectionBase implements Connection {
 		isConnected = true;
 		
 		try {
-	        initializeConnection();
+	        initializeOnConnect();
         }
         catch (RedisException e) {
         	// either authorize or db select is using invalid parameters
@@ -466,7 +465,7 @@ public abstract class ConnectionBase implements Connection {
 	 * @throws ProviderException 
      * 
      */
-    protected final void initializeConnection () throws ProviderException, ClientRuntimeException, RedisException{
+    protected final void initializeOnConnect () throws ProviderException, ClientRuntimeException, RedisException{
     	switch (getModality()){
 			case Asynchronous:
 				initializeAsynchConnection();
