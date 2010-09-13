@@ -148,6 +148,15 @@ public interface ConnectionSpec {
      * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setReconnectCnt(int cnt);
+	/**
+	 * @return
+	 */
+	public int	getMaxConnectWait ();
+	/**
+	 * @param cnt
+     * @return the {@link ConnectionSpec}
+	 */
+	public ConnectionSpec getMaxConnectWait(int cnt);
     /**
      * @return the heartbeat period in seconds
      */
@@ -231,6 +240,16 @@ public interface ConnectionSpec {
 			return (Modality) getConnectionProperty(Connection.Property.MODALITY);
 		}
 		
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getMaxConnectWait() */
+		final public int getMaxConnectWait () {
+			return (Integer) getConnectionProperty(Connection.Property.MAX_CONNECT_WAIT);
+		}
+		
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getMaxConnectWait(int) */
+		final public ConnectionSpec getMaxConnectWait(int cnt) {
+			setConnectionProperty(Connection.Property.MAX_CONNECT_WAIT, cnt);
+			return this;
+		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getReconnectCnt() */
 //		@Override
 		final public int getReconnectCnt () {
@@ -250,13 +269,6 @@ public interface ConnectionSpec {
 //		@Override
         final public Object getConnectionProperty(Property prop){
 			return connectionProperties.get(prop);			
-		}
-		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setConnectionProperty(org.jredis.connector.Connection.Property, java.lang.Object) */
-//		@Override
-		final public ConnectionSpec setConnectionProperty(Property prop, Object value){
-			try {  connectionProperties.put(prop, value); }
-			catch (ClassCastException e){ throw new IllegalArgumentException("value type", e);}
-			return this;
 		}
 
 		// ------------------------------------------------------------------------
@@ -289,10 +301,18 @@ public interface ConnectionSpec {
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setReconnectCnt(int) */
 //      @Override
 		final public ConnectionSpec setReconnectCnt (int reconnectCnt) {
-        	this.reconnectCnt = reconnectCnt;
+			setConnectionProperty(Connection.Property.MAX_CONNECT_ATTEMPT, reconnectCnt);
         	return this;
         }
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setConnectionProperty(org.jredis.connector.Connection.Property, java.lang.Object) */
+//		@Override
+		final public ConnectionSpec setConnectionProperty(Property prop, Object value){
+			try {  connectionProperties.put(prop, value); }
+			catch (ClassCastException e){ throw new IllegalArgumentException("value type", e);}
+			return this;
+		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setModality(org.jredis.connector.Connection.Modality) */
+//		@Override
 		final public ConnectionSpec setModality (Modality modality) {
 			setConnectionProperty(Connection.Property.MODALITY, modality);
 			return this;

@@ -74,6 +74,8 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	
 	/** def value: <code>Modality.Synchronous</code> */
 	private static final Modality DEFAULT_CP_CONN_MODALITY = Modality.Synchronous;
+	/** def value: <code>3</code> */
+	private static final Integer DEFAULT_CP_MAX_CONNECT_ATTEMPT = 3;
 	
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -129,6 +131,7 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
     	setConnectionFlag(CONNECT_IMMEDIATELY, DEFAULT_CF_CONNECT_IMMEDIATELY);
     	
     	setConnectionProperty(Connection.Property.MODALITY, DEFAULT_CP_CONN_MODALITY);
+    	setConnectionProperty(Connection.Property.MAX_CONNECT_ATTEMPT, DEFAULT_CP_MAX_CONNECT_ATTEMPT);
     	
     	setHeartbeat(DEFAULT_HEARTBEAT_SEC);
     }
