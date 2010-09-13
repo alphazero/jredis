@@ -41,8 +41,7 @@ import org.jredis.connector.Connection.Event.Type;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Response;
-import org.jredis.ri.alphazero.protocol.ConcurrentSynchProtocol;
-import org.jredis.ri.alphazero.protocol.SynchProtocol;
+import org.jredis.ri.alphazero.protocol.DefaultProtocolFactory;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.FastBufferedInputStream;
@@ -236,7 +235,7 @@ public abstract class ConnectionBase implements Connection {
      * @return
      */
     protected Protocol newProtocolHandler () {
-		return spec.getConnectionFlag(Connection.Flag.SHARED) ? new ConcurrentSynchProtocol() : new SynchProtocol();	// TODO: rewire it to get it from the ProtocolManager
+    	return (new DefaultProtocolFactory()).newProtocol(spec);
     }
     
     /**
