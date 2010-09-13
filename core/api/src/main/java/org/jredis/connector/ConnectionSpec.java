@@ -156,7 +156,7 @@ public interface ConnectionSpec {
 	 * @param cnt
      * @return the {@link ConnectionSpec}
 	 */
-	public ConnectionSpec getMaxConnectWait(int cnt);
+	public ConnectionSpec setMaxConnectWait(int cnt);
     /**
      * @return the heartbeat period in seconds
      */
@@ -189,9 +189,6 @@ public interface ConnectionSpec {
 		// ------------------------------------------------------------------------
 		// Attrs
 		// ------------------------------------------------------------------------
-		
-		/** retry count for reconnects */
-		int 	reconnectCnt;
 		
 		/** {@link Map} of the {@link SocketFlag}s of the {@link ConnectionSpec} */
 		Map<Connection.Socket.Flag, Boolean> socketFlags = new HashMap<Connection.Socket.Flag, Boolean>();
@@ -245,15 +242,10 @@ public interface ConnectionSpec {
 			return (Integer) getConnectionProperty(Connection.Property.MAX_CONNECT_WAIT);
 		}
 		
-		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getMaxConnectWait(int) */
-		final public ConnectionSpec getMaxConnectWait(int cnt) {
-			setConnectionProperty(Connection.Property.MAX_CONNECT_WAIT, cnt);
-			return this;
-		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getReconnectCnt() */
 //		@Override
 		final public int getReconnectCnt () {
-			return this.reconnectCnt;
+			return (Integer) getConnectionProperty(Connection.Property.MAX_CONNECT_ATTEMPT);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag) */
 //		@Override
@@ -315,6 +307,11 @@ public interface ConnectionSpec {
 //		@Override
 		final public ConnectionSpec setModality (Modality modality) {
 			setConnectionProperty(Connection.Property.MODALITY, modality);
+			return this;
+		}
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getMaxConnectWait(int) */
+		final public ConnectionSpec setMaxConnectWait(int cnt) {
+			setConnectionProperty(Connection.Property.MAX_CONNECT_WAIT, cnt);
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag, java.lang.Boolean) */
