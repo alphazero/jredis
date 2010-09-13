@@ -19,6 +19,7 @@ package org.jredis.connector;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
+import org.jredis.connector.Connection.Modality;
 
 
 /**
@@ -74,6 +75,15 @@ public interface ConnectionSpec {
      * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setDatabase(int database);
+	/**
+	 * @return the {@link Modality} of this protocol handler.
+	 */
+	public Modality getModality ();
+	/**
+	 * @param modality
+	 * @return the the {@link ConnectionSpec}
+	 */
+	public ConnectionSpec setModality (Modality modality);
 	/**
 	 * Get the {@link SocketFlag} for the {@link ConnectionSpec}
 	 * @param flag
@@ -185,6 +195,9 @@ public interface ConnectionSpec {
 		/** retry count for reconnects */
 		int 	reconnectCnt;
 		
+		/** connection modality */
+		Modality modality;
+		
 		/** {@link Map} of the {@link SocketFlag}s of the {@link ConnectionSpec} */
 		Map<Connection.Socket.Flag, Boolean> socketFlags = new HashMap<Connection.Socket.Flag, Boolean>();
 		
@@ -285,6 +298,13 @@ public interface ConnectionSpec {
         	this.reconnectCnt = reconnectCnt;
         	return this;
         }
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getModality() */
+		final public Modality getModality () { return modality;}
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setModality(org.jredis.connector.Connection.Modality) */
+		final public ConnectionSpec setModality (Modality modality) {
+			this.modality = modality;
+			return this;
+		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag, java.lang.Boolean) */
 //      @Override
 		final public ConnectionSpec setSocketFlag(Connection.Socket.Flag flag, Boolean value){

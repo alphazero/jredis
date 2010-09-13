@@ -28,7 +28,6 @@ import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Request;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.ResponseStatus;
-import org.jredis.ri.alphazero.RedisVersion;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Log;
 
@@ -54,27 +53,6 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	
 	/**
 	 * This constructor will pass the connection spec to the super class constructor and
-	 * create and install the {@link Protocol} handler delegate instance for this {@link SynchConnection}
-	 * for the {@link RedisVersion#current_revision}.  
-	 * 
-	 * @param connectionSpec
-	 * @throws ClientRuntimeException
-	 * @throws ProviderException
-	 */
-	public SynchConnection (
-			ConnectionSpec connectionSpec,
-			boolean 	   isShared
-		)
-		throws ClientRuntimeException, ProviderException 
-	{
-		this(connectionSpec, isShared, RedisVersion.current_revision);
-	}
-	
-	/**
-	 * All the constructors in this class delegate to this constructor and are
-	 * effectively provided for convenience.
-	 * <p>
-	 * This constructor will pass the connection spec to the super class constructor and
 	 * create and install the {@link Protocol} handler delegate instance for this {@link SynchConnection}.
 	 * If you definitely need to specify the redis server version, and the protocol implementation for that
 	 * version exists, you should use this constructor.  Otherwise, it is recommended that the 
@@ -89,13 +67,11 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	 * @throws ProviderException if the version specified is not supported.
 	 */
 	public SynchConnection (
-			ConnectionSpec  connectionSpec,
-			boolean			isShared,
-			RedisVersion 	redisversion
+			ConnectionSpec  connectionSpec
 		)
 		throws ClientRuntimeException, ProviderException 
 	{
-		super (connectionSpec);
+		super (connectionSpec.setModality(Modality.Synchronous));
 	}
 
 	// ------------------------------------------------------------------------

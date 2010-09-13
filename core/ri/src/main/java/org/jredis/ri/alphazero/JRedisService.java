@@ -23,7 +23,6 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.Connection.Flag;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
@@ -118,9 +117,10 @@ public class JRedisService extends SynchJRedisBase {
 		connInUse = new boolean [connCount];
 		Connection conn = null;
 		connectionSpec.setConnectionFlag(Connection.Flag.RELIABLE, true);
+		connectionSpec.setConnectionFlag(Connection.Flag.SHARED, true);
 		for(int i=0; i< connCount;i++) {
 			try {
-				conn = Assert.notNull(createSynchConnection(connectionSpec, true, RedisVersion.current_revision), "Connection " + i, ClientRuntimeException.class);
+				conn = Assert.notNull(createSynchConnection(connectionSpec), "Connection " + i, ClientRuntimeException.class);
 				conns[i] = conn;
 				connInUse[i] = false;
 			} 

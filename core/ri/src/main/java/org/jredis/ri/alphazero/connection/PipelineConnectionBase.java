@@ -85,7 +85,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	 * @throws ClientRuntimeException
 	 */
 	protected PipelineConnectionBase (ConnectionSpec spec) throws ClientRuntimeException {
-		super(spec, true);
+		super(spec.setConnectionFlag(Flag.CONNECT_IMMEDIATELY, true));
 	}
 	// ------------------------------------------------------------------------
 	// Extension

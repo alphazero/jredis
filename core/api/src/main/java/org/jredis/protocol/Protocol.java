@@ -17,7 +17,9 @@
 package org.jredis.protocol;
 
 import org.jredis.ClientRuntimeException;
+import org.jredis.NotSupportedException;
 import org.jredis.ProviderException;
+import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.Message;
 
 
@@ -37,8 +39,6 @@ import org.jredis.connector.Message;
  */
 public interface Protocol {
 	
-//	public boolean setConnectionModality(Connection.Modality connectionModality);
-	
 	/**
 	 * 
 	 * @param version
@@ -46,16 +46,6 @@ public interface Protocol {
 	 */
 	public boolean isCompatibleWithVersion (String version);
 	
-//	/**
-//	 * [thinking about deprecating this ...]
-//	 * @param cmd
-//	 * @param args
-//	 * @return
-//	 * @throws ProviderException
-//	 * @throws IllegalArgumentException
-//	 */
-//	public byte[] createMessage (Command cmd, byte[]...args) throws ProviderException, IllegalArgumentException;
-//	
 	/**
 	 * 
 	 * @param cmd
@@ -80,5 +70,16 @@ public interface Protocol {
 	 * @See {@link Response#read(java.io.InputStream)}
 	 */
 	public Response createResponse (Command cmd) throws ProviderException, ClientRuntimeException ;
+	
+	public interface Factory {
+		/**
+		 * Creates a {@link Protocol} instance for a connection per the specified
+		 * {@link ConnectionSpec}
+		 * @param connSpec
+		 * @return the new {@link Protocol} instance.
+		 * @throws NotSupportedException
+		 */
+		public Protocol newProtocol(ConnectionSpec connSpec) throws NotSupportedException;
+	}
 
 }

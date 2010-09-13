@@ -19,6 +19,7 @@ package org.jredis.connector;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.jredis.ClientRuntimeException;
+import org.jredis.NotSupportedException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.protocol.Command;
@@ -63,13 +64,13 @@ import org.jredis.protocol.Response;
  * <br>Implementations that support state and event management must support
  * the following state transition semantics and associated events:
  *  <pre>
+ *  
                 +-------------+
-                | >>> E_0     |
-                | INITIALIZED |
+                |    start    |
                 +-------------+
                        |
-                       x-- TC-0 {}
-                       |
+                      / \
+                      \ / 
                        |  
                       ---................................>>> E_1 
                        V                       
@@ -110,7 +111,7 @@ import org.jredis.protocol.Response;
  *   <li><code>TC-2</code></li>: {@link Connection.Event.Type#CONNECTED}
  *   <li><code>TC-3</code></li>: {@link Connection.Event.Type#DISCONNECTING}
  *   <li><code>TC-4</code></li>: {@link Connection.Event.Type#DISCONNECTED}
- *   <li><code>TC-5</code></li>: {@link Connection.Event.Type#SHUTTING_DOWN}
+ *   <li><code>TC-5</code></li>: {@link Connection.Event.Type#STOPPING}
  *   <li><code>TC-5</code></li>: {@link Connection.Event.Type#SHUTDOWN}
  *   </ul>
  * 
@@ -130,10 +131,10 @@ public interface Connection {
 	 */
 	public ConnectionSpec getSpec();
 	
-	/**
-	 * @return the {@link Modality} of this protocol handler.
-	 */
-	public Modality getModality ();
+//	/**
+//	 * @return the {@link Modality} of this protocol handler.
+//	 */
+//	public Modality getModality ();
 	
 	/**
 	 * A <b>blocking call</b> to service the specified request.  This method will return upon 
@@ -267,13 +268,9 @@ public interface Connection {
         public Event (Connection src, Type type, Object eventInfo) {
 	        super(src, type, eventInfo);
         }
-
-		/**
-		 * 
-		 * Connector.Event types.
-		 */
+		/** Connector.Event types. */
 		public enum Type {
-			INITIALIZED,
+//			INITIALIZED,
 			/** Raised when Connector is about to initiate the connect protocol */
 			CONNECTING,
 			/** Raised when Connector has established connectivity to the remote server */
@@ -288,7 +285,7 @@ public interface Connection {
 			 * Raised to signal the beginning of the shutdown sequence (commences after listerners are notified.  
 			 * Cease all activity on receipt 
 			 * */
-			SHUTTING_DOWN,
+			STOPPING,
 			/** Raised when Connector is terminated.  Dispose of your references on receipt. */
 			SHUTDOWN
 		}
@@ -406,14 +403,13 @@ public interface Connection {
     // ------------------------------------------------------------------------
     public interface Factory {
     	/**
-    	 * Gets a connection to a redis server using the specified connection attributes.  
-    	 * 
-    	 * @param connectionSpecification
-    	 * @return
-    	 * @throws JRedisException
-    	 * 
-    	 * @see {@link Factory#newConnection()}
+    	 * Creates a connection to a redis server using the specified connection attributes.
+    	 * @param spec of the new connection
+    	 * @return a new {@link Connection} initialized per <code>spec</code>.
+    	 * @throws ClientRuntimeException if the requirements exceed system resources/limits.
+    	 * @throws NotSupportedException if the {@link ConnectionSpec} provided 
+    	 * can not be supported by the provider.
     	 */
-    	public Connection newConnection (ConnectionSpec connectionSpecification) throws ClientRuntimeException;
+    	public Connection newConnection (ConnectionSpec spec) throws ClientRuntimeException, NotSupportedException;
     }
 }

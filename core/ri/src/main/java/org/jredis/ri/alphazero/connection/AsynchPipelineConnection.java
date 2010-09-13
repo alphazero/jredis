@@ -40,13 +40,6 @@ public class AsynchPipelineConnection extends PipelineConnectionBase{
      * @throws ClientRuntimeException
      */
     public AsynchPipelineConnection (ConnectionSpec spec) throws ClientRuntimeException {
-	    super(spec);
+	    super(spec.setModality(Modality.Asynchronous));
     }
-    // ------------------------------------------------------------------------
-    // Interface : Connection
-    // ------------------------------------------------------------------------
-    
-	/* (non-Javadoc) @see org.jredis.ri.alphazero.wip.PipelineConnectionBase#getModality() */
-//    @Override
-    public Modality getModality () { return Modality.Asynchronous; }
 }

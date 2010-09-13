@@ -22,6 +22,7 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.Connection.Modality;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.ResponseStatus;
@@ -49,17 +50,13 @@ public class SynchPipelineConnection extends PipelineConnectionBase {
      * @throws ClientRuntimeException
      */
     public SynchPipelineConnection (ConnectionSpec spec) throws ClientRuntimeException {
-	    super(spec);
+	    super(spec.setModality(Modality.Synchronous));
     }
 
     // ------------------------------------------------------------------------
     // Interface : Connection
     // ------------------------------------------------------------------------
     
-	/* (non-Javadoc) @see org.jredis.ri.alphazero.wip.PipelineConnectionBase#getModality() */
-//    @Override
-    public Modality getModality () { return Modality.Synchronous; }
-
 	/* (non-Javadoc)
      * @see org.jredis.ri.alphazero.connection.ConnectionBase#serviceRequest(org.jredis.protocol.Command, byte[][])
      */

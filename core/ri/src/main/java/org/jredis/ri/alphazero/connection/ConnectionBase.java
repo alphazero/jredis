@@ -37,6 +37,7 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.Connection.Flag;
 import org.jredis.connector.Connection.Event.Type;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
@@ -98,19 +99,6 @@ public abstract class ConnectionBase implements Connection {
 	// ------------------------------------------------------------------------
 	
 	/**
-	 * Will create and initialize a socket per the connection spec. Will connect immediately.
-	 * 
-	 * @See {@link ConnectionSpec}
-	 * @param spec
-	 * @throws ClientRuntimeException if connection attempt to specified host is not possible.
-	 */
-	protected ConnectionBase (ConnectionSpec spec) 
-		throws ClientRuntimeException
-	{
-		this(spec, true);
-	}
-	
-	/**
 	 * Will create and initialize a socket per the connection spec.
 	 * @See {@link ConnectionSpec}
 	 * @param spec
@@ -118,16 +106,15 @@ public abstract class ConnectionBase implements Connection {
 	 * @throws ClientRuntimeException if connection attempt to specified host is not possible and
 	 * connect immediate was requested.
 	 */
-	protected ConnectionBase (ConnectionSpec spec, boolean connectImmediately) 
+	protected ConnectionBase (ConnectionSpec spec) 
 		throws ClientRuntimeException
 	{
 		try {
 			this.spec = notNull(spec, "ConnectionSpec init parameter", ClientRuntimeException.class);
 			socketAddress = new InetSocketAddress(spec.getAddress(), spec.getPort());
 			initializeComponents();
-//			if(connectImmediately) {
-//				connect ();
-//			}
+			// temp hack
+			spec.setConnectionFlag(Flag.CONNECT_IMMEDIATELY, true);
 		}
 		catch (IllegalArgumentException e) { 
 			throw new ClientRuntimeException 
@@ -137,7 +124,8 @@ public abstract class ConnectionBase implements Connection {
 			throw new ProviderException("Unexpected error on initialize -- BUG", e);
 		} 
 		
-		if(connectImmediately) { connect (); }
+//		if(spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) { connect (); }
+		if(true) { connect (); }
 	}
 	
 	// ------------------------------------------------------------------------
@@ -464,7 +452,7 @@ public abstract class ConnectionBase implements Connection {
      * 
      */
     protected final void initializeOnConnect () throws ProviderException, ClientRuntimeException, RedisException{
-    	switch (getModality()){
+    	switch (spec.getModality()){
 			case Asynchronous:
 				initializeAsynchConnection();
 				break;
@@ -472,7 +460,7 @@ public abstract class ConnectionBase implements Connection {
 				initializeSynchConnection();
 				break;
 			default:
-				throw new ProviderException("Modality " + getModality().name() + " is not supported.");
+				throw new ProviderException("Modality " + spec.getModality().name() + " is not supported.");
     	}
     }
 
@@ -524,7 +512,7 @@ public abstract class ConnectionBase implements Connection {
     @Override
     public String toString() {
 //    	String selfdesc = String.format("%s@%d", getClass().getSimpleName(), hashCode());
-    	return String.format("Connection: %-12s %s:%d db:%d | %s@%d", getModality().name().toUpperCase(), spec.getAddress(), spec.getPort(), spec.getDatabase(), getClass().getSimpleName(), hashCode());
+    	return String.format("Connection: %-12s %s:%d db:%d | %s@%d", spec.getModality().name().toUpperCase(), spec.getAddress(), spec.getPort(), spec.getDatabase(), getClass().getSimpleName(), hashCode());
     }
 	// ------------------------------------------------------------------------
 	// Property accessors

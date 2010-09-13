@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Houshyar
+ *   Copyright 2009-2010 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import org.jredis.Redis;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.Connection.Flag;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
@@ -88,9 +87,9 @@ public class JRedisClient extends SynchJRedisBase  {
 	// ------------------------------------------------------------------------
 
 	public JRedisClient (ConnectionSpec connectionSpec){
-		// note: using a non shared connection mod
 		connectionSpec.setConnectionFlag(Connection.Flag.RELIABLE, true);
-		Connection synchConnection = createSynchConnection (connectionSpec, false, RedisVersion.current_revision);
+		connectionSpec.setConnectionFlag(Connection.Flag.SHARED, false);
+		Connection synchConnection = createSynchConnection (connectionSpec);
 		setConnection (synchConnection);
 	}
 	/**
@@ -105,8 +104,6 @@ public class JRedisClient extends SynchJRedisBase  {
     }
 
 	/**
-	 * New RedisClient for the default protocol version {@link RedisVersion} 
-	 * obtained from the {@link ProtocolManager}
 	 * and using localhost:6379 as its network addressing parameters. 
 	 * Database will be selected to db 0
 	 * Assumes no password required.
@@ -117,8 +114,6 @@ public class JRedisClient extends SynchJRedisBase  {
 		this ("localhost", 6379, null, 0);
 	}
 	/**
-	 * New RedisClient for the default protocol version {@link RedisVersion} 
-	 * obtained from the {@link ProtocolManager}
 	 * 
 	 * @param host
 	 * @param port

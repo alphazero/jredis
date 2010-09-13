@@ -26,6 +26,7 @@ import org.jredis.ProviderException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.NotConnectedException;
+import org.jredis.connector.Connection.Modality;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Request;
@@ -67,7 +68,7 @@ public class AsynchConnection extends ConnectionBase implements Connection {
 		)
 		throws ClientRuntimeException, ProviderException 
 	{
-		super (connectionSpec);
+		super (connectionSpec.setModality(Modality.Asynchronous));
 	}
 
 	// ------------------------------------------------------------------------

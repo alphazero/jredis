@@ -16,12 +16,8 @@
 
 package org.jredis.ri.alphazero;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
-import org.jredis.NotSupportedException;
 import org.jredis.ProviderException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
@@ -29,7 +25,6 @@ import org.jredis.connector.FaultedConnection;
 import org.jredis.resource.Context;
 import org.jredis.resource.Resource;
 import org.jredis.resource.ResourceException;
-import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.connection.SynchConnection;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Log;
@@ -58,7 +53,7 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 	/**
 	 * This extension point is really only necessary to allow this class to
 	 * set the {@link FaultedConnection} when necessary, in course of the
-	 * {@link SynchJRedisBase#createSynchConnection(String, int, RedisVersion)}
+	 * {@link SynchJRedisBase#createSynchConnection(String)}
 	 * method operation.  
 	 * 
 	 * @param connection
@@ -69,50 +64,15 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 	 * Creates a {@link Connection} with {@link Connection.Modality#Synchronous} semantics
 	 * suitable for use by synchronous (blocking) JRedis clients.
 	 *  
-	 * [TODO: this method should be using connection spec!]
-	 * @param host
-	 * @param port
-	 * @param credentials 
-	 * @param database 
-	 * @param redisVersion
-	 * @return
-	 */
-	protected Connection createSynchConnection (String host, int port, int database, byte[] credentials, boolean isShared, RedisVersion redisVersion) 
-	{
-		InetAddress 	address = null;
-		Connection 		synchConnection = null;
-		try {
-			
-			address = InetAddress.getByName(host);
-			ConnectionSpec spec = DefaultConnectionSpec.newSpec(address, port, database, credentials);
-			synchConnection = createSynchConnection(spec, isShared, redisVersion);
-			Assert.notNull(synchConnection, "connection delegate", ClientRuntimeException.class);
-		}
-		catch (UnknownHostException e) {
-			String msg = "Couldn't obtain InetAddress for "+host;
-			Log.problem (msg+"  => " + e.getLocalizedMessage());
-			throw new ClientRuntimeException(msg, e);
-		}
-		return synchConnection;
-	}
-	
-	/**
-	 * Creates a {@link Connection} with {@link Connection.Modality#Synchronous} semantics
-	 * suitable for use by synchronous (blocking) JRedis clients.
-	 *  
 	 * @param connectionSpec connection's specification
 	 * @param redisVersion redis protocol compliance
 	 * @return
 	 */
-	protected Connection createSynchConnection(ConnectionSpec connectionSpec, boolean isShared, RedisVersion redisVersion){
-		Connection 		synchConnection = null;
+	protected Connection createSynchConnection(ConnectionSpec connectionSpec){
+		Connection 	synchConnection = null;
 		try {
-			synchConnection = new SynchConnection(connectionSpec, isShared, redisVersion);
+			synchConnection = new SynchConnection(connectionSpec);
 			Assert.notNull(synchConnection, "connection delegate", ClientRuntimeException.class);
-		}
-		catch (NotSupportedException e) {
-			Log.log("Can not support redis protocol '%s'", redisVersion);
-			throw e;
 		}
 		catch (ProviderException e) {
 			Log.bug("Couldn't create the handler delegate.  => " + e.getLocalizedMessage());

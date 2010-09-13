@@ -29,6 +29,6 @@ public interface _specification {
 	/** specification level */
 	public interface Version {
 		long	major	= 0xA;
-	    long 	minor	= 0x0;
+	    long 	minor	= 0x1;
 	}
 }

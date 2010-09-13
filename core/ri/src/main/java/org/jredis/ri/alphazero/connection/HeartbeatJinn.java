@@ -72,7 +72,7 @@ public class HeartbeatJinn extends Thread implements Connection.Listener{
 		setDaemon(true);
 		this.conn = conn;
 		conn.addListener(this);
-		this.modality = conn.getModality();
+		this.modality = conn.getSpec().getModality();
 		this.period = periodInSecs * 1000;
 		this.connected = new AtomicBoolean(false);
 		this.mustBeat = new AtomicBoolean(true);
