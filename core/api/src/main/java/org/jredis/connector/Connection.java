@@ -215,6 +215,14 @@ public interface Connection {
 	// Innner Types
 	// ========================================================================
 	
+	/**
+	 * Enumeration of the top-level properties of the {@link Connection} that can be
+	 * specified by the User.  
+	 *
+	 * @author  joubin (alphazero@sensesay.net)
+	 * @date    Sep 13, 2010
+	 * 
+	 */
 	public enum Property {
 		HOST,
 		PORT,
@@ -224,7 +232,8 @@ public interface Connection {
 		MAX_CONNECT_WAIT,
 		MAX_CONNECT_ATTEMPT,
 		PROTOCOL_CLASS,
-		CONNECTION_CLASS
+		CONNECTION_CLASS,
+		;// -- fini
 	}
 	/**
 	 * Enum for defining the operational modality of the protocol handlers.
