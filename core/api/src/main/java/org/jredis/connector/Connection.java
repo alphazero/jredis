@@ -215,6 +215,15 @@ public interface Connection {
 	// Innner Types
 	// ========================================================================
 	
+	public enum Property {
+		HOST,
+		PORT,
+		CREDENTIAL,
+		DB,
+		MODALITY,
+		PROTOCOL_CLASS,
+		CONNECTION_CLASS
+	}
 	/**
 	 * Enum for defining the operational modality of the protocol handlers.
 	 *   
@@ -233,6 +242,7 @@ public interface Connection {
 		/**  */
 		Monitor,
 		;
+		// -- end
 	}
 	
 	/**

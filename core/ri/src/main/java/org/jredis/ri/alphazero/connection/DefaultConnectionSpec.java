@@ -1,5 +1,6 @@
 package org.jredis.ri.alphazero.connection;
 
+import static org.jredis.connector.Connection.Flag.CONNECT_IMMEDIATELY;
 import static org.jredis.connector.Connection.Flag.PIPELINE;
 import static org.jredis.connector.Connection.Flag.RELIABLE;
 import static org.jredis.connector.Connection.Flag.SHARED;
@@ -14,7 +15,6 @@ import java.net.UnknownHostException;
 import org.jredis.ClientRuntimeException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.Connection.Flag;
 import org.jredis.connector.Connection.Modality;
 import org.jredis.ri.alphazero.support.Assert;
 
@@ -64,15 +64,16 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	private static final int DEFAULT_SO_PREF_CONN_TIME = 2;
 	
 	/** def value: <code>true</code> */
-	private static final boolean DEFAULT_IS_SHARED = true;
+	private static final boolean DEFAULT_CF_SHARED = true;
 	/** def value: <code>false</code> */
-	private static final boolean DEFAULT_IS_RELIABLE = false;
+	private static final boolean DEFAULT_CF_RELIABLE = false;
 	/** def value: <code>false</code> */
-	private static final boolean DEFAULT_IS_PIPELINE = false;
-	/** def value: <code>false</code> */
-	private static final boolean DEFAULT_IS_CONNECT_IMMEDIATELY = false;
+	private static final boolean DEFAULT_CF_PIPELINE = false;
+	/** def value: <code>true</code> */
+	private static final boolean DEFAULT_CF_CONNECT_IMMEDIATELY = true;
+	
 	/** def value: <code>Modality.Synchronous</code> */
-	private static final Modality DEFAULT_CONN_MODALITY = Modality.Synchronous;
+	private static final Modality DEFAULT_CP_CONN_MODALITY = Modality.Synchronous;
 	
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -122,12 +123,12 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
     	setSocketProperty(SO_PREF_CONN_TIME, DEFAULT_SO_PREF_CONN_TIME);
     	setSocketProperty(SO_PREF_LATENCY, DEFAULT_SO_PREF_LATENCY);
     	
-    	setConnectionFlag(RELIABLE, DEFAULT_IS_RELIABLE);
-    	setConnectionFlag(SHARED, DEFAULT_IS_SHARED);
-    	setConnectionFlag(PIPELINE, DEFAULT_IS_PIPELINE);
-    	setConnectionFlag(Flag.CONNECT_IMMEDIATELY, DEFAULT_IS_CONNECT_IMMEDIATELY);
+    	setConnectionFlag(RELIABLE, DEFAULT_CF_RELIABLE);
+    	setConnectionFlag(SHARED, DEFAULT_CF_SHARED);
+    	setConnectionFlag(PIPELINE, DEFAULT_CF_PIPELINE);
+    	setConnectionFlag(CONNECT_IMMEDIATELY, DEFAULT_CF_CONNECT_IMMEDIATELY);
     	
-    	setConnectionProperty(Modality.class, DEFAULT_CONN_MODALITY);
+    	setConnectionProperty(Connection.Property.MODALITY, DEFAULT_CP_CONN_MODALITY);
     	
     	setHeartbeat(DEFAULT_HEARTBEAT_SEC);
     }

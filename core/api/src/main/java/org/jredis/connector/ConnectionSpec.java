@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 import org.jredis.connector.Connection.Modality;
+import org.jredis.connector.Connection.Property;
 
 
 /**
@@ -130,14 +131,14 @@ public interface ConnectionSpec {
 	 * @param proptype
 	 * @return
 	 */
-	public <T> T getConnectionProperty(Class<T> proptype);
+	public Object getConnectionProperty(Property prop);
 	/**
 	 * @param <T>
 	 * @param property
 	 * @param value
 	 * @return
 	 */
-	public <T> ConnectionSpec setConnectionProperty(Class<T> property, T value);
+	public ConnectionSpec setConnectionProperty(Property prop, Object value);
 	/**
 	 * @return
 	 */
@@ -156,7 +157,7 @@ public interface ConnectionSpec {
      * @return the {@link ConnectionSpec}
      */
     public ConnectionSpec setHeartbeat(int seconds);
-
+    
 	// ------------------------------------------------------------------------
 	// Reference Implementation 
 	// ------------------------------------------------------------------------
@@ -180,23 +181,8 @@ public interface ConnectionSpec {
 		// Attrs
 		// ------------------------------------------------------------------------
 		
-		/** redis server address */
-		InetAddress  	address;
-		
-        /** redis server port */
-		int			port;
-
-		/** authorization password */
-		byte[]		credentials;
-
-		/** selected database */
-		int			database;
-		
 		/** retry count for reconnects */
 		int 	reconnectCnt;
-		
-		/** connection modality */
-		Modality modality;
 		
 		/** {@link Map} of the {@link SocketFlag}s of the {@link ConnectionSpec} */
 		Map<Connection.Socket.Flag, Boolean> socketFlags = new HashMap<Connection.Socket.Flag, Boolean>();
@@ -204,12 +190,11 @@ public interface ConnectionSpec {
 		/** {@link Map} of the {@link SocketProperty}s of the {@link ConnectionSpec} */
 		Map<Connection.Socket.Property, Integer> socketProperties = new HashMap<Connection.Socket.Property, Integer>();
 		
-//		/** {@link Map} of the {@link Connection.Flag}s of the {@link ConnectionSpec} */
-//		Map<Connection.Flag, Boolean> connectionFlags = new HashMap<Connection.Flag, Boolean>();
+		/** Connection.Flag bitmask */
 		int		connectionFlagBitmask;
 		
 		/** {@link Map} of the {@link Connection.Flag}s of the {@link ConnectionSpec} */
-		Map<Class<?>, Object> connectionProperties = new HashMap<Class<?>, Object>();
+		Map<Connection.Property, Object> connectionProperties = new HashMap<Connection.Property, Object>();
 		
 		/** heartbeat period in milliseconds */
 		private int heartbeat;
@@ -224,23 +209,28 @@ public interface ConnectionSpec {
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getAddress() */
 //		@Override
 		final public InetAddress getAddress () {
-			return address;
+			return (InetAddress) getConnectionProperty(Connection.Property.HOST);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getCredentials() */
 //		@Override
 		final public byte[] getCredentials () {
-			return credentials;
+			return (byte[]) getConnectionProperty(Connection.Property.CREDENTIAL);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getDatabase() */
 //		@Override
 		final public int getDatabase () {
-			return database;
+			return (Integer) getConnectionProperty(Connection.Property.DB);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getPort() */
 //		@Override
 		final public int getPort () {
-			return port;
+			return (Integer) getConnectionProperty(Connection.Property.PORT);
 		}
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getModality() */
+		final public Modality getModality () { 
+			return (Modality) getConnectionProperty(Connection.Property.MODALITY);
+		}
+		
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getReconnectCnt() */
 //		@Override
 		final public int getReconnectCnt () {
@@ -256,12 +246,15 @@ public interface ConnectionSpec {
 		final public Integer getSocketProperty (Connection.Socket.Property property) {
 			return socketProperties.get(property);
 		}
-		@SuppressWarnings("unchecked") // puts are strictly checked.
-        final public <T> T getConnectionProperty(Class<T> proptype){
-			return (T) connectionProperties.get(proptype);			
+        /* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getConnectionProperty(org.jredis.connector.Connection.Property) */
+//		@Override
+        final public Object getConnectionProperty(Property prop){
+			return connectionProperties.get(prop);			
 		}
-		final public <T> ConnectionSpec setConnectionProperty(Class<T> property, T value){
-			try {  connectionProperties.put(property, (T) value); }
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setConnectionProperty(org.jredis.connector.Connection.Property, java.lang.Object) */
+//		@Override
+		final public ConnectionSpec setConnectionProperty(Property prop, Object value){
+			try {  connectionProperties.put(prop, value); }
 			catch (ClassCastException e){ throw new IllegalArgumentException("value type", e);}
 			return this;
 		}
@@ -271,25 +264,26 @@ public interface ConnectionSpec {
 		// ------------------------------------------------------------------------
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setAddress(java.net.InetAddress) */
 		final public ConnectionSpec setAddress (InetAddress address) {
-        	this.address = address;
+			setConnectionProperty(Connection.Property.HOST, address);
         	return this;
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setPort(int) */
 //		@Override
 		final public ConnectionSpec setPort (int port) {
-        	this.port = port;
+			setConnectionProperty(Connection.Property.PORT, port);
+//        	this.port = port;
         	return this;
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setCredentials(byte[]) */
 //      @Override
 		final public ConnectionSpec setCredentials (byte[] credentials) {
-        	this.credentials = credentials;
+			setConnectionProperty(Connection.Property.CREDENTIAL, credentials);
         	return this;
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setDatabase(int) */
 //      @Override
 		final public ConnectionSpec setDatabase (int database) {
-        	this.database = database;
+			setConnectionProperty(Connection.Property.DB, database);
         	return this;
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setReconnectCnt(int) */
@@ -298,11 +292,9 @@ public interface ConnectionSpec {
         	this.reconnectCnt = reconnectCnt;
         	return this;
         }
-		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getModality() */
-		final public Modality getModality () { return modality;}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setModality(org.jredis.connector.Connection.Modality) */
 		final public ConnectionSpec setModality (Modality modality) {
-			this.modality = modality;
+			setConnectionProperty(Connection.Property.MODALITY, modality);
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag, java.lang.Boolean) */
@@ -325,7 +317,7 @@ public interface ConnectionSpec {
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setConnectionFlag(org.jredis.connector.ConnectionSpec.ConnectionFlag, java.lang.Boolean) */
 //      @Override
 		final public ConnectionSpec setConnectionFlag(Connection.Flag flag, Boolean value){
-			Connection.Flag.bitset(connectionFlagBitmask, flag);
+			connectionFlagBitmask = Connection.Flag.bitset(connectionFlagBitmask, flag);
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getHeartbeat() */

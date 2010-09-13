@@ -34,6 +34,7 @@ public class TestSpecElements extends TestBase{
 	@Test
 	public void testConnectionFlags() {
 		log.info("TEST:CONNECTOR spec sematics - ConnectionFlags");
+		
 		Flag flags[] = {Flag.CONNECT_IMMEDIATELY, Flag.SHARED, Flag.RELIABLE};
         int bitset = Flag.bitset(flags);
         for(Flag f : flags)
@@ -43,5 +44,10 @@ public class TestSpecElements extends TestBase{
         bitset = Flag.bitclear(bitset, flags[1]);
         Assert.assertFalse(bitset == oldbitset, "clearing flag should have changed bitset");
         Assert.assertFalse(Flag.isSet(bitset, flags[1]), String.format("%s should have been cleared!\n", flags[1].name()));
+        
+        int bitset2 = 0x0000;
+    	bitset2 = Flag.bitset(bitset2, flags);
+        for(Flag f : flags)
+        	Assert.assertTrue(Flag.isSet(bitset2, f), String.format("%s should have been set!\n", f.name()));
 	}
 }

@@ -85,7 +85,7 @@ public abstract class ConnectionBase implements Connection {
 	/** Connector Listeners */
 	final private Set<Connection.Listener> listeners = new HashSet<Connection.Listener>();
 
-	/** Keep-alive heartbeat daemon thread  */
+//	/** Keep-alive heartbeat daemon thread  */
 	private HeartbeatJinn			heartbeat;
 
 	/** address of the socket connection */
@@ -120,8 +120,9 @@ public abstract class ConnectionBase implements Connection {
 			throw new ProviderException("Unexpected error on initialize -- BUG", e);
 		} 
 		
-//		if(spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) { connect (); }
-		if(true) { connect (); }
+		if(spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) { 
+			connect (); 
+		}
 	}
 	
 	// ------------------------------------------------------------------------
@@ -207,9 +208,6 @@ public abstract class ConnectionBase implements Connection {
      * heartbeats) is required!.
      */
     protected void notifyConnected () {
-//    	if (spec.isReliable()){
-//	    	heartbeat.notifyConnected();
-//    	}
     	notifyListeners(new Event(this, Type.CONNECTED));
     }
     /**
@@ -218,9 +216,6 @@ public abstract class ConnectionBase implements Connection {
      * heartbeats) is required!.
      */
     protected void notifyDisconnected () {
-//    	if (spec.isReliable()){
-//	    	heartbeat.notifyDisconnected();
-//    	}
     	notifyListeners(new Event(this, Type.DISCONNECTED));
     }
     
