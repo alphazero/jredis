@@ -14,6 +14,7 @@ import java.net.UnknownHostException;
 import org.jredis.ClientRuntimeException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.Connection.Flag;
 import org.jredis.connector.Connection.Modality;
 import org.jredis.ri.alphazero.support.Assert;
 
@@ -68,6 +69,8 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	private static final boolean DEFAULT_IS_RELIABLE = false;
 	/** def value: <code>false</code> */
 	private static final boolean DEFAULT_IS_PIPELINE = false;
+	/** def value: <code>false</code> */
+	private static final boolean DEFAULT_IS_CONNECT_IMMEDIATELY = false;
 	/** def value: <code>Modality.Synchronous</code> */
 	private static final Modality DEFAULT_CONN_MODALITY = Modality.Synchronous;
 	
@@ -122,6 +125,7 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
     	setConnectionFlag(RELIABLE, DEFAULT_IS_RELIABLE);
     	setConnectionFlag(SHARED, DEFAULT_IS_SHARED);
     	setConnectionFlag(PIPELINE, DEFAULT_IS_PIPELINE);
+    	setConnectionFlag(Flag.CONNECT_IMMEDIATELY, DEFAULT_IS_CONNECT_IMMEDIATELY);
     	
     	setConnectionProperty(Modality.class, DEFAULT_CONN_MODALITY);
     	

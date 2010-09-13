@@ -22,7 +22,6 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.Connection.Modality;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.ResponseStatus;

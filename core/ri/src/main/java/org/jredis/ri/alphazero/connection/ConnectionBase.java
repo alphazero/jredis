@@ -37,7 +37,6 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.Connection.Flag;
 import org.jredis.connector.Connection.Event.Type;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
@@ -113,8 +112,6 @@ public abstract class ConnectionBase implements Connection {
 			this.spec = notNull(spec, "ConnectionSpec init parameter", ClientRuntimeException.class);
 			socketAddress = new InetSocketAddress(spec.getAddress(), spec.getPort());
 			initializeComponents();
-			// temp hack
-			spec.setConnectionFlag(Flag.CONNECT_IMMEDIATELY, true);
 		}
 		catch (IllegalArgumentException e) { 
 			throw new ClientRuntimeException 
