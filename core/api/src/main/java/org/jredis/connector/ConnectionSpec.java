@@ -296,7 +296,12 @@ public interface ConnectionSpec {
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setCredentials(java.lang.String) */
 //      @Override
 		final public ConnectionSpec setCredentials (String credentials) {
-        	return setCredentials(credentials.getBytes());
+			byte[] bytes;
+			if(credentials == null || credentials.length() == 0)
+				bytes = null;
+			else 
+				bytes = credentials.getBytes();
+        	return setCredentials(bytes);
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setDatabase(int) */
 //      @Override

@@ -17,6 +17,7 @@ import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.Connection.Modality;
 import org.jredis.ri.alphazero.support.Assert;
+import org.jredis.ri.alphazero.support.Log;
 
 /**
  * Default connection spec provides the following default values for a connection.  See
@@ -40,10 +41,16 @@ import org.jredis.ri.alphazero.support.Assert;
  * @since   alpha.0
  * 
  */
-public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
+final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	// ------------------------------------------------------------------------
 	// Consts
 	// ------------------------------------------------------------------------
+	
+	static final int DEFAULT_REDIS_PORT = 6379;
+	static final String DEFAULT_REDIS_HOST_NAME = "localhost";
+	static final int DEFAULT_REDIS_DB = 0;
+	static final byte[] DEFAULT_REDIS_PASSWORD = null;
+	
 	/** defaults to 3 */
 	static final int DEFAULT_RECONNECT_CNT = 3;
 	/** defautls to 48KB */
@@ -86,6 +93,17 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	 * @param port
 	 * @throws ClientRuntimeException for invalid port, or null address values
 	 */
+	public DefaultConnectionSpec () throws ClientRuntimeException {
+		Log.debug("Yo!");
+		setDefaultProperties();
+	}
+	/**
+	 * Instantiates a default connection spec for the given host and port.
+	 * @param address
+	 * @param port
+	 * @throws ClientRuntimeException for invalid port, or null address values
+	 */
+	@Deprecated
 	public DefaultConnectionSpec (InetAddress address, int port) throws ClientRuntimeException {
 		this (address, port, 0, null);
 	}
@@ -97,13 +115,13 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	 * @param credentials
 	 * @throws ClientRuntimeException for invalid port, or null address values
 	 */
+	@Deprecated
 	public DefaultConnectionSpec (InetAddress address, int port, int database, byte[] credentials) throws ClientRuntimeException {
+		this();
 		setPort(Assert.inRange (port, 1, 65534, "port init parameter for DefaultConnectionSpec", ClientRuntimeException.class));
 		setAddress(Assert.notNull(address, "address init parameter for DefaultConnectionSpec", ClientRuntimeException.class));
 		setDatabase(database);
 		setCredentials(credentials);
-		
-		setDefaultProperties();
 	}
 	/**
      * Set the default values for the {@link SocketFlag}s and {@link SocketProperty}s and various
@@ -145,7 +163,7 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	public static final ConnectionSpec newSpec () 
 		throws ClientRuntimeException 
 	{
-		return newSpec ("localhost", 6379, 0, null);
+		return newSpec (DEFAULT_REDIS_HOST_NAME, DEFAULT_REDIS_PORT, DEFAULT_REDIS_DB, DEFAULT_REDIS_PASSWORD);
 	}
 
 	/**
@@ -196,6 +214,9 @@ public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 		) 
 		throws ClientRuntimeException 
 	{
-		return new DefaultConnectionSpec(address, port, database, credentials);
+//		return new DefaultConnectionSpec(address, port, database, credentials);
+		ConnectionSpec spec = new DefaultConnectionSpec();
+		return spec.setAddress(address).setPort(port).setDatabase(database).setCredentials(credentials);
+		
 	}
 }

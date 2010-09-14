@@ -45,7 +45,7 @@ public class TestSpecElements extends TestBase{
         
         bitset = Flag.bitclear(bitset, flags[1]);
         assertFalse(bitset == oldbitset, "clearing flag should have changed bitset");
-        assertFalse(Flag.isSet(bitset, flags[1]), "%s should have been cleared!\n", flags[1].name());
+        assertFalse(Flag.isSet(bitset, flags[1]), "%s should have been cleared!\n", flags[1].name() );
         
         int bitset2 = 0x0000;
     	bitset2 = Flag.bitset(bitset2, flags);
@@ -62,13 +62,14 @@ public class TestSpecElements extends TestBase{
 		String property = Connection.Property.CREDENTIAL.name();
 		log.info(String.format("TEST:CONNECTOR spec sematics - Credentials", property));
 		
+		// check with actual passwords
+		//
+		String password = "jredis";
+		byte[] credentials = password.getBytes();
+		
 		ConnectionSpec spec = new ConnectionSpec.RefImpl();
 		assertNull(spec.getCredentials(), "RefImpl should not have defined: %s", property);
 		
-		String password = "jredis";
-		
-		// use the byte[] variant
-		//
 		spec.setCredentials(password.getBytes());
 		byte[] credentials_1 = spec.getCredentials();
 		assertNotNull(credentials_1, "RefImpl.setCredentials (byte[]) did not set: %s", property);
@@ -81,5 +82,12 @@ public class TestSpecElements extends TestBase{
 
 		// compare them
 		assertEquals(credentials_2, credentials_1, String.format("Overloaded methods for %s setter are not equivalent.", property));
+		
+		// check for treatment of empty strings -- should be equivalent to null byte[]
+		//
+		spec = new ConnectionSpec.RefImpl();  // ASSUMPTION: tested above for null default value.
+		password = "";
+		spec.setCredentials(password);
+		assertNull(spec.getCredentials(), "RefImpl should not have set \"\" (empty) credential to non-null value: %s", property);
 	}
 }

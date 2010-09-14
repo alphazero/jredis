@@ -20,8 +20,10 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
+import org.jredis.connector.ConnectionSpec;
 import org.jredis.protocol.Command;
 import org.jredis.ri.alphazero.JRedisClient;
+import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import static org.jredis.ri.alphazero.support.DefaultCodec.*;
 
 /**
@@ -36,14 +38,16 @@ import static org.jredis.ri.alphazero.support.DefaultCodec.*;
 public class HelloAgain {
 	public static final String key = "jredis::examples::HelloAgain::message";
 	public static void main(String[] args) {
-		String password = "";
+		String password = "jredis";
 		if(args.length > 0) password  = args[0];
 		new HelloAgain().run(password);
 	}
 
 	private void run(String password) {
 		try {
-			JRedis	jredis = new JRedisClient("localhost", 6379, "jredis", 0);
+			ConnectionSpec spec = DefaultConnectionSpec.newSpec().setCredentials(password);
+//			JRedis	jredis = new JRedisClient("localhost", 6379, "jredis", 0);
+			JRedis	jredis = new JRedisClient(spec);
 			jredis.ping();
 			
 			if(!jredis.exists(key)) {
