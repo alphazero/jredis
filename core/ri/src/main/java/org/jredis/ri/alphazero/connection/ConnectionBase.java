@@ -73,8 +73,7 @@ public abstract class ConnectionBase implements Connection {
 	protected Protocol 			protocol;
 	
 	/** Connection specs used to create this {@link Connection} */
-	final 
-	protected ConnectionSpec  	spec;
+	final protected ConnectionSpec  	spec;
 	
 	private boolean 			isConnected = false;
 	/** socket reference -- a new instance obtained in {@link ConnectionBase#newSocketConnect()} */

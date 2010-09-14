@@ -19,6 +19,7 @@ package org.jredis;
 import static org.testng.Assert.fail;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.testng.Assert;
 
 /**
  * [TODO: document me!]
@@ -55,5 +56,39 @@ public class TestBase {
 		finally {
 			if(!didRaiseError) { fail("Failed to raise expected RuntimeError " + errtype.getCanonicalName()); }
 		}
+	}
+	
+	// ------------------------------------------------------------------------
+	// Test support - mildly enhanced TESTNG Assert semantics
+	// ------------------------------------------------------------------------
+	// notNull
+	public static final void assertNotNull(Object object, String msgfmt, Object...optionalFmtArgs){
+		String message = String.format(msgfmt, optionalFmtArgs);
+		Assert.assertNotNull (object, message);
+	}
+	// null
+	public static final void assertNull(Object object, String msgfmt, Object...optionalFmtArgs){
+		String message = String.format(msgfmt, optionalFmtArgs);
+		Assert.assertNull (object, message);		// << has bug.  reports a boolean comp result -- TODO: fix and patch.
+	}
+	
+	// equals
+	public static final void assertEquals(Object actual, Object expected, String msgfmt, Object...optionalFmtArgs){
+		String message = String.format(msgfmt, optionalFmtArgs);
+		Assert.assertEquals (actual, expected, message);		
+	}
+	public static final void assertEquals(byte[] actual, byte[] expected, String msgfmt, Object...optionalFmtArgs){
+		String message = String.format(msgfmt, optionalFmtArgs);
+		Assert.assertEquals (actual, expected, message);		
+	}
+	
+	// true/false
+	public static final void assertTrue(boolean condition, String msgfmt, Object...optionalFmtArgs){
+		String message = String.format(msgfmt, optionalFmtArgs);
+		Assert.assertTrue (condition, message);
+	}
+	public static final void assertFalse(boolean condition, String msgfmt, Object...optionalFmtArgs){
+		String message = String.format(msgfmt, optionalFmtArgs);
+		Assert.assertFalse (condition, message);
 	}
 }

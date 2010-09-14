@@ -18,7 +18,6 @@ package org.jredis.connector;
 
 import org.jredis.TestBase;
 import org.jredis.connector.Connection.Flag;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -31,6 +30,9 @@ import org.testng.annotations.Test;
 
 public class TestSpecElements extends TestBase{
 	
+	/**
+	 * [Doc this baby]
+	 */
 	@Test
 	public void testConnectionFlags() {
 		log.info("TEST:CONNECTOR spec sematics - ConnectionFlags");
@@ -38,16 +40,46 @@ public class TestSpecElements extends TestBase{
 		Flag flags[] = {Flag.CONNECT_IMMEDIATELY, Flag.SHARED, Flag.RELIABLE};
         int bitset = Flag.bitset(flags);
         for(Flag f : flags)
-        	Assert.assertTrue(Flag.isSet(bitset, f), String.format("%s should have been set!\n", f.name()));
+        	assertTrue(Flag.isSet(bitset, f), "%s should have been set!\n", f.name());
         int oldbitset = bitset;
         
         bitset = Flag.bitclear(bitset, flags[1]);
-        Assert.assertFalse(bitset == oldbitset, "clearing flag should have changed bitset");
-        Assert.assertFalse(Flag.isSet(bitset, flags[1]), String.format("%s should have been cleared!\n", flags[1].name()));
+        assertFalse(bitset == oldbitset, "clearing flag should have changed bitset");
+        assertFalse(Flag.isSet(bitset, flags[1]), "%s should have been cleared!\n", flags[1].name());
         
         int bitset2 = 0x0000;
     	bitset2 = Flag.bitset(bitset2, flags);
         for(Flag f : flags)
-        	Assert.assertTrue(Flag.isSet(bitset2, f), String.format("%s should have been set!\n", f.name()));
+        	assertTrue(Flag.isSet(bitset2, f), "%s should have been set!\n", f.name());
+	}
+	/**
+	 * Test the equivalence of
+	 * {@link ConnectionSpec#setCredentials(byte[])} and {@link ConnectionSpec#setCredentials(String)}
+	 * using {@link ConnectionSpec#getCredentials()} 
+	 */
+	@Test
+	public void testCredentialsOverloads () {
+		String property = Connection.Property.CREDENTIAL.name();
+		log.info(String.format("TEST:CONNECTOR spec sematics - Credentials", property));
+		
+		ConnectionSpec spec = new ConnectionSpec.RefImpl();
+		assertNull(spec.getCredentials(), "RefImpl should not have defined: %s", property);
+		
+		String password = "jredis";
+		
+		// use the byte[] variant
+		//
+		spec.setCredentials(password.getBytes());
+		byte[] credentials_1 = spec.getCredentials();
+		assertNotNull(credentials_1, "RefImpl.setCredentials (byte[]) did not set: %s", property);
+		
+		// use the String variant
+		//
+		spec.setCredentials(password);
+		byte[] credentials_2 = spec.getCredentials();
+		assertNotNull(credentials_2, String.format("RefImpl.setCredentials(String) did not set: %s", property));
+
+		// compare them
+		assertEquals(credentials_2, credentials_1, String.format("Overloaded methods for %s setter are not equivalent.", property));
 	}
 }

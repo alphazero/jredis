@@ -60,10 +60,19 @@ public interface ConnectionSpec {
 	 */
 	public byte[] getCredentials();
 	/**
+	 * Set the Connection's credentials, presented to Redis on (re)connects.
 	 * @param credentials
+	 * @see ConnectionSpec#setCredentials(String)
      * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setCredentials(byte[] credentials);
+	/**
+	 * Convenience method 
+	 * @param credentials
+	 * @see ConnectionSpec#setCredentials(byte[])
+     * @return the {@link ConnectionSpec}
+	 */
+	public ConnectionSpec setCredentials(String credentials);
 	/**
 	 * @return the database selected for the connection.  Used on (re-)connect to select the db 
 	 * after network connectivity has been established.
@@ -283,6 +292,11 @@ public interface ConnectionSpec {
 		final public ConnectionSpec setCredentials (byte[] credentials) {
 			setConnectionProperty(Connection.Property.CREDENTIAL, credentials);
         	return this;
+        }
+		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setCredentials(java.lang.String) */
+//      @Override
+		final public ConnectionSpec setCredentials (String credentials) {
+        	return setCredentials(credentials.getBytes());
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setDatabase(int) */
 //      @Override

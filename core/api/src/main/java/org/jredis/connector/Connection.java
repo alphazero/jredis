@@ -224,15 +224,29 @@ public interface Connection {
 	 * 
 	 */
 	public enum Property {
+		/** the redis server host name or ip */
 		HOST,
+		/** the Redis server port */
 		PORT,
+		/** the password used   */
 		CREDENTIAL,
+		/** The db selected on (re-)connect */
 		DB,
+		/** Defines the {@link Connection}'s {@link Connection.Modality} */
 		MODALITY,
+		/** On Connect (or reconnect after faults or timeouts) the maximum duration that you are willing to wait, milliseconds */
 		MAX_CONNECT_WAIT,
+		/** To be deprecated -- number of reconnect attempts after timeouts or faults. */
+		@Deprecated
 		MAX_CONNECT_ATTEMPT,
+		/** if specified, is used to create the new protocol */
 		PROTOCOL_CLASS,
+		/** if specified, is used to create the new protocol */
+		PROTOCOL_FACTORY,
+		/** if specified, is used to create the new connection */
 		CONNECTION_CLASS,
+		/** if specified, is used to create the new connection. */
+		CONNECTION_FACTORY,
 		;// -- fini
 	}
 	/**
