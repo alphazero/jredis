@@ -216,7 +216,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		byte[] keybytes = null;
 		if ((keybytes = getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
-    byte[][] bulk = new byte[3][];
+    byte[][] bulk = new byte[4][];
     bulk[0] = keybytes;
     bulk[1] = (after ? "AFTER" : "BEFORE").getBytes();
     bulk[2] = oldvalue;
