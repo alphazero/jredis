@@ -37,6 +37,7 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.Connection.Property;
 import org.jredis.connector.Connection.Event.Type;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
@@ -229,7 +230,11 @@ public abstract class ConnectionBase implements Connection {
      * @return
      */
     protected Protocol newProtocolHandler () {
-    	return (new DefaultProtocolFactory()).newProtocol(spec);
+    	Protocol.Factory protfac = (Protocol.Factory) spec.getConnectionProperty(Property.PROTOCOL_FACTORY); 
+    	if(protfac == null) protfac = new DefaultProtocolFactory();
+    	return protfac.newProtocol(spec);
+//
+//    	return (new DefaultProtocolFactory()).newProtocol(spec);
     }
     
     /**
