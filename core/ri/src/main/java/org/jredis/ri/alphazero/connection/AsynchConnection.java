@@ -62,8 +62,7 @@ public class AsynchConnection extends ConnectionBase implements Connection {
 	// Constructors
 	// ------------------------------------------------------------------------
 	public AsynchConnection (
-			ConnectionSpec connectionSpec,
-			boolean 	   isShared
+			ConnectionSpec connectionSpec
 		)
 		throws ClientRuntimeException, ProviderException 
 	{

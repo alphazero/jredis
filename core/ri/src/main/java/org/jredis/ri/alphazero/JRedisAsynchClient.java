@@ -21,9 +21,13 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.FaultedConnection;
+import org.jredis.connector.Connection.Modality;
+import org.jredis.connector.Connection.Property;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
-import org.jredis.ri.alphazero.connection.AsynchConnection;
+import org.jredis.ri.alphazero.support.Assert;
+import org.jredis.ri.alphazero.support.Log;
 
 /**
  * [TODO: document me!]
@@ -41,6 +45,8 @@ public class JRedisAsynchClient extends JRedisFutureSupport {
 
 	/**  */
 	final private Connection	connection;
+	/**  */
+	final protected ConnectionSpec connSpec;
 
 	// ------------------------------------------------------------------------
 	// Construct and initialize
@@ -51,10 +57,36 @@ public class JRedisAsynchClient extends JRedisFutureSupport {
 	 */
 	public JRedisAsynchClient (ConnectionSpec connectionSpec) {
 		// note: using a shared connection mod
-		connectionSpec.setConnectionFlag(Connection.Flag.RELIABLE, true);
-		connection = new AsynchConnection(connectionSpec, true);
+		connSpec = Assert.notNull(connectionSpec, "ConnectionSpec 'connectionSpec'", ClientRuntimeException.class);
+		connectionSpec.setConnectionFlag(Connection.Flag.RELIABLE, true);  // REVU: TODO: review all these spot mods.
+		connectionSpec.setConnectionFlag(Connection.Flag.SHARED, false);  // REVU: TODO: review all these spot mods.
+		connectionSpec.setConnectionFlag(Connection.Flag.PIPELINE, false);  // REVU: TODO: review all these spot mods.
+		connectionSpec.setModality(Modality.Asynchronous);
+//		connection = new AsynchConnection(connectionSpec, true);
+		connection = createAsynchConnection();
 	}
 	
+	// ------------------------------------------------------------------------
+	// Internal ops
+	// ------------------------------------------------------------------------
+	final private Connection createAsynchConnection() {
+		Connection.Factory cfact = (Connection.Factory) connSpec.getConnectionProperty(Property.CONNECTION_FACTORY);
+		Connection 	conn = null;
+		try {
+			conn = Assert.notNull(cfact.newConnection(connSpec), "connection delegate", ClientRuntimeException.class);
+		}
+		catch (ProviderException e) {
+			Log.bug("Couldn't create the handler delegate.  => " + e.getLocalizedMessage());
+			throw e;
+		}
+		catch (ClientRuntimeException e) {
+			String msg = String.format("%s\nMake sure your server is running.", e.getMessage());
+			Log.error ("Error creating connection -> " + e.getLocalizedMessage());
+			conn = new FaultedConnection(connSpec, msg);
+		}
+		Log.debug ("%s: Using %s", this.getClass().getSimpleName(), conn);
+		return conn;
+	}
 	// ------------------------------------------------------------------------
 	// Super overrides
 	// ------------------------------------------------------------------------

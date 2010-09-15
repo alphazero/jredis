@@ -95,7 +95,7 @@ final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	 * @throws ClientRuntimeException for invalid port, or null address values
 	 */
 	public DefaultConnectionSpec () throws ClientRuntimeException {
-		Log.debug("Yo!");
+//		Log.debug("Yo!");
 		setDefaultProperties();
 	}
 	/**

@@ -21,6 +21,8 @@ import org.jredis.ClientRuntimeException;
 import org.jredis.NotSupportedException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.Connection.Flag;
+import org.jredis.ri.alphazero.support.Log;
 
 /**
  * [TODO: document me!]
@@ -38,17 +40,42 @@ public class DefaultConnectionFactory implements Connection.Factory {
     {
     	Connection conn = null;
     	switch (spec.getModality()){
-			case Asynchronous:
-				throw new ProviderException("NOT IMPLEMENTED!");
 			case Monitor:
 				throw new ProviderException("NOT IMPLEMENTED!");
 			case PubSub:
 				throw new ProviderException("NOT IMPLEMENTED!");
+			case Asynchronous:
+				conn = newAsynchConnection(spec);
+				break;
 			case Synchronous:
 				conn = new SynchConnection(spec);
 				break;
-    	
     	}
+    	// TODO: factories create completed products --
+    	// this class needs to set conn settings for ALL connection types
+    	// 
+		Log.debug("Created new %s", conn);
 	    return conn;
+    }
+
+	/**
+	 * Creates a new {@link Connection.Modality#Asynchronous} {@link Connection}
+	 * per {@link ConnectionSpec} settings. 
+     * @param spec
+     */
+    private Connection newAsynchConnection (ConnectionSpec spec) {
+    	Connection conn = null;
+    	if(spec.getConnectionFlag(Flag.PIPELINE)){
+    		throw new ProviderException("NOT IMPLEMENTED! [Asynch|PIPELINE]");
+    	}
+    	else {
+    		if(spec.getConnectionFlag(Flag.SHARED)){
+        		throw new ProviderException("NOT IMPLEMENTED! [Asynch|SHARED|not_PIPELINE]");
+    		}
+    		else {
+    			conn = new AsynchConnection(spec);
+    		}
+    	}
+    	return conn;
     }
 }

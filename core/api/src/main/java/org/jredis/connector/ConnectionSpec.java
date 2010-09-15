@@ -353,7 +353,10 @@ public interface ConnectionSpec {
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setConnectionFlag(org.jredis.connector.ConnectionSpec.ConnectionFlag, java.lang.Boolean) */
 //      @Override
 		final public ConnectionSpec setConnectionFlag(Connection.Flag flag, Boolean value){
-			connectionFlagBitmask = Connection.Flag.bitset(connectionFlagBitmask, flag);
+			connectionFlagBitmask = 
+				value ? 
+						Connection.Flag.bitset(connectionFlagBitmask, flag) : 
+						Connection.Flag.bitclear(connectionFlagBitmask, flag);
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getHeartbeat() */

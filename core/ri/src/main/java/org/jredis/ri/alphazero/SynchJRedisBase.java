@@ -70,9 +70,9 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 	 */
 	protected Connection createSynchConnection(ConnectionSpec connSpec){
 		Connection.Factory cfact = (Connection.Factory) connSpec.getConnectionProperty(Property.CONNECTION_FACTORY);
-		Connection 	synchConnection = null;
+		Connection 	conn = null;
 		try {
-			synchConnection = Assert.notNull(cfact.newConnection(connSpec), "connection delegate", ClientRuntimeException.class);
+			conn = Assert.notNull(cfact.newConnection(connSpec), "connection delegate", ClientRuntimeException.class);
 		}
 		catch (ProviderException e) {
 			Log.bug("Couldn't create the handler delegate.  => " + e.getLocalizedMessage());
@@ -83,7 +83,8 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 			Log.error ("Error creating connection -> " + e.getLocalizedMessage());
 			setConnection(new FaultedConnection(connSpec, msg));
 		}
-		return synchConnection;
+		Log.debug ("%s: Using %s", this.getClass().getSimpleName(), conn);
+		return conn;
 	}
 	// ------------------------------------------------------------------------
 	// Interface
