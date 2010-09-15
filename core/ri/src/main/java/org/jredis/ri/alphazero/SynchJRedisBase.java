@@ -22,10 +22,10 @@ import org.jredis.ProviderException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.FaultedConnection;
+import org.jredis.connector.Connection.Property;
 import org.jredis.resource.Context;
 import org.jredis.resource.Resource;
 import org.jredis.resource.ResourceException;
-import org.jredis.ri.alphazero.connection.SynchConnection;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Log;
 
@@ -64,24 +64,24 @@ public abstract class SynchJRedisBase extends JRedisSupport implements Resource<
 	 * Creates a {@link Connection} with {@link Connection.Modality#Synchronous} semantics
 	 * suitable for use by synchronous (blocking) JRedis clients.
 	 *  
-	 * @param connectionSpec connection's specification
+	 * @param connSpec connection's specification
 	 * @param redisVersion redis protocol compliance
 	 * @return
 	 */
-	protected Connection createSynchConnection(ConnectionSpec connectionSpec){
+	protected Connection createSynchConnection(ConnectionSpec connSpec){
+		Connection.Factory cfact = (Connection.Factory) connSpec.getConnectionProperty(Property.CONNECTION_FACTORY);
 		Connection 	synchConnection = null;
 		try {
-			synchConnection = new SynchConnection(connectionSpec);
-			Assert.notNull(synchConnection, "connection delegate", ClientRuntimeException.class);
+			synchConnection = Assert.notNull(cfact.newConnection(connSpec), "connection delegate", ClientRuntimeException.class);
 		}
 		catch (ProviderException e) {
 			Log.bug("Couldn't create the handler delegate.  => " + e.getLocalizedMessage());
 			throw e;
 		}
 		catch (ClientRuntimeException e) {
-			String msg = e.getMessage() + "\nMake sure your server is running.";
+			String msg = String.format("%s\nMake sure your server is running.", e.getMessage());
 			Log.error ("Error creating connection -> " + e.getLocalizedMessage());
-			setConnection(new FaultedConnection(connectionSpec, msg));
+			setConnection(new FaultedConnection(connSpec, msg));
 		}
 		return synchConnection;
 	}

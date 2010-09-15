@@ -125,9 +125,16 @@ final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 		setCredentials(credentials);
 	}
 	/**
-     * Set the default values for the {@link SocketFlag}s and {@link SocketProperty}s and various
+     * Set the default values for the {@link ConnectionSpec}
      * other properties.
-     * @See {@link ConnectionSpec}
+     * @see ConnectionSpec
+     * @see Connection.Property
+     * @see Connection.Property
+     * @see Connection.Flag
+     * @see Connection.Socket.Flag
+     * @see Connection.Socket.Property
+     * @see DefaultConnectionFactory
+     * @see DefaultProtocolFactory
      */
     private void setDefaultProperties () {
     	// reconnect try count
@@ -152,6 +159,7 @@ final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
     	setConnectionProperty(Connection.Property.MODALITY, DEFAULT_CP_CONN_MODALITY);
     	setConnectionProperty(Connection.Property.MAX_CONNECT_ATTEMPT, DEFAULT_CP_MAX_CONNECT_ATTEMPT);
     	setConnectionProperty(Connection.Property.PROTOCOL_FACTORY, new DefaultProtocolFactory());
+    	setConnectionProperty(Connection.Property.CONNECTION_FACTORY, new DefaultConnectionFactory());
     	
     	setHeartbeat(DEFAULT_HEARTBEAT_SEC);
     }
