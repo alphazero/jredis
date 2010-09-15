@@ -150,6 +150,7 @@ final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
     	
     	setConnectionProperty(Connection.Property.MODALITY, DEFAULT_CP_CONN_MODALITY);
     	setConnectionProperty(Connection.Property.MAX_CONNECT_ATTEMPT, DEFAULT_CP_MAX_CONNECT_ATTEMPT);
+    	setConnectionProperty(Connection.Property.PROTOCOL_FACTORY, org.jredis.ri.alphazero.protocol.DefaultProtocolFactory.class);
     	
     	setHeartbeat(DEFAULT_HEARTBEAT_SEC);
     }

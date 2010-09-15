@@ -33,6 +33,11 @@ public class DefaultProtocolFactory implements Protocol.Factory {
 
 	/* (non-Javadoc) @see org.jredis.protocol.Protocol.Factory#newProtocol(org.jredis.connector.ConnectionSpec) */
     public Protocol newProtocol (ConnectionSpec connSpec) throws NotSupportedException {
+    	/* 
+    	 * TODO:
+    	 * check various Connection.Property/Spec keys.  
+    	 * 
+    	 */
 		return connSpec.getConnectionFlag(Connection.Flag.SHARED) ? new ConcurrentSynchProtocol() : new SynchProtocol();
     }
 
