@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Houshyar
+ *   Copyright 2009-2010 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package org.jredis.ri.alphazero.connection;
 
-import static org.jredis.connector.Connection.Socket.Property.SO_RCVBUF;
 import java.io.InputStream;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -29,6 +29,7 @@ import org.jredis.ProviderException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.NotConnectedException;
+//import org.jredis.connector.ConnectionSpec.SocketProperty;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Request;
@@ -40,7 +41,15 @@ import org.jredis.ri.alphazero.support.FastBufferedInputStream;
 import org.jredis.ri.alphazero.support.Log;
 
 /**
- * [TODO: document me!]
+ * Abstract base for all Pipeline connections, providing basically all of the
+ * required functionality for a pipeline with asynchronous semantics.  
+ * 
+ * The asynch extensions merely need to provide support for 
+ * {@link Connection#getModality()}.  Synchronous pipelines can simply call
+ * the {@link PipelineConnectionBase#queueRequest(Command, byte[])} method
+ * in their implementation of the synchronous {@link Connection#serviceRequest(Command, byte[])} 
+ * method and block on {@link Future#get()} to realize the blocking semantics 
+ * and results required.
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Sep 7, 2009
@@ -96,9 +105,13 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     @Override
     protected void initializeComponents () {
     	
-    	spec.setConnectionFlag(Connection.Flag.RELIABLE, true);
-    	spec.setConnectionFlag(Connection.Flag.PIPELINE, true);
-    	spec.setConnectionFlag(Connection.Flag.SHARED, true);
+//    	spec.isReliable(true);
+//    	spec.isPipeline(true);
+//    	spec.isShared(true);
+    	spec.setConnectionFlag(Flag.PIPELINE, true);
+    	spec.setConnectionFlag(Flag.RELIABLE, true);
+    	spec.setConnectionFlag(Flag.SHARED, true);
+    	
     	super.initializeComponents();
     	
     	serviceLock = new Object();
@@ -146,8 +159,8 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	
     	InputStream in = super.newInputStream(socketInputStream);
     	if(!(in instanceof FastBufferedInputStream)){
-    		Log.log(String.format("WARN: input was: %s\n", in.getClass().getCanonicalName()));
-    		in = new FastBufferedInputStream (in, spec.getSocketProperty(SO_RCVBUF));
+    		System.out.format("WARN: input was: %s\n", in.getClass().getCanonicalName());
+    		in = new FastBufferedInputStream (in, spec.getSocketProperty(Connection.Socket.Property.SO_RCVBUF));
     	}
     	return in;
     }
@@ -173,7 +186,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 			throw new NotConnectedException ("Not connected!");
 		
 		PendingRequest pendingResponse = null;
-		synchronized (serviceLock) {	// << get rid of this thing!
+		synchronized (serviceLock) {
 			if(pendingQuit) 
 				throw new ClientRuntimeException("Pipeline shutting down: Quit in progess; no further requests are accepted.");
 			
@@ -193,19 +206,67 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 		return pendingResponse;
     }
 
+    private void onResponseHandlerError (ClientRuntimeException cre, PendingRequest request) {
+    	Log.error("Pipeline response handler encountered an error: " + cre.getMessage());
+    	
+    	// signal fault
+    	onConnectionFault(cre.getMessage(), false);
+    	
+    	// set execution error for future object
+    	request.setCRE(cre);
+    	
+		// BEST:
+		// 1 - block the request phase
+		// 2 - try reconnect
+		// 3-ok: 		reconnected, resume processing
+		// 2-not ok: 	close shop, and set all pendings to error
+    	
+		// for now .. flush the remaining pending resposes from queue
+    	// with execution error
+    	//
+		PendingRequest pending = null;
+		while(true){
+			try {
+				pending = pendingResponseQueue.remove();
+				pending.setCRE(cre);
+				Log.log("set pending %s response to error with CRE", pending.cmd);
+			}
+			catch (NoSuchElementException empty){ break; }
+		}
+    }
 	// ------------------------------------------------------------------------
 	// Inner Class
 	// ------------------------------------------------------------------------
     /**
      * Provides the response processing logic as a {@link Runnable}.
+     * <p>
+     * TODD: Needs to have a more regulated operating cycle.  Right now its just
+     * infinite loop until something goes boom.  Not good.
      * 
      * @author  Joubin Houshyar (alphazero@sensesay.net)
      * @version alpha.0, Oct 18, 2009
      * @since   alpha.0
      * 
      */
-    public final class ResponseHandler implements Runnable {
+    public final class ResponseHandler implements Runnable, Connection.Listener {
 
+    	// ------------------------------------------------------------------------
+    	// Constructor
+    	// ------------------------------------------------------------------------
+    	
+    	/**
+         * Adds self to the listeners of the enclosing {@link Connection} instance.
+         */
+        public ResponseHandler () {
+        	PipelineConnectionBase.this.addListener(this);
+        } 
+        
+    	// ------------------------------------------------------------------------
+    	// INTERFACE
+    	/* ====================================================== Thread (Runnable)
+    	 * 
+    	 */
+    	// ------------------------------------------------------------------------
     	/**
     	 * Keeps processing the {@link PendingRequest}s in the pending {@link Queue}
 		 * until a QUIT is encountered in the pending queue.  Thread will stop after
@@ -215,11 +276,13 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	 * <p>
     	 * TODO: socket Reconnect in the context of pipelining is non-trivial, and maybe
     	 * not even practically possible.  (e.g. request n is sent but pipe breaks on
-    	 * some m (m!=n) response.  non trivial.
+    	 * some m (m!=n) response.  non trivial.  Perhaps its best to assume broken connection
+    	 * means faulted server, specially given the fact that a pipeline has a heartbeat
+    	 * so the issue can not be timeout.
     	 */
 //        @Override
         public void run () {
-			Log.log("Pipeline thread <%s> started.", Thread.currentThread().getName());
+			Log.log("Pipeline <%s> thread for <%s> started.", Thread.currentThread().getName(), PipelineConnectionBase.this);
         	PendingRequest pending = null;
         	while(true){
         		Response response = null;
@@ -235,21 +298,27 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 						}
 
 					}
+					
+					// this exception handling as of now is basically broken and fairly useless
+					// really, what we want is making a distinction between bugs and runtime problems
+					// and in case of connection issues, signal the retry mechanism.
+					// in the interim, all incoming requests must be rejected (e.g. PipelineReconnecting ...)
+					// and all remaining pending responses must be set to error.
+					// major TODO
+					
 					catch (ProviderException bug){
-						Log.error ("ProviderException: " + bug.getLocalizedMessage());
-						bug.printStackTrace();
-						pending.setCRE(bug);
+						Log.bug ("ProviderException: " + bug.getMessage());
+						onResponseHandlerError(bug, pending);
+						break;
 					}
 					catch (ClientRuntimeException cre) {
-						Log.error ("ClientRuntimeException: " + cre.getLocalizedMessage());
-						cre.printStackTrace();
-						pending.setCRE(cre);
+						Log.problem ("ClientRuntimeException: " + cre.getMessage());
+						onResponseHandlerError(cre, pending);
+						break;
 					}
 					catch (RuntimeException e){
-						Log.error ("Unexpected (and not handled) RuntimeException: " + e.getLocalizedMessage());
-						e.printStackTrace();
-						pending.setCRE(new ProviderException("Unexpected runtime exception in response handler"));
-						pending.setResponse(null);
+						Log.problem ("Unexpected (and not handled) RuntimeException: " + e.getMessage());
+						onResponseHandlerError(new ClientRuntimeException("Unexpected (and not handled) RuntimeException", e), pending);
 						break;
 					}
 					
@@ -265,7 +334,38 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	                e1.printStackTrace();
                 }
         	}
-			Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
+			Log.log("Pipeline <%s> thread for <%s> stopped.", Thread.currentThread().getName(), PipelineConnectionBase.this);
+//			Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
+        }
+
+    	// ------------------------------------------------------------------------
+    	// INTERFACE
+    	/* =================================================== Connection.Listener
+    	 * 
+    	 * hooks for integrating the response handler thread's state with the 
+    	 * wrapping connection's state through event callbacks. 
+    	 */
+    	// ------------------------------------------------------------------------
+        
+		/**
+		 * Needs to be hooked up.
+		 * TODO: zood tond foree saree!
+		 * 
+         * @see org.jredis.connector.Connection.Listener#onEvent(org.jredis.connector.Connection.Event)
+         */
+        public void onEvent (Event event) {
+        	if(event.getSource() != PipelineConnectionBase.this) {
+        		// BUG: what to do about it?
+        	}
+        	switch (event.getType()){
+				case CONNECTED:
+					break;
+				case DISCONNECTED:
+					break;
+				case FAULTED:
+					break;
+        	
+        	}
         }
     }
 }

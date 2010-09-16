@@ -2138,6 +2138,7 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			assertEquals(remCnt, SMALL_CNT+1, "should have specific number of rem cnt for zremrangebyrank");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+		catch (RuntimeException rte) { fail(cmd + " RUNTIME-ERROR => " + rte.getLocalizedMessage(), rte); }
 	}
 	
 	@Test

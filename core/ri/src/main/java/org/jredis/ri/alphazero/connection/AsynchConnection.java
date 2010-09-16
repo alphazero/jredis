@@ -67,6 +67,7 @@ public class AsynchConnection extends ConnectionBase implements Connection {
 		throws ClientRuntimeException, ProviderException 
 	{
 		super (connectionSpec.setModality(Modality.Asynchronous));
+//		super (connectionSpec); // should be - really need an assert
 	}
 
 	// ------------------------------------------------------------------------

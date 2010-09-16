@@ -86,7 +86,7 @@ public abstract class ConnectionBase implements Connection {
 	final private Set<Connection.Listener> listeners = new HashSet<Connection.Listener>();
 
 //	/** Keep-alive heartbeat daemon thread  */
-	private HeartbeatJinn			heartbeat;
+//	private HeartbeatJinn			heartbeat;
 
 	/** address of the socket connection */
 	private final InetSocketAddress  	socketAddress;
@@ -197,8 +197,8 @@ public abstract class ConnectionBase implements Connection {
 		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
 
 		if(spec.getConnectionFlag(Connection.Flag.RELIABLE)){
-	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), " [" + this + "] heartbeat");
-	    	heartbeat.start();
+//	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), " [" + this + "] heartbeat");
+//	    	heartbeat.start();
 		}
     }
 
