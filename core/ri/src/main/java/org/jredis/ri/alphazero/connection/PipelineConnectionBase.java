@@ -250,6 +250,9 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
      */
     public final class ResponseHandler implements Runnable, Connection.Listener {
 
+    	private final AtomicBoolean work_flag;
+    	private final AtomicBoolean run_flag;
+    	
     	// ------------------------------------------------------------------------
     	// Constructor
     	// ------------------------------------------------------------------------
@@ -259,6 +262,8 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
          */
         public ResponseHandler () {
         	PipelineConnectionBase.this.addListener(this);
+        	this.work_flag = new AtomicBoolean(false);
+        	this.run_flag = new AtomicBoolean(true); // TODO: should be false
         } 
         
     	// ------------------------------------------------------------------------
@@ -284,7 +289,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
         public void run () {
 			Log.log("Pipeline <%s> thread for <%s> started.", Thread.currentThread().getName(), PipelineConnectionBase.this);
         	PendingRequest pending = null;
-        	while(true){
+        	while(run_flag.get()){
         		Response response = null;
 				try {
 	                pending = pendingResponseQueue.take();
@@ -355,14 +360,33 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
          */
         public void onEvent (Event event) {
         	if(event.getSource() != PipelineConnectionBase.this) {
+        		Log.bug("event source [%s] is not this pipeline [%s]", event.getSource(), PipelineConnectionBase.this);
         		// BUG: what to do about it?
         	}
+        	Log.log("Pipeline.ResponseHandler: onEvent %s", event);
         	switch (event.getType()){
 				case CONNECTED:
+					// (re)start
 					break;
 				case DISCONNECTED:
+					// should be stopped now
+					//
 					break;
 				case FAULTED:
+					// stop
+					break;
+				case CONNECTING:
+					// no op
+					break;
+				case DISCONNECTING:
+					
+					// stop
+					break;
+				case SHUTDOWN:
+					// exit
+					break;
+				case STOPPING:
+					// stop
 					break;
         	
         	}
