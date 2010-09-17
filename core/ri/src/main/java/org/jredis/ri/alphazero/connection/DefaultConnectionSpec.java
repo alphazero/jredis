@@ -18,7 +18,6 @@ import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.Connection.Modality;
 import org.jredis.ri.alphazero.protocol.DefaultProtocolFactory;
 import org.jredis.ri.alphazero.support.Assert;
-import org.jredis.ri.alphazero.support.Log;
 
 /**
  * Default connection spec provides the following default values for a connection.  See

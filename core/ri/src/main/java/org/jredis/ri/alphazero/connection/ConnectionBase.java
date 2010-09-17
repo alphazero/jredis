@@ -37,7 +37,6 @@ import org.jredis.ProviderException;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.connector.Connection.Property;
 import org.jredis.connector.Connection.Event.Type;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
@@ -64,7 +63,7 @@ import org.jredis.ri.alphazero.support.Log;
  * 
  */
 
-public abstract class ConnectionBase implements Connection {
+public abstract class ConnectionBase implements Connection{
 
 	// ------------------------------------------------------------------------
 	// Properties
@@ -119,12 +118,22 @@ public abstract class ConnectionBase implements Connection {
 		catch (Exception e) {
 			throw new ProviderException("Unexpected error on initialize -- BUG", e);
 		} 
-		
+		// TODO: problematic in constructor.
 		if(spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) { 
 			connect (); 
 		}
 	}
-	
+	/*
+	 * TDOD: this is the right way but breaks some assumptions in various impls.
+	 * - need to add INITIALIZED state and go from there.
+	 */
+//	@Override
+//	public void initialize() throws ClientRuntimeException, ProviderException {
+//		if(spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) { 
+//			connect (); 
+//		}
+//	}
+
 	// ------------------------------------------------------------------------
 	// Interface
 	// ============================================================ Connection
@@ -197,6 +206,7 @@ public abstract class ConnectionBase implements Connection {
 		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
 
 		if(spec.getConnectionFlag(Connection.Flag.RELIABLE)){
+			Log.debug("WARNING: heartbeat is disabled.");
 //	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), " [" + this + "] heartbeat");
 //	    	heartbeat.start();
 		}

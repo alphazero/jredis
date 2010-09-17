@@ -54,6 +54,10 @@ public class DefaultConnectionFactory implements Connection.Factory {
     	// TODO: factories create completed products --
     	// this class needs to set conn settings for ALL connection types
     	// 
+//		if(spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) {
+//			((ConnectionBase)conn).initialize (); 
+//    	}
+    	
 		Log.debug("Created new %s", conn);
 	    return conn;
     }

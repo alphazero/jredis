@@ -16,6 +16,8 @@
 
 package org.jredis.ri.alphazero.connection;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.RedisException;
@@ -46,6 +48,7 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	// Properties
 	// ------------------------------------------------------------------------
 	
+	final private Lock lock;
 	
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -72,6 +75,14 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		throws ClientRuntimeException, ProviderException 
 	{
 		super (connectionSpec.setModality(Modality.Synchronous));
+		// REVU: huge flaw.  connection initialization occurs in constructor!!! stupid.
+		// TODO: change it.
+		if(spec.getConnectionFlag(Flag.RELIABLE))
+			lock = new ReentrantLock(false);
+		else{
+			lock = null;
+			spec.getConnectionFlag(Flag.RELIABLE);
+		}
 	}
 
 	// ------------------------------------------------------------------------
@@ -90,12 +101,26 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	/* (non-Javadoc)
 	 * @see org.jredis.ri.alphazero.connection.ConnectionBase#serviceRequest(org.jredis.protocol.Command, byte[][])
 	 */
-	// TODO: not happy about the performance hit synchronized has caused ... but its required for heartbeat.
-	// is it worth it?
-	public synchronized Response serviceRequest (Command cmd, byte[]... args) 
+	public Response serviceRequest (Command cmd, byte[]... args) 
 		throws RedisException
+//	{
+//		Lock _lock = null;
+//		if(spec.getConnectionFlag(Flag.RELIABLE)) 
+//			_lock = acquireLock();
+//		
+//		Response r = null;
+//		
+//		try { r = _serviceRequest(cmd, args); }
+//		catch (Throwable t){ Log.error("serviceRequest cmd:%s %s:=>%s", t, t.getMessage());}
+//		finally { 
+//			if(_lock != null) releaseLock(); 
+//		}
+//		
+//		return r;
+//	}
+//	private Response _serviceRequest(Command cmd, byte[]... args)
+//		throws RedisException
 	{
-		
 		if(!isConnected()) throw new NotConnectedException ("Not connected!");
 		
 		Request  		request = null;
@@ -137,7 +162,6 @@ public class SynchConnection extends ConnectionBase implements Connection {
 
 			throw new ClientRuntimeException("unexpected runtime exeption: " + e.getLocalizedMessage(), e);
 		}
-		
 		// 3 - Status
 		//
 		status = Assert.notNull (response.getStatus(), "status from response object", ProviderException.class);
@@ -151,5 +175,14 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		}
 
 		return response;
+	}
+	@SuppressWarnings("unused")
+    private Lock acquireLock() {
+		lock.lock();
+		return lock;
+	}
+	@SuppressWarnings("unused")
+    private void releaseLock() {
+		lock.unlock();
 	}
 }
