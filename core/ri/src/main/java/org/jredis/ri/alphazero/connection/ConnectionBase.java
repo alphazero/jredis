@@ -206,7 +206,7 @@ public abstract class ConnectionBase implements Connection{
 		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
 
 		if(spec.getConnectionFlag(Connection.Flag.RELIABLE)){
-			Log.debug("WARNING: heartbeat is disabled.");
+			Log.log("WARNING: heartbeat is disabled.");
 //	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), " [" + this + "] heartbeat");
 //	    	heartbeat.start();
 		}

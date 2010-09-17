@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import org.jredis.ri.alphazero.support.Log;
+import org.testng.Assert;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Parameters;
 
@@ -328,4 +329,38 @@ public abstract class JRedisTestSuiteBase<T> extends ProviderTestBase<T>{
 			return res;
 		}
 	}
+	// ------------------------------------------------------------------------
+	// Test support - mildly enhanced TESTNG Assert semantics
+	// ------------------------------------------------------------------------
+// TODO: check latest version of testng	
+//	// notNull
+//	public static final void assertNotNull(Object object, String msgfmt, Object...optionalFmtArgs){
+//		String message = String.format(msgfmt, optionalFmtArgs);
+//		Assert.assertNotNull (object, message);
+//	}
+//	// null
+//	public static final void assertNull(Object object, String msgfmt, Object...optionalFmtArgs){
+//		String message = String.format(msgfmt, optionalFmtArgs);
+//		Assert.assertNull (object, message);		// << has bug.  reports a boolean comp result -- TODO: fix and patch.
+//	}
+//	
+//	// equals
+//	public static final void assertEquals(Object actual, Object expected, String msgfmt, Object...optionalFmtArgs){
+//		String message = String.format(msgfmt, optionalFmtArgs);
+//		Assert.assertEquals (actual, expected, message);		
+//	}
+//	public static final void assertEquals(byte[] actual, byte[] expected, String msgfmt, Object...optionalFmtArgs){
+//		String message = String.format(msgfmt, optionalFmtArgs);
+//		Assert.assertEquals (actual, expected, message);		
+//	}
+//	
+//	// true/false
+//	public static final void assertTrue(boolean condition, String msgfmt, Object...optionalFmtArgs){
+//		String message = String.format(msgfmt, optionalFmtArgs);
+//		Assert.assertTrue (condition, message);
+//	}
+//	public static final void assertFalse(boolean condition, String msgfmt, Object...optionalFmtArgs){
+//		String message = String.format(msgfmt, optionalFmtArgs);
+//		Assert.assertFalse (condition, message);
+//	}
 }

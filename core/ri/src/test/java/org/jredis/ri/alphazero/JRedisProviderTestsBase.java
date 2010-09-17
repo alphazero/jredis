@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Houshyar
+ *   Copyright 2009-2010 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.jredis.RedisType;
 import org.jredis.ZSetEntry;
 import org.jredis.protocol.Command;
 import org.jredis.ri.JRedisTestSuiteBase;
+import org.jredis.ri.RI.Version;
 import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.Test;
@@ -45,9 +46,7 @@ import org.testng.annotations.Test;
  * This class is abstract and it is to remain abstract.
  * It provides the comprehensive set of tests of all {@link JRedis} methods.
  */
-
-//TODO: get rid of NG in class name
-
+@Version(major=2, minor=0)
 public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis>{
 
 	// ------------------------------------------------------------------------
@@ -3065,6 +3064,8 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
+	
+	
 //	/**
 //	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#shutdown()}.
 //	 */
@@ -3073,9 +3074,38 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 //		fail("Not yet implemented");
 //	}
 //
-
-
-
+	// ========================================================================
+	// Test MULTI/EXEC/DISCARD *BASICS*
+	// ========================================================================
+	/**
+	 * Test the basics of multi/exec/discard
+	 * TODO: requires supports() in JRedis.
+	 */
+//	@Test
+//	public void testMultiDiscardBasics() {
+//		cmd = Command.MULTI + " | " + Command.DISCARD + " | basics";
+//		Log.log("TEST: %s command", cmd);
+//		
+//		try {
+//			provider.flushdb();
+//		} 
+//		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+//		
+//		try {
+//			provider.multi();
+//			provider.discard();
+//		} 
+//		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+//		
+//		boolean didRaiseEx;
+//		didRaiseEx = false;
+//		try {
+//			provider.discard();
+//		}
+//		catch (IllegalArgumentException e) {didRaiseEx = true;}
+//		catch (Throwable whatsthis) { fail ("unexpected exception raised", whatsthis);}
+//		if(!didRaiseEx){ fail ("Expected exception not raised."); }
+//	}
 	// ========================================================================
 	// Test Properties
 	// ========================================================================
