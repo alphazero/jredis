@@ -48,7 +48,8 @@ import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.SortSupport;
 import org.jredis.semantics.KeyCodec;
-
+import org.jredis.ri.RI.Release;
+import static org.jredis.ri.RI.*;
 /**
  * 
  * [TODO: document me!]
@@ -1978,7 +1979,61 @@ public abstract class JRedisSupport implements JRedis {
 		}
 		return value;
 	}
+//	@Override
+	public byte[] echo (byte[] value) throws RedisException {
+		if(value ==null) 
+			throw new IllegalArgumentException ("invalid echo value => ["+value+"]");
 
+		byte[] bulkData= null;
+		try {
+			BulkResponse response = (BulkResponse) this.serviceRequest(Command.ECHO, value);
+			bulkData = response.getBulkData();
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return bulkData;
+	}
+//	@Override
+	public byte[] echo(String value) throws RedisException {
+		return echo(DefaultCodec.encode(value));
+	}
+//	@Override
+	public byte[] echo(Number value) throws RedisException {
+		return echo(String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> 
+	byte[] echo (T value) throws RedisException
+	{
+		return echo(DefaultCodec.encode(value));
+	}
+	// ------------------------------------------------------------------------
+	// Transactional commands
+	// ------------------------------------------------------------------------
+	/**
+	 * one option is to return a subclass of JRedis (e.g. JRedisCommandSequence)
+	 * and have that interface declare discard and multi.  Benefit is being able
+	 * to associate state with the transaction.
+	 * @throws RedisException
+	 */
+	@Version(major=2, minor=0, release=Release.ALPHA)
+	public JRedis multi() throws RedisException {
+		this.serviceRequest(Command.MULTI);
+		return this;
+	}
+	/**
+	 * @throws RedisException
+	 */
+	@Version(major=2, minor=0, release=Release.ALPHA)
+	public JRedis discard () throws RedisException {
+		this.serviceRequest(Command.DISCARD);
+		return this;
+	}
+	// ------------------------------------------------------------------------
+	// utility
+	// ------------------------------------------------------------------------
+	
 	// TODO: integrate using KeyCodec and a CodecManager at client spec and init time.
 	// TODO: (implied) ClientSpec (impls. ConnectionSpec)
 	// this isn't cooked yet -- lets think more about the implications...
@@ -2009,34 +2064,5 @@ public abstract class JRedisSupport implements JRedis {
 		}
 
 		return bytes;
-	}
-//	@Override
-	public byte[] echo (byte[] value) throws RedisException {
-		if(value ==null) 
-			throw new IllegalArgumentException ("invalid echo value => ["+value+"]");
-
-		byte[] bulkData= null;
-		try {
-			BulkResponse response = (BulkResponse) this.serviceRequest(Command.ECHO, value);
-			bulkData = response.getBulkData();
-		}
-		catch (ClassCastException e){
-			throw new ProviderException("Expecting a BulkResponse here => " + e.getLocalizedMessage(), e);
-		}
-		return bulkData;
-	}
-//	@Override
-	public byte[] echo(String value) throws RedisException {
-		return echo(DefaultCodec.encode(value));
-	}
-//	@Override
-	public byte[] echo(Number value) throws RedisException {
-		return echo(String.valueOf(value).getBytes());
-	}
-//	@Override
-	public <T extends Serializable> 
-	byte[] echo (T value) throws RedisException
-	{
-		return echo(DefaultCodec.encode(value));
 	}
 }

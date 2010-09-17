@@ -27,18 +27,12 @@ import org.jredis.Redis;
  * <p><b>specification</b> <code>Redis 1.00</code>
  * 
  * @author  Joubin (alphazero@sensesay.net)
- * @version alpha.0, 04/02/09
+ * @version alpha.0, 04/02/09 (Redis 1.n)
+ * @version alpha.0, 09/17/10 (Redis 2.n)
  * @since   alpha.0
  * 
  */
-/**
- * [TODO: document me!]
- *
- * @author  joubin (alphazero@sensesay.net)
- * @date    Sep 12, 2010
- * 
- */
-@Redis(versions="1.3")
+@Redis(versions={"1.n", "2.0"})
 public enum Command {
 	// security
 	AUTH 		(RequestType.KEY, 			ResponseType.STATUS),
@@ -134,7 +128,7 @@ public enum Command {
 	
 	// transactional commands
 	MULTI		(RequestType.NO_ARG, 		ResponseType.STATUS),
-	EXEC		(RequestType.NO_ARG, 		ResponseType.STATUS), // NEED NEW RESPONSE TYPE
+	EXEC		(RequestType.NO_ARG, 		ResponseType.RESULT_SET), // NEED NEW RESPONSE TYPE
 	DISCARD		(RequestType.NO_ARG, 		ResponseType.STATUS),
 	
 	// "Multiple databases handling commands"
@@ -329,6 +323,8 @@ public enum Command {
     	/**  */
     	STATUS (StatusResponse.class),
     	/**  */
+    	QUEUED (StatusResponse.class),
+    	/**  */
     	STRING (ValueResponse.class),
     	/**  */
     	BOOLEAN (ValueResponse.class),
@@ -337,7 +333,10 @@ public enum Command {
     	/**  */
     	BULK (BulkResponse.class),
     	/**  */
-    	MULTI_BULK (MultiBulkResponse.class);
+    	MULTI_BULK (MultiBulkResponse.class),
+    	/** */
+    	RESULT_SET (Response.class),
+    	;
     	public Class<? extends Response> respClass;
     	
     	/**

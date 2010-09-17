@@ -914,21 +914,22 @@ public interface JRedis {
 	@Redis(versions="1.3.n")
 	public Map<String, byte[]> hgetall(String key)  throws RedisException;
 	
-//	// ------------------------------------------------------------------------
-//	// Transactional commands
-//	// ------------------------------------------------------------------------
-//	/**
-//	 * one option is to return a subclass of JRedis (e.g. JRedisCommandSequence)
-//	 * and have that interface declare discard and multi.  Benefit is being able
-//	 * to associate state with the transaction.
-//	 * @throws RedisException
-//	 */
-//	@Redis(versions="1.3")
-//	public void multi() throws RedisException;
-//	/**
-//	 * @throws RedisException
-//	 */
-//	public void discard () throws RedisException;
+	// ------------------------------------------------------------------------
+	// Transactional commands
+	// ------------------------------------------------------------------------
+	/**
+	 * one option is to return a subclass of JRedis (e.g. JRedisCommandSequence)
+	 * and have that interface declare discard and multi.  Benefit is being able
+	 * to associate state with the transaction.
+	 * @throws RedisException
+	 */
+	@Redis(versions="2.0")
+	public JRedis multi() throws RedisException;
+	/**
+	 * @throws RedisException
+	 */
+	@Redis(versions="2.0")
+	public JRedis discard () throws RedisException;
 	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands
