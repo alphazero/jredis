@@ -59,65 +59,6 @@ import org.jredis.protocol.Response;
  * transparent connection management (on fault detection, connect on demand,
  * etc.).
  * 
- *<hr>
- * <h3>Optional state management and event generation</h3>
- * <br>Implementations that support state and event management must support
- * the following state transition semantics and associated events:
- *  <pre>
- *  
-                +-------------+
-                |    start    |
-                +-------------+
-                       |
-                      / \
-                      \ / 
-                       |  
-                      ---................................>>> E_1 
-                       V                       
-                +--------------+
-                |  >>> E_2     |
-                |  CONNECTED   |<----------+
-                +--------------+           |
-                       |                   |
-                       x-- TC-1{}         ---........... >>> E_1 
-                       |                   |
-   E_3 <<<............---                  |
-                       V                   x-- TC-2{}   
-                +------*-------+           |
-                |  >>> E_4     |
-                | DISCONNECTED |-----------+
-                +--------------+
-                       |
-                       x-- TC-3{}
-                       |
-                      ---............................... >>> E_5
-                       V                       
-                +--------------+
-                |  >>> E_6     |
-                |  TERMINATED  |
-                +--------------+
- *   </pre>  
- *   with transition conditions, where:
- *   <ul>
- *   <li><code>TC-0</code></li>: transits on {connect, startup w/({@link Connection.Flag#CONNECT_IMMEDIATELY}), Service startup w/{@link Connection.Flag#TRANSPARENT_RECONNECT} }
- *   <li><code>TC-1</code></li>: transits on {disconnect, connection reset}
- *   <li><code>TC-2</code></li>: transits on {reconnect}
- *   <li><code>TC-2</code></li>: transits on {shutdown, fault}
- *   </ul>
- *   and associated events, where:
- *   <ul>
- *   <li><code>TC-0</code></li>: {@link Connection.Event.Type#INITIALIZED}
- *   <li><code>TC-1</code></li>: {@link Connection.Event.Type#CONNECTING}
- *   <li><code>TC-2</code></li>: {@link Connection.Event.Type#CONNECTED}
- *   <li><code>TC-3</code></li>: {@link Connection.Event.Type#DISCONNECTING}
- *   <li><code>TC-4</code></li>: {@link Connection.Event.Type#DISCONNECTED}
- *   <li><code>TC-5</code></li>: {@link Connection.Event.Type#STOPPING}
- *   <li><code>TC-5</code></li>: {@link Connection.Event.Type#SHUTDOWN}
- *   </ul>
- * 
- * <b>Note that</b> all {@link Connection.Listener}s must (minimally) consume the event
- * raised before the {@link Connection} transitions to the new state.
- * 
  * <br> 
  * @author  joubin (alphazero@sensesay.net)
  * @date    Sep 12, 2010
@@ -130,11 +71,6 @@ public interface Connection {
 	 * @return the associated {@link ConnectionSpec} for this Connection. 
 	 */
 	public ConnectionSpec getSpec();
-	
-//	/**
-//	 * @return the {@link Modality} of this protocol handler.
-//	 */
-//	public Modality getModality ();
 	
 	/**
 	 * A <b>blocking call</b> to service the specified request.  This method will return upon 
@@ -329,20 +265,30 @@ public interface Connection {
 	// ------------------------------------------------------------------------
     // Connection.Flag
     // ------------------------------------------------------------------------
-    public enum Flag {
-    	/**  */
+    /**
+     * Connection flags - not necessarily mutually exclusive.  Uses a 32 bit
+     * mask for 32 (max) disctinct flags for Connnections.
+     *
+     * @author  joubin (alphazero@sensesay.net)
+     * @date    Sep 18, 2010
+     * 
+     */
+    public enum Flag {  	
+    	/** if true will connect immediately on initialization.  otherwise on first use. */
     	CONNECT_IMMEDIATELY,
-    	/**  */
-    	TRANSPARENT_RECONNECT,
-    	/**  */
-    	RETRY_AFTER_RESET, 
-    	/**  */
+//    	/**  */
+//    	TRANSPARENT_RECONNECT,
+//    	/**  */
+//    	RETRY_AFTER_RESET, 
+    	/** if true uses pipelining */
     	PIPELINE,
-    	/**  */
+    	/** Connection can be used by more than 1 client concurrently */
     	SHARED,
-    	/**  */
+    	/** if true attempts to maintain connection. drops are detected. Better fault tolerance guarantees, w/ some performance impact */
     	RELIABLE,
-    	/**  */
+    	/** if true connection maintains conversational state - for use with multi-exec */
+    	STATEFUL,
+    	/** if true service requests are logged (verbose/slower due to io)  */
     	TRACE,
     	;
 		public final int bitmask;

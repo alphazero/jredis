@@ -15,6 +15,7 @@ import java.net.UnknownHostException;
 import org.jredis.ClientRuntimeException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.connector.Connection.Flag;
 import org.jredis.connector.Connection.Modality;
 import org.jredis.ri.alphazero.protocol.DefaultProtocolFactory;
 import org.jredis.ri.alphazero.support.Assert;
@@ -78,6 +79,8 @@ final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	private static final boolean DEFAULT_CF_PIPELINE = false;
 	/** def value: <code>true</code> */
 	private static final boolean DEFAULT_CF_CONNECT_IMMEDIATELY = true;
+	/** def value: <code>true</code> */
+	private static final boolean DEFAULT_CF_STATEFUL = false;
 	
 	/** def value: <code>Modality.Synchronous</code> */
 	private static final Modality DEFAULT_CP_CONN_MODALITY = Modality.Synchronous;
@@ -95,7 +98,7 @@ final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	 */
 	public DefaultConnectionSpec () throws ClientRuntimeException {
 //		Log.debug("Yo!");
-		setDefaultProperties();
+		setDefaultValues();
 	}
 	/**
 	 * Instantiates a default connection spec for the given host and port.
@@ -135,7 +138,7 @@ final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
      * @see DefaultConnectionFactory
      * @see DefaultProtocolFactory
      */
-    private void setDefaultProperties () {
+    private void setDefaultValues () {
     	// reconnect try count
     	setReconnectCnt(DEFAULT_RECONNECT_CNT);
     	
@@ -154,6 +157,7 @@ final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
     	setConnectionFlag(SHARED, DEFAULT_CF_SHARED);
     	setConnectionFlag(PIPELINE, DEFAULT_CF_PIPELINE);
     	setConnectionFlag(CONNECT_IMMEDIATELY, DEFAULT_CF_CONNECT_IMMEDIATELY);
+    	setConnectionFlag(Flag.STATEFUL, DEFAULT_CF_STATEFUL);
     	
     	setConnectionProperty(Connection.Property.MODALITY, DEFAULT_CP_CONN_MODALITY);
     	setConnectionProperty(Connection.Property.MAX_CONNECT_ATTEMPT, DEFAULT_CP_MAX_CONNECT_ATTEMPT);

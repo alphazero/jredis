@@ -2019,6 +2019,8 @@ public abstract class JRedisSupport implements JRedis {
 	 */
 	@Version(major=2, minor=0, release=Release.ALPHA)
 	public JRedis multi() throws RedisException {
+		if(true) throw new ProviderException("NOT IMPLEMENTED");
+		// works
 		this.serviceRequest(Command.MULTI);
 		return this;
 	}
@@ -2027,6 +2029,8 @@ public abstract class JRedisSupport implements JRedis {
 	 */
 	@Version(major=2, minor=0, release=Release.ALPHA)
 	public JRedis discard () throws RedisException {
+		if(true) throw new ProviderException("NOT IMPLEMENTED");
+		// works
 		this.serviceRequest(Command.DISCARD);
 		return this;
 	}
