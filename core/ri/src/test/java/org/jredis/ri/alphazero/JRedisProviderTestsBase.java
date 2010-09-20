@@ -233,6 +233,31 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 		}
 	}
 
+	@Test
+	public void testSetex() {
+		cmd = Command.SETEX.code;
+		Log.log("TEST: %s command(s)", cmd);
+		try {
+			provider.flushdb();
+			assertTrue(provider.dbsize() == 0);
+
+			String keyToExpire = "expire-me";
+
+			Log.log("TEST: %s with expire time %s seconds", Command.SETEX, expire_secs);
+			assertFalse (provider.setex(keyToExpire, expire_secs, dataList.get(0)), "set for new key is false"); // seems odd that this returns false
+			assertTrue (provider.exists(keyToExpire));
+			assertEquals (provider.get(keyToExpire), dataList.get(0), "value was set correctly for new key");
+
+			Thread.sleep(this.expire_wait_millisecs);
+			assertTrue (!provider.exists(keyToExpire), "key should have expired by now");
+		}
+		catch (RedisException e) {
+			fail(cmd + " with password: " + password, e);
+		}
+		catch (InterruptedException e) {
+			fail (cmd + "thread was interrupted and test did not conclude" + e.getLocalizedMessage());
+		}
+	}
 
 // CANT test this without risking hosing the user's DBs
 // TODO: use a flag

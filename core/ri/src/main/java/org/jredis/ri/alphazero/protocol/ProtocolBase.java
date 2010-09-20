@@ -175,6 +175,7 @@ public abstract class ProtocolBase implements Protocol {
 			}
 			break;
 
+			case KEY_NUM_VALUE:
 			case KEY_IDX_VALUE:
 			case KEY_KEY_VALUE:
 			{

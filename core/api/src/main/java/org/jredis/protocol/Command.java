@@ -47,6 +47,7 @@ public enum Command {
 	GETSET		(RequestType.KEY_VALUE, 	ResponseType.BULK), 
 	MGET		(RequestType.MULTI_KEY, 	ResponseType.MULTI_BULK), 
 	SETNX		(RequestType.KEY_VALUE, 	ResponseType.BOOLEAN),
+	SETEX		(RequestType.KEY_NUM_VALUE,	ResponseType.BOOLEAN),
 	MSET		(RequestType.BULK_SET, 		ResponseType.STATUS), 
 	MSETNX		(RequestType.BULK_SET, 		ResponseType.BOOLEAN), 
 	INCR		(RequestType.KEY, 			ResponseType.NUMBER), 
@@ -298,6 +299,8 @@ public enum Command {
     	KEY_IDX_VALUE,
     	/**  */
     	KEY_CNT_VALUE,  // TODO: this should be key value cnt ...
+    	/**  */
+    	KEY_NUM_VALUE,
     	/**  */
     	MULTI_KEY,
     	/**  */
