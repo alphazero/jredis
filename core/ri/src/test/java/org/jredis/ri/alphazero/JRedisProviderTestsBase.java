@@ -191,8 +191,6 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			assertFalse (provider.exists(keyToExpire));
 			assertTrue (provider.ttl(keyToExpire) == -1, "expired key ttl is not -1");
 			assertTrue (provider.ttl(keyToKeep) == -1, "key to keep ttl is not -1");
-			
-			
 		} 
 		catch (RedisException e) {
 			fail(cmd + " with password: " + password, e);
