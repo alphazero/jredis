@@ -2168,7 +2168,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 
 			Log.log("TEST: %s with expire time 1000 msecs in future", Command.EXPIREAT);
 			assertTrue(provider.expireat(keyToExpire, System.currentTimeMillis() + 2000).get(), "expireat for existing key should be true");
-      assertTrue (provider.exists(keyToExpire).get());
+            assertTrue (provider.exists(keyToExpire).get());
 			assertTrue(!provider.expireat("no-such-key", System.currentTimeMillis() + 500).get(), "expireat for non-existant key should be false");
 			
 			

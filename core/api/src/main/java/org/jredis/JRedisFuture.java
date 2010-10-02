@@ -49,13 +49,13 @@ import org.jredis.protocol.ResponseStatus;
  * you should review).
  * <p>
  * If your request results in a {@link RedisException}, the call to {@link Future#get()} (of either flavor)
- * will raise a {@link ExecutionException} with {@link ExecutionException#getCause()} returning the underlying
+ * will raise an {@link ExecutionException} with {@link ExecutionException#getCause()} returning the underlying
  * {@link RedisException}.
  * <p>
  * Similarly, if the request results in either {@link ClientRuntimeException} or {@link ProviderException}, the
  * {@link Future}'s {@link ExecutionException} will wrap these as the cause.
  * <p>
- * Beyond that , just be aware that an implementation may throw {@link ClientRuntimeException}
+ * Beyond that, just be aware that an implementation may throw {@link ClientRuntimeException}
  * or an extension to report problems (typically connectivity) or {@link ProviderException}
  * (to highlight implementation features/bugs).  
  * These are {@link RuntimeException} that have been encountered while trying to queue your request.
