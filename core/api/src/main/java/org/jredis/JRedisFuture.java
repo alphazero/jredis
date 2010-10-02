@@ -142,8 +142,21 @@ public interface JRedisFuture {
 	public Future<Boolean> setnx (String key, byte[] value);
 	public Future<Boolean> setnx (String key, String stringValue);
 	public Future<Boolean> setnx (String key, Number numberValue);
-	public <T extends Serializable> 
+	public <T extends Serializable>
 		   Future<Boolean> setnx (String key, T object);
+
+	/**
+	 * @Redis SETEX
+	 * @param key
+	 * @param ttlseconds
+	 * @param value
+	 * @return
+	 */
+	public Future<Boolean> setex (String key, int ttlseconds, byte[] value);
+	public Future<Boolean> setex (String key, int ttlseconds, String stringValue);
+	public Future<Boolean> setex (String key, int ttlseconds, Number numberValue);
+	public <T extends Serializable>
+		   Future<Boolean> setex (String key, int ttlseconds, T object);
 
 	/**
 	 * @Redis GET

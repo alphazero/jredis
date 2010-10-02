@@ -365,6 +365,29 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return setnx(key, DefaultCodec.encode(value));
 	}
 
+//	@Override
+	public Future<Boolean> setex(String key, int ttlseconds, byte[] value){
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null)
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+		byte[] ttlbytes = Convert.toBytes(ttlseconds);
+
+		Future<Response> futureResponse = this.queueRequest(Command.SETEX, keybytes, ttlbytes, value);
+		return new FutureBoolean(futureResponse);
+	}
+//	@Override
+	public Future<Boolean> setex(String key, int ttlseconds, String value) {
+		return setex(key, ttlseconds, DefaultCodec.encode(value));
+	}
+//	@Override
+	public Future<Boolean> setex(String key, int ttlseconds, Number value) {
+		return setex(key, ttlseconds, String.valueOf(value).getBytes());
+	}
+//	@Override
+	public <T extends Serializable> Future<Boolean> setex (String key, int ttlseconds, T value) {
+		return setex(key, ttlseconds, DefaultCodec.encode(value));
+	}
+
 	
 //	@Override
 	public Future<Long> append (String key, byte[] value){

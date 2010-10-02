@@ -1774,6 +1774,37 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 	}
 	
 	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#setex(java.lang.String, byte[])}.
+	 * @throws InterruptedException
+	 */
+	@Test
+	public void testSetexStringByteArray() throws InterruptedException {
+		cmd = Command.SETEX.code + " | " + " byte[] | " + Command.GET;
+		int ttlseconds = 1;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			String key = keys.get(1);
+			Future<Boolean> setexResp = provider.setex(key, ttlseconds, dataList.get(1));
+
+			try {
+				assertFalse(setexResp.get());
+
+				assertEquals(provider.get(key).get(), dataList.get(1));
+
+				Thread.sleep(ttlseconds * 1000 + 2000);  // give it a little extra time
+
+				assertNull(provider.get(key).get());
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e);
+			}
+		}
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
+	/**
 	 * Test method for {@link JRedisFuture#append(String, String)}
 	 * @throws InterruptedException 
 	 */
