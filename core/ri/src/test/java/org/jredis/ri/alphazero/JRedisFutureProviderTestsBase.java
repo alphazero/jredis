@@ -1785,10 +1785,10 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		try {
 			provider.flushdb();
 			String key = keys.get(1);
-			Future<Boolean> setexResp = provider.setex(key, ttlseconds, dataList.get(1));
+			Future<ResponseStatus> setexResp = provider.setex(key, ttlseconds, dataList.get(1));
 
 			try {
-				assertFalse(setexResp.get());
+				setexResp.get();
 
 				assertEquals(provider.get(key).get(), dataList.get(1));
 

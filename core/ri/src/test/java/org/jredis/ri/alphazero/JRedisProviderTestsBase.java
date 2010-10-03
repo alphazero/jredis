@@ -242,7 +242,7 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			String keyToExpire = "expire-me";
 
 			Log.log("TEST: %s with expire time %s seconds", Command.SETEX, expire_secs);
-			assertFalse (provider.setex(keyToExpire, expire_secs, dataList.get(0)), "set for new key is false"); // seems odd that this returns false
+			provider.setex(keyToExpire, expire_secs, dataList.get(0));
 			assertTrue (provider.exists(keyToExpire));
 			assertEquals (provider.get(keyToExpire), dataList.get(0), "value was set correctly for new key");
 

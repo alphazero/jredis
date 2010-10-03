@@ -147,11 +147,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean setex (String key, int ttlseconds, byte[] value) throws RedisException;
-	public boolean setex (String key, int ttlseconds, String stringValue) throws RedisException;
-	public boolean setex (String key, int ttlseconds, Number numberValue) throws RedisException;
+	public void setex (String key, int ttlseconds, byte[] value) throws RedisException;
+	public void setex (String key, int ttlseconds, String stringValue) throws RedisException;
+	public void setex (String key, int ttlseconds, Number numberValue) throws RedisException;
 	public <T extends Serializable>
-		boolean setex (String key, int ttlseconds, T object) throws RedisException;
+           void setex (String key, int ttlseconds, T object) throws RedisException;
 
 
 	/**

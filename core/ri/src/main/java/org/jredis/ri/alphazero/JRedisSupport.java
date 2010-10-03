@@ -456,34 +456,26 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
-	public boolean setex(String key, int ttlseconds, byte[] value) throws RedisException{
+	public void setex(String key, int ttlseconds, byte[] value) throws RedisException{
 		byte[] keybytes = null;
 		if((keybytes = getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] ttlbytes = Convert.toBytes(ttlseconds);
 
-		boolean resvalue = false;
-		try {
-			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.SETEX, keybytes, ttlbytes, value);
-			resvalue = valResponse.getBooleanValue();
-		}
-		catch (ClassCastException e){
-			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
-		}
-		return resvalue;
+		this.serviceRequest(Command.SETEX, keybytes, ttlbytes, value);
 	}
 //	@Override
-	public boolean setex(String key, int ttlseconds, String value) throws RedisException {
-		return setex(key, ttlseconds, DefaultCodec.encode(value));
+	public void setex(String key, int ttlseconds, String value) throws RedisException {
+		setex(key, ttlseconds, DefaultCodec.encode(value));
 	}
 //	@Override
-	public boolean setex(String key, int ttlseconds, Number value) throws RedisException {
-		return setex(key, ttlseconds, String.valueOf(value).getBytes());
+	public void setex(String key, int ttlseconds, Number value) throws RedisException {
+		setex(key, ttlseconds, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> boolean setex (String key, int ttlseconds, T value) throws RedisException {
-		return setex(key, ttlseconds, DefaultCodec.encode(value));
+	public <T extends Serializable> void setex (String key, int ttlseconds, T value) throws RedisException {
+		setex(key, ttlseconds, DefaultCodec.encode(value));
 	}
 	
 //	@Override

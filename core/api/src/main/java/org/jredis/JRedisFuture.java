@@ -152,11 +152,11 @@ public interface JRedisFuture {
 	 * @param value
 	 * @return
 	 */
-	public Future<Boolean> setex (String key, int ttlseconds, byte[] value);
-	public Future<Boolean> setex (String key, int ttlseconds, String stringValue);
-	public Future<Boolean> setex (String key, int ttlseconds, Number numberValue);
+	public Future<ResponseStatus> setex (String key, int ttlseconds, byte[] value);
+	public Future<ResponseStatus> setex (String key, int ttlseconds, String stringValue);
+	public Future<ResponseStatus> setex (String key, int ttlseconds, Number numberValue);
 	public <T extends Serializable>
-		   Future<Boolean> setex (String key, int ttlseconds, T object);
+           Future<ResponseStatus> setex (String key, int ttlseconds, T object);
 
 	/**
 	 * @Redis GET
