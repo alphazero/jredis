@@ -86,18 +86,18 @@ public abstract class ProtocolBase implements Protocol {
 		ByteArrayOutputStream buffer = createRequestBufffer (cmd);
 
 		try {
-			byte[] setCmdLenBytes = Convert.toBytes(cmd.bytes.length);
-			byte[] bulkSetLineCntBytes = Convert.toBytes(args.length+1);
+			byte[] cmdLenBytes = Convert.toBytes(cmd.bytes.length);
+			byte[] lineCntBytes = Convert.toBytes(args.length+1);
 
 			switch (cmd.requestType) {
 
 			case NO_ARG:
 				// -------------------
 				buffer.write(COUNT_BYTE);
-				buffer.write(bulkSetLineCntBytes);
+				buffer.write(lineCntBytes);
 				buffer.write(CRLF);
 				buffer.write(SIZE_BYTE);
-				buffer.write(setCmdLenBytes);
+				buffer.write(cmdLenBytes);
 				buffer.write(CRLF);
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
@@ -107,10 +107,10 @@ public abstract class ProtocolBase implements Protocol {
 			case KEY:
 				// -------------------
 				buffer.write(COUNT_BYTE);
-				buffer.write(bulkSetLineCntBytes);
+				buffer.write(lineCntBytes);
 				buffer.write(CRLF);
 				buffer.write(SIZE_BYTE);
-				buffer.write(setCmdLenBytes);
+				buffer.write(cmdLenBytes);
 				buffer.write(CRLF);
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
@@ -119,20 +119,20 @@ public abstract class ProtocolBase implements Protocol {
 				buffer.write(Convert.toBytes(args[0].length));
 				buffer.write(CRLF);
 				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
-				buffer.write(CRLF);
-				
+				buffer.write(CRLF);	
 				// -------------------
 				break;
 
 			case VALUE:
 			{
 				byte[] value = Assert.notNull(args[0], "value arg", ProviderException.class);				
+				
 				// -------------------
 				buffer.write(COUNT_BYTE);
-				buffer.write(bulkSetLineCntBytes);
+				buffer.write(lineCntBytes);
 				buffer.write(CRLF);
 				buffer.write(SIZE_BYTE);
-				buffer.write(setCmdLenBytes);
+				buffer.write(cmdLenBytes);
 				buffer.write(CRLF);
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
@@ -142,10 +142,9 @@ public abstract class ProtocolBase implements Protocol {
 				buffer.write(CRLF);
 				buffer.write(value);
 				buffer.write(CRLF);
-				
 				// -------------------
 			}
-				break;
+			break;
 				
 			case KEY_KEY:
 			case KEY_NUM:
@@ -153,10 +152,10 @@ public abstract class ProtocolBase implements Protocol {
 				byte[] value = Assert.notNull(args[1], "key2 arg", ProviderException.class);
 				// -------------------
 				buffer.write(COUNT_BYTE);
-				buffer.write(bulkSetLineCntBytes);
+				buffer.write(lineCntBytes);
 				buffer.write(CRLF);
 				buffer.write(SIZE_BYTE);
-				buffer.write(setCmdLenBytes);
+				buffer.write(cmdLenBytes);
 				buffer.write(CRLF);
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
@@ -191,15 +190,15 @@ public abstract class ProtocolBase implements Protocol {
 				buffer.write(CRLF);
 				// -------------------
 			}
-				break;
+			break;
 
 			case KEY_NUM_NUM:
 				// -------------------
 				buffer.write(COUNT_BYTE);
-				buffer.write(bulkSetLineCntBytes);
+				buffer.write(lineCntBytes);
 				buffer.write(CRLF);
 				buffer.write(SIZE_BYTE);
-				buffer.write(setCmdLenBytes);
+				buffer.write(cmdLenBytes);
 				buffer.write(CRLF);
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
@@ -227,10 +226,10 @@ public abstract class ProtocolBase implements Protocol {
 			case KEY_NUM_NUM_OPTS:
 				// -------------------
 				buffer.write(COUNT_BYTE);
-				buffer.write(bulkSetLineCntBytes);
+				buffer.write(lineCntBytes);
 				buffer.write(CRLF);
 				buffer.write(SIZE_BYTE);
-				buffer.write(setCmdLenBytes);
+				buffer.write(cmdLenBytes);
 				buffer.write(CRLF);
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
@@ -264,12 +263,13 @@ public abstract class ProtocolBase implements Protocol {
 			case KEY_VALUE:
 			{
 				byte[] value = Assert.notNull(args[1], "value arg", ProviderException.class);
+				
 				// -------------------
 				buffer.write(COUNT_BYTE);
-				buffer.write(bulkSetLineCntBytes);
+				buffer.write(lineCntBytes);
 				buffer.write(CRLF);
 				buffer.write(SIZE_BYTE);
-				buffer.write(setCmdLenBytes);
+				buffer.write(cmdLenBytes);
 				buffer.write(CRLF);
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
@@ -295,12 +295,13 @@ public abstract class ProtocolBase implements Protocol {
 			case KEY_KEY_VALUE:
 			{
 				byte[] value = Assert.notNull(args[2], "value arg", ProviderException.class);
+				
 				// -------------------
 				buffer.write(COUNT_BYTE);
-				buffer.write(bulkSetLineCntBytes);
+				buffer.write(lineCntBytes);
 				buffer.write(CRLF);
 				buffer.write(SIZE_BYTE);
-				buffer.write(setCmdLenBytes);
+				buffer.write(cmdLenBytes);
 				buffer.write(CRLF);
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
@@ -333,10 +334,10 @@ public abstract class ProtocolBase implements Protocol {
 				
 				// -------------------
 				buffer.write(COUNT_BYTE);
-				buffer.write(bulkSetLineCntBytes);
+				buffer.write(lineCntBytes);
 				buffer.write(CRLF);
 				buffer.write(SIZE_BYTE);
-				buffer.write(setCmdLenBytes);
+				buffer.write(cmdLenBytes);
 				buffer.write(CRLF);
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
@@ -367,10 +368,10 @@ public abstract class ProtocolBase implements Protocol {
 				int keycnt = args.length;
 				// -------------------
 				buffer.write(COUNT_BYTE);
-				buffer.write(bulkSetLineCntBytes);
+				buffer.write(lineCntBytes);
 				buffer.write(CRLF);
 				buffer.write(SIZE_BYTE);
-				buffer.write(setCmdLenBytes);
+				buffer.write(cmdLenBytes);
 				buffer.write(CRLF);
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
@@ -390,12 +391,11 @@ public abstract class ProtocolBase implements Protocol {
 			case BULK_SET:
 				Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX , "Only MSET/NX bulk commands are supported", NotSupportedException.class);
 
-
 				buffer.write(COUNT_BYTE);
-				buffer.write(bulkSetLineCntBytes);
+				buffer.write(lineCntBytes);
 				buffer.write(CRLF);
 				buffer.write(SIZE_BYTE);
-				buffer.write(setCmdLenBytes);
+				buffer.write(cmdLenBytes);
 				buffer.write(CRLF);
 				buffer.write(cmd.bytes);
 				buffer.write(CRLF);
@@ -416,7 +416,6 @@ public abstract class ProtocolBase implements Protocol {
 				break;
 			
 			}
-
 		}
 		catch (Exception e) {
 			throw new ProviderException("Problem writing to the buffer" + e.getLocalizedMessage());
