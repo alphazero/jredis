@@ -89,32 +89,22 @@ public abstract class ProtocolBase implements Protocol {
 			byte[] cmdLenBytes = Convert.toBytes(cmd.bytes.length);
 			byte[] lineCntBytes = Convert.toBytes(args.length+1);
 
+            // -------------------
+            buffer.write(COUNT_BYTE);
+            buffer.write(lineCntBytes);
+            buffer.write(CRLF);
+            buffer.write(SIZE_BYTE);
+            buffer.write(cmdLenBytes);
+            buffer.write(CRLF);
+            buffer.write(cmd.bytes);
+            buffer.write(CRLF);
+            // -------------------
+            
 			switch (cmd.requestType) {
 
 			case NO_ARG:
-				// -------------------
-				buffer.write(COUNT_BYTE);
-				buffer.write(lineCntBytes);
-				buffer.write(CRLF);
-				buffer.write(SIZE_BYTE);
-				buffer.write(cmdLenBytes);
-				buffer.write(CRLF);
-				buffer.write(cmd.bytes);
-				buffer.write(CRLF);
-				// -------------------
-				break;
-
+			    break;
 			case KEY:
-				// -------------------
-				buffer.write(COUNT_BYTE);
-				buffer.write(lineCntBytes);
-				buffer.write(CRLF);
-				buffer.write(SIZE_BYTE);
-				buffer.write(cmdLenBytes);
-				buffer.write(CRLF);
-				buffer.write(cmd.bytes);
-				buffer.write(CRLF);
-				
 				buffer.write(SIZE_BYTE);
 				buffer.write(Convert.toBytes(args[0].length));
 				buffer.write(CRLF);
@@ -127,16 +117,6 @@ public abstract class ProtocolBase implements Protocol {
 			{
 				byte[] value = Assert.notNull(args[0], "value arg", ProviderException.class);				
 				
-				// -------------------
-				buffer.write(COUNT_BYTE);
-				buffer.write(lineCntBytes);
-				buffer.write(CRLF);
-				buffer.write(SIZE_BYTE);
-				buffer.write(cmdLenBytes);
-				buffer.write(CRLF);
-				buffer.write(cmd.bytes);
-				buffer.write(CRLF);
-				
 				buffer.write(SIZE_BYTE);
 				buffer.write(Convert.toBytes(value.length));
 				buffer.write(CRLF);
@@ -147,17 +127,7 @@ public abstract class ProtocolBase implements Protocol {
 			break;
 
 			case KEY_SPEC:
-			{
-              // -------------------
-              buffer.write(COUNT_BYTE);
-              buffer.write(lineCntBytes);
-              buffer.write(CRLF);
-              buffer.write(SIZE_BYTE);
-              buffer.write(cmdLenBytes);
-              buffer.write(CRLF);
-              buffer.write(cmd.bytes);
-              buffer.write(CRLF);
-              
+			{             
               buffer.write(SIZE_BYTE);
               buffer.write(Convert.toBytes(args[0].length));
               buffer.write(CRLF);
@@ -175,16 +145,6 @@ public abstract class ProtocolBase implements Protocol {
 			break;
 
 			case KEY_NUM_NUM:
-				// -------------------
-				buffer.write(COUNT_BYTE);
-				buffer.write(lineCntBytes);
-				buffer.write(CRLF);
-				buffer.write(SIZE_BYTE);
-				buffer.write(cmdLenBytes);
-				buffer.write(CRLF);
-				buffer.write(cmd.bytes);
-				buffer.write(CRLF);
-				
 				buffer.write(SIZE_BYTE);
 				buffer.write(Convert.toBytes(args[0].length));
 				buffer.write(CRLF);
@@ -205,17 +165,7 @@ public abstract class ProtocolBase implements Protocol {
 				// -------------------
 				break;
 
-			case KEY_NUM_NUM_OPTS:
-				// -------------------
-				buffer.write(COUNT_BYTE);
-				buffer.write(lineCntBytes);
-				buffer.write(CRLF);
-				buffer.write(SIZE_BYTE);
-				buffer.write(cmdLenBytes);
-				buffer.write(CRLF);
-				buffer.write(cmd.bytes);
-				buffer.write(CRLF);
-				
+			case KEY_NUM_NUM_OPTS:			
 				buffer.write(SIZE_BYTE);
 				buffer.write(Convert.toBytes(args[0].length));
 				buffer.write(CRLF);
@@ -248,17 +198,6 @@ public abstract class ProtocolBase implements Protocol {
 			{
 				byte[] value = Assert.notNull(args[1], "value arg", ProviderException.class);
 				
-				// -------------------
-				buffer.write(COUNT_BYTE);
-				buffer.write(lineCntBytes);
-				buffer.write(CRLF);
-				buffer.write(SIZE_BYTE);
-				buffer.write(cmdLenBytes);
-				buffer.write(CRLF);
-				buffer.write(cmd.bytes);
-				buffer.write(CRLF);
-				
-				
 				buffer.write(SIZE_BYTE);
 				buffer.write(Convert.toBytes(args[0].length));
 				buffer.write(CRLF);
@@ -279,16 +218,6 @@ public abstract class ProtocolBase implements Protocol {
 			case KEY_KEY_VALUE:
 			{
 				byte[] value = Assert.notNull(args[2], "value arg", ProviderException.class);
-				
-				// -------------------
-				buffer.write(COUNT_BYTE);
-				buffer.write(lineCntBytes);
-				buffer.write(CRLF);
-				buffer.write(SIZE_BYTE);
-				buffer.write(cmdLenBytes);
-				buffer.write(CRLF);
-				buffer.write(cmd.bytes);
-				buffer.write(CRLF);
 				
 				buffer.write(SIZE_BYTE);
 				buffer.write(Convert.toBytes(args[0].length));
@@ -316,16 +245,6 @@ public abstract class ProtocolBase implements Protocol {
 			{
 				byte[] value = Assert.notNull(args[1], "value arg", ProviderException.class);
 				
-				// -------------------
-				buffer.write(COUNT_BYTE);
-				buffer.write(lineCntBytes);
-				buffer.write(CRLF);
-				buffer.write(SIZE_BYTE);
-				buffer.write(cmdLenBytes);
-				buffer.write(CRLF);
-				buffer.write(cmd.bytes);
-				buffer.write(CRLF);
-				
 				buffer.write(SIZE_BYTE);
 				buffer.write(Convert.toBytes(args[0].length));
 				buffer.write(CRLF);
@@ -350,16 +269,7 @@ public abstract class ProtocolBase implements Protocol {
 			case MULTI_KEY:
 			{
 				int keycnt = args.length;
-				// -------------------
-				buffer.write(COUNT_BYTE);
-				buffer.write(lineCntBytes);
-				buffer.write(CRLF);
-				buffer.write(SIZE_BYTE);
-				buffer.write(cmdLenBytes);
-				buffer.write(CRLF);
-				buffer.write(cmd.bytes);
-				buffer.write(CRLF);
-				
+
 				for(int i=0;i<keycnt; i++){
 					buffer.write(SIZE_BYTE);
 					buffer.write(Convert.toBytes(args[i].length));
