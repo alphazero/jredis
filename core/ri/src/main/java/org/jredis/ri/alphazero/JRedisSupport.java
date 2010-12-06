@@ -1416,12 +1416,12 @@ public abstract class JRedisSupport implements JRedis {
 		final JRedisSupport client = this;
 		Sort sortQuery = new SortSupport (key, keybytes) {
 		//	@Override 
-			protected List<byte[]> execSort(byte[] keyBytes, byte[] sortSpecBytes) 
+			protected List<byte[]> execSort(byte[]... fullSortCmd) 
 			throws IllegalStateException, RedisException {
 				
 				List<byte[]> multiBulkData= null;
 				try {
-					MultiBulkResponse multiBulkResponse = (MultiBulkResponse) client.serviceRequest(Command.SORT, keyBytes, sortSpecBytes);
+					MultiBulkResponse multiBulkResponse = (MultiBulkResponse) client.serviceRequest(Command.SORT, fullSortCmd);
 					multiBulkData = multiBulkResponse.getMultiBulkData();
 				}
 				catch (ClassCastException e){
@@ -1430,12 +1430,12 @@ public abstract class JRedisSupport implements JRedis {
 				return multiBulkData;
 			}
 
-			protected List<byte[]> execSortStore(byte[] keyBytes, byte[] sortSpecBytes) 
+			protected List<byte[]> execSortStore(byte[]... fullSortCmd) 
 			throws IllegalStateException, RedisException {
 				
 				List<byte[]> multiBulkData= new ArrayList<byte[]>(1);
 				try {
-					ValueResponse valueResp = (ValueResponse) client.serviceRequest(Command.SORT$STORE, keyBytes, sortSpecBytes);
+					ValueResponse valueResp = (ValueResponse) client.serviceRequest(Command.SORT$STORE, fullSortCmd);
 					long resSize = valueResp.getLongValue();
 					multiBulkData.add(Convert.toBytes(resSize));
 				}
@@ -1446,11 +1446,11 @@ public abstract class JRedisSupport implements JRedis {
 			}
 
 			@Override
-	        protected Future<List<byte[]>> execAsynchSort (byte[] keyBytes, byte[] sortSpecBytes) {
+	        protected Future<List<byte[]>> execAsynchSort (byte[]... fullSortCmd) {
 				throw new IllegalStateException("JRedis does not support asynchronous sort.");
 	        }
 			@Override
-	        protected Future<List<byte[]>> execAsynchSortStore (byte[] keyBytes, byte[] sortSpecBytes) {
+	        protected Future<List<byte[]>> execAsynchSortStore (byte[]... fullSortCmd) {
 				throw new IllegalStateException("JRedis does not support asynchronous sort.");
 	        }
 		};

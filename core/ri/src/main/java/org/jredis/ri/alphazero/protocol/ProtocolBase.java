@@ -145,49 +145,31 @@ public abstract class ProtocolBase implements Protocol {
 				// -------------------
 			}
 			break;
-				
-			case KEY_KEY:
-			case KEY_NUM:
-			{
-				byte[] value = Assert.notNull(args[1], "key2 arg", ProviderException.class);
-				// -------------------
-				buffer.write(COUNT_BYTE);
-				buffer.write(lineCntBytes);
-				buffer.write(CRLF);
-				buffer.write(SIZE_BYTE);
-				buffer.write(cmdLenBytes);
-				buffer.write(CRLF);
-				buffer.write(cmd.bytes);
-				buffer.write(CRLF);
-				
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[0].length));
-				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
-				buffer.write(CRLF);
-				
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(value.length));
-				buffer.write(CRLF);
-				buffer.write(Assert.notNull(value, "key2 arg", ProviderException.class));
-				buffer.write(CRLF);
-				// -------------------
-			}
-			break;
-			
+
 			case KEY_SPEC:
 			{
-				// -------------------
-				buffer.write(cmd.bytes);
-				buffer.write(SPACE);
-				
-				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
-				buffer.write(SPACE);
-				
-				buffer.write(Assert.notNull(args[1], "key2 arg", ProviderException.class));
-				buffer.write(CRLF);
+              // -------------------
+              buffer.write(COUNT_BYTE);
+              buffer.write(lineCntBytes);
+              buffer.write(CRLF);
+              buffer.write(SIZE_BYTE);
+              buffer.write(cmdLenBytes);
+              buffer.write(CRLF);
+              buffer.write(cmd.bytes);
+              buffer.write(CRLF);
+              
+              buffer.write(SIZE_BYTE);
+              buffer.write(Convert.toBytes(args[0].length));
+              buffer.write(CRLF);
+              buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
+              buffer.write(CRLF);
+              
+              buffer.write(SIZE_BYTE);
+              buffer.write(Convert.toBytes(args[1].length));
+              buffer.write(CRLF);
+              
+			  buffer.write(Assert.notNull(args[1], "key2 arg", ProviderException.class));
+			  buffer.write(CRLF);
 				// -------------------
 			}
 			break;
@@ -259,7 +241,9 @@ public abstract class ProtocolBase implements Protocol {
 				buffer.write(CRLF);
 				// -------------------
 				break;
-				
+
+            case KEY_KEY:
+            case KEY_NUM:
 			case KEY_VALUE:
 			{
 				byte[] value = Assert.notNull(args[1], "value arg", ProviderException.class);
