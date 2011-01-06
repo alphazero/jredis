@@ -42,15 +42,6 @@ public class Convert {
 	private static final int	MAX_POSITIVE_32_BIT_DIGITS	= 10;
 	private static final int	MAX_POSITIVE_64_BIT_DIGITS	= 19;
 	
-	/**
-	 * A few hundred Ks/classloader  Speed things up considerably in the long run as far
-	 * as int to byte[] conversions are concerned.  
-	 * Reduce the constant to adjust memory consumption as required.
-	 */
-	static {
-		for(int i=0; i<INT_P_65535; i++) Integer.toString(i).getBytes();
-	}
-	
 	// ------------------------------------------------------------------------
 	// public Interface
 	// ------------------------------------------------------------------------
