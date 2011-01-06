@@ -318,15 +318,15 @@ public abstract class JRedisTestSuiteBase<T> extends ProviderTestBase<T>{
 		}
 		@Override public String toString() { return "[" + getClass().getSimpleName() + " | name: " + getName() + " created on: " + getCreated_on() + "]"; }
 		@Override public boolean equals (Object o) {
-			boolean res = false;
-			try {
+			if(o instanceof TestBean) {
 				TestBean isItMe = (TestBean) o;
-				res = isItMe.getName().equals(name) && isItMe.getCreated_on()==this.named_on;
+				return isItMe.getName().equals(name) && isItMe.getCreated_on()==this.named_on;
 			}
-			catch (ClassCastException e) {
-				return false;
-			}
-			return res;
+			return false;
+		}
+
+		@Override public int hashCode() {
+			return name.hashCode() ^ (int)named_on;
 		}
 	}
 	// ------------------------------------------------------------------------
