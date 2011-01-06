@@ -1982,7 +1982,7 @@ public abstract class JRedisSupport implements JRedis {
 //	@Override
 	public byte[] echo (byte[] value) throws RedisException {
 		if(value ==null) 
-			throw new IllegalArgumentException ("invalid echo value => ["+value+"]");
+			throw new IllegalArgumentException ("invalid echo value => [null]");
 
 		byte[] bulkData= null;
 		try {

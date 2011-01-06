@@ -1715,7 +1715,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	 */
 	public Future<byte[]> echo (byte[] msg) {
 		if(msg == null) 
-			throw new IllegalArgumentException ("invalid value for echo => ["+msg+"]");
+			throw new IllegalArgumentException ("invalid value for echo => [null]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.ECHO, msg);
 		return new FutureByteArray(futureResponse);
