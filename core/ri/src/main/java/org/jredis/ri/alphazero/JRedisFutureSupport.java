@@ -1,12 +1,12 @@
 /*
  *   Copyright 2009-2010 Joubin Houshyar
- * 
+ *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
- *    
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- *    
+ *
  *   Unless required by applicable law or agreed to in writing, software
  *   distributed under the License is distributed on an "AS IS" BASIS,
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,7 +51,7 @@ import org.jredis.ri.alphazero.support.SortSupport;
 import org.jredis.semantics.KeyCodec;
 
 /**
- * 
+ *
  * [TODO: document me!]
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
@@ -74,9 +74,9 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	/*
 	 * This class provides the convenience of a uniform implementation wide mapping
 	 * of JRedis api semantics to the native protocol level semantics of byte[]s.
-	 * 
+	 *
 	 * Extensions can use the provided extension points to provide or delegate the
-	 * servicing of request calls.  
+	 * servicing of request calls.
 	 */
 	// ------------------------------------------------------------------------
 	
@@ -84,26 +84,26 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	 * This method mimics the eponymous {@link Connection#queueRequest(Command, byte[]...)}
 	 * which defines the blocking api semantics of Synchronous connections.  The extending class
 	 * can either directly (a) implement the protocol requirements, or, (b) delegate to a
-	 * {@link Connection} instance, or, (c) utilize a pool of {@link Connection}s.  
-	 * 
+	 * {@link Connection} instance, or, (c) utilize a pool of {@link Connection}s.
+	 *
 	 * @param cmd
 	 * @param args
 	 * @return
 	 * @throws ClientRuntimeException
 	 * @throws ProviderException
 	 */
-	abstract protected  Future<Response> queueRequest (Command cmd, byte[]...args) throws ClientRuntimeException, ProviderException; 
+	abstract protected  Future<Response> queueRequest (Command cmd, byte[]...args) throws ClientRuntimeException, ProviderException;
 	// ------------------------------------------------------------------------
 	// INTERFACE
 	// ================================================================ Redis
 	/*
 	 * Support of all the JRedisFuture interface methods.
-	 * 
+	 *
 	 * This class uses the UTF-8 character set for all conversions due to its
 	 * use of the Convert and Codec support classes.
-	 * 
+	 *
 	 * All calls are forwarded to an abstract queueRequest method that the
-	 * extending classes are expected to implement.  
+	 * extending classes are expected to implement.
 	 */
 	// ------------------------------------------------------------------------
 
@@ -140,11 +140,11 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	public Future<ResponseStatus>  slaveof(String host, int port) {
 		byte[] hostbytes = null;
-		if((hostbytes = getKeyBytes(host)) == null) 
+		if((hostbytes = JRedisSupport.getKeyBytes(host)) == null)
 			throw new IllegalArgumentException ("invalid host => ["+host+"]");
 
 		byte[] portbytes = null;
-		if((portbytes = Convert.toBytes(port)) == null) 
+		if((portbytes = Convert.toBytes(port)) == null)
 			throw new IllegalArgumentException ("invalid port => ["+port+"]");
 
 		return new FutureStatus(this.queueRequest(Command.SLAVEOF, hostbytes, portbytes));
@@ -156,11 +156,11 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public FutureStatus rename(String oldkey, String newkey) {
 		byte[] oldkeydata = null;
-		if((oldkeydata = getKeyBytes(oldkey)) == null) 
+		if((oldkeydata = JRedisSupport.getKeyBytes(oldkey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+oldkey+"]");
 
 		byte[] newkeydata = null;
-		if((newkeydata = getKeyBytes(newkey)) == null) 
+		if((newkeydata = JRedisSupport.getKeyBytes(newkey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+newkey+"]");
 
 		return new FutureStatus(this.queueRequest(Command.RENAME, oldkeydata, newkeydata));
@@ -169,11 +169,11 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Boolean> renamenx(String oldkey, String newkey){
 		byte[] oldkeydata = null;
-		if((oldkeydata = getKeyBytes(oldkey)) == null) 
+		if((oldkeydata = JRedisSupport.getKeyBytes(oldkey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+oldkey+"]");
 
 		byte[] newkeydata = null;
-		if((newkeydata = getKeyBytes(newkey)) == null) 
+		if((newkeydata = JRedisSupport.getKeyBytes(newkey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+newkey+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.RENAMENX, oldkeydata, newkeydata);
@@ -181,10 +181,10 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	public FutureStatus rpush(String key, byte[] value)  {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 		
-		if(value == null) 
+		if(value == null)
 			throw new IllegalArgumentException ("null value");
 		
 		return new FutureStatus(this.queueRequest(Command.RPUSH, keybytes, value));
@@ -193,10 +193,10 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public FutureByteArray rpoplpush (String srcList, String destList)  {
 		byte[] srckeybytes = null;
-		if((srckeybytes = getKeyBytes(srcList)) == null) 
+		if((srckeybytes = JRedisSupport.getKeyBytes(srcList)) == null)
 			throw new IllegalArgumentException ("invalid src key => ["+srcList+"]");
 		byte[] destkeybytes = null;
-		if((destkeybytes = getKeyBytes(destList)) == null) 
+		if((destkeybytes = JRedisSupport.getKeyBytes(destList)) == null)
 			throw new IllegalArgumentException ("invalid dest key => ["+destList+"]");
 		
 		Future<Response> futureResponse = this.queueRequest(Command.RPOPLPUSH, srckeybytes, destkeybytes);
@@ -218,10 +218,10 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Boolean> sadd(String key, byte[] member) 
+	public Future<Boolean> sadd(String key, byte[] member)
 	{
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.SADD, keybytes, member);
@@ -242,10 +242,10 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Boolean> zadd(String key, double score, byte[] member) 
+	public Future<Boolean> zadd(String key, double score, byte[] member)
 	{
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.ZADD, keybytes,  Convert.toBytes(score), member);
@@ -266,10 +266,10 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Double> zincrby(String key, double score, byte[] member) 
+	public Future<Double> zincrby(String key, double score, byte[] member)
 	{
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.ZINCRBY, keybytes,  Convert.toBytes(score), member);
@@ -290,17 +290,17 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public FutureStatus save() 
+	public FutureStatus save()
 	{
 		return new FutureStatus(this.queueRequest(Command.SAVE));
 	}
 	
-	// -------- set 
+	// -------- set
 
 //	@Override
 	public FutureStatus set(String key, byte[] value) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		return new FutureStatus(this.queueRequest(Command.SET, keybytes, value));
@@ -322,7 +322,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<byte[]> getset(String key, byte[] value) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.GETSET, keybytes, value);
@@ -337,7 +337,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return getset(key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> 
+	public <T extends Serializable>
 	Future<byte[]> getset (String key, T value)
 	{
 		return getset(key, DefaultCodec.encode(value));
@@ -346,7 +346,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Boolean> setnx(String key, byte[] value){
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.SETNX, keybytes, value);
@@ -369,7 +369,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> append (String key, byte[] value){
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.APPEND, keybytes, value);
@@ -391,7 +391,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Boolean> sismember(String key, byte[] member) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.SISMEMBER, keybytes, member);
@@ -415,11 +415,11 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	public Future<Boolean> smove (String srcKey, String destKey, byte[] member) {
 		byte[] srcKeyBytes = null;
-		if((srcKeyBytes = getKeyBytes(srcKey)) == null) 
+		if((srcKeyBytes = JRedisSupport.getKeyBytes(srcKey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+srcKey+"]");
 
 		byte[] destKeyBytes = null;
-		if((destKeyBytes = getKeyBytes(destKey)) == null) 
+		if((destKeyBytes = JRedisSupport.getKeyBytes(destKey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+destKey+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.SMOVE, srcKeyBytes, destKeyBytes, member);
@@ -431,22 +431,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	public Future<Boolean> smove (String srcKey, String destKey, Number numberValue) {
 		return smove (srcKey, destKey, String.valueOf(numberValue).getBytes());
 	}
-	public <T extends Serializable> 
+	public <T extends Serializable>
 		   Future<Boolean> smove (String srcKey, String destKey, T object) {
 		return smove (srcKey, destKey, DefaultCodec.encode(object));
 	}
-		   
+		
 	// ------------------------------------------------------------------------
 	// Commands operating on hashes
 	// ------------------------------------------------------------------------
 	
 	public Future<Boolean> hset(String key, String field, byte[] value) {
 		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = getKeyBytes(key)) == null) 
+		if((hashKeyBytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] hashFieldBytes = null;
-		if((hashFieldBytes = getKeyBytes(field)) == null) 
+		if((hashFieldBytes = JRedisSupport.getKeyBytes(field)) == null)
 			throw new IllegalArgumentException ("invalid field => ["+field+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.HSET, hashKeyBytes, hashFieldBytes, value);
@@ -458,18 +458,18 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	public Future<Boolean> hset(String key, String field, Number numberValue) {
 		return hset (key, field, String.valueOf(numberValue).getBytes());
 	}
-	public <T extends Serializable> 
+	public <T extends Serializable>
 		Future<Boolean> hset(String key, String field, T object) {
 		return hset (key, field, DefaultCodec.encode(object));
 	}
 	
 	public Future<byte[]> hget(String hashKey, String hashField) {
 		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
 
 		byte[] hashFieldBytes = null;
-		if((hashFieldBytes = getKeyBytes(hashField)) == null) 
+		if((hashFieldBytes = JRedisSupport.getKeyBytes(hashField)) == null)
 			throw new IllegalArgumentException ("invalid field => ["+hashField+"]");
 		
 		Future<Response> futureResponse = this.queueRequest(Command.HGET, hashKeyBytes, hashFieldBytes);
@@ -479,11 +479,11 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	
 	public Future<Boolean> hexists(String hashKey, String hashField) {
 		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
 
 		byte[] hashFieldBytes = null;
-		if((hashFieldBytes = getKeyBytes(hashField)) == null) 
+		if((hashFieldBytes = JRedisSupport.getKeyBytes(hashField)) == null)
 			throw new IllegalArgumentException ("invalid field => ["+hashField+"]");
 		
 		Future<Response> futureResponse = this.queueRequest(Command.HEXISTS, hashKeyBytes, hashFieldBytes);
@@ -492,11 +492,11 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	
 	public Future<Boolean> hdel(String hashKey, String hashField) {
 		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
 
 		byte[] hashFieldBytes = null;
-		if((hashFieldBytes = getKeyBytes(hashField)) == null) 
+		if((hashFieldBytes = JRedisSupport.getKeyBytes(hashField)) == null)
 			throw new IllegalArgumentException ("invalid field => ["+hashField+"]");
 		
 		Future<Response> futureResponse = this.queueRequest(Command.HDEL, hashKeyBytes, hashFieldBytes);
@@ -505,7 +505,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	
 	public Future<Long> hlen(String hashKey) {
 		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
 
 		
@@ -515,7 +515,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	
 	public Future<List<String>> hkeys(String hashKey) {
 		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.HKEYS, hashKeyBytes);
@@ -524,7 +524,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	
 	public Future<List<byte[]>> hvals(String hashKey) {
 		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.HKEYS, hashKeyBytes);
@@ -533,7 +533,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	
 	public Future<Map<String, byte[]>> hgetall(String hashKey) {
 		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
+		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.HGETALL, hashKeyBytes);
@@ -546,7 +546,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> incr(String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.INCR, keybytes);
@@ -556,7 +556,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> incrby(String key, int delta) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.INCRBY, keybytes, Convert.toBytes(delta));
@@ -566,7 +566,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> decr(String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.DECR, keybytes);
@@ -576,7 +576,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> decrby(String key, int delta) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.DECRBY, keybytes, Convert.toBytes(delta));
@@ -586,7 +586,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> llen(String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.LLEN, keybytes);
@@ -596,7 +596,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> scard(String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.SCARD, keybytes);
@@ -606,7 +606,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> zcard(String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.ZCARD, keybytes);
@@ -615,7 +615,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	
 	public Future<byte[]> srandmember (String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.SRANDMEMBER, keybytes);
@@ -624,7 +624,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	public Future<byte[]> spop (String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.SPOP, keybytes);
@@ -649,7 +649,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<byte[]> get(String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.GET, keybytes);
@@ -659,7 +659,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<byte[]> lindex(String key, long index) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.LINDEX, keybytes, Convert.toBytes(index));
@@ -668,7 +668,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<byte[]> lpop(String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.LPOP, keybytes);
@@ -678,7 +678,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<byte[]> rpop(String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.RPOP, keybytes);
@@ -696,7 +696,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<RedisType> type(String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		return new FutureRedisType(this.queueRequest(Command.TYPE, keybytes));
@@ -711,7 +711,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 //	@Override
 	public Future<ObjectInfo> debug (String key) {
-		byte[] keybytes = getKeyBytes(key);
+		byte[] keybytes = JRedisSupport.getKeyBytes(key);
 		if(key.length() == 0)
 			throw new IllegalArgumentException ("invalid zero length key => ["+key+"]");
 
@@ -727,7 +727,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		byte[][] keybytes = new byte[keys.length][];
 		int i=0;
 		for(String k : keys) {
-			if((keydata = getKeyBytes(k)) == null) 
+			if((keydata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"] @ index: " + i);
 			
 			keybytes[i++] = keydata;
@@ -801,7 +801,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<List<byte[]>> smembers(String key) {
 		byte[] keydata = null;
-		if((keydata = getKeyBytes(key)) == null) 
+		if((keydata = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("null key.");
 
 		return new FutureByteArrayList(this.queueRequest(Command.SMEMBERS, keydata));
@@ -814,7 +814,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<List<String>> keys(String pattern) {
 		byte[] keydata = null;
-		if((keydata = getKeyBytes(pattern)) == null) 
+		if((keydata = JRedisSupport.getKeyBytes(pattern)) == null)
 			throw new IllegalArgumentException ("null key.");
 
 		Future<Response> futureResponse = this.queueRequest(Command.KEYS, keydata);
@@ -824,7 +824,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<List<byte[]>> lrange(String key, long from, long to) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] fromBytes = Convert.toBytes(from);
@@ -836,7 +836,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<byte[]> substr(String key, long from, long to) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] fromBytes = Convert.toBytes(from);
@@ -848,7 +848,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<List<byte[]>> zrange(String key, long from, long to) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] fromBytes = Convert.toBytes(from);
@@ -860,7 +860,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<List<byte[]>> zrangebyscore(String key, double minScore, double maxScore) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] minScoreBytes = Convert.toBytes(minScore);
@@ -872,7 +872,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> zremrangebyscore(String key, double minScore, double maxScore) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] minScoreBytes = Convert.toBytes(minScore);
@@ -884,7 +884,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> zcount(String key, double minScore, double maxScore) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] minScoreBytes = Convert.toBytes(minScore);
@@ -896,7 +896,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> zremrangebyrank(String key, long minRank, long maxRank) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] minScoreBytes = Convert.toBytes(minRank);
@@ -909,7 +909,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<List<byte[]>> zrevrange(String key, long from, long to) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] fromBytes = Convert.toBytes(from);
@@ -921,7 +921,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<List<ZSetEntry>> zrangeSubset(String key, long from, long to) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] fromBytes = Convert.toBytes(from);
@@ -933,7 +933,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<List<ZSetEntry>> zrevrangeSubset(String key, long from, long to) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] fromBytes = Convert.toBytes(from);
@@ -945,12 +945,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Sort sort(final String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 		
 		final JRedisFutureSupport client = this;
 		Sort sortQuery = new SortSupport (key, keybytes) {
-			//	@Override 
+			//	@Override
 			protected Future<List<byte[]>> execAsynchSort(byte[] keyBytes, byte[] sortSpecBytes) {
 				return new FutureByteArrayList(client.queueRequest(Command.SORT, keyBytes, sortSpecBytes));
 			}
@@ -978,13 +978,13 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<List<byte[]>> sinter(String set1, String... sets) {
 		byte[] keydata = null;
-		if((keydata = getKeyBytes(set1)) == null) 
+		if((keydata = JRedisSupport.getKeyBytes(set1)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+set1+"]");
 
 		byte[][] keybytes = new byte[1+sets.length][];
 		int i=0; keybytes[i++] = keydata;
 		for(String k : sets) {
-			if((keydata = getKeyBytes(k)) == null) 
+			if((keydata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			keybytes[i++] = keydata;
 		}
@@ -995,13 +995,13 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<List<byte[]>> sunion(String set1, String... sets) {
 		byte[] keydata = null;
-		if((keydata = getKeyBytes(set1)) == null) 
+		if((keydata = JRedisSupport.getKeyBytes(set1)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+set1+"]");
 
 		byte[][] keybytes = new byte[1+sets.length][];
 		int i=0; keybytes[i++] = keydata;
 		for(String k : sets) {
-			if((keydata = getKeyBytes(k)) == null) 
+			if((keydata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			keybytes[i++] = keydata;
 		}
@@ -1012,13 +1012,13 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<List<byte[]>> sdiff(String set1, String... sets) {
 		byte[] keydata = null;
-		if((keydata = getKeyBytes(set1)) == null) 
+		if((keydata = JRedisSupport.getKeyBytes(set1)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+set1+"]");
 
 		byte[][] keybytes = new byte[1+sets.length][];
 		int i=0; keybytes[i++] = keydata;
 		for(String k : sets) {
-			if((keydata = getKeyBytes(k)) == null) 
+			if((keydata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			keybytes[i++] = keydata;
 		}
@@ -1028,15 +1028,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public FutureStatus sinterstore(String dest, String... sets) {
 		byte[] keydata = null;
-		if((keydata = getKeyBytes(dest)) == null) 
+		if((keydata = JRedisSupport.getKeyBytes(dest)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+dest+"]");
 
 		byte[][] setbytes = new byte[1+sets.length][];
-		int i=0; 
+		int i=0;
 		setbytes[i++] = keydata;
 		byte[] setdata =null;
 		for(String k : sets) {
-			if((setdata = getKeyBytes(k)) == null) 
+			if((setdata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			setbytes[i++] = setdata;
 		}
@@ -1047,15 +1047,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public FutureStatus sunionstore(String dest, String... sets) {
 		byte[] keydata = null;
-		if((keydata = getKeyBytes(dest)) == null) 
+		if((keydata = JRedisSupport.getKeyBytes(dest)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+dest+"]");
 
 		byte[][] setbytes = new byte[1+sets.length][];
-		int i=0; 
+		int i=0;
 		setbytes[i++] = keydata;
 		byte[] setdata =null;
 		for(String k : sets) {
-			if((setdata = getKeyBytes(k)) == null) 
+			if((setdata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			setbytes[i++] = setdata;
 		}
@@ -1066,15 +1066,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public FutureStatus sdiffstore(String dest, String... sets) {
 		byte[] keydata = null;
-		if((keydata = getKeyBytes(dest)) == null) 
+		if((keydata = JRedisSupport.getKeyBytes(dest)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+dest+"]");
 
 		byte[][] setbytes = new byte[1+sets.length][];
-		int i=0; 
+		int i=0;
 		setbytes[i++] = keydata;
 		byte[] setdata =null;
 		for(String k : sets) {
-			if((setdata = getKeyBytes(k)) == null) 
+			if((setdata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			setbytes[i++] = setdata;
 		}
@@ -1089,7 +1089,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		byte[][] keybytes = new byte[keys.length][];
 		int i=0;
 		for(String k : keys) {
-			if((keydata = getKeyBytes(k)) == null) 
+			if((keydata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"] @ index: " + i);
 			
 			keybytes[i++] = keydata;
@@ -1103,7 +1103,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Boolean> exists(String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.EXISTS, keybytes);
@@ -1114,10 +1114,10 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public FutureStatus lpush(String key, byte[] value) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 		
-		if(value == null) 
+		if(value == null)
 			throw new IllegalArgumentException ("null value");
 		
 		
@@ -1142,7 +1142,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> lrem(String key, byte[] value, int count) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] countBytes = Convert.toBytes(count);
@@ -1159,7 +1159,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return lrem (listKey, String.valueOf(numberValue).getBytes(), count);
 	}
 //	@Override
-	public <T extends Serializable> 
+	public <T extends Serializable>
 	Future<Long> lrem (String listKey, T object, int count){
 		return lrem (listKey, DefaultCodec.encode(object), count);
 	}
@@ -1168,7 +1168,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public FutureStatus lset(String key, long index, byte[] value) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] indexBytes = Convert.toBytes(index);
@@ -1190,7 +1190,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Boolean> move(String key, int dbIndex) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 		
 		Future<Response> futureResponse = this.queueRequest(Command.MOVE, keybytes, Convert.toBytes(dbIndex));
@@ -1201,7 +1201,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Boolean> srem(String key, byte[] member) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.SREM, keybytes, member);
@@ -1224,7 +1224,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Boolean> zrem(String key, byte[] member) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.ZREM, keybytes, member);
@@ -1248,7 +1248,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Double> zscore(String key, byte[] member) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.ZSCORE, keybytes, member);
@@ -1271,7 +1271,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> zrank(String key, byte[] member) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.ZRANK, keybytes, member);
@@ -1294,7 +1294,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> zrevrank(String key, byte[] member) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.ZREVRANK, keybytes, member);
@@ -1318,7 +1318,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public FutureStatus ltrim(String key, long keepFrom, long keepTo) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] fromBytes = Convert.toBytes(keepFrom);
@@ -1329,7 +1329,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Boolean> expire(String key, int ttlseconds) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		byte[] ttlbytes = Convert.toBytes(ttlseconds);
@@ -1341,7 +1341,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Boolean> expireat(String key, long epochtime) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		long expiretime = TimeUnit.SECONDS.convert(epochtime, TimeUnit.MILLISECONDS);
@@ -1354,7 +1354,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //	@Override
 	public Future<Long> ttl (String key) {
 		byte[] keybytes = null;
-		if((keybytes = getKeyBytes(key)) == null) 
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.TTL, keybytes);
@@ -1364,37 +1364,9 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	// TODO: integrate using KeyCodec and a CodecManager at client spec and init time.
 	// TODO: (implied) ClientSpec (impls. ConnectionSpec)
 	// this isn't cooked yet -- lets think more about the implications...
-	// 
+	//
 	static final private Map<String, byte[]>	keyByteCache = new ConcurrentHashMap<String, byte[]>();
 	public static final boolean	CacheKeys	= false;
-	
-	private byte[] getKeyBytes(String key) throws IllegalArgumentException {
-		if(null == key) throw new IllegalArgumentException("key is null");
-		byte[] bytes = null;
-		if(JRedisSupport.CacheKeys == true)
-			bytes = keyByteCache.get(key);
-		if(null == bytes) {
-//			bytes = key.getBytes(DefaultCodec.SUPPORTED_CHARSET); // java 1.6
-			try {
-	            bytes = key.getBytes(DefaultCodec.SUPPORTED_CHARSET_NAME);
-            }
-            catch (UnsupportedEncodingException e) {
-	            e.printStackTrace();
-            }
-			for(byte b : bytes) {
-				if (b == (byte)32 || b == (byte)10 || b == (byte)13)
-					throw new IllegalArgumentException ("Key includes invalid byte value: " + (int)b);
-			}
-			
-			if(JRedisSupport.CacheKeys == true)
-				keyByteCache.put(key, bytes);
-		}
-		return bytes;
-	}
-
-	// ------------------------------------------------------------------------
-	// Inner classes : support for Future<x> return types
-	// ------------------------------------------------------------------------
 	
 	public static class FutureResultBase {
 		final protected Future<Response> pendingRequest;
@@ -1419,13 +1391,13 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public ResponseStatus get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
 //        	StatusResponse statusResponse = (StatusResponse) pendingRequest.get(timeout, unit);
 //        	return statusResponse.getStatus();
         	return pendingRequest.get(timeout, unit).getStatus();
         }
-        
+
 	}
 	public static class FutureBoolean extends FutureResultBase implements Future<Boolean>{
 
@@ -1437,7 +1409,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public Boolean get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
         	ValueResponse valResp = (ValueResponse) pendingRequest.get(timeout, unit);
         	return valResp.getBooleanValue();
@@ -1453,7 +1425,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public String get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
         	ValueResponse valResp = (ValueResponse) pendingRequest.get(timeout, unit);
         	return valResp.getStringValue();
@@ -1473,7 +1445,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public RedisType get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
         	ValueResponse valResp = (ValueResponse) pendingRequest.get(timeout, unit);
         	return getRedisType(valResp);
@@ -1489,7 +1461,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public Long get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
         	ValueResponse valResp = (ValueResponse) pendingRequest.get(timeout, unit);
         	return valResp.getLongValue();
@@ -1507,7 +1479,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public Double get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
         	BulkResponse bulkResp = (BulkResponse) pendingRequest.get(timeout, unit);
         	if(bulkResp.getBulkData() != null)
@@ -1525,7 +1497,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public byte[] get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
         	BulkResponse resp = (BulkResponse) pendingRequest.get(timeout, unit);
         	return resp.getBulkData();
@@ -1541,7 +1513,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 		
         public List<byte[]> get (long timeout, TimeUnit unit)
-		throws InterruptedException, ExecutionException, TimeoutException 
+		throws InterruptedException, ExecutionException, TimeoutException
         {
         	ValueResponse resp = (ValueResponse) pendingRequest.get(timeout, unit);
         	return packValueResult(resp.getLongValue());
@@ -1563,7 +1535,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public List<byte[]> get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
         	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get(timeout, unit);
         	return resp.getMultiBulkData();
@@ -1580,7 +1552,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public Map<String, byte[]> get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
         	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get(timeout, unit);
         	return convert(resp.getMultiBulkData());
@@ -1620,7 +1592,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public List<String> get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
             	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get(timeout, unit);
             	List<byte[]> multibulkdata = resp.getMultiBulkData();
@@ -1652,7 +1624,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public Map<String, String> get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
         	BulkResponse resp = (BulkResponse) pendingRequest.get(timeout, unit);
         	return getResultMap(resp);
@@ -1672,7 +1644,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public ObjectInfo get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
         	ValueResponse valResp = (ValueResponse) pendingRequest.get(timeout, unit);
         	return getObjectInfo(valResp);
@@ -1688,7 +1660,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 
         public List<ZSetEntry> get (long timeout, TimeUnit unit)
-        	throws InterruptedException, ExecutionException, TimeoutException 
+        	throws InterruptedException, ExecutionException, TimeoutException
         {
         	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get(timeout, unit);
         	return convert(resp.getMultiBulkData());
@@ -1714,7 +1686,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	 * @return
 	 */
 	public Future<byte[]> echo (byte[] msg) {
-		if(msg == null) 
+		if(msg == null)
 			throw new IllegalArgumentException ("invalid value for echo => [null]");
 
 		Future<Response> futureResponse = this.queueRequest(Command.ECHO, msg);
@@ -1727,7 +1699,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	public Future<byte[]> echo (Number msg) {
 		return echo(String.valueOf(msg).getBytes());
 	}
-	public <T extends Serializable> 
+	public <T extends Serializable>
 		Future<byte[]> echo (T msg) {
 			return echo (DefaultCodec.encode(msg));
 	}

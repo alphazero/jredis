@@ -2045,7 +2045,7 @@ public abstract class JRedisSupport implements JRedis {
 	static final private Map<String, byte[]>	keyByteCache = new ConcurrentHashMap<String, byte[]>();
 	public static final boolean	CacheKeys	= false;
 	
-	private byte[] getKeyBytes(String key) throws IllegalArgumentException {
+	public static byte[] getKeyBytes(String key) throws IllegalArgumentException {
 		if(null == key) throw new IllegalArgumentException("key is null");
 		byte[] bytes = null;
 		if(JRedisSupport.CacheKeys == true)

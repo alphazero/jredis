@@ -58,26 +58,7 @@ public class DefaultKeyCodec implements KeyCodec {
 	 * @see org.jredis.Codec#encode(java.lang.Object)
 	 */
 	public byte[] encode (String key) {
-		if(null == key) throw new IllegalArgumentException("key is null");
-		byte[] bytes = null;
-		
-		if(JRedisSupport.CacheKeys == true)
-			bytes = keyByteCache.get(key);
-		
-		if(null == bytes) {
-			try {
-	            bytes = key.getBytes(DefaultCodec.SUPPORTED_CHARSET_NAME);
-            }
-            catch (UnsupportedEncodingException e) {
-	            e.printStackTrace();
-            }
-			for(byte b : bytes) {
-				if (b == (byte)32 || b == (byte)10 || b == (byte)13)
-					throw new IllegalArgumentException ("Key includes invalid byte value: " + (int)b);
-			}
-			if(CacheKeys == true) keyByteCache.put(key, bytes);
-		}
-		return bytes;
+		return JRedisSupport.getKeyBytes(key);
 	}
 
 	/* (non-Javadoc)
