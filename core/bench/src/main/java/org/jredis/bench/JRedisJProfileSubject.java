@@ -63,7 +63,7 @@ public class JRedisJProfileSubject {
 			jredis.rpush(listkey, data);
 		}
 		long delta = System.currentTimeMillis() - start;
-		float rate = (iter * 1000) / delta;
+		float rate = ((float)iter * 1000) / delta;
 		System.out.format("%d iterations | %d msec | %8.2f /sec \n", iter, delta, rate);
 	}
 }
