@@ -65,25 +65,22 @@ public class Convert {
 	 * @return
 	 */ 
 	public static final byte[] toBytes(int i){
-		byte[] data = null;
-		boolean negative=false;
-		if(i >= INT_N_65535 && i <= INT_P_65535) {
-			if(i < 0) {
-				negative = true;
-				i = 0 - i;
-			}
-			if(null == i2b_65535[i]){
-				i2b_65535[i] = Integer.toString(i).getBytes();
-			}
-			data = i2b_65535[i];
-			if(negative) data = getSignedNumberBytes(data, negative);
+		if(i < INT_N_65535 || i > INT_P_65535) {
+			return Integer.toString(i).getBytes();
+		}
+		final int absi = Math.abs(i);
+		final byte[] cachedData = i2b_65535[absi];
+		final byte[] data;
+		if(cachedData == null) {
+			data = Integer.toString(i).getBytes();
+			i2b_65535[absi] = data;
 		}
 		else {
-			data = Integer.toString(i).getBytes();
+			data = cachedData;
 		}
-		if(null == data) throw new RuntimeException("null for i=" + i + " and cache is: " + i2b_65535[i]);
-		return data;
+		return i >= 0 ? data : getNegativeNumberBytes(data);
 	}
+
 	/**
 	 * Will delegate to {@link Convert#getBytes(int)} if the 'long' number is actually
 	 * within the range of our int cache, otherwise it will return the bytes using std
@@ -224,13 +221,12 @@ public class Convert {
 	// ------------------------------------------------------------------------
 	/**
 	 * @param unsigned
-	 * @param negative
 	 * @return
 	 */
-	private static final byte[] getSignedNumberBytes(byte[] unsigned, boolean negative){
+	private static final byte[] getNegativeNumberBytes(byte[] unsigned){
 		int unsigned_length = unsigned.length;
 		byte[] data = new byte[unsigned_length+1];
-		data [0] = negative ? BYTE_MINUS : BYTE_PLUS;
+		data [0] = BYTE_MINUS;
 		System.arraycopy(unsigned, 0, data, 1, unsigned_length);
 		return data;
 	}
