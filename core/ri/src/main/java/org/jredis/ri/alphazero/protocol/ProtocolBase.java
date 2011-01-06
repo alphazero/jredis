@@ -260,7 +260,7 @@ public abstract class ProtocolBase implements Protocol {
 			
 			}
 		}
-		catch (Exception e) {
+		catch (IOException e) {
 			throw new ProviderException("Problem writing to the buffer" + e.getLocalizedMessage());
 		}
 		return createRequest(buffer);
