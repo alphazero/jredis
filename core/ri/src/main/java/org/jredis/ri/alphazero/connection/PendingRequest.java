@@ -110,7 +110,7 @@ public final class PendingRequest implements Future<Response> {
 			if(cre != null) {
 				if(cre instanceof ProviderException)
 					throw new ExecutionException ("Provider Exception", cre);
-				else if( cre instanceof ClientRuntimeException)
+				else
 					throw new ExecutionException ("Client Runtime Exception", cre);
 			}
 			else {
