@@ -18,6 +18,7 @@ package org.jredis.ri.alphazero;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -2056,7 +2057,7 @@ public abstract class JRedisSupport implements JRedis {
 	            bytes = key.getBytes(DefaultCodec.SUPPORTED_CHARSET_NAME);
             }
             catch (UnsupportedEncodingException e) {
-	            e.printStackTrace();
+	            throw new UndeclaredThrowableException(e);
             }
 			for(byte b : bytes) {
 				if (b == (byte)32 || b == (byte)10 || b == (byte)13)
