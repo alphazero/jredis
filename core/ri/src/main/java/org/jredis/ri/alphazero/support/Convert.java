@@ -117,10 +117,13 @@ public class Convert {
 
 		boolean negative = false;
 		int digitCnt = len;
-		if(buff[offset]==BYTE_MINUS || buff[offset]==BYTE_PLUS){ 
-			if(buff[offset]==BYTE_MINUS) negative = true; 
-			offset++;
-			digitCnt--;
+		switch(buff[offset]) {
+		    case BYTE_MINUS:
+		    	negative = true;
+		    	// Intentional fall-through
+		    case BYTE_PLUS:
+				offset++;
+				digitCnt--;
 		}
 		if(digitCnt > MAX_POSITIVE_32_BIT_DIGITS) throw new IllegalArgumentException ("This \"int\" has more digits than a 32 bit signed number:" + digitCnt);
 		
