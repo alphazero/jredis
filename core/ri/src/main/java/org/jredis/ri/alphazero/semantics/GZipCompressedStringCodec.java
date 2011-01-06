@@ -17,7 +17,7 @@ public class GZipCompressedStringCodec extends DefaultStringCodec {
      */
     @Override
     public String decode (byte[] bytes) {
-        return decode(decompress(bytes));
+        return super.decode(decompress(bytes));
     }
 
 	/* (non-Javadoc)
