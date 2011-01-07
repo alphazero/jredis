@@ -17,12 +17,14 @@
 package org.jredis.semantics;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.jredis.Codec;
 
 // REFACTOR: this doesn't belong here
 //
 public final class BasicCodecManager implements CodecManager {
-	Map<Class<?>, Codec<?>> map;
+	private final Map<Class<?>, Codec<?>> map = new ConcurrentHashMap<Class<?>, Codec<?>>();
 	public void foo () {
 		Codec<String>  stringCodec = null;
 		map.put(String.class, stringCodec);
