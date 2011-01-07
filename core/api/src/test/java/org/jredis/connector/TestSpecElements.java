@@ -60,7 +60,7 @@ public class TestSpecElements extends TestBase{
 	@Test
 	public void testCredentialsOverloads () {
 		String property = Connection.Property.CREDENTIAL.name();
-		log.info(String.format("TEST:CONNECTOR spec sematics - Credentials", property));
+		log.info(String.format("TEST:CONNECTOR spec sematics - Credentials %s", property));
 		
 		// check with actual passwords
 		//
