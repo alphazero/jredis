@@ -38,15 +38,13 @@ public final class BasicCodecManager implements CodecManager {
 
 //	@Override
 	public <T> boolean register(Codec<T> code, Class<T> type) {
-		// 1 - does it exist?
-		boolean registered = false;
-		Codec<?>	existing = map.get(type);
+		Codec<?> existing = map.get(type);
 		if(null == existing){
 			if (code.supports(type)){
 				map.put(type, code);
-				registered = true;
+				return true;
 			}
 		}
-		return registered;
+		return false;
 	}
 }
