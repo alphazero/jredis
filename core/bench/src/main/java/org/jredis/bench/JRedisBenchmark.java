@@ -610,7 +610,7 @@ public abstract class JRedisBenchmark {
 				System.out.format("===== %s =====\n",cmd.code);
 				System.out.format("%d concurrent clients (%d %ss each) [host: %s]\n", threadCnt, reqCnt, cmd.code, host);
 				System.out.format("  ==> %d total requests @ %f seconds\n", threadCnt*reqCnt, (float)timer.deltaAtMark(TimeUnit.SECONDS));
-				System.out.format("  ==> %f/second\n", (float)timer.opsPerSecAtMark(threadCnt*reqCnt));
+				System.out.format("  ==> %f/second\n", (float)timer.opsPerSecAtMark((long)threadCnt*reqCnt));
 				System.out.println();
 				
 					// report for each - this is response time
