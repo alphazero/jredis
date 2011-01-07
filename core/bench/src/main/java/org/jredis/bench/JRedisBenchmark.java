@@ -55,7 +55,8 @@ public abstract class JRedisBenchmark {
 	final static Random 		random = new Random(System.currentTimeMillis());
 	
 	/**  */
-	static byte[] 			fixedbytes = null;
+	byte[] 			fixedbytes;
+
 	/**  */
 	static List<String>		stringList = new ArrayList<String>();
 		
@@ -471,7 +472,7 @@ public abstract class JRedisBenchmark {
 	/** does the SET */
 	public  final BenchmarkWorker newSetWorker (String host, int port, int db) {
 		return new BenchmarkWorker (host, port, db){
-			byte[] data = JRedisBenchmark.fixedbytes;
+			byte[] data = fixedbytes;
 			String key = id + ":fixedbytes:string";
 			@Override
 			protected void prep() {  }
@@ -490,7 +491,7 @@ public abstract class JRedisBenchmark {
 	/** does the SETNX */
 	public  final BenchmarkWorker newSetnxWorker (String host, int port, int db) {
 		return new BenchmarkWorker (host, port, db){
-			byte[] data = JRedisBenchmark.fixedbytes;
+			byte[] data = fixedbytes;
 			String key = id + ":fixedbytes:string";
 			@Override
 			protected void prep() {  }
@@ -508,7 +509,7 @@ public abstract class JRedisBenchmark {
 	/** does the GET */
 	public  final BenchmarkWorker newGetWorker (String host, int port, int db) {
 		return new BenchmarkWorker (host, port, db){
-			byte[] data = JRedisBenchmark.fixedbytes;
+			byte[] data = fixedbytes;
 			String key = id + ":fixedbytes:string";
 			@Override
 			protected void prep() {
