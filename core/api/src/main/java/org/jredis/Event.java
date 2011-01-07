@@ -16,6 +16,9 @@
 
 package org.jredis;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 
@@ -36,7 +39,7 @@ public class Event <SRC, ETYPE, INFO> implements Serializable{
 	/**  */
 	private final ETYPE type;
 	/**  */
-	private final WeakReference<SRC> srcRef;
+	private transient WeakReference<SRC> srcRef;
 	/**  */
 	private final INFO info;
 	
@@ -75,4 +78,15 @@ public class Event <SRC, ETYPE, INFO> implements Serializable{
 	public INFO getInfo () {
     	return info;
     }
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.defaultWriteObject();
+		out.writeObject(srcRef.get());
+	}
+
+	@SuppressWarnings("unchecked")
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		srcRef = new WeakReference<SRC>((SRC)in.readObject());
+	}
 }
