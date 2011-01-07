@@ -72,7 +72,7 @@ public class Convert {
 		final byte[] cachedData = i2b_65535[absi];
 		final byte[] data;
 		if(cachedData == null) {
-			data = Integer.toString(i).getBytes();
+			data = Integer.toString(absi).getBytes();
 			i2b_65535[absi] = data;
 		}
 		else {
