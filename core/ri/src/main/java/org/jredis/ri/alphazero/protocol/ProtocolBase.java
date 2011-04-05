@@ -261,7 +261,7 @@ public abstract class ProtocolBase implements Protocol {
 			}
 		}
 		catch (IOException e) {
-			throw new ProviderException("Problem writing to the buffer" + e.getLocalizedMessage());
+			throw new ProviderException("Problem writing to the buffer" + e.getLocalizedMessage(), e);
 		}
 		return createRequest(buffer);
 	}
