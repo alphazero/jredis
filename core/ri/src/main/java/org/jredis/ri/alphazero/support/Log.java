@@ -16,7 +16,8 @@
 
 package org.jredis.ri.alphazero.support;
 
-import org.apache.commons.logging.LogFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -26,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  */
 public class Log {
-	public static org.apache.commons.logging.Log logger = LogFactory.getLog("JREDIS");
+  public static Logger logger = Logger.getLogger("org.jredis.JRedis");
 	public enum Category { INFO, DEBUG, ERROR, PROBLEM, BUG }
 
 	// the various 'just FYI's ...
@@ -36,7 +37,7 @@ public class Log {
 	}
 	public static final void debug (String msg) { debug(msg, (Object[])null); }
 	public static final void debug (String format, Object...args) { 
-		logger.debug(String.format(format, args)); 
+		logger.log(Level.FINE, String.format(format, args)); 
 	}
 	
 	// the various 'error! run for covers', ... 
@@ -52,8 +53,8 @@ public class Log {
 	private static final void _error (Category cat, String msg, Object...args) {
 		msg = String.format(msg, args);
 		if(cat.equals(Category.ERROR))
-			logger.error(String.format("%s", msg));
+			logger.severe(String.format("%s", msg));
 		else
-			logger.error(String.format("%s: %s", cat, msg));
+			logger.log(Level.WARNING, String.format("%s: %s", cat, msg));
 	}
 }

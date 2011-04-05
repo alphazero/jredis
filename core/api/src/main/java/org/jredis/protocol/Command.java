@@ -61,6 +61,7 @@ public enum Command {
 
 	// "Commands operating on the key space"
 	KEYS		(RequestType.KEY, 			ResponseType.MULTI_BULK), 
+        KEYSTOLIST	(RequestType.KEY_KEY, 		ResponseType.NUMBER), 
 	RANDOMKEY	(RequestType.NO_ARG,		ResponseType.BULK),
 	RENAME		(RequestType.KEY_KEY, 		ResponseType.STATUS), 
 	RENAMENX	(RequestType.KEY_KEY, 		ResponseType.BOOLEAN), 
@@ -70,8 +71,11 @@ public enum Command {
 	TTL			(RequestType.KEY,			ResponseType.NUMBER),
 	
 	// Commands operating on lists
-	RPUSH		(RequestType.KEY_VALUE,		ResponseType.STATUS), 
-	LPUSH		(RequestType.KEY_VALUE,		ResponseType.STATUS),
+	RPUSH		(RequestType.KEY_VALUE,		ResponseType.NUMBER), 
+	RPUSHX	(RequestType.KEY_VALUE,		ResponseType.NUMBER), 
+	LPUSH		(RequestType.KEY_VALUE,		ResponseType.NUMBER),
+	LPUSHX		(RequestType.KEY_VALUE,		ResponseType.NUMBER),
+	LINSERT	(RequestType.BULK_SET,		ResponseType.NUMBER),
 	LLEN		(RequestType.KEY,			ResponseType.NUMBER), 
 	LRANGE		(RequestType.KEY_NUM_NUM,	ResponseType.MULTI_BULK), 
 	LTRIM		(RequestType.KEY_NUM_NUM,	ResponseType.STATUS),

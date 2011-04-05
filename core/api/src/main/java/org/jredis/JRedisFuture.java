@@ -347,22 +347,22 @@ public interface JRedisFuture {
 	 * @param listkey
 	 * @param value
 	 */
-	public Future<ResponseStatus> rpush (String listkey, byte[] value);
-	public Future<ResponseStatus> rpush (String listkey, String stringValue);
-	public Future<ResponseStatus> rpush (String listkey, Number numberValue);
+	public Future<Long> rpush (String listkey, byte[] value);
+	public Future<Long> rpush (String listkey, String stringValue);
+	public Future<Long> rpush (String listkey, Number numberValue);
 	public <T extends Serializable> 
-		Future<ResponseStatus> rpush (String listkey, T object);
+		Future<Long> rpush (String listkey, T object);
 	
 	/**
 	 * @Redis LPUSH
 	 * @param listkey
 	 * @param value
 	 */
-	public Future<ResponseStatus> lpush (String listkey, byte[] value);
-	public Future<ResponseStatus> lpush (String listkey, String stringValue);
-	public Future<ResponseStatus> lpush (String listkey, Number numberValue);
+	public Future<Long> lpush (String listkey, byte[] value);
+	public Future<Long> lpush (String listkey, String stringValue);
+	public Future<Long> lpush (String listkey, Number numberValue);
 	public <T extends Serializable> 
-		Future<ResponseStatus> lpush (String listkey, T object);
+		Future<Long> lpush (String listkey, T object);
 	
 	/**
 	 * @Redis LSET

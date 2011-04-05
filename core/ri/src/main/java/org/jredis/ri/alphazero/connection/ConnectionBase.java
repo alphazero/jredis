@@ -118,21 +118,17 @@ public abstract class ConnectionBase implements Connection{
 		catch (Exception e) {
 			throw new ProviderException("Unexpected error on initialize -- BUG", e);
 		} 
-		// TODO: problematic in constructor.
-		if(spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) { 
-			connect (); 
-		}
+
+    if (spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) {
+      try {
+        connect ();
+      } catch (ClientRuntimeException e) {
+        // if connecting failed, clean up on our way out.
+        cleanup();
+        throw e;
+      }
+    }
 	}
-	/*
-	 * TDOD: this is the right way but breaks some assumptions in various impls.
-	 * - need to add INITIALIZED state and go from there.
-	 */
-//	@Override
-//	public void initialize() throws ClientRuntimeException, ProviderException {
-//		if(spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) { 
-//			connect (); 
-//		}
-//	}
 
 	// ------------------------------------------------------------------------
 	// Interface
@@ -210,6 +206,12 @@ public abstract class ConnectionBase implements Connection{
 //	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), " [" + this + "] heartbeat");
 //	    	heartbeat.start();
 		}
+    }
+
+    protected void cleanup () {
+      if (heartbeat != null) {
+        heartbeat.exit();
+      }
     }
 
     /**
@@ -374,6 +376,7 @@ public abstract class ConnectionBase implements Connection{
 		socketClose();
 		isConnected = false;
 
+    cleanup();
 		notifyDisconnected();
 		Log.debug ("DISCONNECTED | conn: %s", toString());
 	}
