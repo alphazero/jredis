@@ -142,9 +142,9 @@ public enum Command {
 	MOVE		(RequestType.KEY_NUM,		ResponseType.BOOLEAN),
 	
 	// Sorting
-	SORT		(RequestType.KEY_SPEC,		ResponseType.MULTI_BULK),
+	SORT		(RequestType.MULTI_KEY,		ResponseType.MULTI_BULK),
 	/** SORT...STORE */
-	SORT$STORE  (RequestType.KEY_SPEC,		ResponseType.NUMBER),
+	SORT$STORE	(RequestType.MULTI_KEY,		ResponseType.NUMBER),
 	
 	// Persistence control commands
 	SAVE		(RequestType.NO_ARG,		ResponseType.STATUS), 

@@ -1003,19 +1003,20 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		
 		final JRedisFutureSupport client = this;
 		Sort sortQuery = new SortSupport (key, keybytes) {
-			//	@Override
-			protected Future<List<byte[]>> execAsynchSort(byte[] keyBytes, byte[] sortSpecBytes) {
-				return new FutureByteArrayList(client.queueRequest(Command.SORT, keyBytes, sortSpecBytes));
+
+			//	@Override 
+			protected Future<List<byte[]>> execAsynchSort(byte[]... fullSortCmd) {
+				return new FutureByteArrayList(client.queueRequest(Command.SORT, fullSortCmd));
 			}
-			protected Future<List<byte[]>> execAsynchSortStore(byte[] keyBytes, byte[] sortSpecBytes) {
-				Future<Response> fResp = client.queueRequest(Command.SORT$STORE, keyBytes, sortSpecBytes);
+			protected Future<List<byte[]>> execAsynchSortStore(byte[]... fullSortCmd) {
+				Future<Response> fResp = client.queueRequest(Command.SORT$STORE, fullSortCmd);
 				new FutureLong(fResp);
 				return new FutureSortStoreResp(fResp);
 			}
-			protected List<byte[]> execSort(byte[] keyBytes, byte[] sortSpecBytes) {
+			protected List<byte[]> execSort(byte[]... fullSortCmd) {
 				throw new IllegalStateException("JRedisFuture does not support synchronous sort.");
 			}
-			protected List<byte[]> execSortStore(byte[] keyBytes, byte[] sortSpecBytes) {
+			protected List<byte[]> execSortStore(byte[]... fullSortCmd) {
 				throw new IllegalStateException("JRedisFuture does not support synchronous sort.");
 			}
 		};
