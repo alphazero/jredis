@@ -1497,7 +1497,7 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			assertEquals(substr, value, "full range substr should be equal to value");
 			
 			substr = provider.substr(key, -1, 0);
-			assertEquals(substr, null, "substr with -1 from idx should be null");
+			assertEquals(substr, new byte[0], "substr with -1 from idx should be zero-length array");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}

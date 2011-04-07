@@ -1003,7 +1003,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			try {
 				assertEquals(frFullValue1.get(), value, "full range substr should be equal to value");
 				assertEquals(frFullValue2.get(), value, "full range substr should be equal to value");
-				assertEquals(frExpectedNull.get(), null, "substr with -1 from idx should be null");
+				assertEquals(frExpectedNull.get(), new byte[0], "substr with -1 from idx should be zero-length array");
 				for(int i=0; i<value.length; i++){
 					assertTrue(frBytesRespList.get(i).get().length == 1, "checking size: using substr to iterate over value bytes @ idx " + i);
 					assertEquals(frBytesRespList.get(i).get()[0], value[i], "checking value: using substr to iterate over value bytes @ idx " + i);
