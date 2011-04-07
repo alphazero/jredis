@@ -42,6 +42,7 @@ public class Log {
 	
 	// the various 'error! run for covers', ... 
 	public static final void error (String msg)   { _error (Category.ERROR, msg); }
+  public static final void error (String msg, Throwable t)   { logger.log(Level.SEVERE, msg, t); }
 	public static final void error (String msg, Object...args) { _error (Category.ERROR, msg, args); }
 	
 	public static final void problem (String msg) { _error (Category.PROBLEM, msg); }

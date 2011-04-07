@@ -209,9 +209,6 @@ public abstract class ConnectionBase implements Connection{
     }
 
     protected void cleanup () {
-      if (heartbeat != null) {
-        heartbeat.exit();
-      }
     }
 
     /**

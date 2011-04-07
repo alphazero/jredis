@@ -192,7 +192,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	public FutureLong rpushx(String key, byte[] value) {
 		byte[] keybytes = null;
-		if ((keybytes = getKeyBytes(key)) == null)
+		if ((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		if (value == null)
@@ -203,7 +203,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	public FutureLong lpushx(String key, byte[] value) {
 		byte[] keybytes = null;
-		if ((keybytes = getKeyBytes(key)) == null)
+		if ((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		if (value == null)
@@ -214,7 +214,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	public FutureLong linsert(String key, boolean after, byte[] oldvalue, byte[] newvalue) {
 		byte[] keybytes = null;
-		if ((keybytes = getKeyBytes(key)) == null)
+		if ((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
     byte[][] bulk = new byte[4][];
     bulk[0] = keybytes;
@@ -865,10 +865,10 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	public Future<Long> keystolist(String pattern, String listname) {
 		byte[] keydata = null;
-		if((keydata = getKeyBytes(pattern)) == null) 
+		if((keydata = JRedisSupport.getKeyBytes(pattern)) == null)
 			throw new IllegalArgumentException ("null key.");
 		byte[] listnamedata = null;
-		if((listnamedata = getKeyBytes(listname)) == null) 
+		if((listnamedata = JRedisSupport.getKeyBytes(listname)) == null)
 			throw new IllegalArgumentException ("null list name.");
 
 		return new FutureLong(this.queueRequest(Command.KEYSTOLIST, keydata, listnamedata));

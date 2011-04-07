@@ -21,6 +21,7 @@ import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
 import org.jredis.connector.Connection;
@@ -184,7 +185,7 @@ public class AsynchConnection extends ConnectionBase implements Connection {
 						pending.setCRE(cre);
 					}
 					catch (RuntimeException e){
-						Log.logger.error("Unexpected RuntimeException ", e);
+						Log.error("Unexpected RuntimeException ", e);
 						e.printStackTrace();
 						pending.setCRE(new ProviderException("Unexpected runtime exception in response handler"));
 						pending.setResponse(null);
