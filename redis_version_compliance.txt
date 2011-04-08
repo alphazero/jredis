@@ -1,2 +1,2 @@
-compliance:      Redis 2.0.0 
-tested with:	 Redis 2.0.0
+compliance:      Redis 2.2.0 
+tested with:	 Redis 2.2.4
