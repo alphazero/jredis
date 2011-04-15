@@ -54,7 +54,7 @@ public interface JRedis {
 //	 * @return the {@link JavaSemantics} for type <code>T</code>, if the type specified meets
 //	 * the required initialization characteristics.
 //	 */
-//	public <T> JavaSemantics<T>  semantic (Class<T>  type) throws ClientRuntimeException;
+//	public <K extends Object, T> JavaSemantics<T>  semantic (Class<T>  type) throws ClientRuntimeException;
 	
 	// ------------------------------------------------------------------------
 	// Security and User Management
@@ -71,13 +71,13 @@ public interface JRedis {
 	 * @return true (unless not authorized)
 	 * @throws RedisException (as of ver. 0.09) in case of unauthorized access
 	 */
-	public JRedis ping () throws RedisException;
+	public <K extends Object> JRedis ping () throws RedisException;
 
 	/**
 	 * Disconnects the client.
 	 * @Redis QUIT
 	 */
-	public void quit ();
+	public <K extends Object> void quit ();
 	
 	// ------------------------------------------------------------------------
 	// "Commands operating on string values"
@@ -93,7 +93,7 @@ public interface JRedis {
 	 * @throws ProviderException on un-documented features/bug
 	 * @throws ClientRuntimeException on errors due to operating environment (Redis or network)
 	 */
-	public void set (String key, byte[] value) throws RedisException;
+	public <K extends Object> void set (K key, byte[] value) throws RedisException;
 	/**
 	 * Convenient method for {@link String} data binding
 	 * @Redis SET
@@ -102,7 +102,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 * @see {@link JRedis#set(String, byte[])}
 	 */
-	public void set (String key, String stringValue) throws RedisException;
+	public <K extends Object> void set (K key, String stringValue) throws RedisException;
 	/**
 	 * Convenient method for {@link String} numeric values binding
 	 * @Redis SET
@@ -111,7 +111,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 * @see {@link JRedis#set(String, byte[])}
 	 */
-	public void set (String key, Number numberValue) throws RedisException;
+	public <K extends Object> void set (K key, Number numberValue) throws RedisException;
 	/**
 	 * Binds the given java {@link Object} to the key.  Serialization format is
 	 * implementation specific.  Simple implementations may apply the basic {@link Serializable}
@@ -123,8 +123,8 @@ public interface JRedis {
 	 * @throws RedisException
 	 * @see {@link JRedis#set(String, byte[])}
 	 */
-	public <T extends Serializable> 
-		   void set (String key, T object) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   void set (K key, T object) throws RedisException;
 
 	/**
 	 * @Redis SETNX
@@ -133,11 +133,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean setnx (String key, byte[] value) throws RedisException;
-	public boolean setnx (String key, String stringValue) throws RedisException;
-	public boolean setnx (String key, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		   boolean setnx (String key, T object) throws RedisException;
+	public <K extends Object> boolean setnx (K key, byte[] value) throws RedisException;
+	public <K extends Object> boolean setnx (K key, String stringValue) throws RedisException;
+	public <K extends Object> boolean setnx (K key, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   boolean setnx (K key, T object) throws RedisException;
 
 	/**
 	 * @Redis GET
@@ -145,13 +145,13 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public byte[] get (String key)  throws RedisException;
+	public <K extends Object> byte[] get (K key)  throws RedisException;
 
-	public byte[] getset (String key, byte[] value) throws RedisException;
-	public byte[] getset (String key, String stringValue) throws RedisException;
-	public byte[] getset (String key, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		byte[] getset (String key, T object) throws RedisException;
+	public <K extends Object> byte[] getset (K key, byte[] value) throws RedisException;
+	public <K extends Object> byte[] getset (K key, String stringValue) throws RedisException;
+	public <K extends Object> byte[] getset (K key, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		byte[] getset (K key, T object) throws RedisException;
 
 	
 	/**
@@ -161,7 +161,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public List<byte[]> mget(String...keys) throws RedisException;
+	public <K extends Object> List<byte[]> mget(String...keys) throws RedisException;
 
 	/**
 	 * @Redis MSET
@@ -169,12 +169,12 @@ public interface JRedis {
 	 * @return 
 	 * @throws RedisException
 	 */
-	public void mset(Map<String, byte[]> keyValueMap) throws RedisException;
+	public <K extends Object> void mset(Map<String, byte[]> keyValueMap) throws RedisException;
 	
-	public void mset(KeyValueSet.ByteArrays mappings) throws RedisException;
-	public void mset(KeyValueSet.Strings mappings) throws RedisException;
-	public void mset(KeyValueSet.Numbers mappings) throws RedisException;
-	public <T extends Serializable> void mset(KeyValueSet.Objects<T> mappings) throws RedisException;
+	public <K extends Object> void mset(KeyValueSet.ByteArrays mappings) throws RedisException;
+	public <K extends Object> void mset(KeyValueSet.Strings mappings) throws RedisException;
+	public <K extends Object> void mset(KeyValueSet.Numbers mappings) throws RedisException;
+	public <K extends Object, T extends Serializable> void mset(KeyValueSet.Objects<T> mappings) throws RedisException;
 	
 	/**
 	 * @Redis MSETNX
@@ -182,12 +182,12 @@ public interface JRedis {
 	 * @return false if ANY of the keys in the map already existed, true if all were new and were set.
 	 * @throws RedisException
 	 */
-	public boolean msetnx(Map<String, byte[]> keyValueMap) throws RedisException;
+	public <K extends Object> boolean msetnx(Map<String, byte[]> keyValueMap) throws RedisException;
 	
-	public boolean msetnx(KeyValueSet.ByteArrays mappings) throws RedisException;
-	public boolean msetnx(KeyValueSet.Strings mappings) throws RedisException;
-	public boolean msetnx(KeyValueSet.Numbers mappings) throws RedisException;
-	public <T extends Serializable> boolean msetnx(KeyValueSet.Objects<T> mappings) throws RedisException;
+	public <K extends Object> boolean msetnx(KeyValueSet.ByteArrays mappings) throws RedisException;
+	public <K extends Object> boolean msetnx(KeyValueSet.Strings mappings) throws RedisException;
+	public <K extends Object> boolean msetnx(KeyValueSet.Numbers mappings) throws RedisException;
+	public <K extends Object, T extends Serializable> boolean msetnx(KeyValueSet.Objects<T> mappings) throws RedisException;
 	
 	/**
 	 * @Redis INCR
@@ -195,7 +195,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public long incr (String key) throws RedisException;
+	public <K extends Object> long incr (K key) throws RedisException;
 
 	/**
 	 * @Redis INCRBY
@@ -204,7 +204,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public long incrby (String key, int delta) throws RedisException;
+	public <K extends Object> long incrby (K key, int delta) throws RedisException;
 
 	/**
 	 * @Redis DECR
@@ -212,7 +212,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public long decr (String key) throws RedisException;
+	public <K extends Object> long decr (K key) throws RedisException;
 
 	/**
 	 * @Redis DECRBY
@@ -221,7 +221,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public long decrby (String key, int delta) throws RedisException;
+	public <K extends Object> long decrby (K key, int delta) throws RedisException;
 
 	/**
 	 * @Redis SUBSTR
@@ -231,7 +231,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public byte[] substr (String key, long from, long to) throws RedisException;
+	public <K extends Object> byte[] substr (K key, long from, long to) throws RedisException;
 	
 	
 	/**
@@ -241,11 +241,11 @@ public interface JRedis {
 	 * @return length (byte count) of appended value
 	 * @throws RedisException
 	 */
-	public long append (String key, byte[] value) throws RedisException;
-	public long append (String key, String stringValue) throws RedisException;
-	public long append (String key, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		   long append (String key, T object) throws RedisException;
+	public <K extends Object> long append (K key, byte[] value) throws RedisException;
+	public <K extends Object> long append (K key, String stringValue) throws RedisException;
+	public <K extends Object> long append (K key, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   long append (K key, T object) throws RedisException;
 
 	// ------------------------------------------------------------------------
 	// "Commands operating on the key space"
@@ -257,7 +257,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean exists(String key) throws RedisException;
+	public <K extends Object> boolean exists(K key) throws RedisException;
 
 	/**
 	 * @Redis DEL
@@ -265,8 +265,8 @@ public interface JRedis {
 	 * @return number of keys actually deleted
 	 * @throws RedisException
 	 */
-//	public boolean del (String key) throws RedisException;
-	public long del (String ... keys) throws RedisException;
+//	public <K extends Object> boolean del (K key) throws RedisException;
+	public <K extends Object> long del (K ... keys) throws RedisException;
 
 	/**
 	 * @Redis TYPE
@@ -274,7 +274,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public RedisType type (String key) throws RedisException;
+	public <K extends Object> RedisType type (K key) throws RedisException;
 	
 	
 	/**
@@ -283,7 +283,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public List<String> keys (String pattern) throws RedisException;
+	public <K extends Object> List<String> keys (K pattern) throws RedisException;
 	
 	/**
 	 * Convenience method.  Equivalent to calling <code>jredis.keys("*");</code>
@@ -292,14 +292,14 @@ public interface JRedis {
 	 * @throws RedisException
 	 * @see {@link JRedis#keys(String)}
 	 */
-	public List<String> keys () throws RedisException;
+	public <K extends Object> List<String> keys () throws RedisException;
 
 	/**
 	 * @Redis RANDOMKEY
 	 * @return
 	 * @throws RedisException
 	 */
-	public String randomkey() throws RedisException;
+	public byte[] randomkey() throws RedisException;
 	
 	/**
 	 * @Redis RENAME
@@ -307,7 +307,7 @@ public interface JRedis {
 	 * @param newkey
 	 * @throws RedisException
 	 */
-	public void rename (String oldkey, String newkey) throws RedisException;
+	public <K extends Object> void rename (K oldkey, K newkey) throws RedisException;
 	
 	/**
 	 * @Redis RENAMENX
@@ -316,14 +316,14 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean renamenx (String oldkey, String brandnewkey) throws RedisException;
+	public <K extends Object> boolean renamenx (K oldkey, K brandnewkey) throws RedisException;
 	
 	/**
 	 * @Redis DBSIZE
 	 * @return
 	 * @throws RedisException
 	 */
-	public long dbsize () throws RedisException;
+	public <K extends Object> long dbsize () throws RedisException;
 	
 	/**
 	 * @Redis EXPIRE
@@ -332,7 +332,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean expire (String key, int ttlseconds) throws RedisException; 
+	public <K extends Object> boolean expire (K key, int ttlseconds) throws RedisException; 
 	
 	/**
 	 * 
@@ -345,7 +345,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 * @see {@link System#currentTimeMillis()}
 	 */
-	public boolean expireat (String key, long epochtimeMillisecs) throws RedisException; 
+	public <K extends Object> boolean expireat (K key, long epochtimeMillisecs) throws RedisException; 
 	
 	/**
 	 * @Redis TTL
@@ -353,7 +353,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public long ttl (String key) throws RedisException;
+	public <K extends Object> long ttl (K key) throws RedisException;
 	
 	// ------------------------------------------------------------------------
 	// Commands operating on lists
@@ -365,11 +365,11 @@ public interface JRedis {
 	 * @param value
 	 * @throws RedisException
 	 */
-	public void rpush (String listkey, byte[] value) throws RedisException;
-	public void rpush (String listkey, String stringValue) throws RedisException;
-	public void rpush (String listkey, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		   void rpush (String listkey, T object) throws RedisException;
+	public <K extends Object> void rpush (K listkey, byte[] value) throws RedisException;
+	public <K extends Object> void rpush (K listkey, String stringValue) throws RedisException;
+	public <K extends Object> void rpush (K listkey, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   void rpush (K listkey, T object) throws RedisException;
 	
 	/**
 	 * @Redis LPUSH
@@ -377,11 +377,11 @@ public interface JRedis {
 	 * @param value
 	 * @throws RedisException
 	 */
-	public void lpush (String listkey, byte[] value) throws RedisException;
-	public void lpush (String listkey, String stringValue) throws RedisException;
-	public void lpush (String listkey, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		   void lpush (String listkey, T object) throws RedisException;
+	public <K extends Object> void lpush (K listkey, byte[] value) throws RedisException;
+	public <K extends Object> void lpush (K listkey, String stringValue) throws RedisException;
+	public <K extends Object> void lpush (K listkey, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   void lpush (K listkey, T object) throws RedisException;
 	
 	/**
 	 * @Redis LSET
@@ -390,11 +390,11 @@ public interface JRedis {
 	 * @param value
 	 * @throws RedisException
 	 */
-	public void lset (String key, long index, byte[] value) throws RedisException;
-	public void lset (String key, long index, String stringValue) throws RedisException;
-	public void lset (String key, long index, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		   void lset (String key, long index, T object) throws RedisException;
+	public <K extends Object> void lset (K key, long index, byte[] value) throws RedisException;
+	public <K extends Object> void lset (K key, long index, String stringValue) throws RedisException;
+	public <K extends Object> void lset (K key, long index, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   void lset (K key, long index, T object) throws RedisException;
 	
 
 	/**
@@ -405,11 +405,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public long lrem (String listKey, byte[] value,       int count) throws RedisException;
-	public long lrem (String listKey, String stringValue, int count) throws RedisException;
-	public long lrem (String listKey, Number numberValue, int count) throws RedisException;
-	public <T extends Serializable> 
-		   long lrem (String listKey, T object, int count) throws RedisException;
+	public <K extends Object> long lrem (K listkey, byte[] value,       int count) throws RedisException;
+	public <K extends Object> long lrem (K listkey, String stringValue, int count) throws RedisException;
+	public <K extends Object> long lrem (K listkey, Number numberValue, int count) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   long lrem (K listkey, T object, int count) throws RedisException;
 	
 	/**
 	 * Given a 'list' key, returns the number of items in the list.
@@ -418,7 +418,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public long llen (String listkey) throws RedisException;
+	public <K extends Object> long llen (K listkey) throws RedisException;
 	
 	/**
 	 * @Redis LRANGE
@@ -428,7 +428,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public List<byte[]> lrange (String listkey, long from, long to) throws RedisException; 
+	public <K extends Object> List<byte[]> lrange (K listkey, long from, long to) throws RedisException; 
 
 	/**
 	 * @Redis LTRIM
@@ -437,7 +437,7 @@ public interface JRedis {
 	 * @param keepTo
 	 * @throws RedisException
 	 */
-	public void ltrim (String listkey, long keepFrom, long keepTo) throws RedisException;
+	public <K extends Object> void ltrim (K listkey, long keepFrom, long keepTo) throws RedisException;
 	
 	/**
 	 * @Redis LINDEX
@@ -446,7 +446,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public byte[] lindex (String listkey, long index) throws RedisException;
+	public <K extends Object> byte[] lindex (K listkey, long index) throws RedisException;
 	
 	/**
 	 * @Redis LPOP
@@ -454,7 +454,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public byte[] lpop (String listKey) throws RedisException;
+	public <K extends Object> byte[] lpop (K listkey) throws RedisException;
 	
 	/**
 	 * @Redis RPOP
@@ -462,7 +462,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public byte[] rpop (String listKey) throws RedisException;
+	public <K extends Object> byte[] rpop (K listkey) throws RedisException;
 
 	/**
 	 * @Redis RPOPLPUSH
@@ -471,7 +471,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public byte[] rpoplpush (String srcList, String destList) throws RedisException;
+	public <K extends Object> byte[] rpoplpush (K srcList, K destList) throws RedisException;
 
 	// ------------------------------------------------------------------------
 	// Commands operating on sets
@@ -484,11 +484,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean sadd (String setkey, byte[] member) throws RedisException;
-	public boolean sadd (String setkey, String stringValue) throws RedisException;
-	public boolean sadd (String setkey, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		   boolean sadd (String setkey, T object) throws RedisException;
+	public <K extends Object> boolean sadd (K setkey, byte[] member) throws RedisException;
+	public <K extends Object> boolean sadd (K setkey, String stringValue) throws RedisException;
+	public <K extends Object> boolean sadd (K setkey, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   boolean sadd (K setkey, T object) throws RedisException;
 
 	/**
 	 * @Redis SREM
@@ -497,11 +497,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean srem (String setKey, byte[] member) throws RedisException;
-	public boolean srem (String setKey, String stringValue) throws RedisException;
-	public boolean srem (String setKey, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		   boolean srem (String setKey, T object) throws RedisException;
+	public <K extends Object> boolean srem (K setkey, byte[] member) throws RedisException;
+	public <K extends Object> boolean srem (K setkey, String stringValue) throws RedisException;
+	public <K extends Object> boolean srem (K setkey, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   boolean srem (K setkey, T object) throws RedisException;
 
 	/**
 	 * @Redis SISMEMBER
@@ -510,11 +510,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean sismember (String setKey, byte[] member) throws RedisException;
-	public boolean sismember (String setKey, String stringValue) throws RedisException;
-	public boolean sismember (String setKey, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		   boolean sismember (String setKey, T object) throws RedisException;
+	public <K extends Object> boolean sismember (K setkey, byte[] member) throws RedisException;
+	public <K extends Object> boolean sismember (K setkey, String stringValue) throws RedisException;
+	public <K extends Object> boolean sismember (K setkey, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   boolean sismember (K setkey, T object) throws RedisException;
 	
 	/**
 	 * @Redis SMOVE
@@ -524,11 +524,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean smove (String srcKey, String destKey, byte[] member) throws RedisException;
-	public boolean smove (String srcKey, String destKey, String stringValue) throws RedisException;
-	public boolean smove (String srcKey, String destKey, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		   boolean smove (String srcKey, String destKey, T object) throws RedisException;
+	public <K extends Object> boolean smove (K srcKey, K destKey, byte[] member) throws RedisException;
+	public <K extends Object> boolean smove (K srcKey, K destKey, String stringValue) throws RedisException;
+	public <K extends Object> boolean smove (K srcKey, K destKey, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   boolean smove (K srcKey, K destKey, T object) throws RedisException;
 	
 	/**
 	 * @Redis SCARD
@@ -536,7 +536,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public long scard (String setKey) throws RedisException;	
+	public <K extends Object> long scard (K setKey) throws RedisException;	
 	
 	/**
 	 * @Redis SINTER
@@ -545,14 +545,14 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public List<byte[]> sinter (String set1, String...sets) throws RedisException;
+	public <K extends Object> List<byte[]> sinter (String set1, String...sets) throws RedisException;
 	/**
 	 * @Redis SINTERSTORE
 	 * @param destSetKey
 	 * @param sets
 	 * @throws RedisException
 	 */
-	public void sinterstore (String destSetKey, String...sets) throws RedisException;
+	public <K extends Object> void sinterstore (String destSetKey, String...sets) throws RedisException;
 
 	/**
 	 * @Redis SUNION
@@ -561,7 +561,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public List<byte[]> sunion (String set1, String...sets) throws RedisException;
+	public <K extends Object> List<byte[]> sunion (String set1, String...sets) throws RedisException;
 	
 	/**
 	 * @Redis SUNIONSTORE
@@ -569,7 +569,7 @@ public interface JRedis {
 	 * @param sets
 	 * @throws RedisException
 	 */
-	public void sunionstore (String destSetKey, String...sets) throws RedisException;
+	public <K extends Object> void sunionstore (String destSetKey, String...sets) throws RedisException;
 
 	/**
 	 * @Redis SDIFF
@@ -578,7 +578,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public List<byte[]> sdiff (String set1, String...sets) throws RedisException;
+	public <K extends Object> List<byte[]> sdiff (String set1, String...sets) throws RedisException;
 	
 	/**
 	 * @Redis SDIFFSTORE
@@ -586,7 +586,7 @@ public interface JRedis {
 	 * @param sets
 	 * @throws RedisException
 	 */
-	public void sdiffstore (String destSetKey, String...sets) throws RedisException;
+	public <K extends Object> void sdiffstore (String destSetKey, String...sets) throws RedisException;
 
 	/**
 	 * @Redis SMEMBERS
@@ -594,7 +594,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public List<byte[]> smembers (String setkey) throws RedisException;
+	public <K extends Object> List<byte[]> smembers (K setKey) throws RedisException;
 	
 	/**
 	 * @Redis SRANDMEMBER
@@ -602,7 +602,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public byte[] srandmember (String setkey) throws RedisException;
+	public <K extends Object> byte[] srandmember (K setKey) throws RedisException;
 	
 	/**
 	 * @Redis SPOP
@@ -610,7 +610,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public byte[] spop (String setkey) throws RedisException;
+	public <K extends Object> byte[] spop (K setKey) throws RedisException;
 	// ------------------------------------------------------------------------
 	// Commands operating on sets
 	// ------------------------------------------------------------------------
@@ -623,11 +623,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean zadd (String setkey, double score, byte[] member) throws RedisException;
-	public boolean zadd (String setkey, double score, String stringValue) throws RedisException;
-	public boolean zadd (String setkey, double score, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		   boolean zadd (String setkey, double score, T object) throws RedisException;
+	public <K extends Object> boolean zadd (K setkey, double score, byte[] member) throws RedisException;
+	public <K extends Object> boolean zadd (K setkey, double score, String stringValue) throws RedisException;
+	public <K extends Object> boolean zadd (K setkey, double score, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   boolean zadd (K setkey, double score, T object) throws RedisException;
 
 	/**
 	 * @Redis ZREM
@@ -636,11 +636,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean zrem (String setKey, byte[] member) throws RedisException;
-	public boolean zrem (String setKey, String stringValue) throws RedisException;
-	public boolean zrem (String setKey, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		   boolean zrem (String setKey, T object) throws RedisException;
+	public <K extends Object> boolean zrem (K setkey, byte[] member) throws RedisException;
+	public <K extends Object> boolean zrem (K setkey, String stringValue) throws RedisException;
+	public <K extends Object> boolean zrem (K setkey, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		   boolean zrem (K setkey, T object) throws RedisException;
 	
 	/**
 	 * @Redis ZCARD
@@ -648,7 +648,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public long zcard (String setKey) throws RedisException;	
+	public <K extends Object> long zcard (K setKey) throws RedisException;	
 	
 	
 	/**
@@ -658,11 +658,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public Double zscore (String setkey, byte[] member) throws RedisException;
-	public Double zscore (String setkey, String stringValue) throws RedisException;
-	public Double zscore (String setkey, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		Double zscore (String setkey, T object) throws RedisException;
+	public <K extends Object> Double zscore (K setkey, byte[] member) throws RedisException;
+	public <K extends Object> Double zscore (K setkey, String stringValue) throws RedisException;
+	public <K extends Object> Double zscore (K setkey, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		Double zscore (K setkey, T object) throws RedisException;
 
 	/**
 	 * @Redis ZRANK
@@ -671,11 +671,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public long zrank (String setkey, byte[] member) throws RedisException;
-	public long zrank (String setkey, String stringValue) throws RedisException;
-	public long zrank (String setkey, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		long zrank (String setkey, T object) throws RedisException;
+	public <K extends Object> long zrank (K setkey, byte[] member) throws RedisException;
+	public <K extends Object> long zrank (K setkey, String stringValue) throws RedisException;
+	public <K extends Object> long zrank (K setkey, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		long zrank (K setkey, T object) throws RedisException;
 
 	/**
 	 * @Redis ZREVRANK
@@ -684,11 +684,11 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public long zrevrank (String setkey, byte[] member) throws RedisException;
-	public long zrevrank (String setkey, String stringValue) throws RedisException;
-	public long zrevrank (String setkey, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		long zrevrank (String setkey, T object) throws RedisException;
+	public <K extends Object> long zrevrank (K setkey, byte[] member) throws RedisException;
+	public <K extends Object> long zrevrank (K setkey, String stringValue) throws RedisException;
+	public <K extends Object> long zrevrank (K setkey, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		long zrevrank (K setkey, T object) throws RedisException;
 
 	/**
 	 * @Redis ZRANGE
@@ -698,7 +698,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public List<byte[]> zrange (String setkey, long from, long to) throws RedisException; 
+	public <K extends Object> List<byte[]> zrange (K setkey, long from, long to) throws RedisException; 
 
 	/**
 	 * @Redis ZREVRANGE
@@ -708,7 +708,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public List<byte[]> zrevrange (String setkey, long from, long to) throws RedisException; 
+	public <K extends Object> List<byte[]> zrevrange (K setkey, long from, long to) throws RedisException; 
 
 	/**
 	 * Equivalent to {@link JRedis#zrange(String, long, long)} with the {@link Option.Options#WITHSCORES}.
@@ -724,7 +724,7 @@ public interface JRedis {
 	 * @see JRedis#zrange(String, long, long)
 	 * @see ZSetEntry
 	 */
-	public List<ZSetEntry> zrangeSubset (String setkey, long from, long to) throws RedisException; 
+	public <K extends Object> List<ZSetEntry> zrangeSubset (K setkey, long from, long to) throws RedisException; 
 
 	/**
 	 * Equivalent to {@link JRedis#zrevrange(String, long, long)} with the {@link Option.Options#WITHSCORES}.
@@ -740,7 +740,7 @@ public interface JRedis {
 	 * @see JRedis#zrevrange(String, long, long)
 	 * @see ZSetEntry
 	 */
-	public List<ZSetEntry> zrevrangeSubset (String setkey, long from, long to) throws RedisException; 
+	public <K extends Object> List<ZSetEntry> zrevrangeSubset (K setkey, long from, long to) throws RedisException; 
 
 	/**
 	 * @Redis ZRANGE
@@ -750,7 +750,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public List<byte[]> zrangebyscore (String setkey, double minScore, double maxScore) throws RedisException; 
+	public <K extends Object> List<byte[]> zrangebyscore (K setkey, double minScore, double maxScore) throws RedisException; 
 
 	/**
 	 * @Redis ZREMRANGEBYSCORE
@@ -760,7 +760,7 @@ public interface JRedis {
 	 * @return number of removed elements
 	 * @throws RedisException
 	 */
-	public long zremrangebyscore (String setkey, double minScore, double maxScore) throws RedisException; 
+	public <K extends Object> long zremrangebyscore (K setkey, double minScore, double maxScore) throws RedisException; 
 
 	/**
 	 * @Redis ZREMRANGEBYRANK
@@ -770,7 +770,7 @@ public interface JRedis {
 	 * @return number of removed elements
 	 * @throws RedisException
 	 */
-	public long zremrangebyrank (String setkey, long minRank, long maxRank) throws RedisException; 
+	public <K extends Object> long zremrangebyrank (K setkey, long minRank, long maxRank) throws RedisException; 
 
 	/**
 	 * @Redis ZINCRBY
@@ -781,11 +781,11 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.07")
-	public Double zincrby (String setkey, double score, byte[] member) throws RedisException;
-	public Double zincrby (String setkey, double score, String stringValue) throws RedisException;
-	public Double zincrby (String setkey, double score, Number numberValue) throws RedisException;
-	public <T extends Serializable> 
-		Double zincrby (String setkey, double score, T object) throws RedisException;
+	public <K extends Object> Double zincrby (K setkey, double score, byte[] member) throws RedisException;
+	public <K extends Object> Double zincrby (K setkey, double score, String stringValue) throws RedisException;
+	public <K extends Object> Double zincrby (K setkey, double score, Number numberValue) throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		Double zincrby (K setkey, double score, T object) throws RedisException;
 
 	/**
 	 * @Redis ZCOUNT
@@ -795,7 +795,7 @@ public interface JRedis {
 	 * @return count of set members with score in the given range.
 	 * @throws RedisException
 	 */
-	public long zcount (String setkey, double minScore, double maxScore) throws RedisException; 
+	public <K extends Object> long zcount (K setkey, double minScore, double maxScore) throws RedisException; 
 	// ------------------------------------------------------------------------
 	// Commands operating on hashes
 	// ------------------------------------------------------------------------
@@ -808,7 +808,7 @@ public interface JRedis {
 	 * @return
 	 */
 	@Redis(versions="1.3.n")
-	public boolean hset(String key, String field, byte[] value)  throws RedisException;
+	public <K extends Object> boolean hset(K key, String field, byte[] value)  throws RedisException;
 	
 	/**
 	 * @Redis HSET
@@ -818,7 +818,7 @@ public interface JRedis {
 	 * @return
 	 */
 	@Redis(versions="1.3.n")
-	public boolean hset(String key, String field, String string)  throws RedisException;
+	public <K extends Object> boolean hset(K key, String field, String string)  throws RedisException;
 	
 	/**
 	 * @Redis HSET
@@ -828,7 +828,7 @@ public interface JRedis {
 	 * @return
 	 */
 	@Redis(versions="1.3.n")
-	public boolean hset(String key, String field, Number number)  throws RedisException;
+	public <K extends Object> boolean hset(K key, String field, Number number)  throws RedisException;
 	
 	/**
 	 * @Redis HSET
@@ -839,8 +839,8 @@ public interface JRedis {
 	 * @return
 	 */
 	@Redis(versions="1.3.4")
-	public <T extends Serializable> 
-		boolean hset(String key, String field, T object)  throws RedisException;
+	public <K extends Object, T extends Serializable> 
+		boolean hset(K key, String field, T object)  throws RedisException;
 	
 	/**
 	 * @Redis HGET
@@ -849,7 +849,7 @@ public interface JRedis {
 	 * @return
 	 */
 	@Redis(versions="1.3.4")
-	public byte[] hget(String key, String field)  throws RedisException;
+	public <K extends Object> byte[] hget(K key, String field)  throws RedisException;
 	
 	
 	/**
@@ -861,7 +861,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public boolean hexists(String key, String field)  throws RedisException;
+	public <K extends Object> boolean hexists(K key, String field)  throws RedisException;
 	
 	/**
 	 * 
@@ -872,7 +872,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public boolean hdel(String key, String field)  throws RedisException;
+	public <K extends Object> boolean hdel(K key, String field)  throws RedisException;
 	
 	/**
 	 * 
@@ -882,7 +882,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public long hlen(String key)  throws RedisException;
+	public <K extends Object> long hlen(K key)  throws RedisException;
 	
 	/**
 	 * 
@@ -892,7 +892,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public List<String> hkeys(String key)  throws RedisException;
+	public <K extends Object> List<String> hkeys(K key)  throws RedisException;
 	
 	/**
 	 * 
@@ -902,7 +902,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public List<byte[]> hvals(String key)  throws RedisException;
+	public <K extends Object> List<byte[]> hvals(K key)  throws RedisException;
 	
 	/**
 	 * 
@@ -912,7 +912,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public Map<String, byte[]> hgetall(String key)  throws RedisException;
+	public <K extends Object> Map<String, byte[]> hgetall(K key)  throws RedisException;
 	
 	// ------------------------------------------------------------------------
 	// Transactional commands
@@ -924,19 +924,19 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="2.0")
-	public JRedis multi() throws RedisException;
+	public <K extends Object> JRedis multi() throws RedisException;
 	/**
 	 * @throws RedisException
 	 */
 	@Redis(versions="2.0")
-	public JRedis discard () throws RedisException;
+	public <K extends Object> JRedis discard () throws RedisException;
 	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands
 	// ------------------------------------------------------------------------
 	
 //	@Deprecated
-//	public JRedis select (int index) throws RedisException;
+//	public <K extends Object> JRedis select (int index) throws RedisException;
 
 	/**
 	 * Flushes the db you selected when connecting to Redis server.  Typically,
@@ -946,7 +946,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public JRedis flushdb () throws RedisException;
+	public <K extends Object> JRedis flushdb () throws RedisException;
 
 	/**
 	 * Flushes all dbs in the connect Redis server, regardless of which db was selected
@@ -955,7 +955,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public JRedis flushall () throws RedisException;
+	public <K extends Object> JRedis flushall () throws RedisException;
 
 	/**
 	 * Moves the given key from the currently selected db to the one indicated
@@ -966,7 +966,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public boolean move (String key, int dbIndex) throws RedisException;
+	public <K extends Object> boolean move (K key, int dbIndex) throws RedisException;
 	
 	// ------------------------------------------------------------------------
 	// Sorting
@@ -999,7 +999,7 @@ public interface JRedis {
 	 * 
 	 * @Redis SORT
 	 */
-	public Sort sort(String key);
+	public <K extends Object> Sort sort(K key);
 	
 	// ------------------------------------------------------------------------
 	// Persistence control commands
@@ -1009,30 +1009,30 @@ public interface JRedis {
 	 * @Redis SAVE
 	 * @throws RedisException
 	 */
-	public void save() throws RedisException;
+	public <K extends Object> void save() throws RedisException;
 
 	/**
 	 * @Redis BGSAVE
 	 * @throws RedisException
 	 */
-	public void bgsave () throws RedisException;
+	public <K extends Object> void bgsave () throws RedisException;
 
 	/**
 	 * @Redis BGREWRITEAOF
 	 * @return ack message.  
 	 * @throws RedisException
 	 */
-	public String bgrewriteaof () throws RedisException;
+	public <K extends Object> String bgrewriteaof () throws RedisException;
 
 	/**
 	 * @Redis LASTSAVE
 	 * @return
 	 * @throws RedisException
 	 */
-	public long lastsave () throws RedisException;
+	public <K extends Object> long lastsave () throws RedisException;
 
 //	@Deprecated
-//	public void shutdown () throws RedisException;
+//	public <K extends Object> void shutdown () throws RedisException;
 
 // ------------------------------------------------------------------------
 // Remote server control commands
@@ -1043,20 +1043,20 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public Map<String, String>	info ()  throws RedisException;
+	public <K extends Object> Map<String, String>	info ()  throws RedisException;
 	
 	/**
 	 * @Redis SLAVEOF
 	 * @param host ip address 
 	 * @param port
 	 */
-	public void slaveof(String host, int port) throws RedisException;
+	public <K extends Object> void slaveof(String host, int port) throws RedisException;
 	
 	/**
 	 * Convenience method.  Turns off replication.
 	 * @Redis SLAVEOF "no one"
 	 */
-	public void slaveofnone() throws RedisException;
+	public <K extends Object> void slaveofnone() throws RedisException;
 	
 	// ------------------------------------------------------------------------
 	// Diagnostics commands
@@ -1068,10 +1068,10 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public byte[] echo (byte[] msg) throws RedisException;
-	public byte[] echo (String msg) throws RedisException;
-	public byte[] echo (Number msg) throws RedisException;
-	public <T extends Serializable> 
+	public <K extends Object> byte[] echo (byte[] msg) throws RedisException;
+	public <K extends Object> byte[] echo (String msg) throws RedisException;
+	public <K extends Object> byte[] echo (Number msg) throws RedisException;
+	public <K extends Object, T extends Serializable> 
 		byte[] echo (T msg) throws RedisException;
 	
 	/**
@@ -1081,5 +1081,5 @@ public interface JRedis {
 	 * @throws RedisException
 	 * @see {@link ObjectInfo}
 	 */
-	public ObjectInfo debug (String key) throws RedisException;
+	public <K extends Object> ObjectInfo debug (K key) throws RedisException;
 }

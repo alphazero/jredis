@@ -37,6 +37,7 @@ import static org.jredis.ri.alphazero.support.DefaultCodec.*;
 
 public class HelloAgain {
 	public static final String key = "jredis::examples::HelloAgain::message";
+	public static final byte[] bkey = key.getBytes();
 	public static void main(String[] args) {
 		String password = "jredis";
 		if(args.length > 0) password  = args[0];
@@ -46,16 +47,15 @@ public class HelloAgain {
 	private void run(String password) {
 		try {
 			ConnectionSpec spec = DefaultConnectionSpec.newSpec().setCredentials(password);
-//			JRedis	jredis = new JRedisClient("localhost", 6379, "jredis", 0);
 			JRedis	jredis = new JRedisClient(spec);
 			jredis.ping();
 			
-			if(!jredis.exists(key)) {
-				jredis.set(key, "Hello Again!");
+			if(!jredis.exists(bkey)) {
+				jredis.set(bkey, "Hello Again!");
 				System.out.format("Hello!  You should run me again!\n");
 			}
 			else {
-				String msg = toStr ( jredis.get(key) );
+				String msg = toStr ( jredis.get(bkey) );
 				System.out.format("%s\n", msg);
 			}
 			jredis.quit();

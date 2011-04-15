@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jredis.JRedis;
+import org.jredis.semantics.KeyCodec;
 
 /**
  * Note that this is the one element of this package that is most likely to change
@@ -40,6 +41,31 @@ import org.jredis.JRedis;
  * 
  */
 public class DefaultCodec {
+	public static class Keys<K extends Object> implements KeyCodec<K>{
+		public enum SupportedType {
+			STRING (),
+			BYTES ();
+		}
+
+		/* (non-Javadoc)  @see org.jredis.Codec#decode(byte[]) */
+		@Override
+		public K decode(byte[] bytes) {
+			throw new RuntimeException("TODO Auto-generated Codec<K>#decode stub -- NOT IMPLEMENTED");
+		}
+
+		/* (non-Javadoc)  @see org.jredis.Codec#encode(java.lang.Object) */
+		@Override
+		public byte[] encode(K object) {
+			throw new RuntimeException("TODO Auto-generated Codec<K>#encode stub -- NOT IMPLEMENTED");
+		}
+
+		/* (non-Javadoc)  @see org.jredis.Codec#supports(java.lang.Class) */
+		@Override
+		public boolean supports(Class<?> type) {
+			throw new RuntimeException("TODO Auto-generated Codec<K>#supports stub -- NOT IMPLEMENTED");
+		}
+	}
+
 	public final static String SUPPORTED_CHARSET_NAME = "UTF-8";	// this is for jdk 1.5 compliance
 	public final static Charset SUPPORTED_CHARSET = Charset.forName ("UTF-8");
 	

@@ -109,36 +109,36 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 
 //	@Override
-	public FutureStatus bgsave() {
+	public <K extends Object> FutureStatus bgsave() {
 		return new FutureStatus(this.queueRequest(Command.BGSAVE));
 	}
 	
 //	@Override
-	public FutureString bgrewriteaof() {
+	public <K extends Object> FutureString bgrewriteaof() {
 		Future<Response> futureResponse = this.queueRequest(Command.BGREWRITEAOF);
 		return new FutureString(futureResponse);
 	}
 
 //	@Override
-	public FutureStatus ping() {
+	public <K extends Object> FutureStatus ping() {
 		return new FutureStatus(this.queueRequest(Command.PING));
 	}
 
 //	@Override
-	public FutureStatus flushall() {
+	public <K extends Object> FutureStatus flushall() {
 		return new FutureStatus(this.queueRequest(Command.FLUSHALL));
 	}
 //	@Override
-	public FutureStatus flushdb() {
+	public <K extends Object> FutureStatus flushdb() {
 		return new FutureStatus(this.queueRequest(Command.FLUSHDB));
 	}
 ////	@Override
-//	public FutureStatus select(int index) {
+//	public <K extends Object> FutureStatus select(int index) {
 //		this.queueRequest(Command.SELECT, Convert.toBytes(index));
 //		return this;
 //	}
 
-	public Future<ResponseStatus>  slaveof(String host, int port) {
+	public <K extends Object> Future<ResponseStatus>  slaveof(String host, int port) {
 		byte[] hostbytes = null;
 		if((hostbytes = JRedisSupport.getKeyBytes(host)) == null)
 			throw new IllegalArgumentException ("invalid host => ["+host+"]");
@@ -149,12 +149,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 		return new FutureStatus(this.queueRequest(Command.SLAVEOF, hostbytes, portbytes));
 	}
-	public Future<ResponseStatus>  slaveofnone() {
+	public <K extends Object> Future<ResponseStatus>  slaveofnone() {
 		return new FutureStatus(this.queueRequest(Command.SLAVEOF, "no".getBytes(), "one".getBytes()));
 	}
 	
 //	@Override
-	public FutureStatus rename(String oldkey, String newkey) {
+	public <K extends Object> FutureStatus rename(K oldkey, K newkey) {
 		byte[] oldkeydata = null;
 		if((oldkeydata = JRedisSupport.getKeyBytes(oldkey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+oldkey+"]");
@@ -167,7 +167,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	
 //	@Override
-	public Future<Boolean> renamenx(String oldkey, String newkey){
+	public <K extends Object> Future<Boolean> renamenx(K oldkey, K newkey){
 		byte[] oldkeydata = null;
 		if((oldkeydata = JRedisSupport.getKeyBytes(oldkey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+oldkey+"]");
@@ -179,7 +179,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.RENAMENX, oldkeydata, newkeydata);
 		return new FutureBoolean(futureResponse);
 	}
-	public FutureLong rpush(String key, byte[] value)  {
+	public <K extends Object> FutureLong rpush(K key, byte[] value)  {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -190,7 +190,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(this.queueRequest(Command.RPUSH, keybytes, value));
 	}
 
-	public FutureLong rpushx(String key, byte[] value) {
+	public <K extends Object> FutureLong rpushx(K key, byte[] value) {
 		byte[] keybytes = null;
 		if ((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -201,7 +201,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(this.queueRequest(Command.RPUSHX, keybytes, value));
 	}
 
-	public FutureLong lpushx(String key, byte[] value) {
+	public <K extends Object> FutureLong lpushx(K key, byte[] value) {
 		byte[] keybytes = null;
 		if ((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -212,7 +212,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(this.queueRequest(Command.LPUSHX, keybytes, value));
 	}
 
-	public FutureLong linsert(String key, boolean after, byte[] oldvalue, byte[] newvalue) {
+	public <K extends Object> FutureLong linsert(K key, boolean after, byte[] oldvalue, byte[] newvalue) {
 		byte[] keybytes = null;
 		if ((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -224,16 +224,16 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(this.queueRequest(Command.LINSERT, bulk));
 	}
 
-	public FutureLong linsertAfter(String key, byte[] oldvalue, byte[] newvalue) {
+	public <K extends Object> FutureLong linsertAfter(K key, byte[] oldvalue, byte[] newvalue) {
     return linsert(key, true, oldvalue, newvalue);
   }
 
-	public FutureLong linsertBefore(String key, byte[] oldvalue, byte[] newvalue) {
+	public <K extends Object> FutureLong linsertBefore(K key, byte[] oldvalue, byte[] newvalue) {
     return linsert(key, false, oldvalue, newvalue);
   }
 
 //	@Override
-	public FutureByteArray rpoplpush (String srcList, String destList)  {
+	public <K extends Object> FutureByteArray rpoplpush (String srcList, String destList)  {
 		byte[] srckeybytes = null;
 		if((srckeybytes = JRedisSupport.getKeyBytes(srcList)) == null)
 			throw new IllegalArgumentException ("invalid src key => ["+srcList+"]");
@@ -245,22 +245,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArray(futureResponse);
 	}
 //	@Override
-	public FutureLong rpush(String key, String value) {
+	public <K extends Object> FutureLong rpush(K key, String value) {
 //		rpush(key, DefaultCodec.encode(value));
 		return rpush(key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public FutureLong rpush(String key, Number value) {
+	public <K extends Object> FutureLong rpush(K key, Number value) {
 		return rpush(key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> FutureLong rpush (String key, T value)
+	public <K extends Object, T extends Serializable> FutureLong rpush (K key, T value)
 	{
 		return rpush(key, DefaultCodec.encode(value));
 	}
 
 //	@Override
-	public Future<Boolean> sadd(String key, byte[] member)
+	public <K extends Object> Future<Boolean> sadd(K key, byte[] member)
 	{
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -270,21 +270,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureBoolean(futureResponse);
 	}
 //	@Override
-	public Future<Boolean> sadd (String key, String value) {
+	public <K extends Object> Future<Boolean> sadd (K key, String value) {
 		return sadd (key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<Boolean> sadd (String key, Number value) {
+	public <K extends Object> Future<Boolean> sadd (K key, Number value) {
 		return sadd (key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> Future<Boolean> sadd (String key, T value)
+	public <K extends Object, T extends Serializable> Future<Boolean> sadd (K key, T value)
 	{
 		return sadd (key, DefaultCodec.encode(value));
 	}
 
 //	@Override
-	public Future<Boolean> zadd(String key, double score, byte[] member)
+	public <K extends Object> Future<Boolean> zadd(K key, double score, byte[] member)
 	{
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -294,21 +294,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureBoolean(futureResponse);
 	}
 //	@Override
-	public Future<Boolean> zadd (String key, double score, String value) {
+	public <K extends Object> Future<Boolean> zadd (K key, double score, String value) {
 		return zadd (key, score, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<Boolean> zadd (String key, double score, Number value) {
+	public <K extends Object> Future<Boolean> zadd (K key, double score, Number value) {
 		return zadd (key, score, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> Future<Boolean> zadd (String key, double score, T value)
+	public <K extends Object, T extends Serializable> Future<Boolean> zadd (K key, double score, T value)
 	{
 		return zadd (key, score, DefaultCodec.encode(value));
 	}
 
 //	@Override
-	public Future<Double> zincrby(String key, double score, byte[] member)
+	public <K extends Object> Future<Double> zincrby(K key, double score, byte[] member)
 	{
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -318,21 +318,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureDouble(futureResponse);
 	}
 //	@Override
-	public Future<Double> zincrby (String key, double score, String value) {
+	public <K extends Object> Future<Double> zincrby (K key, double score, String value) {
 		return zincrby (key, score, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<Double> zincrby (String key, double score, Number value) {
+	public <K extends Object> Future<Double> zincrby (K key, double score, Number value) {
 		return zincrby (key, score, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> Future<Double> zincrby (String key, double score, T value)
+	public <K extends Object, T extends Serializable> Future<Double> zincrby (K key, double score, T value)
 	{
 		return zincrby (key, score, DefaultCodec.encode(value));
 	}
 
 //	@Override
-	public FutureStatus save()
+	public <K extends Object> FutureStatus save()
 	{
 		return new FutureStatus(this.queueRequest(Command.SAVE));
 	}
@@ -340,7 +340,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	// -------- set
 
 //	@Override
-	public FutureStatus set(String key, byte[] value) {
+	public <K extends Object> FutureStatus set(K key, byte[] value) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -348,21 +348,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.SET, keybytes, value));
 	}
 //	@Override
-	public FutureStatus set(String key, String value) {
+	public <K extends Object> FutureStatus set(K key, String value) {
 		return set(key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public FutureStatus set(String key, Number value) {
+	public <K extends Object> FutureStatus set(K key, Number value) {
 		return set(key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> FutureStatus set (String key, T value)
+	public <K extends Object, T extends Serializable> FutureStatus set (K key, T value)
 	{
 		return set(key, DefaultCodec.encode(value));
 	}
 	
 //	@Override
-	public Future<byte[]> getset(String key, byte[] value) {
+	public <K extends Object> Future<byte[]> getset(K key, byte[] value) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -371,22 +371,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArray(futureResponse);
 	}
 //	@Override
-	public Future<byte[]> getset(String key, String value) {
+	public <K extends Object> Future<byte[]> getset(K key, String value) {
 		return getset(key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<byte[]> getset(String key, Number value) {
+	public <K extends Object> Future<byte[]> getset(K key, Number value) {
 		return getset(key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable>
-	Future<byte[]> getset (String key, T value)
+	public <K extends Object, T extends Serializable>
+	Future<byte[]> getset (K key, T value)
 	{
 		return getset(key, DefaultCodec.encode(value));
 	}
 	
 //	@Override
-	public Future<Boolean> setnx(String key, byte[] value){
+	public <K extends Object> Future<Boolean> setnx(K key, byte[] value){
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -395,21 +395,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureBoolean(futureResponse);
 	}
 //	@Override
-	public Future<Boolean> setnx(String key, String value) {
+	public <K extends Object> Future<Boolean> setnx(K key, String value) {
 		return setnx(key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<Boolean> setnx(String key, Number value) {
+	public <K extends Object> Future<Boolean> setnx(K key, Number value) {
 		return setnx(key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> Future<Boolean> setnx (String key, T value) {
+	public <K extends Object, T extends Serializable> Future<Boolean> setnx (K key, T value) {
 		return setnx(key, DefaultCodec.encode(value));
 	}
 
 	
 //	@Override
-	public Future<Long> append (String key, byte[] value){
+	public <K extends Object> Future<Long> append (K key, byte[] value){
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -418,20 +418,20 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(futureResponse);
 	}
 //	@Override
-	public Future<Long> append(String key, String value) {
+	public <K extends Object> Future<Long> append(K key, String value) {
 		return append(key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<Long> append(String key, Number value) {
+	public <K extends Object> Future<Long> append(K key, Number value) {
 		return append(key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> Future<Long> append (String key, T value) {
+	public <K extends Object, T extends Serializable> Future<Long> append (K key, T value) {
 		return append(key, DefaultCodec.encode(value));
 	}
 
 //	@Override
-	public Future<Boolean> sismember(String key, byte[] member) {
+	public <K extends Object> Future<Boolean> sismember(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -441,21 +441,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Boolean> sismember(String key, String value) {
+	public <K extends Object> Future<Boolean> sismember(K key, String value) {
 		return sismember(key, DefaultCodec.encode(value));
 	}
 
 //	@Override
-	public Future<Boolean> sismember(String key, Number numberValue) {
+	public <K extends Object> Future<Boolean> sismember(K key, Number numberValue) {
 		return sismember (key, String.valueOf(numberValue).getBytes());
 	}
 
 //	@Override
-	public <T extends Serializable> Future<Boolean> sismember(String key, T object) {
+	public <K extends Object, T extends Serializable> Future<Boolean> sismember(K key, T object) {
 		return sismember(key, DefaultCodec.encode(object));
 	}
 
-	public Future<Boolean> smove (String srcKey, String destKey, byte[] member) {
+	public <K extends Object> Future<Boolean> smove (K srcKey, K destKey, byte[] member) {
 		byte[] srcKeyBytes = null;
 		if((srcKeyBytes = JRedisSupport.getKeyBytes(srcKey)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+srcKey+"]");
@@ -467,14 +467,14 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.SMOVE, srcKeyBytes, destKeyBytes, member);
 		return new FutureBoolean(futureResponse);
 	}
-	public Future<Boolean> smove (String srcKey, String destKey, String stringValue) {
+	public <K extends Object> Future<Boolean> smove (K srcKey, K destKey, String stringValue) {
 		return smove (srcKey, destKey, DefaultCodec.encode(stringValue));
 	}
-	public Future<Boolean> smove (String srcKey, String destKey, Number numberValue) {
+	public <K extends Object> Future<Boolean> smove (K srcKey, K destKey, Number numberValue) {
 		return smove (srcKey, destKey, String.valueOf(numberValue).getBytes());
 	}
-	public <T extends Serializable>
-		   Future<Boolean> smove (String srcKey, String destKey, T object) {
+	public <K extends Object, T extends Serializable>
+		   Future<Boolean> smove (K srcKey, K destKey, T object) {
 		return smove (srcKey, destKey, DefaultCodec.encode(object));
 	}
 		
@@ -482,103 +482,103 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	// Commands operating on hashes
 	// ------------------------------------------------------------------------
 	
-	public Future<Boolean> hset(String key, String field, byte[] value) {
-		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = JRedisSupport.getKeyBytes(key)) == null)
+	public <K extends Object> Future<Boolean> hset(K key, K field, byte[] value) {
+		byte[] keyBytes = null;
+		if((keyBytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
-		byte[] hashFieldBytes = null;
-		if((hashFieldBytes = JRedisSupport.getKeyBytes(field)) == null)
+		byte[] entryBytes = null;
+		if((entryBytes = JRedisSupport.getKeyBytes(field)) == null)
 			throw new IllegalArgumentException ("invalid field => ["+field+"]");
 
-		Future<Response> futureResponse = this.queueRequest(Command.HSET, hashKeyBytes, hashFieldBytes, value);
+		Future<Response> futureResponse = this.queueRequest(Command.HSET, keyBytes, entryBytes, value);
 		return new FutureBoolean(futureResponse);
 	}
-	public Future<Boolean> hset(String key, String field, String stringValue) {
+	public <K extends Object> Future<Boolean> hset(K key, K field, String stringValue) {
 		return hset (key, field, DefaultCodec.encode(stringValue));
 	}
-	public Future<Boolean> hset(String key, String field, Number numberValue) {
+	public <K extends Object> Future<Boolean> hset(K key, K field, Number numberValue) {
 		return hset (key, field, String.valueOf(numberValue).getBytes());
 	}
-	public <T extends Serializable>
-		Future<Boolean> hset(String key, String field, T object) {
+	public <K extends Object, T extends Serializable>
+		Future<Boolean> hset(K key, K field, T object) {
 		return hset (key, field, DefaultCodec.encode(object));
 	}
 	
-	public Future<byte[]> hget(String hashKey, String hashField) {
-		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+	public <K extends Object> Future<byte[]> hget(K key, K entry) {
+		byte[] keyBytes = null;
+		if((keyBytes = JRedisSupport.getKeyBytes(key)) == null)
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
-		byte[] hashFieldBytes = null;
-		if((hashFieldBytes = JRedisSupport.getKeyBytes(hashField)) == null)
-			throw new IllegalArgumentException ("invalid field => ["+hashField+"]");
+		byte[] entryBytes = null;
+		if((entryBytes = JRedisSupport.getKeyBytes(entry)) == null)
+			throw new IllegalArgumentException ("invalid field => ["+entry+"]");
 		
-		Future<Response> futureResponse = this.queueRequest(Command.HGET, hashKeyBytes, hashFieldBytes);
+		Future<Response> futureResponse = this.queueRequest(Command.HGET, keyBytes, entryBytes);
 		return new FutureByteArray(futureResponse);
 	}
 	
 	
-	public Future<Boolean> hexists(String hashKey, String hashField) {
-		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+	public <K extends Object> Future<Boolean> hexists(K key, K entry) {
+		byte[] keyBytes = null;
+		if((keyBytes = JRedisSupport.getKeyBytes(key)) == null)
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
-		byte[] hashFieldBytes = null;
-		if((hashFieldBytes = JRedisSupport.getKeyBytes(hashField)) == null)
-			throw new IllegalArgumentException ("invalid field => ["+hashField+"]");
+		byte[] entryBytes = null;
+		if((entryBytes = JRedisSupport.getKeyBytes(entry)) == null)
+			throw new IllegalArgumentException ("invalid field => ["+entry+"]");
 		
-		Future<Response> futureResponse = this.queueRequest(Command.HEXISTS, hashKeyBytes, hashFieldBytes);
+		Future<Response> futureResponse = this.queueRequest(Command.HEXISTS, keyBytes, entryBytes);
 		return new FutureBoolean(futureResponse);
 	}
 	
-	public Future<Boolean> hdel(String hashKey, String hashField) {
-		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+	public <K extends Object> Future<Boolean> hdel(K key, K entry) {
+		byte[] keyBytes = null;
+		if((keyBytes = JRedisSupport.getKeyBytes(key)) == null)
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
-		byte[] hashFieldBytes = null;
-		if((hashFieldBytes = JRedisSupport.getKeyBytes(hashField)) == null)
-			throw new IllegalArgumentException ("invalid field => ["+hashField+"]");
+		byte[] entryBytes = null;
+		if((entryBytes = JRedisSupport.getKeyBytes(entry)) == null)
+			throw new IllegalArgumentException ("invalid field => ["+entry+"]");
 		
-		Future<Response> futureResponse = this.queueRequest(Command.HDEL, hashKeyBytes, hashFieldBytes);
+		Future<Response> futureResponse = this.queueRequest(Command.HDEL, keyBytes, entryBytes);
 		return new FutureBoolean(futureResponse);
 	}
 	
-	public Future<Long> hlen(String hashKey) {
-		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+	public <K extends Object> Future<Long> hlen(K key) {
+		byte[] keyBytes = null;
+		if((keyBytes = JRedisSupport.getKeyBytes(key)) == null)
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
 		
-		Future<Response> futureResponse = this.queueRequest(Command.HLEN, hashKeyBytes);
+		Future<Response> futureResponse = this.queueRequest(Command.HLEN, keyBytes);
 		return new FutureLong(futureResponse);
 	}
 	
-	public Future<List<String>> hkeys(String hashKey) {
-		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+	public <K extends Object> Future<List<byte[]>> hkeys(K key) {
+		byte[] keyBytes = null;
+		if((keyBytes = JRedisSupport.getKeyBytes(key)) == null)
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
-		Future<Response> futureResponse = this.queueRequest(Command.HKEYS, hashKeyBytes);
+		Future<Response> futureResponse = this.queueRequest(Command.HKEYS, keyBytes);
 		return new FutureKeyList (futureResponse);
 	}
 	
-	public Future<List<byte[]>> hvals(String hashKey) {
-		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+	public <K extends Object> Future<List<byte[]>> hvals(K key) {
+		byte[] keyBytes = null;
+		if((keyBytes = JRedisSupport.getKeyBytes(key)) == null)
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
-		Future<Response> futureResponse = this.queueRequest(Command.HKEYS, hashKeyBytes);
+		Future<Response> futureResponse = this.queueRequest(Command.HKEYS, keyBytes);
 		return new FutureByteArrayList (futureResponse);
 	}
 	
-	public Future<Map<String, byte[]>> hgetall(String hashKey) {
-		byte[] hashKeyBytes = null;
-		if((hashKeyBytes = JRedisSupport.getKeyBytes(hashKey)) == null)
-			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+	public <K extends Object> Future<Map<String, byte[]>> hgetall(K key) {
+		byte[] keyBytes = null;
+		if((keyBytes = JRedisSupport.getKeyBytes(key)) == null)
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 
-		Future<Response> futureResponse = this.queueRequest(Command.HGETALL, hashKeyBytes);
+		Future<Response> futureResponse = this.queueRequest(Command.HGETALL, keyBytes);
 		return new FutureDataDictionary (futureResponse);
 	}
 	
@@ -586,7 +586,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	/* ------------------------------- commands returning int value --------- */
 
 //	@Override
-	public Future<Long> incr(String key) {
+	public <K extends Object> Future<Long> incr(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -596,7 +596,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Long> incrby(String key, int delta) {
+	public <K extends Object> Future<Long> incrby(K key, int delta) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -606,7 +606,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Long> decr(String key) {
+	public <K extends Object> Future<Long> decr(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -616,7 +616,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Long> decrby(String key, int delta) {
+	public <K extends Object> Future<Long> decrby(K key, int delta) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -626,7 +626,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Long> llen(String key) {
+	public <K extends Object> Future<Long> llen(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -636,7 +636,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Long> scard(String key) {
+	public <K extends Object> Future<Long> scard(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -646,7 +646,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	
 //	@Override
-	public Future<Long> zcard(String key) {
+	public <K extends Object> Future<Long> zcard(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -655,7 +655,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong (futureResponse);
 	}
 	
-	public Future<byte[]> srandmember (String key) {
+	public <K extends Object> Future<byte[]> srandmember (K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -664,7 +664,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArray (futureResponse);
 	}
 
-	public Future<byte[]> spop (String key) {
+	public <K extends Object> Future<byte[]> spop (K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -676,12 +676,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	/* ------------------------------- commands returning long value --------- */
 
 //	@Override
-	public Future<Long> dbsize() {
+	public <K extends Object> Future<Long> dbsize() {
 		Future<Response> futureResponse = this.queueRequest(Command.DBSIZE);
 		return new FutureLong (futureResponse);
 	}
 //	@Override
-	public Future<Long> lastsave() {
+	public <K extends Object> Future<Long> lastsave() {
 		Future<Response> futureResponse = this.queueRequest(Command.LASTSAVE);
 		return new FutureLong (futureResponse);
 	}
@@ -689,7 +689,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	/* ------------------------------- commands returning byte[] --------- */
 
 //	@Override
-	public Future<byte[]> get(String key) {
+	public <K extends Object> Future<byte[]> get(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -699,7 +699,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<byte[]> lindex(String key, long index) {
+	public <K extends Object> Future<byte[]> lindex(K key, long index) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -708,7 +708,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArray(futureResponse);
 	}
 //	@Override
-	public Future<byte[]> lpop(String key) {
+	public <K extends Object> Future<byte[]> lpop(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -718,7 +718,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<byte[]> rpop(String key) {
+	public <K extends Object> Future<byte[]> rpop(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -731,12 +731,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	/* ------------------------------- commands returning String--------- */
 
 //	@Override
-	public Future<String> randomkey() {
+	public <K extends Object> Future<byte[]> randomkey() {
 		Future<Response> futureResponse = this.queueRequest(Command.RANDOMKEY);
-		return new FutureString(futureResponse);
+		return new FutureByteArray(futureResponse);
 	}
 //	@Override
-	public Future<RedisType> type(String key) {
+	public <K extends Object> Future<RedisType> type(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -747,22 +747,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	/* ------------------------------- commands returning Maps --------- */
 
 //	@Override
-	public Future<Map<String, String>> info() {
+	public <K extends Object> Future<Map<String, String>> info() {
 		return new FutureInfo(this.queueRequest(Command.INFO));
 	}
 
 //	@Override
-	public Future<ObjectInfo> debug (String key) {
+	public <K extends Object> Future<ObjectInfo> debug (K key) {
 		byte[] keybytes = JRedisSupport.getKeyBytes(key);
-		if(key.length() == 0)
-			throw new IllegalArgumentException ("invalid zero length key => ["+key+"]");
+//		if(key.length() == 0)
+//			throw new IllegalArgumentException ("invalid zero length key => ["+key+"]");
 
 		return new FutureObjectInfo (this.queueRequest(Command.DEBUG, "OBJECT".getBytes(), keybytes));
 	}
 	/* ------------------------------- commands returning Lists --------- */
 
 //	@Override
-	public Future<List<byte[]>> mget(String ... keys) {
+	public <K extends Object> Future<List<byte[]>> mget(String ... keys) {
 
 		if(null == keys || keys.length == 0) throw new IllegalArgumentException("no keys specified");
 		byte[] keydata = null;
@@ -782,7 +782,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.MSET, mappings);
 		return new FutureStatus(futureResponse);
 	}
-	public FutureStatus mset(Map<String, byte[]> keyValueMap){
+	public <K extends Object> FutureStatus mset(Map<String, byte[]> keyValueMap){
 		KeyCodec codec = DefaultKeyCodec.provider();
 		byte[][] mappings = new byte[keyValueMap.size()*2][];
 		int i = 0;
@@ -793,18 +793,18 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return mset(mappings);
 	}
 	
-	public FutureStatus mset(KeyValueSet.ByteArrays keyValueMap){
+	public <K extends Object> FutureStatus mset(KeyValueSet.ByteArrays keyValueMap){
 		return mset(keyValueMap.getMappings());
 	}
-	public FutureStatus mset(KeyValueSet.Strings keyValueMap){
-		return mset(keyValueMap.getMappings());
-	}
-
-	public FutureStatus mset(KeyValueSet.Numbers keyValueMap){
+	public <K extends Object> FutureStatus mset(KeyValueSet.Strings keyValueMap){
 		return mset(keyValueMap.getMappings());
 	}
 
-	public <T extends Serializable> FutureStatus mset(KeyValueSet.Objects<T> keyValueMap){
+	public <K extends Object> FutureStatus mset(KeyValueSet.Numbers keyValueMap){
+		return mset(keyValueMap.getMappings());
+	}
+
+	public <K extends Object, T extends Serializable> FutureStatus mset(KeyValueSet.Objects<T> keyValueMap){
 		return mset(keyValueMap.getMappings());
 	}
 
@@ -813,7 +813,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.MSETNX, mappings);
 		return new FutureBoolean(futureResponse);
 	}
-	public Future<Boolean> msetnx(Map<String, byte[]> keyValueMap){
+	public <K extends Object> Future<Boolean> msetnx(Map<String, byte[]> keyValueMap){
 		KeyCodec codec = DefaultKeyCodec.provider();
 		byte[][] mappings = new byte[keyValueMap.size()*2][];
 		int i = 0;
@@ -824,24 +824,24 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return msetnx(mappings);
 	}
 	
-	public Future<Boolean> msetnx(KeyValueSet.ByteArrays keyValueMap){
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.ByteArrays keyValueMap){
 		return msetnx(keyValueMap.getMappings());
 	}
-	public Future<Boolean> msetnx(KeyValueSet.Strings keyValueMap){
-		return msetnx(keyValueMap.getMappings());
-	}
-
-	public Future<Boolean> msetnx(KeyValueSet.Numbers keyValueMap){
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Strings keyValueMap){
 		return msetnx(keyValueMap.getMappings());
 	}
 
-	public <T extends Serializable> Future<Boolean> msetnx(KeyValueSet.Objects<T> keyValueMap){
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Numbers keyValueMap){
+		return msetnx(keyValueMap.getMappings());
+	}
+
+	public <K extends Object,T extends Serializable> Future<Boolean> msetnx(KeyValueSet.Objects<T> keyValueMap){
 		return msetnx(keyValueMap.getMappings());
 	}
 
 
 //	@Override
-	public Future<List<byte[]>> smembers(String key) {
+	public <K extends Object> Future<List<byte[]>> smembers(K key) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("null key.");
@@ -849,12 +849,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArrayList(this.queueRequest(Command.SMEMBERS, keydata));
 	}
 //	@Override
-	public Future<List<String>> keys() {
+	public <K extends Object> Future<List<byte[]>> keys() {
 		return this.keys("*");
 	}
 
 //	@Override
-	public Future<List<String>> keys(String pattern) {
+	public <K extends Object> Future<List<byte[]>> keys(K pattern) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(pattern)) == null)
 			throw new IllegalArgumentException ("null key.");
@@ -863,7 +863,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureKeyList(futureResponse);
 	}
 
-	public Future<Long> keystolist(String pattern, String listname) {
+	public <K extends Object> Future<Long> keystolist(String pattern, String listname) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(pattern)) == null)
 			throw new IllegalArgumentException ("null key.");
@@ -875,7 +875,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<List<byte[]>> lrange(String key, long from, long to) {
+	public <K extends Object> Future<List<byte[]>> lrange(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -887,7 +887,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<byte[]> substr(String key, long from, long to) {
+	public <K extends Object> Future<byte[]> substr(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -899,7 +899,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<List<byte[]>> zrange(String key, long from, long to) {
+	public <K extends Object> Future<List<byte[]>> zrange(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -911,7 +911,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<List<byte[]>> zrangebyscore(String key, double minScore, double maxScore) {
+	public <K extends Object> Future<List<byte[]>> zrangebyscore(K key, double minScore, double maxScore) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -923,7 +923,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	
 //	@Override
-	public Future<Long> zremrangebyscore(String key, double minScore, double maxScore) {
+	public <K extends Object> Future<Long> zremrangebyscore(K key, double minScore, double maxScore) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -935,7 +935,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	
 //	@Override
-	public Future<Long> zcount(String key, double minScore, double maxScore) {
+	public <K extends Object> Future<Long> zcount(K key, double minScore, double maxScore) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -947,7 +947,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	
 //	@Override
-	public Future<Long> zremrangebyrank(String key, long minRank, long maxRank) {
+	public <K extends Object> Future<Long> zremrangebyrank(K key, long minRank, long maxRank) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -960,7 +960,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 
 //	@Override
-	public Future<List<byte[]>> zrevrange(String key, long from, long to) {
+	public <K extends Object> Future<List<byte[]>> zrevrange(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -972,7 +972,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<List<ZSetEntry>> zrangeSubset(String key, long from, long to) {
+	public <K extends Object> Future<List<ZSetEntry>> zrangeSubset(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -984,7 +984,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<List<ZSetEntry>> zrevrangeSubset(String key, long from, long to) {
+	public <K extends Object> Future<List<ZSetEntry>> zrevrangeSubset(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -996,13 +996,13 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	
 //	@Override
-	public Sort sort(final String key) {
+	public <K extends Object> Sort sort(final K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
 		
 		final JRedisFutureSupport client = this;
-		Sort sortQuery = new SortSupport (key, keybytes) {
+		Sort sortQuery = new SortSupport (keybytes) {
 
 			//	@Override 
 			protected Future<List<byte[]>> execAsynchSort(byte[]... fullSortCmd) {
@@ -1026,18 +1026,18 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	/* ------------------------------- commands that don't get a response --------- */
 
 //	@Override
-	public FutureStatus quit()  {
+	public <K extends Object> FutureStatus quit()  {
 		return new FutureStatus(this.queueRequest(Command.QUIT));
 	}
 //	@Override
-	public Future<List<byte[]>> sinter(String set1, String... sets) {
+	public <K extends Object> Future<List<byte[]>> sinter(K set1, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(set1)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+set1+"]");
 
 		byte[][] keybytes = new byte[1+sets.length][];
 		int i=0; keybytes[i++] = keydata;
-		for(String k : sets) {
+		for(K k : sets) {
 			if((keydata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			keybytes[i++] = keydata;
@@ -1047,14 +1047,14 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<List<byte[]>> sunion(String set1, String... sets) {
+	public <K extends Object> Future<List<byte[]>> sunion(K set1, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(set1)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+set1+"]");
 
 		byte[][] keybytes = new byte[1+sets.length][];
 		int i=0; keybytes[i++] = keydata;
-		for(String k : sets) {
+		for(K k : sets) {
 			if((keydata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			keybytes[i++] = keydata;
@@ -1064,14 +1064,14 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<List<byte[]>> sdiff(String set1, String... sets) {
+	public <K extends Object> Future<List<byte[]>> sdiff(K set1, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(set1)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+set1+"]");
 
-		byte[][] keybytes = new byte[1+sets.length][];
+		byte[][] keybytes = new byte[sets.length+1][];
 		int i=0; keybytes[i++] = keydata;
-		for(String k : sets) {
+		for(K k : sets) {
 			if((keydata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			keybytes[i++] = keydata;
@@ -1080,7 +1080,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public FutureStatus sinterstore(String dest, String... sets) {
+	public <K extends Object> FutureStatus sinterstore(K dest, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(dest)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+dest+"]");
@@ -1089,7 +1089,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		int i=0;
 		setbytes[i++] = keydata;
 		byte[] setdata =null;
-		for(String k : sets) {
+		for(K k : sets) {
 			if((setdata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			setbytes[i++] = setdata;
@@ -1099,7 +1099,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public FutureStatus sunionstore(String dest, String... sets) {
+	public <K extends Object> FutureStatus sunionstore(K dest, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(dest)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+dest+"]");
@@ -1108,7 +1108,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		int i=0;
 		setbytes[i++] = keydata;
 		byte[] setdata =null;
-		for(String k : sets) {
+		for(K k : sets) {
 			if((setdata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			setbytes[i++] = setdata;
@@ -1118,7 +1118,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public FutureStatus sdiffstore(String dest, String... sets) {
+	public <K extends Object> FutureStatus sdiffstore(K dest, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(dest)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+dest+"]");
@@ -1127,7 +1127,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		int i=0;
 		setbytes[i++] = keydata;
 		byte[] setdata =null;
-		for(String k : sets) {
+		for(K k : sets) {
 			if((setdata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			setbytes[i++] = setdata;
@@ -1137,12 +1137,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Long> del(String ... keys) {
+	public <K extends Object> Future<Long> del(K ... keys) {
 		if(null == keys || keys.length == 0) throw new IllegalArgumentException("no keys specified");
 		byte[] keydata = null;
 		byte[][] keybytes = new byte[keys.length][];
 		int i=0;
-		for(String k : keys) {
+		for(K k : keys) {
 			if((keydata = JRedisSupport.getKeyBytes(k)) == null)
 				throw new IllegalArgumentException ("invalid key => ["+k+"] @ index: " + i);
 			
@@ -1155,7 +1155,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 
 //	@Override
-	public Future<Boolean> exists(String key) {
+	public <K extends Object> Future<Boolean> exists(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1166,7 +1166,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 
 //	@Override
-	public FutureLong lpush(String key, byte[] value) {
+	public <K extends Object> FutureLong lpush(K key, byte[] value) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1178,15 +1178,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(this.queueRequest(Command.LPUSH, keybytes, value));
 	}
 //	@Override
-	public FutureLong lpush(String key, String value) {
+	public <K extends Object> FutureLong lpush(K key, String value) {
 		return lpush(key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public FutureLong lpush(String key, Number value) {
+	public <K extends Object> FutureLong lpush(K key, Number value) {
 		return lpush(key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> FutureLong lpush (String key, T value)
+	public <K extends Object, T extends Serializable> FutureLong lpush (K key, T value)
 	{
 		return lpush(key, DefaultCodec.encode(value));
 	}
@@ -1194,7 +1194,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 
 //	@Override
-	public Future<Long> lrem(String key, byte[] value, int count) {
+	public <K extends Object> Future<Long> lrem(K key, byte[] value, int count) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1205,22 +1205,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(futureResponse);
 	}
 //	@Override
-	public Future<Long> lrem (String listKey, String value, int count){
+	public <K extends Object> Future<Long> lrem (K listKey, String value, int count){
 		return lrem (listKey, DefaultCodec.encode(value), count);
 	}
 //	@Override
-	public Future<Long> lrem (String listKey, Number numberValue, int count) {
+	public <K extends Object> Future<Long> lrem (K listKey, Number numberValue, int count) {
 		return lrem (listKey, String.valueOf(numberValue).getBytes(), count);
 	}
 //	@Override
-	public <T extends Serializable>
-	Future<Long> lrem (String listKey, T object, int count){
+	public <K extends Object, T extends Serializable>
+	Future<Long> lrem (K listKey, T object, int count){
 		return lrem (listKey, DefaultCodec.encode(object), count);
 	}
 
 
 //	@Override
-	public FutureStatus lset(String key, long index, byte[] value) {
+	public <K extends Object> FutureStatus lset(K key, long index, byte[] value) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1229,20 +1229,20 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.LSET, keybytes, indexBytes, value));
 	}
 //	@Override
-	public FutureStatus lset (String key, long index, String value) {
+	public <K extends Object> FutureStatus lset (K key, long index, String value) {
 		return lset (key, index, DefaultCodec.encode(value));
 	}
 //	@Override
-	public FutureStatus lset (String key, long index, Number numberValue){
+	public <K extends Object> FutureStatus lset (K key, long index, Number numberValue){
 		return lset (key, index, String.valueOf(numberValue).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> FutureStatus lset (String key, long index, T object){
+	public <K extends Object, T extends Serializable> FutureStatus lset (K key, long index, T object){
 		return lset (key, index, DefaultCodec.encode(object));
 	}
 
 //	@Override
-	public Future<Boolean> move(String key, int dbIndex) {
+	public <K extends Object> Future<Boolean> move(K key, int dbIndex) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1253,7 +1253,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 
 //	@Override
-	public Future<Boolean> srem(String key, byte[] member) {
+	public <K extends Object> Future<Boolean> srem(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1262,21 +1262,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureBoolean(futureResponse);
 	}
 //	@Override
-	public Future<Boolean> srem (String key, String value) {
+	public <K extends Object> Future<Boolean> srem (K key, String value) {
 		return srem (key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<Boolean> srem (String key, Number value) {
+	public <K extends Object> Future<Boolean> srem (K key, Number value) {
 		return srem (key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> Future<Boolean> srem (String key, T value)
+	public <K extends Object, T extends Serializable> Future<Boolean> srem (K key, T value)
 	{
 		return srem (key, DefaultCodec.encode(value));
 	}
 
 //	@Override
-	public Future<Boolean> zrem(String key, byte[] member) {
+	public <K extends Object> Future<Boolean> zrem(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1285,22 +1285,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureBoolean(futureResponse);
 	}
 //	@Override
-	public Future<Boolean> zrem (String key, String value) {
+	public <K extends Object> Future<Boolean> zrem (K key, String value) {
 		return zrem (key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<Boolean> zrem (String key, Number value) {
+	public <K extends Object> Future<Boolean> zrem (K key, Number value) {
 		return zrem (key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> Future<Boolean> zrem (String key, T value)
+	public <K extends Object, T extends Serializable> Future<Boolean> zrem (K key, T value)
 	{
 		return zrem (key, DefaultCodec.encode(value));
 	}
 
 
 //	@Override
-	public Future<Double> zscore(String key, byte[] member) {
+	public <K extends Object> Future<Double> zscore(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1309,21 +1309,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureDouble(futureResponse);
 	}
 //	@Override
-	public Future<Double> zscore (String key, String value) {
+	public <K extends Object> Future<Double> zscore (K key, String value) {
 		return zscore (key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<Double> zscore (String key, Number value) {
+	public <K extends Object> Future<Double> zscore (K key, Number value) {
 		return zscore (key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> Future<Double> zscore (String key, T value)
+	public <K extends Object, T extends Serializable> Future<Double> zscore (K key, T value)
 	{
 		return zscore (key, DefaultCodec.encode(value));
 	}
 
 //	@Override
-	public Future<Long> zrank(String key, byte[] member) {
+	public <K extends Object> Future<Long> zrank(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1332,21 +1332,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(futureResponse);
 	}
 //	@Override
-	public Future<Long> zrank (String key, String value) {
+	public <K extends Object> Future<Long> zrank (K key, String value) {
 		return zrank (key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<Long> zrank (String key, Number value) {
+	public <K extends Object> Future<Long> zrank (K key, Number value) {
 		return zrank (key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> Future<Long> zrank (String key, T value)
+	public <K extends Object, T extends Serializable> Future<Long> zrank (K key, T value)
 	{
 		return zrank (key, DefaultCodec.encode(value));
 	}
 
 //	@Override
-	public Future<Long> zrevrank(String key, byte[] member) {
+	public <K extends Object> Future<Long> zrevrank(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1355,22 +1355,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(futureResponse);
 	}
 //	@Override
-	public Future<Long> zrevrank (String key, String value) {
+	public <K extends Object> Future<Long> zrevrank (K key, String value) {
 		return zrevrank (key, DefaultCodec.encode(value));
 	}
 //	@Override
-	public Future<Long> zrevrank (String key, Number value) {
+	public <K extends Object> Future<Long> zrevrank (K key, Number value) {
 		return zrevrank (key, String.valueOf(value).getBytes());
 	}
 //	@Override
-	public <T extends Serializable> Future<Long> zrevrank (String key, T value)
+	public <K extends Object, T extends Serializable> Future<Long> zrevrank (K key, T value)
 	{
 		return zrevrank (key, DefaultCodec.encode(value));
 	}
 
 
 //	@Override
-	public FutureStatus ltrim(String key, long keepFrom, long keepTo) {
+	public <K extends Object> FutureStatus ltrim(K key, long keepFrom, long keepTo) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1381,7 +1381,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Boolean> expire(String key, int ttlseconds) {
+	public <K extends Object> Future<Boolean> expire(K key, int ttlseconds) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1393,7 +1393,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Boolean> expireat(String key, long epochtime) {
+	public <K extends Object> Future<Boolean> expireat(K key, long epochtime) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1406,7 +1406,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 //	@Override
-	public Future<Long> ttl (String key) {
+	public <K extends Object> Future<Long> ttl (K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -1623,7 +1623,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 	}
 
-	public static class FutureKeyList extends FutureResultBase implements Future<List<String>>{
+	public static class FutureKeyList extends FutureResultBase implements Future<List<byte[]>>{
 
         protected FutureKeyList (Future<Response> pendingRequest) { super(pendingRequest); }
 
@@ -1635,25 +1635,25 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 //    		}
 //    		return list;
 //        }
-        public List<String> get () throws InterruptedException, ExecutionException {
+        public List<byte[]> get () throws InterruptedException, ExecutionException {
 
         	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get();
         	List<byte[]> multibulkdata = resp.getMultiBulkData();
-        	List<String> list = null;
-        	if(null != multibulkdata)
-        		list = DefaultCodec.toStr(multibulkdata);
-        	return list;
+//        	List<String> list = null;
+//        	if(null != multibulkdata)
+//        		list = DefaultCodec.toStr(multibulkdata);
+        	return multibulkdata;
         }
 
-        public List<String> get (long timeout, TimeUnit unit)
+        public List<byte[]> get (long timeout, TimeUnit unit)
         	throws InterruptedException, ExecutionException, TimeoutException
         {
             	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get(timeout, unit);
             	List<byte[]> multibulkdata = resp.getMultiBulkData();
-            	List<String> list = null;
-            	if(null != multibulkdata)
-            		list = DefaultCodec.toStr(multibulkdata);
-            	return list;
+//            	List<String> list = null;
+//            	if(null != multibulkdata)
+//            		list = DefaultCodec.toStr(multibulkdata);
+            	return multibulkdata;
         }
 	}
 	public static class FutureInfo extends FutureResultBase implements Future<Map<String, String>>{
@@ -1666,9 +1666,9 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
     		while (tokenizer.hasMoreTokens()){
     			String info = tokenizer.nextToken();
     			int c = info.indexOf(':');
-    			String key =info.substring(0, c);
-    			String value = info.substring(c+1);
-    			infomap.put(key, value);
+    			String _key =info.substring(0, c);
+    			String _value = info.substring(c+1);
+    			infomap.put(_key, _value);
     		}
     		return infomap;
         }
@@ -1739,7 +1739,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	 * @param msg
 	 * @return
 	 */
-	public Future<byte[]> echo (byte[] msg) {
+	public <K extends Object> Future<byte[]> echo (byte[] msg) {
 		if(msg == null)
 			throw new IllegalArgumentException ("invalid value for echo => [null]");
 
@@ -1747,13 +1747,13 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArray(futureResponse);
 		
 	}
-	public Future<byte[]> echo (String msg) {
+	public <K extends Object> Future<byte[]> echo (String msg) {
 		return echo(DefaultCodec.encode(msg));
 	}
-	public Future<byte[]> echo (Number msg) {
+	public <K extends Object> Future<byte[]> echo (Number msg) {
 		return echo(String.valueOf(msg).getBytes());
 	}
-	public <T extends Serializable>
+	public <K extends Object, T extends Serializable>
 		Future<byte[]> echo (T msg) {
 			return echo (DefaultCodec.encode(msg));
 	}

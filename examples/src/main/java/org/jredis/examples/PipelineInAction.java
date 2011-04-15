@@ -217,7 +217,7 @@ public class PipelineInAction {
 	    		Util.Timer timer = Timer.startNewTimer();
 	    		Future<ResponseStatus> futureStat = null;
 	    		while(cnt < reqCnt){
-	    			futureStat = pipeline.lpush(key, data);
+	    			futureLong = pipeline.lpush(key, data);
 	    			cnt++;
 	    		}
 	    		long reqDoneTime = timer.mark();

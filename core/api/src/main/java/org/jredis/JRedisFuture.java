@@ -82,13 +82,13 @@ public interface JRedisFuture {
 	/**
 	 * Ping redis
 	 */
-	public Future<ResponseStatus> ping ();
+	public <K extends Object> Future<ResponseStatus> ping ();
 
 	/**
 	 * Disconnects the client.
 	 * @Redis QUIT
 	 */
-	public Future<ResponseStatus> quit ();
+	public <K extends Object> Future<ResponseStatus> quit ();
 	
 	// ------------------------------------------------------------------------
 	// "Commands operating on string values"
@@ -103,7 +103,7 @@ public interface JRedisFuture {
 	 * @throws ProviderException on un-documented features/bug
 	 * @throws ClientRuntimeException on errors due to operating environment (Redis or network)
 	 */
-	public Future<ResponseStatus> set (String key, byte[] value);
+	public <K extends Object> Future<ResponseStatus> set (K key, byte[] value);
 	/**
 	 * Convenient method for {@link String} data binding
 	 * @Redis SET
@@ -111,7 +111,7 @@ public interface JRedisFuture {
 	 * @param stringValue
 	 * @see {@link JRedis#set(String, byte[])}
 	 */
-	public Future<ResponseStatus> set (String key, String stringValue);
+	public <K extends Object> Future<ResponseStatus> set (K key, String stringValue);
 	/**
 	 * Convenient method for {@link String} numeric values binding
 	 * @Redis SET
@@ -119,7 +119,7 @@ public interface JRedisFuture {
 	 * @param numberValue
 	 * @see {@link JRedis#set(String, byte[])}
 	 */
-	public Future<ResponseStatus> set (String key, Number numberValue);
+	public <K extends Object> Future<ResponseStatus> set (K key, Number numberValue);
 	/**
 	 * Binds the given java {@link Object} to the key.  Serialization format is
 	 * implementation specific.  Simple implementations may apply the basic {@link Serializable}
@@ -130,8 +130,8 @@ public interface JRedisFuture {
 	 * @param object
 	 * @see {@link JRedis#set(String, byte[])}
 	 */
-	public <T extends Serializable> 
-		   Future<ResponseStatus> set (String key, T object);
+	public <K extends Object, T extends Serializable> 
+		   Future<ResponseStatus> set (K key, T object);
 
 	/**
 	 * @Redis SETNX
@@ -139,24 +139,24 @@ public interface JRedisFuture {
 	 * @param value
 	 * @return
 	 */
-	public Future<Boolean> setnx (String key, byte[] value);
-	public Future<Boolean> setnx (String key, String stringValue);
-	public Future<Boolean> setnx (String key, Number numberValue);
-	public <T extends Serializable> 
-		   Future<Boolean> setnx (String key, T object);
+	public <K extends Object> Future<Boolean> setnx (K key, byte[] value);
+	public <K extends Object> Future<Boolean> setnx (K key, String stringValue);
+	public <K extends Object> Future<Boolean> setnx (K key, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		   Future<Boolean> setnx (K key, T object);
 
 	/**
 	 * @Redis GET
 	 * @param key
 	 * @return
 	 */
-	public Future<byte[]> get (String key) ;
+	public <K extends Object> Future<byte[]> get (K key) ;
 
-	public Future<byte[]> getset (String key, byte[] value);
-	public Future<byte[]> getset (String key, String stringValue);
-	public Future<byte[]> getset (String key, Number numberValue);
-	public <T extends Serializable> 
-		Future<byte[]> getset (String key, T object);
+	public <K extends Object> Future<byte[]> getset (K key, byte[] value);
+	public <K extends Object> Future<byte[]> getset (K key, String stringValue);
+	public <K extends Object> Future<byte[]> getset (K key, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<byte[]> getset (K key, T object);
 
 	
 	/**
@@ -165,7 +165,7 @@ public interface JRedisFuture {
 	 * @param moreKeys
 	 * @return
 	 */
-	public Future<List<byte[]>> mget(String ... keys);
+	public <K extends Object> Future<List<byte[]>> mget(String ... keys);
 
 	/**
 	 * @Redis MSET
@@ -173,12 +173,12 @@ public interface JRedisFuture {
 	 * @return Future<Boolean> indicating if all of sets were OK or not
 	 * @throws RedisException
 	 */
-	public Future<ResponseStatus> mset(Map<String, byte[]> keyValueMap);
+	public <K extends Object> Future<ResponseStatus> mset(Map<String, byte[]> keyValueMap);
 	
-	public Future<ResponseStatus> mset(KeyValueSet.ByteArrays mappings);
-	public Future<ResponseStatus> mset(KeyValueSet.Strings mappings);
-	public Future<ResponseStatus> mset(KeyValueSet.Numbers mappings);
-	public <T extends Serializable> Future<ResponseStatus> mset(KeyValueSet.Objects<T> mappings);
+	public <K extends Object> Future<ResponseStatus> mset(KeyValueSet.ByteArrays mappings);
+	public <K extends Object> Future<ResponseStatus> mset(KeyValueSet.Strings mappings);
+	public <K extends Object> Future<ResponseStatus> mset(KeyValueSet.Numbers mappings);
+	public <K extends Object, T extends Serializable> Future<ResponseStatus> mset(KeyValueSet.Objects<T> mappings);
 	
 	/**
 	 * @Redis MSETNX
@@ -186,19 +186,19 @@ public interface JRedisFuture {
 	 * @return Future<Boolean> indicating if all of sets were OK or not
 	 * @throws RedisException
 	 */
-	public Future<Boolean> msetnx(Map<String, byte[]> keyValueMap);
+	public <K extends Object> Future<Boolean> msetnx(Map<String, byte[]> keyValueMap);
 	
-	public Future<Boolean> msetnx(KeyValueSet.ByteArrays mappings);
-	public Future<Boolean> msetnx(KeyValueSet.Strings mappings);
-	public Future<Boolean> msetnx(KeyValueSet.Numbers mappings);
-	public <T extends Serializable> Future<Boolean> msetnx(KeyValueSet.Objects<T> mappings);
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.ByteArrays mappings);
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Strings mappings);
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Numbers mappings);
+	public <K extends Object, T extends Serializable> Future<Boolean> msetnx(KeyValueSet.Objects<T> mappings);
 	
 	/**
 	 * @Redis INCR
 	 * @param key
 	 * @return
 	 */
-	public Future<Long> incr (String key);
+	public <K extends Object> Future<Long> incr (K key);
 
 	/**
 	 * @Redis INCRBY
@@ -206,14 +206,14 @@ public interface JRedisFuture {
 	 * @param delta
 	 * @return
 	 */
-	public Future<Long> incrby (String key, int delta);
+	public <K extends Object> Future<Long> incrby (K key, int delta);
 
 	/**
 	 * @Redis DECR
 	 * @param key
 	 * @return
 	 */
-	public Future<Long> decr (String key);
+	public <K extends Object> Future<Long> decr (K key);
 
 	/**
 	 * @Redis DECRBY
@@ -221,7 +221,7 @@ public interface JRedisFuture {
 	 * @param delta
 	 * @return
 	 */
-	public Future<Long> decrby (String key, int delta);
+	public <K extends Object> Future<Long> decrby (K key, int delta);
 
 	/**
 	 * @Redis SUBSTR
@@ -230,7 +230,7 @@ public interface JRedisFuture {
 	 * @param to
 	 * @return
 	 */
-	public Future<byte[]> substr (String listkey, long from, long to); 
+	public <K extends Object> Future<byte[]> substr (K listkey, long from, long to); 
 	
 	/**
 	 * @Redis APPEND
@@ -238,32 +238,32 @@ public interface JRedisFuture {
 	 * @param value
 	 * @return the length (byte count) of appended key.
 	 */
-	public Future<Long> append (String key, byte[] value);
-	public Future<Long> append (String key, String stringValue);
-	public Future<Long> append (String key, Number numberValue);
-	public <T extends Serializable> 
-		   Future<Long> append (String key, T object);
+	public <K extends Object> Future<Long> append (K key, byte[] value);
+	public <K extends Object> Future<Long> append (K key, String stringValue);
+	public <K extends Object> Future<Long> append (K key, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		   Future<Long> append (K key, T object);
 
 	/**
 	 * @Redis EXISTS
 	 * @param key
 	 * @return
 	 */
-	public Future<Boolean> exists(String key);
+	public <K extends Object> Future<Boolean> exists(K key);
 
 	/**
 	 * @Redis DEL
 	 * @param keys one or more, non-null, non-zero-length, keys to be deleted
 	 * @return Future<Long> of number keys actually deleted.
 	 */
-	public Future<Long> del (String ... keys);
+	public <K extends Object> Future<Long> del (K ... keys);
 
 	/**
 	 * @Redis TYPE
 	 * @param key
 	 * @return
 	 */
-	public Future<RedisType> type (String key);
+	public <K extends Object> Future<RedisType> type (K key);
 	
 	
 	// ------------------------------------------------------------------------
@@ -275,7 +275,7 @@ public interface JRedisFuture {
 	 * @param pattern
 	 * @return
 	 */
-	public Future<List<String>> keys (String pattern);
+	public <K extends Object> Future<List<byte[]>> keys (K pattern);
 	
 	/**
 	 * Convenience method.  Equivalent to calling <code>jredis.keys("*");</code>
@@ -283,20 +283,20 @@ public interface JRedisFuture {
 	 * @return
 	 * @see {@link JRedis#keys(String)}
 	 */
-	public Future<List<String>> keys ();
+	public <K extends Object> Future<List<byte[]>> keys ();
 
 	/**
 	 * @Redis RANDOMKEY
 	 * @return
 	 */
-	public Future<String> randomkey();
+	public <K extends Object> Future<byte[]> randomkey();
 	
 	/**
 	 * @Redis RENAME
 	 * @param oldkey
 	 * @param newkey
 	 */
-	public Future<ResponseStatus> rename (String oldkey, String newkey);
+	public <K extends Object> Future<ResponseStatus> rename (K oldkey, K newkey);
 	
 	/**
 	 * @Redis RENAMENX
@@ -304,13 +304,13 @@ public interface JRedisFuture {
 	 * @param brandnewkey
 	 * @return
 	 */
-	public Future<Boolean> renamenx (String oldkey, String brandnewkey);
+	public <K extends Object> Future<Boolean> renamenx (K oldkey, K brandnewkey);
 	
 	/**
 	 * @Redis DBSIZE
 	 * @return
 	 */
-	public Future<Long> dbsize ();
+	public <K extends Object> Future<Long> dbsize ();
 	
 	/**
 	 * @Redis EXPIRE
@@ -318,7 +318,7 @@ public interface JRedisFuture {
 	 * @param ttlseconds
 	 * @return
 	 */
-	public Future<Boolean> expire (String key, int ttlseconds); 
+	public <K extends Object> Future<Boolean> expire (K key, int ttlseconds); 
 	
 	/**
 	 * @Redis EXPIREAT
@@ -329,14 +329,14 @@ public interface JRedisFuture {
 	 * @return
 	 * @see {@link System#currentTimeMillis()}
 	 */
-	public Future<Boolean> expireat (String key, long epochtimeMillisecs); 
+	public <K extends Object> Future<Boolean> expireat (K key, long epochtimeMillisecs); 
 	
 	/**
 	 * @Redis TTL
 	 * @param key
 	 * @return
 	 */
-	public Future<Long> ttl (String key);
+	public <K extends Object> Future<Long> ttl (K key);
 	
 	// ------------------------------------------------------------------------
 	// Commands operating on lists
@@ -347,22 +347,22 @@ public interface JRedisFuture {
 	 * @param listkey
 	 * @param value
 	 */
-	public Future<Long> rpush (String listkey, byte[] value);
-	public Future<Long> rpush (String listkey, String stringValue);
-	public Future<Long> rpush (String listkey, Number numberValue);
-	public <T extends Serializable> 
-		Future<Long> rpush (String listkey, T object);
+	public <K extends Object> Future<Long> rpush (K listkey, byte[] value);
+	public <K extends Object> Future<Long> rpush (K listkey, String stringValue);
+	public <K extends Object> Future<Long> rpush (K listkey, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Long> rpush (K listkey, T object);
 	
 	/**
 	 * @Redis LPUSH
 	 * @param listkey
 	 * @param value
 	 */
-	public Future<Long> lpush (String listkey, byte[] value);
-	public Future<Long> lpush (String listkey, String stringValue);
-	public Future<Long> lpush (String listkey, Number numberValue);
-	public <T extends Serializable> 
-		Future<Long> lpush (String listkey, T object);
+	public <K extends Object> Future<Long> lpush (K listkey, byte[] value);
+	public <K extends Object> Future<Long> lpush (K listkey, String stringValue);
+	public <K extends Object> Future<Long> lpush (K listkey, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Long> lpush (K listkey, T object);
 	
 	/**
 	 * @Redis LSET
@@ -370,11 +370,11 @@ public interface JRedisFuture {
 	 * @param index
 	 * @param value
 	 */
-	public Future<ResponseStatus> lset (String key, long index, byte[] value);
-	public Future<ResponseStatus> lset (String key, long index, String stringValue);
-	public Future<ResponseStatus> lset (String key, long index, Number numberValue);
-	public <T extends Serializable> 
-		Future<ResponseStatus> lset (String key, long index, T object);
+	public <K extends Object> Future<ResponseStatus> lset (K key, long index, byte[] value);
+	public <K extends Object> Future<ResponseStatus> lset (K key, long index, String stringValue);
+	public <K extends Object> Future<ResponseStatus> lset (K key, long index, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<ResponseStatus> lset (K key, long index, T object);
 	
 
 	/**
@@ -384,11 +384,11 @@ public interface JRedisFuture {
 	 * @param count
 	 * @return
 	 */
-	public Future<Long> lrem (String listKey, byte[] value,       int count);
-	public Future<Long> lrem (String listKey, String stringValue, int count);
-	public Future<Long> lrem (String listKey, Number numberValue, int count);
-	public <T extends Serializable> 
-		Future<Long> lrem (String listKey, T object, int count);
+	public <K extends Object> Future<Long> lrem (K listkey, byte[] value,       int count);
+	public <K extends Object> Future<Long> lrem (K listkey, String stringValue, int count);
+	public <K extends Object> Future<Long> lrem (K listkey, Number numberValue, int count);
+	public <K extends Object, T extends Serializable> 
+		Future<Long> lrem (K listkey, T object, int count);
 	
 	/**
 	 * Given a 'list' key, returns the number of items in the list.
@@ -396,7 +396,7 @@ public interface JRedisFuture {
 	 * @param listkey
 	 * @return
 	 */
-	public Future<Long> llen (String listkey);
+	public <K extends Object> Future<Long> llen (K listkey);
 	
 	/**
 	 * @Redis LRANGE
@@ -405,7 +405,7 @@ public interface JRedisFuture {
 	 * @param to
 	 * @return
 	 */
-	public Future<List<byte[]>> lrange (String listkey, long from, long to); 
+	public <K extends Object> Future<List<byte[]>> lrange (K listkey, long from, long to); 
 
 	/**
 	 * @Redis LTRIM
@@ -413,7 +413,7 @@ public interface JRedisFuture {
 	 * @param keepFrom
 	 * @param keepTo
 	 */
-	public Future<ResponseStatus> ltrim (String listkey, long keepFrom, long keepTo);
+	public <K extends Object> Future<ResponseStatus> ltrim (K listkey, long keepFrom, long keepTo);
 	
 	/**
 	 * @Redis LINDEX
@@ -421,21 +421,21 @@ public interface JRedisFuture {
 	 * @param index
 	 * @return
 	 */
-	public Future<byte[]> lindex (String listkey, long index);
+	public <K extends Object> Future<byte[]> lindex (K listkey, long index);
 	
 	/**
 	 * @Redis LPOP
 	 * @param listKey
 	 * @return
 	 */
-	public Future<byte[]> lpop (String listKey);
+	public <K extends Object> Future<byte[]> lpop (K listkey);
 	
 	/**
 	 * @Redis RPOP
 	 * @param listKey
 	 * @return
 	 */
-	public Future<byte[]> rpop (String listKey);
+	public <K extends Object> Future<byte[]> rpop (K listkey);
 
 	/**
 	 * @Redis RPOPLPUSH
@@ -443,7 +443,7 @@ public interface JRedisFuture {
 	 * @param destList
 	 * @return
 	 */
-	public Future<byte[]> rpoplpush (String srcList, String destList);
+	public <K extends Object> Future<byte[]> rpoplpush (String srcList, String destList);
 	// ------------------------------------------------------------------------
 	// Commands operating on sets
 	// ------------------------------------------------------------------------
@@ -454,11 +454,11 @@ public interface JRedisFuture {
 	 * @param member
 	 * @return
 	 */
-	public Future<Boolean> sadd (String setkey, byte[] member);
-	public Future<Boolean> sadd (String setkey, String stringValue);
-	public Future<Boolean> sadd (String setkey, Number numberValue);
-	public <T extends Serializable> 
-		Future<Boolean> sadd (String setkey, T object);
+	public <K extends Object> Future<Boolean> sadd (K setkey, byte[] member);
+	public <K extends Object> Future<Boolean> sadd (K setkey, String stringValue);
+	public <K extends Object> Future<Boolean> sadd (K setkey, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Boolean> sadd (K setkey, T object);
 
 	/**
 	 * @Redis SREM
@@ -466,11 +466,11 @@ public interface JRedisFuture {
 	 * @param member
 	 * @return
 	 */
-	public Future<Boolean> srem (String setKey, byte[] member);
-	public Future<Boolean> srem (String setKey, String stringValue);
-	public Future<Boolean> srem (String setKey, Number numberValue);
-	public <T extends Serializable> 
-		Future<Boolean> srem (String setKey, T object);
+	public <K extends Object> Future<Boolean> srem (K setkey, byte[] member);
+	public <K extends Object> Future<Boolean> srem (K setkey, String stringValue);
+	public <K extends Object> Future<Boolean> srem (K setkey, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Boolean> srem (K setkey, T object);
 
 	/**
 	 * @Redis SISMEMBER
@@ -478,11 +478,11 @@ public interface JRedisFuture {
 	 * @param member
 	 * @return
 	 */
-	public Future<Boolean> sismember (String setKey, byte[] member);
-	public Future<Boolean> sismember (String setKey, String stringValue);
-	public Future<Boolean> sismember (String setKey, Number numberValue);
-	public <T extends Serializable> 
-		Future<Boolean> sismember (String setKey, T object);
+	public <K extends Object> Future<Boolean> sismember (K setkey, byte[] member);
+	public <K extends Object> Future<Boolean> sismember (K setkey, String stringValue);
+	public <K extends Object> Future<Boolean> sismember (K setkey, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Boolean> sismember (K setkey, T object);
 	
 	/**
 	 * @Redis SMOVE
@@ -491,18 +491,18 @@ public interface JRedisFuture {
 	 * @param member
 	 * @return
 	 */
-	public Future<Boolean> smove (String srcKey, String destKey, byte[] member);
-	public Future<Boolean> smove (String srcKey, String destKey, String stringValue);
-	public Future<Boolean> smove (String srcKey, String destKey, Number numberValue);
-	public <T extends Serializable> 
-		Future<Boolean> smove (String srcKey, String destKey, T object);
+	public <K extends Object> Future<Boolean> smove (K srcKey, K destKey, byte[] member);
+	public <K extends Object> Future<Boolean> smove (K srcKey, K destKey, String stringValue);
+	public <K extends Object> Future<Boolean> smove (K srcKey, K destKey, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Boolean> smove (K srcKey, K destKey, T object);
 	
 	/**
 	 * @Redis SCARD
 	 * @param setKey
 	 * @return
 	 */
-	public Future<Long> scard (String setKey);	
+	public <K extends Object> Future<Long> scard (K setKey);	
 	
 	/**
 	 * @Redis SINTER
@@ -510,13 +510,13 @@ public interface JRedisFuture {
 	 * @param sets
 	 * @return
 	 */
-	public Future<List<byte[]>> sinter (String set1, String...sets);
+	public <K extends Object> Future<List<byte[]>> sinter (K set1, K...sets);
 	/**
 	 * @Redis SINTERSTORE
 	 * @param destSetKey
 	 * @param sets
 	 */
-	public Future<ResponseStatus> sinterstore (String destSetKey, String...sets);
+	public <K extends Object> Future<ResponseStatus> sinterstore (K destSetKey, K...sets);
 
 	/**
 	 * @Redis SUNION
@@ -524,14 +524,14 @@ public interface JRedisFuture {
 	 * @param sets
 	 * @return
 	 */
-	public Future<List<byte[]>> sunion (String set1, String...sets);
+	public <K extends Object> Future<List<byte[]>> sunion (K set1, K...sets);
 	
 	/**
 	 * @Redis SUNIONSTORE
 	 * @param destSetKey
 	 * @param sets
 	 */
-	public Future<ResponseStatus> sunionstore (String destSetKey, String...sets);
+	public <K extends Object> Future<ResponseStatus> sunionstore (K destSetKey, K...sets);
 
 	/**
 	 * @Redis SDIFF
@@ -539,35 +539,35 @@ public interface JRedisFuture {
 	 * @param sets
 	 * @return
 	 */
-	public Future<List<byte[]>> sdiff (String set1, String...sets);
+	public <K extends Object> Future<List<byte[]>> sdiff (K set1, K...sets);
 	
 	/**
 	 * @Redis SDIFFSTORE
 	 * @param destSetKey
 	 * @param sets
 	 */
-	public Future<ResponseStatus> sdiffstore (String destSetKey, String...sets);
+	public <K extends Object> Future<ResponseStatus> sdiffstore (K destSetKey, K...sets);
 
 	/**
 	 * @Redis SMEMBERS
 	 * @param setkey
 	 * @return
 	 */
-	public Future<List<byte[]>> smembers (String setkey);
+	public <K extends Object> Future<List<byte[]>> smembers (K setkey);
 	
 	/**
 	 * @Redis SRANDMEMBER
 	 * @param setkey
 	 * @return
 	 */
-	public Future<byte[]> srandmember (String setkey);
+	public <K extends Object> Future<byte[]> srandmember (K setkey);
 
 	/**
 	 * @Redis SPOP
 	 * @param setkey
 	 * @return
 	 */
-	public Future<byte[]> spop (String setkey);
+	public <K extends Object> Future<byte[]> spop (K setkey);
 	// ------------------------------------------------------------------------
 	// Commands operating on sorted sets
 	// ------------------------------------------------------------------------
@@ -579,11 +579,11 @@ public interface JRedisFuture {
 	 * @param member
 	 * @return
 	 */
-	public Future<Boolean> zadd (String setkey, double score, byte[] member);
-	public Future<Boolean> zadd (String setkey, double score, String stringValue);
-	public Future<Boolean> zadd (String setkey, double score, Number numberValue);
-	public <T extends Serializable> 
-		Future<Boolean> zadd (String setkey, double score, T object);
+	public <K extends Object> Future<Boolean> zadd (K setkey, double score, byte[] member);
+	public <K extends Object> Future<Boolean> zadd (K setkey, double score, String stringValue);
+	public <K extends Object> Future<Boolean> zadd (K setkey, double score, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Boolean> zadd (K setkey, double score, T object);
 
 	/**
 	 * @Redis ZREM
@@ -591,18 +591,18 @@ public interface JRedisFuture {
 	 * @param member
 	 * @return
 	 */
-	public Future<Boolean> zrem (String setKey, byte[] member);
-	public Future<Boolean> zrem (String setKey, String stringValue);
-	public Future<Boolean> zrem (String setKey, Number numberValue);
-	public <T extends Serializable> 
-		Future<Boolean> zrem (String setKey, T object);
+	public <K extends Object> Future<Boolean> zrem (K setkey, byte[] member);
+	public <K extends Object> Future<Boolean> zrem (K setkey, String stringValue);
+	public <K extends Object> Future<Boolean> zrem (K setkey, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Boolean> zrem (K setkey, T object);
 
 	/**
 	 * @Redis ZCARD
 	 * @param setKey
 	 * @return
 	 */
-	public Future<Long> zcard (String setKey);	
+	public <K extends Object> Future<Long> zcard (K setKey);	
 	
 	/**
 	 * @Redis ZSCORE
@@ -610,11 +610,11 @@ public interface JRedisFuture {
 	 * @param member
 	 * @return
 	 */
-	public Future<Double> zscore (String setkey, byte[] member);
-	public Future<Double> zscore (String setkey, String stringValue);
-	public Future<Double> zscore (String setkey, Number numberValue);
-	public <T extends Serializable> 
-		Future<Double> zscore (String setkey, T object);
+	public <K extends Object> Future<Double> zscore (K setkey, byte[] member);
+	public <K extends Object> Future<Double> zscore (K setkey, String stringValue);
+	public <K extends Object> Future<Double> zscore (K setkey, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Double> zscore (K setkey, T object);
 
 	/**
 	 * @Redis ZRANK
@@ -622,11 +622,11 @@ public interface JRedisFuture {
 	 * @param member
 	 * @return
 	 */
-	public Future<Long> zrank (String setkey, byte[] member);
-	public Future<Long> zrank (String setkey, String stringValue);
-	public Future<Long> zrank (String setkey, Number numberValue);
-	public <T extends Serializable> 
-		Future<Long> zrank (String setkey, T object);
+	public <K extends Object> Future<Long> zrank (K setkey, byte[] member);
+	public <K extends Object> Future<Long> zrank (K setkey, String stringValue);
+	public <K extends Object> Future<Long> zrank (K setkey, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Long> zrank (K setkey, T object);
 
 	/**
 	 * @Redis ZREVRANK
@@ -634,11 +634,11 @@ public interface JRedisFuture {
 	 * @param member
 	 * @return
 	 */
-	public Future<Long> zrevrank (String setkey, byte[] member);
-	public Future<Long> zrevrank (String setkey, String stringValue);
-	public Future<Long> zrevrank (String setkey, Number numberValue);
-	public <T extends Serializable> 
-		Future<Long> zrevrank (String setkey, T object);
+	public <K extends Object> Future<Long> zrevrank (K setkey, byte[] member);
+	public <K extends Object> Future<Long> zrevrank (K setkey, String stringValue);
+	public <K extends Object> Future<Long> zrevrank (K setkey, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Long> zrevrank (K setkey, T object);
 
 	/**
 	 * @Redis ZRANGE
@@ -647,7 +647,7 @@ public interface JRedisFuture {
 	 * @param to
 	 * @return
 	 */
-	public Future<List<byte[]>> zrange (String setkey, long from, long to); 
+	public <K extends Object> Future<List<byte[]>> zrange (K setkey, long from, long to); 
 
 	/**
 	 * @Redis ZREVRANGE
@@ -656,7 +656,7 @@ public interface JRedisFuture {
 	 * @param to
 	 * @return
 	 */
-	public Future<List<byte[]>> zrevrange (String setkey, long from, long to); 
+	public <K extends Object> Future<List<byte[]>> zrevrange (K setkey, long from, long to); 
 
 	/**
 	 * Equivalent to {@link JRedis#zrange(String, long, long)} with the {@link Command.Option#WITHSCORES}.
@@ -671,7 +671,7 @@ public interface JRedisFuture {
 	 * @see JRedis#zrange(String, long, long)
 	 * @see ZSetEntry
 	 */
-	public Future<List<ZSetEntry>> zrangeSubset (String setkey, long from, long to); 
+	public <K extends Object> Future<List<ZSetEntry>> zrangeSubset (K setkey, long from, long to); 
 
 	/**
 	 * Equivalent to {@link JRedis#zrange(String, long, long)} with the {@link Command.Option#WITHSCORES}.
@@ -686,7 +686,7 @@ public interface JRedisFuture {
 	 * @see JRedis#zrevrange(String, long, long)
 	 * @see ZSetEntry
 	 */
-	public Future<List<ZSetEntry>> zrevrangeSubset (String setkey, long from, long to); 
+	public <K extends Object> Future<List<ZSetEntry>> zrevrangeSubset (K setkey, long from, long to); 
 
 	/**
 	 * @Redis ZINCRBY
@@ -696,11 +696,11 @@ public interface JRedisFuture {
 	 * @return
 	 */
 	@Redis(versions="1.07")
-	public Future<Double> zincrby (String setkey, double score, byte[] member);
-	public Future<Double> zincrby (String setkey, double score, String stringValue);
-	public Future<Double> zincrby (String setkey, double score, Number numberValue);
-	public <T extends Serializable> 
-		Future<Double> zincrby (String setkey, double score, T object);
+	public <K extends Object> Future<Double> zincrby (K setkey, double score, byte[] member);
+	public <K extends Object> Future<Double> zincrby (K setkey, double score, String stringValue);
+	public <K extends Object> Future<Double> zincrby (K setkey, double score, Number numberValue);
+	public <K extends Object, T extends Serializable> 
+		Future<Double> zincrby (K setkey, double score, T object);
 
 	/**
 	 * @Redis ZRANGEBYSCORE
@@ -709,7 +709,7 @@ public interface JRedisFuture {
 	 * @param to
 	 * @return
 	 */
-	public Future<List<byte[]>> zrangebyscore (String setkey, double minScore, double maxScore); 
+	public <K extends Object> Future<List<byte[]>> zrangebyscore (K setkey, double minScore, double maxScore); 
 
 	/**
 	 * @Redis ZREMRANGEBYSCORE
@@ -718,7 +718,7 @@ public interface JRedisFuture {
 	 * @param to
 	 * @return number of removed elements
 	 */
-	public Future<Long> zremrangebyscore (String setkey, double minScore, double maxScore); 
+	public <K extends Object> Future<Long> zremrangebyscore (K setkey, double minScore, double maxScore); 
 
 	/**
 	 * @Redis ZCOUNT
@@ -727,7 +727,7 @@ public interface JRedisFuture {
 	 * @param maxScore
 	 * @return number of removed elements
 	 */
-	public Future<Long> zcount (String setkey, double minScore, double maxScore); 
+	public <K extends Object> Future<Long> zcount (K setkey, double minScore, double maxScore); 
 
 	/**
 	 * @Redis ZREMRANGEBYRANK
@@ -736,7 +736,7 @@ public interface JRedisFuture {
 	 * @param to
 	 * @return number of removed elements
 	 */
-	public Future<Long> zremrangebyrank (String setkey, long minRank, long maxRank); 
+	public <K extends Object> Future<Long> zremrangebyrank (K setkey, long minRank, long maxRank); 
 	
 	
 	// ------------------------------------------------------------------------
@@ -751,7 +751,7 @@ public interface JRedisFuture {
 	 * @return
 	 */
 	@Redis(versions="1.3.n")
-	public Future<Boolean> hset(String key, String field, byte[] value);
+	public <K extends Object> Future<Boolean> hset(K key, K entry, byte[] value);
 	
 	/**
 	 * @Redis HSET
@@ -761,7 +761,7 @@ public interface JRedisFuture {
 	 * @return
 	 */
 	@Redis(versions="1.3.n")
-	public Future<Boolean> hset(String key, String field, String string);
+	public <K extends Object> Future<Boolean> hset(K key, K entry, String string);
 	
 	/**
 	 * @Redis HSET
@@ -771,7 +771,7 @@ public interface JRedisFuture {
 	 * @return
 	 */
 	@Redis(versions="1.3.n")
-	public Future<Boolean> hset(String key, String field, Number number);
+	public <K extends Object> Future<Boolean> hset(K key, K entry, Number number);
 	
 	/**
 	 * @Redis HSET
@@ -782,8 +782,8 @@ public interface JRedisFuture {
 	 * @return
 	 */
 	@Redis(versions="1.3.4")
-	public <T extends Serializable> 
-		Future<Boolean> hset(String key, String field, T object);
+	public <K extends Object, T extends Serializable> 
+		Future<Boolean> hset(K key, K entry, T object);
 	
 	/**
 	 * @Redis HGET
@@ -792,7 +792,7 @@ public interface JRedisFuture {
 	 * @return
 	 */
 	@Redis(versions="1.3.4")
-	public Future<byte[]> hget(String key, String field);
+	public <K extends Object> Future<byte[]> hget(K key, K entry);
 	
 	/**
 	 * 
@@ -802,7 +802,7 @@ public interface JRedisFuture {
 	 * @return true if the spec'd field exists for the spec'd (hash type) key
 	 */
 	@Redis(versions="1.3.5")
-	public Future<Boolean> hexists(String key, String field);
+	public <K extends Object> Future<Boolean> hexists(K key, K entry);
 	
 	/**
 	 * 
@@ -812,7 +812,7 @@ public interface JRedisFuture {
 	 * @return true if the spec'd field exists for the spec'd (hash type) key
 	 */
 	@Redis(versions="1.3.5")
-	public Future<Boolean> hdel(String key, String field);
+	public <K extends Object> Future<Boolean> hdel(K key, K entry);
 	
 	/**
 	 * 
@@ -822,7 +822,7 @@ public interface JRedisFuture {
 	 * @return # of fields/entries for the given hash type key
 	 */
 	@Redis(versions="1.3.5")
-	public Future<Long> hlen(String key);
+	public <K extends Object> Future<Long> hlen(K key);
 	
 	/**
 	 * 
@@ -832,7 +832,7 @@ public interface JRedisFuture {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public Future<List<String>> hkeys(String key);
+	public <K extends Object> Future<List<byte[]>> hkeys(K key);
 	
 	/**
 	 * 
@@ -842,7 +842,7 @@ public interface JRedisFuture {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public Future<List<byte[]>> hvals(String key);
+	public <K extends Object> Future<List<byte[]>> hvals(K key);
 	
 	/**
 	 * 
@@ -852,14 +852,14 @@ public interface JRedisFuture {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public Future<Map<String, byte[]>> hgetall(String key);
+	public <K extends Object> Future<Map<String, byte[]>> hgetall(K key);
 	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands
 	// ------------------------------------------------------------------------
 	
 //	@Deprecated
-//	public Future<ResponseStatus> select (int index);
+//	public <K extends Object> Future<ResponseStatus> select (int index);
 
 	/**
 	 * Flushes the db you selected when connecting to Redis server.  Typically,
@@ -868,7 +868,7 @@ public interface JRedisFuture {
 	 * @Redis FLUSHDB
 	 * @return
 	 */
-	public Future<ResponseStatus> flushdb ();
+	public <K extends Object> Future<ResponseStatus> flushdb ();
 
 	/**
 	 * Flushes all dbs in the connect Redis server, regardless of which db was selected
@@ -876,7 +876,7 @@ public interface JRedisFuture {
 	 * @Redis FLUSHALL
 	 * @return
 	 */
-	public Future<ResponseStatus> flushall ();
+	public <K extends Object> Future<ResponseStatus> flushall ();
 
 	/**
 	 * Moves the given key from the currently selected db to the one indicated
@@ -886,7 +886,7 @@ public interface JRedisFuture {
 	 * @param dbIndex
 	 * @return
 	 */
-	public Future<Boolean> move (String key, int dbIndex);
+	public <K extends Object> Future<Boolean> move (K key, int dbIndex);
 	
 	// ------------------------------------------------------------------------
 	// Sorting
@@ -910,7 +910,7 @@ public interface JRedisFuture {
 	 * @see Future
 	 * 
 	 */
-	public Sort sort(String key);
+	public <K extends Object> Sort sort(K key);
 	
 	// ------------------------------------------------------------------------
 	// Persistence control commands
@@ -919,24 +919,24 @@ public interface JRedisFuture {
 	/**
 	 * @Redis SAVE
 	 */
-	public Future<ResponseStatus> save();
+	public <K extends Object> Future<ResponseStatus> save();
 
 	/**
 	 * @Redis BGSAVE
 	 */
-	public Future<ResponseStatus> bgsave ();
+	public <K extends Object> Future<ResponseStatus> bgsave ();
 
 	/**
 	 * @Redis BGREWRITEAOF
 	 * @return ack message.  
 	 */
-	public Future<String> bgrewriteaof ();
+	public <K extends Object> Future<String> bgrewriteaof ();
 
 	/**
 	 * @Redis LASTSAVE
 	 * @return
 	 */
-	public Future<Long> lastsave ();
+	public <K extends Object> Future<Long> lastsave ();
 
 
 // ------------------------------------------------------------------------
@@ -947,20 +947,20 @@ public interface JRedisFuture {
 	 * @Redis INFO
 	 * @return
 	 */
-	public Future<Map<String, String>>	info () ;
+	public <K extends Object> Future<Map<String, String>>	info () ;
 
 	/**
 	 * @Redis SLAVEOF
 	 * @param host ip address 
 	 * @param port
 	 */
-	public Future<ResponseStatus>  slaveof(String host, int port);
+	public <K extends Object> Future<ResponseStatus>  slaveof(String host, int port);
 	
 	/**
 	 * Convenience method.  Turns off replication.
 	 * @Redis SLAVEOF "no one"
 	 */
-	public Future<ResponseStatus>  slaveofnone();
+	public <K extends Object> Future<ResponseStatus>  slaveofnone();
 	// ------------------------------------------------------------------------
 	// Diagnostics commands
 	// ------------------------------------------------------------------------
@@ -970,10 +970,10 @@ public interface JRedisFuture {
 	 * @param msg
 	 * @return
 	 */
-	public Future<byte[]> echo (byte[] msg);
-	public Future<byte[]> echo (String msg);
-	public Future<byte[]> echo (Number msg);
-	public <T extends Serializable> 
+	public <K extends Object> Future<byte[]> echo (byte[] msg);
+	public <K extends Object> Future<byte[]> echo (String msg);
+	public <K extends Object> Future<byte[]> echo (Number msg);
+	public <K extends Object, T extends Serializable> 
 		Future<byte[]> echo (T msg);
 		
 	/**
@@ -981,5 +981,5 @@ public interface JRedisFuture {
 	 * @param key
 	 * @return
 	 */
-	public Future<ObjectInfo> debug (String key);
+	public <K extends Object> Future<ObjectInfo> debug (K key);
 }

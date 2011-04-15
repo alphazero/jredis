@@ -30,7 +30,7 @@ package org.jredis;
  * 
  */
 
-public interface Codec <T>  {
+public interface Codec <T extends Object>  {
 	/**
 	 * @param bytes
 	 * @return an instance of type <code>T</code> corresponding to the value of decoded <code>bytes</code>

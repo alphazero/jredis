@@ -62,10 +62,10 @@ import java.util.List;
  */
 public interface Sort extends Query {
 	/** species the BY clause */
-	Sort BY    (String pattern);
+	<K extends Object> Sort BY    (K pattern);
 	
 	/** specifies the GET clause */
-	Sort GET   (String pattern);
+	<K extends Object> Sort GET   (K pattern);
 	
 	/** 
 	 * Specifies the LIMIT class: from is the initial index, count is the number of results 
@@ -100,5 +100,5 @@ public interface Sort extends Query {
 	 * 	System.out.format("Sorted list (size: %d):\n", size);
 	 * </pre>
  	 */
-	Sort STORE (String destKey);
+	<K extends Object> Sort STORE (K destKey);
 }

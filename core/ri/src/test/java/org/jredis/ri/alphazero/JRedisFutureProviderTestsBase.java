@@ -1595,20 +1595,20 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			Future<Boolean> hsetResp4 = provider.hset(keys.get(0), keys.get(4), objectList.get(0));
 			
 			// get keys
-			Future<List<String>> hkeysResp1 = provider.hkeys(keys.get(0));
+			Future<List<byte[]>> hkeysResp1 = provider.hkeys(keys.get(0));
 			// alright - empty the hash
 			for(int i=1; i<5; i++)
 	            try {
-	                assertTrue(provider.hdel(keys.get(0), keys.get(i)).get());
+	                assertTrue(provider.hdel(keys.get(0), keys.get(i).getBytes()).get());
                 }
                 catch (ExecutionException e) {
     				Throwable cause = e.getCause();
     				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
                 }
 			// get keys again
-			Future<List<String>> hkeysResp2 = provider.hkeys(keys.get(0));
+			Future<List<byte[]>> hkeysResp2 = provider.hkeys(keys.get(0));
 			// nil case
-			Future<List<String>> hkeysResp3 = provider.hkeys("no-such-hash");
+			Future<List<byte[]>> hkeysResp3 = provider.hkeys("no-such-hash");
 			
 			
 			try {
@@ -1617,7 +1617,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				assertTrue (hsetResp3.get(), "hset using Number value");
 				assertTrue (hsetResp4.get(), "hset using Object value");
 				
-				List<String> hkeys = hkeysResp1.get(); 
+				List<byte[]> hkeys = hkeysResp1.get(); 
 				assertEquals (hkeys.size(), 4, "keys list size should be 4");
 				assertEquals(hkeysResp2.get(), Collections.EMPTY_LIST, "result should be empty");
 				assertEquals(hkeysResp3.get(), Collections.EMPTY_LIST, "list of keys of non-existent hash should be empty");
@@ -1694,7 +1694,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			Future<Boolean> hsetResp4 = provider.hset(keys.get(0), keys.get(4), objectList.get(0));
 			
 			// get keys
-			Future<List<String>> frHkeys = provider.hkeys(keys.get(0));
+			Future<List<byte[]>> frHkeys = provider.hkeys(keys.get(0));
 			
 			// get all
 			Future<Map<String, byte[]>> frHmap1 = provider.hgetall(keys.get(0));
@@ -1934,7 +1934,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			Future<ResponseStatus> setResp = provider.set(key, "meow");
 			Future<Boolean> existsResp = provider.exists(key);
 			Future<ResponseStatus> flush2Resp = provider.flushdb();
-			Future<List<String>>  keysResp = provider.keys();
+			Future<List<byte[]>>  keysResp = provider.keys();
 			
 			try {
 				flushResp.get(); // no need to check status; if error exception is raised

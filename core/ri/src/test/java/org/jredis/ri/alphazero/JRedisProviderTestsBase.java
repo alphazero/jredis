@@ -2906,7 +2906,8 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			provider.flushdb();
 			assertTrue(provider.dbsize() == 0);
 			
-			String iamempty = provider.randomkey();
+//			String iamempty = provider.randomkey();
+			byte[] iamempty = provider.randomkey();
 			assertNull(iamempty, "randomkey of an empty db should be null, but instead it was: " + iamempty);
 			
 			for (int i=0; i<MEDIUM_CNT; i++)
@@ -2914,7 +2915,7 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			
 			assertTrue (provider.dbsize() == MEDIUM_CNT, "dbsize should be MEDIUM_CNT");
 			for (int i=0; i<SMALL_CNT; i++) {
-				assertTrue(keys.contains(provider.randomkey()), "randomkey should be an item in our keys list");
+				assertTrue(keys.contains(new String(provider.randomkey())), "randomkey should be an item in our keys list");
 			}
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
