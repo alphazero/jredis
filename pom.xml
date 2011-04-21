@@ -6,18 +6,19 @@
   <name>JRedis [Build POM]</name>
   <groupId>org.jredis</groupId>
   <artifactId>jredis</artifactId>
-  <version>a.0-SNAPSHOT</version>
+  <version>${jredisVersion}</version>
   <packaging>pom</packaging>
 
   <!-- production units -->
+  <properties>
+     <jredisVersion>a.0-SNAPSHOT</jredisVersion>
+  </properties>						 
   <modules>
     <module>core</module>
     <module>examples</module>
     <module>extensions</module>
   </modules>
-  
   <build>
-  
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

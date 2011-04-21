@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.jredis</groupId>
     <artifactId>jredis-core</artifactId>
-    <version>a.0-SNAPSHOT</version>
+	<version>${jredisVersion}</version>
   </parent>
 
   <!-- production | jar -->
@@ -19,7 +19,7 @@
   <name>JRedis - Core - ALL [Jar POM]</name>
   <groupId>org.jredis</groupId>
   <artifactId>jredis-core-all</artifactId>
-  <version>a.0-SNAPSHOT</version>
+  <version>${jredisVersion}</version>
   <packaging>jar</packaging>
   
   <dependencies>
@@ -28,21 +28,21 @@
     <dependency>
       <groupId>org.jredis</groupId>
       <artifactId>jredis-core-api</artifactId>
-      <version>a.0-SNAPSHOT</version>
+      <version>${jredisVersion}</version>
     </dependency>
  
     <!-- ri -->
     <dependency>
       <groupId>org.jredis</groupId>
       <artifactId>jredis-core-ri</artifactId>
-      <version>a.0-SNAPSHOT</version>
+      <version>${jredisVersion}</version>
     </dependency>
  
     <!-- bench -->
     <dependency>
       <groupId>org.jredis</groupId>
       <artifactId>jredis-core-bench</artifactId>
-      <version>a.0-SNAPSHOT</version>
+      <version>${jredisVersion}</version>
     </dependency>
   </dependencies>
  

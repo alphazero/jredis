@@ -7,14 +7,14 @@
   <parent>
     <groupId>org.jredis</groupId>
     <artifactId>jredis-extensions</artifactId>
-    <version>a.0-SNAPSHOT</version>
+	<version>${jredisVersion}</version>
   </parent>
 
   <!-- production | jar -->
   <name>JRedis - Extensions - RI</name>
   <groupId>org.jredis</groupId>
   <artifactId>jredis-extensions-ri</artifactId>
-  <version>a.0-SNAPSHOT</version>
+  <version>${jredisVersion}</version>
   <packaging>jar</packaging>
   
   <dependencies>
@@ -23,21 +23,21 @@
     <dependency>
       <groupId>org.jredis</groupId>
       <artifactId>jredis-core-api</artifactId>
-      <version>a.0-SNAPSHOT</version>
+	  <version>${jredisVersion}</version>
     </dependency>
 
     <!-- core ri -->
     <dependency>
       <groupId>org.jredis</groupId>
       <artifactId>jredis-core-ri</artifactId>
-      <version>a.0-SNAPSHOT</version>
+	  <version>${jredisVersion}</version>
     </dependency>
     
     <!-- extensions api -->
     <dependency>
       <groupId>org.jredis</groupId>
       <artifactId>jredis-extensions-api</artifactId>
-      <version>a.0-SNAPSHOT</version>
+	  <version>${jredisVersion}</version>
     </dependency>
 
     <!-- unit testing -->
