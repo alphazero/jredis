@@ -126,7 +126,7 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		Request  		request = null;
 		Response		response = null;
 		ResponseStatus  status = null;
-		
+		Protocol		protocol = Assert.notNull(getProtocolHandler(), "thread protocol handler", ProviderException.class);
 		try {
 			// 1 - Request
 			//				Log.log("RedisConnection - requesting ..." + cmd.code);

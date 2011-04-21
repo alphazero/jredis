@@ -69,9 +69,12 @@ public abstract class ConnectionBase implements Connection{
 	// Properties
 	// ------------------------------------------------------------------------
 	
-	/** Protocol specific matters are delegated to an instance of {@link Protocol} */
-	protected Protocol 			protocol;
+	/** Thread specific protocol handler -- optimize fencing */
+	ThreadLocal<Protocol> thrdProtocol = new ThreadLocal<Protocol>();
 	
+	/** Protocol specific matters are delegated to an instance of {@link Protocol} */
+//	private Protocol 			protocol;
+
 	/** Connection specs used to create this {@link Connection} */
 	final protected ConnectionSpec  	spec;
 	
@@ -524,11 +527,13 @@ public abstract class ConnectionBase implements Connection{
 	// ------------------------------------------------------------------------
 	
 	final protected void setProtocolHandler(Protocol protocolHandler) {
-		this.protocol = notNull(protocolHandler, "protocolHandler for ConnectionBase", ClientRuntimeException.class);
+		if(protocolHandler == null) throw new ProviderException("protocol handler is null - BUG");
+    	thrdProtocol.set(protocolHandler);
+//		this.protocol = notNull(protocolHandler, "protocolHandler for ConnectionBase", ClientRuntimeException.class);
 	}
 	
 	final protected Protocol getProtocolHandler() {
-		return notNull(protocol, "protocolHandler for ConnectionBase", ClientRuntimeException.class);
+		return notNull(thrdProtocol.get(), "protocolHandler for ConnectionBase", ClientRuntimeException.class);
 	}
 
 	final protected OutputStream getOutputStream() {

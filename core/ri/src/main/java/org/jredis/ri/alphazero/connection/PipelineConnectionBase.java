@@ -191,6 +191,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 		if(!isConnected()) 
 			throw new NotConnectedException ("Not connected!");
 		
+		Protocol		protocol = Assert.notNull(getProtocolHandler(), "thread protocol handler", ProviderException.class);
 		PendingRequest pendingResponse = null;
 		synchronized (serviceLock) {
 			if(pendingQuit) 
@@ -293,6 +294,9 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	 */
 //        @Override
         public void run () {
+        	/** Response handler thread specific protocol handler -- optimize fencing */
+        	Protocol protocol = Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class);
+        	
 			Log.log("Pipeline <%s> thread for <%s> started.", Thread.currentThread().getName(), PipelineConnectionBase.this);
         	PendingRequest pending = null;
         	while(run_flag.get()){

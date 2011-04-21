@@ -157,6 +157,8 @@ public class AsynchConnection extends ConnectionBase implements Connection {
 
         public void run () {
 			Log.log("AsynchConnection processor thread <%s> started.", Thread.currentThread().getName());
+        	/** Response handler thread specific protocol handler -- optimize fencing */
+        	Protocol protocol = Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class);
         	PendingRequest pending = null;
         	while(true){
 				try {
