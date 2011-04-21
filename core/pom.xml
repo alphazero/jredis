@@ -1,90 +1,132 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <!-- parent -->
-  <parent>
-    <groupId>org.jredis</groupId>
-    <artifactId>jredis</artifactId>
-	<version>${jredisVersion}</version>
-  </parent>
+	<!-- parent -->
+	<parent>
+		<groupId>org.jredis</groupId>
+		<artifactId>jredis</artifactId>
+		<version>a.0-SNAPSHOT</version>
+	</parent>
 
-  <!-- coordination | build pom -->
-  <name>JRedis - Core [Build POM]</name>
-  <groupId>org.jredis</groupId>
-  <artifactId>jredis-core</artifactId>
-  <version>${jredisVersion}</version>
-  <packaging>pom</packaging>
+	<!-- coordination | build pom -->
+	<name>JRedis - Core [Build POM]</name>
+	<groupId>org.jredis</groupId>
+	<artifactId>jredis-core</artifactId>
+	<version>a.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-  <!-- production units -->
-  <modules>
-    <module>api</module>
-    <module>ri</module>
-    <module>bench</module>
-    <module>all</module>
-  </modules>
+	<!-- production units -->
+	<modules>
+		<module>api</module>
+		<module>ri</module>
+		<module>bench</module>
+		<module>all</module>
+	</modules>
 
-  <!-- core specific surefire testrunner-->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <systemProperties>
-            <!-- TestNG parameters -->
+	<!-- core specific surefire testrunner -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemProperties>
+						<!-- TestNG parameters -->
 
-            <!-- redis tests | Test Server info -->
-            <property><name>jredis.test.host</name>     <value>localhost</value></property>
-            <property><name>jredis.test.port</name>     <value>6379</value></property>
-            <property><name>jredis.test.password</name> <value>jredis</value></property>
-            <!-- redis tests | Test DBs info *NOTE* THESE WILL BE FLUSHED *NOTE* -->
-            <property><name>jredis.test.db.1</name>     <value>13</value></property>
-            <property><name>jredis.test.db.2</name>     <value>10</value></property>
-            
-            <!-- redis core tests | test data sizes -->
-            <property><name>jredis.test.datasize.small</name>   <value>128</value></property>
-            <property><name>jredis.test.datasize.medium</name>  <value>2048</value></property>
-            <property><name>jredis.test.datasize.large</name>   <value>524288</value></property>
+						<!-- redis tests | Test Server info -->
+						<property>
+							<name>jredis.test.host</name>
+							<value>localhost</value>
+						</property>
+						<property>
+							<name>jredis.test.port</name>
+							<value>6379</value>
+						</property>
+						<property>
+							<name>jredis.test.password</name>
+							<value>jredis</value>
+						</property>
+						<!-- redis tests | Test DBs info *NOTE* THESE WILL BE FLUSHED *NOTE* -->
+						<property>
+							<name>jredis.test.db.1</name>
+							<value>13</value>
+						</property>
+						<property>
+							<name>jredis.test.db.2</name>
+							<value>10</value>
+						</property>
 
-            <!-- redis core tests | test cnt limits; mostly for iteration cnts -->
-            <property><name>jredis.test.cnt.small</name>   <value>10</value></property>
-            <property><name>jredis.test.cnt.medium</name>  <value>1000</value></property>
-            <property><name>jredis.test.cnt.large</name>   <value>100000</value></property>
-            
-            <property><name>jredis.test.expire.secs</name>   <value>1</value></property>
-            <property><name>jredis.test.expire.wait.millisecs</name>   <value>2000</value></property>
+						<!-- redis core tests | test data sizes -->
+						<property>
+							<name>jredis.test.datasize.small</name>
+							<value>128</value>
+						</property>
+						<property>
+							<name>jredis.test.datasize.medium</name>
+							<value>2048</value>
+						</property>
+						<property>
+							<name>jredis.test.datasize.large</name>
+							<value>524288</value>
+						</property>
 
-            <!-- redis core tests | Service params -->
-            <property><name>jredis.service.connection.cnt</name><value>5</value></property>
+						<!-- redis core tests | test cnt limits; mostly for iteration cnts -->
+						<property>
+							<name>jredis.test.cnt.small</name>
+							<value>10</value>
+						</property>
+						<property>
+							<name>jredis.test.cnt.medium</name>
+							<value>1000</value>
+						</property>
+						<property>
+							<name>jredis.test.cnt.large</name>
+							<value>100000</value>
+						</property>
 
-          </systemProperties>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+						<property>
+							<name>jredis.test.expire.secs</name>
+							<value>1</value>
+						</property>
+						<property>
+							<name>jredis.test.expire.wait.millisecs</name>
+							<value>2000</value>
+						</property>
 
-  <!-- info -->
-  <licenses>
-    <license>
-      <name>Apache 2</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>all</distribution>
-      <comments>Copyright 2009 (c) Joubin Houshyar - All Right Resererved</comments>
-    </license>
-  </licenses>
-  <developers>
-    <developer>
-      <id>joubin</id>
-      <name>Joubin Houshyar</name>
-      <email>alphazero@sensesay.net</email>
-      <url>http://www.sensesay.net</url>
-      <roles>
-        <role>ReleaseManager</role>
-        <role>Designer</role>
-        <role>Developer</role>
-      </roles>
-      <timezone>UTC-5</timezone>
-    </developer>
-  </developers>
+						<!-- redis core tests | Service params -->
+						<property>
+							<name>jredis.service.connection.cnt</name>
+							<value>5</value>
+						</property>
+
+					</systemProperties>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- info -->
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>all</distribution>
+			<comments>Copyright 2009 (c) Joubin Houshyar - All Right Resererved</comments>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>joubin</id>
+			<name>Joubin Houshyar</name>
+			<email>alphazero@sensesay.net</email>
+			<url>http://www.sensesay.net</url>
+			<roles>
+				<role>ReleaseManager</role>
+				<role>Designer</role>
+				<role>Developer</role>
+			</roles>
+			<timezone>UTC-5</timezone>
+		</developer>
+	</developers>
 </project>

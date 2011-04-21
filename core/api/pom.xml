@@ -6,16 +6,16 @@
 	<parent>
 		<groupId>org.jredis</groupId>
 		<artifactId>jredis-core</artifactId>
-		<version>${jredisVersion}</version>
+		<version>a.0-SNAPSHOT</version>
 	</parent>
 
 	<!-- production | jar -->
 	<name>JRedis - Core - API</name>
 	<groupId>org.jredis</groupId>
 	<artifactId>jredis-core-api</artifactId>
-	<version>${jredisVersion}</version>
+	<version>a.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	
+
 
 	<dependencies>
 		<!-- unit testing -->
@@ -26,7 +26,7 @@
 			<scope>test</scope>
 			<classifier>jdk15</classifier>
 		</dependency>
-		<!--  logging -->
+		<!-- logging -->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
