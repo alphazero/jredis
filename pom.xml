@@ -16,7 +16,9 @@
   <modules>
     <module>core</module>
     <module>examples</module>
-    <module>extensions</module>
+	<!-- next time be more careful when you pull ..
+	<module>extensions</module>
+	-->
   </modules>
   <build>
     <plugins>
