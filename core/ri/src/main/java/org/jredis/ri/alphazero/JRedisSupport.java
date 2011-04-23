@@ -1567,7 +1567,7 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 	@Override
-	public <K extends Object> void sinterstore(String dest, String... sets) throws RedisException {
+	public <K extends Object> void sinterstore(K dest, K... sets) throws RedisException {
 		byte[] keydata = null;
 		if((keydata = getKeyBytes(dest)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+dest+"]");
@@ -1576,7 +1576,7 @@ public abstract class JRedisSupport implements JRedis {
 		int i=0; 
 		setbytes[i++] = keydata;
 		byte[] setdata =null;
-		for(String k : sets) {
+		for(K k : sets) {
 			if((setdata = getKeyBytes(k)) == null) 
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			setbytes[i++] = setdata;

@@ -552,7 +552,7 @@ public interface JRedis {
 	 * @param sets
 	 * @throws RedisException
 	 */
-	public <K extends Object> void sinterstore (String destSetKey, String...sets) throws RedisException;
+	public <K extends Object> void sinterstore (K destSetKey, K...sets) throws RedisException;
 
 	/**
 	 * @Redis SUNION
