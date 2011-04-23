@@ -169,12 +169,12 @@ public interface JRedis {
 	 * @return 
 	 * @throws RedisException
 	 */
-	public <K extends Object> void mset(Map<String, byte[]> keyValueMap) throws RedisException;
+	public <K extends Object> void mset(Map<K, byte[]> keyValueMap) throws RedisException;
 	
-	public <K extends Object> void mset(KeyValueSet.ByteArrays mappings) throws RedisException;
-	public <K extends Object> void mset(KeyValueSet.Strings mappings) throws RedisException;
-	public <K extends Object> void mset(KeyValueSet.Numbers mappings) throws RedisException;
-	public <K extends Object, T extends Serializable> void mset(KeyValueSet.Objects<T> mappings) throws RedisException;
+	public <K extends Object> void mset(KeyValueSet.ByteArrays<K> mappings) throws RedisException;
+	public <K extends Object> void mset(KeyValueSet.Strings<K> mappings) throws RedisException;
+	public <K extends Object> void mset(KeyValueSet.Numbers<K> mappings) throws RedisException;
+	public <K extends Object, T extends Serializable> void mset(KeyValueSet.Objects<K, T> mappings) throws RedisException;
 	
 	/**
 	 * @Redis MSETNX
@@ -182,12 +182,12 @@ public interface JRedis {
 	 * @return false if ANY of the keys in the map already existed, true if all were new and were set.
 	 * @throws RedisException
 	 */
-	public <K extends Object> boolean msetnx(Map<String, byte[]> keyValueMap) throws RedisException;
+	public <K extends Object> boolean msetnx(Map<K, byte[]> keyValueMap) throws RedisException;
 	
-	public <K extends Object> boolean msetnx(KeyValueSet.ByteArrays mappings) throws RedisException;
-	public <K extends Object> boolean msetnx(KeyValueSet.Strings mappings) throws RedisException;
-	public <K extends Object> boolean msetnx(KeyValueSet.Numbers mappings) throws RedisException;
-	public <K extends Object, T extends Serializable> boolean msetnx(KeyValueSet.Objects<T> mappings) throws RedisException;
+	public <K extends Object> boolean msetnx(KeyValueSet.ByteArrays<K> mappings) throws RedisException;
+	public <K extends Object> boolean msetnx(KeyValueSet.Strings<K> mappings) throws RedisException;
+	public <K extends Object> boolean msetnx(KeyValueSet.Numbers<K> mappings) throws RedisException;
+	public <K extends Object, T extends Serializable> boolean msetnx(KeyValueSet.Objects<K, T> mappings) throws RedisException;
 	
 	/**
 	 * @Redis INCR

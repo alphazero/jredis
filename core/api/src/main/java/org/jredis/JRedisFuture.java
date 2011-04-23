@@ -173,12 +173,12 @@ public interface JRedisFuture {
 	 * @return Future<Boolean> indicating if all of sets were OK or not
 	 * @throws RedisException
 	 */
-	public <K extends Object> Future<ResponseStatus> mset(Map<String, byte[]> keyValueMap);
+	public <K extends Object> Future<ResponseStatus> mset(Map<K, byte[]> keyValueMap);
 	
-	public <K extends Object> Future<ResponseStatus> mset(KeyValueSet.ByteArrays mappings);
-	public <K extends Object> Future<ResponseStatus> mset(KeyValueSet.Strings mappings);
-	public <K extends Object> Future<ResponseStatus> mset(KeyValueSet.Numbers mappings);
-	public <K extends Object, T extends Serializable> Future<ResponseStatus> mset(KeyValueSet.Objects<T> mappings);
+	public <K extends Object> Future<ResponseStatus> mset(KeyValueSet.ByteArrays<K> mappings);
+	public <K extends Object> Future<ResponseStatus> mset(KeyValueSet.Strings<K> mappings);
+	public <K extends Object> Future<ResponseStatus> mset(KeyValueSet.Numbers<K> mappings);
+	public <K extends Object, T extends Serializable> Future<ResponseStatus> mset(KeyValueSet.Objects<K, T> mappings);
 	
 	/**
 	 * @Redis MSETNX
@@ -186,12 +186,12 @@ public interface JRedisFuture {
 	 * @return Future<Boolean> indicating if all of sets were OK or not
 	 * @throws RedisException
 	 */
-	public <K extends Object> Future<Boolean> msetnx(Map<String, byte[]> keyValueMap);
+	public <K extends Object> Future<Boolean> msetnx(Map<K, byte[]> keyValueMap);
 	
-	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.ByteArrays mappings);
-	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Strings mappings);
-	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Numbers mappings);
-	public <K extends Object, T extends Serializable> Future<Boolean> msetnx(KeyValueSet.Objects<T> mappings);
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.ByteArrays<K> mappings);
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Strings<K> mappings);
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Numbers<K> mappings);
+	public <K extends Object, T extends Serializable> Future<Boolean> msetnx(KeyValueSet.Objects<K, T> mappings);
 	
 	/**
 	 * @Redis INCR

@@ -28,14 +28,14 @@ import java.io.Serializable;
  * 
  */
 
-public interface KeyValueSet <T> {
-	public KeyValueSet<T> add(String key, T value);
+public interface KeyValueSet <K extends Object, T> {
+	public KeyValueSet<K, T> add(K key, T value);
 	byte[][] getMappings ();
 	
-	public interface ByteArrays extends KeyValueSet<byte[]>{}
-	public interface Numbers extends KeyValueSet<Number>{}
-	public interface Strings extends KeyValueSet<String>{}
-	public interface Objects <T extends Serializable> extends KeyValueSet<T>{}
+	public interface ByteArrays<K extends Object> extends KeyValueSet<K, byte[]>{}
+	public interface Numbers<K extends Object>  extends KeyValueSet<K, Number>{}
+	public interface Strings<K extends Object>  extends KeyValueSet<K, String>{}
+	public interface Objects<K extends Object, T extends Serializable> extends KeyValueSet<K, T>{}
 	
 //	abstract static class  GenImpl<T> implements  BulkSetMappings<T> {
 //		protected final Map<String, T> map = new HashMap<String, T>();

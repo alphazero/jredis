@@ -17,18 +17,17 @@
 package org.jredis.ri.alphazero;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.KeyValueSet;
@@ -44,11 +43,9 @@ import org.jredis.protocol.MultiBulkResponse;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.ResponseStatus;
 import org.jredis.protocol.ValueResponse;
-import org.jredis.ri.alphazero.semantics.DefaultKeyCodec;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.SortSupport;
-import org.jredis.semantics.KeyCodec;
 
 /**
  *
@@ -782,29 +779,29 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.MSET, mappings);
 		return new FutureStatus(futureResponse);
 	}
-	public <K extends Object> FutureStatus mset(Map<String, byte[]> keyValueMap){
-		KeyCodec codec = DefaultKeyCodec.provider();
+	public <K extends Object> FutureStatus mset(Map<K, byte[]> keyValueMap){
+//		KeyCodec codec = DefaultKeyCodec.provider();
 		byte[][] mappings = new byte[keyValueMap.size()*2][];
 		int i = 0;
-		for (Entry<String, byte[]> e : keyValueMap.entrySet()){
-			mappings[i++] = codec.encode(e.getKey());
+		for (Entry<K, byte[]> e : keyValueMap.entrySet()){
+			mappings[i++] = JRedisSupport.getKeyBytes(e.getKey());
 			mappings[i++] = e.getValue();
 		}
 		return mset(mappings);
 	}
 	
-	public <K extends Object> FutureStatus mset(KeyValueSet.ByteArrays keyValueMap){
+	public <K extends Object> FutureStatus mset(KeyValueSet.ByteArrays<K> keyValueMap){
 		return mset(keyValueMap.getMappings());
 	}
-	public <K extends Object> FutureStatus mset(KeyValueSet.Strings keyValueMap){
-		return mset(keyValueMap.getMappings());
-	}
-
-	public <K extends Object> FutureStatus mset(KeyValueSet.Numbers keyValueMap){
+	public <K extends Object> FutureStatus mset(KeyValueSet.Strings<K> keyValueMap){
 		return mset(keyValueMap.getMappings());
 	}
 
-	public <K extends Object, T extends Serializable> FutureStatus mset(KeyValueSet.Objects<T> keyValueMap){
+	public <K extends Object> FutureStatus mset(KeyValueSet.Numbers<K> keyValueMap){
+		return mset(keyValueMap.getMappings());
+	}
+
+	public <K extends Object, T extends Serializable> FutureStatus mset(KeyValueSet.Objects<K, T> keyValueMap){
 		return mset(keyValueMap.getMappings());
 	}
 
@@ -813,29 +810,29 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.MSETNX, mappings);
 		return new FutureBoolean(futureResponse);
 	}
-	public <K extends Object> Future<Boolean> msetnx(Map<String, byte[]> keyValueMap){
-		KeyCodec codec = DefaultKeyCodec.provider();
+	public <K extends Object> Future<Boolean> msetnx(Map<K, byte[]> keyValueMap){
+//		KeyCodec codec = DefaultKeyCodec.provider();
 		byte[][] mappings = new byte[keyValueMap.size()*2][];
 		int i = 0;
-		for (Entry<String, byte[]> e : keyValueMap.entrySet()){
-			mappings[i++] = codec.encode(e.getKey());
+		for (Entry<K, byte[]> e : keyValueMap.entrySet()){
+			mappings[i++] = JRedisSupport.getKeyBytes(e.getKey());
 			mappings[i++] = e.getValue();
 		}
 		return msetnx(mappings);
 	}
 	
-	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.ByteArrays keyValueMap){
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.ByteArrays<K> keyValueMap){
 		return msetnx(keyValueMap.getMappings());
 	}
-	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Strings keyValueMap){
-		return msetnx(keyValueMap.getMappings());
-	}
-
-	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Numbers keyValueMap){
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Strings<K> keyValueMap){
 		return msetnx(keyValueMap.getMappings());
 	}
 
-	public <K extends Object,T extends Serializable> Future<Boolean> msetnx(KeyValueSet.Objects<T> keyValueMap){
+	public <K extends Object> Future<Boolean> msetnx(KeyValueSet.Numbers<K> keyValueMap){
+		return msetnx(keyValueMap.getMappings());
+	}
+
+	public <K extends Object,T extends Serializable> Future<Boolean> msetnx(KeyValueSet.Objects<K, T> keyValueMap){
 		return msetnx(keyValueMap.getMappings());
 	}
 
@@ -1419,7 +1416,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	// TODO: (implied) ClientSpec (impls. ConnectionSpec)
 	// this isn't cooked yet -- lets think more about the implications...
 	//
-	static final private Map<String, byte[]>	keyByteCache = new ConcurrentHashMap<String, byte[]>();
+//	static final private Map<String, byte[]>	keyByteCache = new ConcurrentHashMap<String, byte[]>();
 	public static final boolean	CacheKeys	= false;
 	
 	public static class FutureResultBase {

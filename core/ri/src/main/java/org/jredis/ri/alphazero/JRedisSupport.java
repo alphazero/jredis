@@ -48,7 +48,7 @@ import org.jredis.ri.alphazero.semantics.DefaultKeyCodec;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.SortSupport;
-import org.jredis.semantics.KeyCodec;
+
 /**
  * 
  * [TODO: document me!]
@@ -495,26 +495,31 @@ public abstract class JRedisSupport implements JRedis {
 		}
 		return resvalue;
 	}
-	public <K extends Object> boolean msetnx(Map<String, byte[]> keyValueMap) throws RedisException {
-		KeyCodec<Object> codec = DefaultKeyCodec.provider();
+//	@Override
+	public <K extends Object> boolean msetnx(Map<K, byte[]> keyValueMap) throws RedisException {
+//		KeyCodec<Object> codec = DefaultKeyCodec.provider();
 		byte[][] mappings = new byte[keyValueMap.size()*2][];
 		int i = 0;
-		for (Entry<String, byte[]> e : keyValueMap.entrySet()){
-			mappings[i++] = codec.encode(e.getKey());
+		for (Entry<K, byte[]> e : keyValueMap.entrySet()){
+			mappings[i++] = getKeyBytes(e.getKey());
 			mappings[i++] = e.getValue();
 		}
 		return msetnx(mappings);
 	}
-	public <K extends Object> boolean msetnx(KeyValueSet.ByteArrays keyValueMap) throws RedisException {
+//	@Override
+	public <K extends Object> boolean msetnx(KeyValueSet.ByteArrays<K> keyValueMap) throws RedisException {
 		return msetnx(keyValueMap.getMappings());
 	}
-	public <K extends Object> boolean msetnx(KeyValueSet.Strings keyValueMap) throws RedisException{
+//	@Override
+	public <K extends Object> boolean msetnx(KeyValueSet.Strings<K> keyValueMap) throws RedisException{
 		return msetnx(keyValueMap.getMappings());
 	}
-	public <K extends Object> boolean msetnx(KeyValueSet.Numbers keyValueMap) throws RedisException{
+//	@Override
+	public <K extends Object> boolean msetnx(KeyValueSet.Numbers<K> keyValueMap) throws RedisException{
 		return msetnx(keyValueMap.getMappings());
 	}
-	public <K extends Object, T extends Serializable> boolean msetnx(KeyValueSet.Objects<T> keyValueMap) throws RedisException{
+//	@Override
+	public <K extends Object, T extends Serializable> boolean msetnx(KeyValueSet.Objects<K, T> keyValueMap) throws RedisException{
 		return msetnx(keyValueMap.getMappings());
 	}
 
@@ -1093,26 +1098,26 @@ public abstract class JRedisSupport implements JRedis {
 	private void mset(byte[][] mappings) throws RedisException {
 		this.serviceRequest(Command.MSET, mappings);
 	}
-	public <K extends Object> void mset(Map<String, byte[]> keyValueMap) throws RedisException {
-		KeyCodec<Object> codec = DefaultKeyCodec.provider();
+	public <K extends Object> void mset(Map<K, byte[]> keyValueMap) throws RedisException {
+//		KeyCodec<Object> codec = DefaultKeyCodec.provider();
 		byte[][] mappings = new byte[keyValueMap.size()*2][];
 		int i = 0;
-		for (Entry<String, byte[]> e : keyValueMap.entrySet()){
-			mappings[i++] = codec.encode(e.getKey());
+		for (Entry<K, byte[]> e : keyValueMap.entrySet()){
+			mappings[i++] = getKeyBytes(e.getKey());
 			mappings[i++] = e.getValue();
 		}
 		mset(mappings);
 	}
-	public <K extends Object> void mset(KeyValueSet.ByteArrays keyValueMap) throws RedisException {
+	public <K extends Object> void mset(KeyValueSet.ByteArrays<K> keyValueMap) throws RedisException {
 		mset(keyValueMap.getMappings());
 	}
-	public <K extends Object> void mset(KeyValueSet.Strings keyValueMap) throws RedisException{
+	public <K extends Object> void mset(KeyValueSet.Strings<K> keyValueMap) throws RedisException{
 		mset(keyValueMap.getMappings());
 	}
-	public <K extends Object> void mset(KeyValueSet.Numbers keyValueMap) throws RedisException{
+	public <K extends Object> void mset(KeyValueSet.Numbers<K> keyValueMap) throws RedisException{
 		mset(keyValueMap.getMappings());
 	}
-	public <K extends Object, T extends Serializable> void mset(KeyValueSet.Objects<T> keyValueMap) throws RedisException{
+	public <K extends Object, T extends Serializable> void mset(KeyValueSet.Objects<K, T> keyValueMap) throws RedisException{
 		mset(keyValueMap.getMappings());
 	}
 
@@ -2050,46 +2055,5 @@ public abstract class JRedisSupport implements JRedis {
 	
 	public static <K extends Object> byte[] getKeyBytes(K key) throws IllegalArgumentException {
 		return DefaultKeyCodec.provider().encode(key);
-//		if(null == key) throw new IllegalArgumentException("key is null");
-//		if(key instanceof String) {
-//			return getKeyBytes((String) key);
-//		}
-//		else if (key instanceof byte[]){
-//			byte[] bkey = (byte[]) key ;
-//			if(bkey.length == 0) throw new IllegalArgumentException("key is zerolewn");
-//			return bkey;
-//		}
-//		else {
-//			String msg = String.format("only String and byte[] keys are supported", key.getClass().getCanonicalName());
-//			throw new IllegalArgumentException(msg);
-//		}
 	}
-//	public <K extends Object> static byte[] getKeyBytes(byte[] key) throws IllegalArgumentException {
-//		if(null == key) throw new IllegalArgumentException("key is null");
-//		if(key.length == 0) throw new IllegalArgumentException("key is zerolewn");
-//		return key;
-//	}
-//	public static byte[] getKeyBytes(String key) throws IllegalArgumentException {
-//		if(null == key) throw new IllegalArgumentException("key is null");
-//		byte[] bytes = null;
-//		if(JRedisSupport.CacheKeys == true)
-//			bytes = keyByteCache.get(key);
-//		if(null == bytes) {
-////			bytes = key.getBytes(DefaultCodec.SUPPORTED_CHARSET); // java 1.6
-//			try {
-//	            bytes = key.getBytes(DefaultCodec.SUPPORTED_CHARSET_NAME);
-//            }
-//            catch (UnsupportedEncodingException e) {
-//	            throw new UndeclaredThrowableException(e);
-//            }
-//			for(byte b : bytes) {
-//				if (b == (byte)32 || b == (byte)10 || b == (byte)13)
-//					throw new IllegalArgumentException ("Key includes invalid byte value: " + (int)b);
-//			}
-//			
-//			if(JRedisSupport.CacheKeys == true)
-//				keyByteCache.put(key, bytes);
-//		}
-//		return bytes;
-//	}
 }
