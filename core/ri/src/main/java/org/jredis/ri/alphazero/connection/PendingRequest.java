@@ -1,3 +1,19 @@
+/*
+ *   Copyright 2009-2011 Joubin Houshyar
+ * 
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *    
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *    
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package org.jredis.ri.alphazero.connection;
 
 import java.util.concurrent.ExecutionException;
@@ -32,9 +48,6 @@ public final class PendingRequest implements Future<Response> {
 //	final private BooleanLatch completion = new BooleanLatch();
 	final Signal completion = new Signal();
 
-	/** the aysnchronous {@link Request} */
-    final Request	request;
-
 	/** awaited response */
 	Response response;
 
@@ -51,14 +64,12 @@ public final class PendingRequest implements Future<Response> {
 	// ------------------------------------------------------------------------
 	// constructor(s)
 	// ------------------------------------------------------------------------
-	public PendingRequest(Request request, Command cmd){
-		this.request = request;
+	public PendingRequest(Command cmd){
 		this.cmd = cmd;
 		this.args = null;
 	}
 	
 	public PendingRequest(Command cmd, byte[]... args){
-		this.request = null;
 		this.cmd = cmd;
 		this.args = args;
 	}
@@ -69,9 +80,6 @@ public final class PendingRequest implements Future<Response> {
 	final Command getCommand () {
 		return cmd;
 	}
-
-//	/**  @return request */
-//	final Request getRequest () { return request; }
 
 	/**
 	 * Signals completion without error.

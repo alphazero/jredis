@@ -275,11 +275,8 @@ public class PipelineInAction {
 	    			futureStat = pipeline.set(key, data);
 	    			cnt++;
 	    		}
-	    		long reqDoneTime = timer.mark();
 				futureStat.get();
 	    		long respDoneTime = timer.mark();
-//				System.out.format("JRedisPipeline: %d SETs invoked   @ %5d  (%.2f ops/s)\n", cnt, reqDoneTime, timer.opsPerSecAtDelta(cnt, reqDoneTime));
-//				System.out.format("JRedisPipeline: %d SETs completed @ %5d  (%.2f ops/s) [%d msecs to comp] \n", cnt, timer.deltaAtMark(), timer.opsPerSecAtMark(cnt), respDoneTime-reqDoneTime);
 				if(iters > 0){
 					totTime += respDoneTime;
 					avgRespTime = (totTime) / (long)iters;
@@ -287,7 +284,6 @@ public class PipelineInAction {
 					System.out.format("JRedisPipeline: %d SETs [%d bytes/GET] average response time @ %dms (%.2f ops/s) \n", cnt, data.length, avgRespTime, avgThroughput);
 				}
 				iters ++;
-//				System.out.println ();
     		} while(forever);
 
     		pipeline.quit();

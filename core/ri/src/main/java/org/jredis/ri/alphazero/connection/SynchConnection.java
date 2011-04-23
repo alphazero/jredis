@@ -103,23 +103,6 @@ public class SynchConnection extends ConnectionBase implements Connection {
 	 */
 	public Response serviceRequest (Command cmd, byte[]... args) 
 		throws RedisException
-//	{
-//		Lock _lock = null;
-//		if(spec.getConnectionFlag(Flag.RELIABLE)) 
-//			_lock = acquireLock();
-//		
-//		Response r = null;
-//		
-//		try { r = _serviceRequest(cmd, args); }
-//		catch (Throwable t){ Log.error("serviceRequest cmd:%s %s:=>%s", t, t.getMessage());}
-//		finally { 
-//			if(_lock != null) releaseLock(); 
-//		}
-//		
-//		return r;
-//	}
-//	private Response _serviceRequest(Command cmd, byte[]... args)
-//		throws RedisException
 	{
 		if(!isConnected()) throw new NotConnectedException ("Not connected!");
 		
@@ -127,6 +110,7 @@ public class SynchConnection extends ConnectionBase implements Connection {
 		Response		response = null;
 		ResponseStatus  status = null;
 		Protocol		protocol = Assert.notNull(getProtocolHandler(), "thread protocol handler", ProviderException.class);
+
 		try {
 			// 1 - Request
 			//				Log.log("RedisConnection - requesting ..." + cmd.code);

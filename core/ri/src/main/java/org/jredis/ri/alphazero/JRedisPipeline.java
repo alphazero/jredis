@@ -20,11 +20,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedis;
 import org.jredis.JRedisFuture;
 import org.jredis.ProviderException;
-import org.jredis.Redis;
 import org.jredis.RedisException;
 import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
@@ -44,7 +44,7 @@ import org.jredis.ri.alphazero.connection.AsynchPipelineConnection;
  * 
  */
 
-@Redis(versions={"1.00"})
+//@Redis(versions={"1.00"})
 public class JRedisPipeline extends JRedisFutureSupport {
 	
 	// ------------------------------------------------------------------------

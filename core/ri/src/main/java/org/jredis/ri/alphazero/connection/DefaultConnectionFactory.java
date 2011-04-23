@@ -17,11 +17,12 @@
 package org.jredis.ri.alphazero.connection;
 
 import java.security.ProviderException;
+
 import org.jredis.ClientRuntimeException;
 import org.jredis.NotSupportedException;
 import org.jredis.connector.Connection;
-import org.jredis.connector.ConnectionSpec;
 import org.jredis.connector.Connection.Flag;
+import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 
 /**
@@ -68,9 +69,10 @@ public class DefaultConnectionFactory implements Connection.Factory {
      * @param spec
      */
     private Connection newAsynchConnection (ConnectionSpec spec) {
+
     	Connection conn = null;
     	if(spec.getConnectionFlag(Flag.PIPELINE)){
-    		throw new ProviderException("NOT IMPLEMENTED! [Asynch|PIPELINE]");
+			conn = new AsynchPipelineConnection(spec); // why not for all asyncs?
     	}
     	else {
     		if(spec.getConnectionFlag(Flag.SHARED)){
@@ -78,6 +80,7 @@ public class DefaultConnectionFactory implements Connection.Factory {
     		}
     		else {
     			conn = new AsynchConnection(spec);
+//    			conn = new AsynchPipelineConnection(spec); // why not for all asyncs?
     		}
     	}
     	return conn;
