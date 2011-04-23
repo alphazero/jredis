@@ -105,31 +105,31 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	// ------------------------------------------------------------------------
 
 
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus bgsave() {
 		return new FutureStatus(this.queueRequest(Command.BGSAVE));
 	}
 	
-//	@Override
+	@Override
 	public <K extends Object> FutureString bgrewriteaof() {
 		Future<Response> futureResponse = this.queueRequest(Command.BGREWRITEAOF);
 		return new FutureString(futureResponse);
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus ping() {
 		return new FutureStatus(this.queueRequest(Command.PING));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus flushall() {
 		return new FutureStatus(this.queueRequest(Command.FLUSHALL));
 	}
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus flushdb() {
 		return new FutureStatus(this.queueRequest(Command.FLUSHDB));
 	}
-////	@Override
+//	@Override
 //	public <K extends Object> FutureStatus select(int index) {
 //		this.queueRequest(Command.SELECT, Convert.toBytes(index));
 //		return this;
@@ -150,7 +150,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.SLAVEOF, "no".getBytes(), "one".getBytes()));
 	}
 	
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus rename(K oldkey, K newkey) {
 		byte[] oldkeydata = null;
 		if((oldkeydata = JRedisSupport.getKeyBytes(oldkey)) == null)
@@ -163,7 +163,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.RENAME, oldkeydata, newkeydata));
 	}
 	
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> renamenx(K oldkey, K newkey){
 		byte[] oldkeydata = null;
 		if((oldkeydata = JRedisSupport.getKeyBytes(oldkey)) == null)
@@ -229,7 +229,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
     return linsert(key, false, oldvalue, newvalue);
   }
 
-//	@Override
+	@Override
 	public <K extends Object> FutureByteArray rpoplpush (String srcList, String destList)  {
 		byte[] srckeybytes = null;
 		if((srckeybytes = JRedisSupport.getKeyBytes(srcList)) == null)
@@ -241,22 +241,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.RPOPLPUSH, srckeybytes, destkeybytes);
 		return new FutureByteArray(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> FutureLong rpush(K key, String value) {
 //		rpush(key, DefaultCodec.encode(value));
 		return rpush(key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> FutureLong rpush(K key, Number value) {
 		return rpush(key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> FutureLong rpush (K key, T value)
 	{
 		return rpush(key, DefaultCodec.encode(value));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> sadd(K key, byte[] member)
 	{
 		byte[] keybytes = null;
@@ -266,21 +266,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.SADD, keybytes, member);
 		return new FutureBoolean(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> sadd (K key, String value) {
 		return sadd (key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> sadd (K key, Number value) {
 		return sadd (key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> Future<Boolean> sadd (K key, T value)
 	{
 		return sadd (key, DefaultCodec.encode(value));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> zadd(K key, double score, byte[] member)
 	{
 		byte[] keybytes = null;
@@ -290,21 +290,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.ZADD, keybytes,  Convert.toBytes(score), member);
 		return new FutureBoolean(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> zadd (K key, double score, String value) {
 		return zadd (key, score, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> zadd (K key, double score, Number value) {
 		return zadd (key, score, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> Future<Boolean> zadd (K key, double score, T value)
 	{
 		return zadd (key, score, DefaultCodec.encode(value));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Double> zincrby(K key, double score, byte[] member)
 	{
 		byte[] keybytes = null;
@@ -314,21 +314,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.ZINCRBY, keybytes,  Convert.toBytes(score), member);
 		return new FutureDouble(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Double> zincrby (K key, double score, String value) {
 		return zincrby (key, score, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Double> zincrby (K key, double score, Number value) {
 		return zincrby (key, score, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> Future<Double> zincrby (K key, double score, T value)
 	{
 		return zincrby (key, score, DefaultCodec.encode(value));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus save()
 	{
 		return new FutureStatus(this.queueRequest(Command.SAVE));
@@ -336,7 +336,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	
 	// -------- set
 
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus set(K key, byte[] value) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -344,21 +344,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 		return new FutureStatus(this.queueRequest(Command.SET, keybytes, value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus set(K key, String value) {
 		return set(key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus set(K key, Number value) {
 		return set(key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> FutureStatus set (K key, T value)
 	{
 		return set(key, DefaultCodec.encode(value));
 	}
 	
-//	@Override
+	@Override
 	public <K extends Object> Future<byte[]> getset(K key, byte[] value) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -367,22 +367,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.GETSET, keybytes, value);
 		return new FutureByteArray(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<byte[]> getset(K key, String value) {
 		return getset(key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<byte[]> getset(K key, Number value) {
 		return getset(key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable>
 	Future<byte[]> getset (K key, T value)
 	{
 		return getset(key, DefaultCodec.encode(value));
 	}
 	
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> setnx(K key, byte[] value){
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -391,21 +391,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.SETNX, keybytes, value);
 		return new FutureBoolean(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> setnx(K key, String value) {
 		return setnx(key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> setnx(K key, Number value) {
 		return setnx(key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> Future<Boolean> setnx (K key, T value) {
 		return setnx(key, DefaultCodec.encode(value));
 	}
 
 	
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> append (K key, byte[] value){
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -414,20 +414,20 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.APPEND, keybytes, value);
 		return new FutureLong(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> append(K key, String value) {
 		return append(key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> append(K key, Number value) {
 		return append(key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> Future<Long> append (K key, T value) {
 		return append(key, DefaultCodec.encode(value));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> sismember(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -437,17 +437,17 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureBoolean(futureResponse);
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> sismember(K key, String value) {
 		return sismember(key, DefaultCodec.encode(value));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> sismember(K key, Number numberValue) {
 		return sismember (key, String.valueOf(numberValue).getBytes());
 	}
 
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> Future<Boolean> sismember(K key, T object) {
 		return sismember(key, DefaultCodec.encode(object));
 	}
@@ -561,6 +561,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureKeyList (futureResponse);
 	}
 	
+	@Override
 	public <K extends Object> Future<List<byte[]>> hvals(K key) {
 		byte[] keyBytes = null;
 		if((keyBytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -569,8 +570,8 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.HKEYS, keyBytes);
 		return new FutureByteArrayList (futureResponse);
 	}
-	
-	public <K extends Object> Future<Map<String, byte[]>> hgetall(K key) {
+	@Override
+	public <K extends Object> Future<Map<byte[], byte[]>> hgetall(K key) {
 		byte[] keyBytes = null;
 		if((keyBytes = JRedisSupport.getKeyBytes(key)) == null)
 			throw new IllegalArgumentException ("invalid key => ["+key+"]");
@@ -582,7 +583,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	
 	/* ------------------------------- commands returning int value --------- */
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> incr(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -592,7 +593,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong (futureResponse);
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> incrby(K key, int delta) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -602,7 +603,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong (futureResponse);
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> decr(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -612,7 +613,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong (futureResponse);
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> decrby(K key, int delta) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -622,7 +623,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong (futureResponse);
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> llen(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -632,7 +633,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong (futureResponse);
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> scard(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -642,7 +643,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong (futureResponse);
 	}
 	
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> zcard(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -672,12 +673,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	/* ------------------------------- commands returning long value --------- */
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> dbsize() {
 		Future<Response> futureResponse = this.queueRequest(Command.DBSIZE);
 		return new FutureLong (futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> lastsave() {
 		Future<Response> futureResponse = this.queueRequest(Command.LASTSAVE);
 		return new FutureLong (futureResponse);
@@ -685,7 +686,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	/* ------------------------------- commands returning byte[] --------- */
 
-//	@Override
+	@Override
 	public <K extends Object> Future<byte[]> get(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -695,7 +696,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArray(futureResponse);
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<byte[]> lindex(K key, long index) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -704,7 +705,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.LINDEX, keybytes, Convert.toBytes(index));
 		return new FutureByteArray(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<byte[]> lpop(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -714,7 +715,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArray(futureResponse);
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<byte[]> rpop(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -727,12 +728,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	/* ------------------------------- commands returning String--------- */
 
-//	@Override
+	@Override
 	public <K extends Object> Future<byte[]> randomkey() {
 		Future<Response> futureResponse = this.queueRequest(Command.RANDOMKEY);
 		return new FutureByteArray(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<RedisType> type(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -743,12 +744,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	/* ------------------------------- commands returning Maps --------- */
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Map<String, String>> info() {
 		return new FutureInfo(this.queueRequest(Command.INFO));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<ObjectInfo> debug (K key) {
 		byte[] keybytes = JRedisSupport.getKeyBytes(key);
 //		if(key.length() == 0)
@@ -758,7 +759,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	/* ------------------------------- commands returning Lists --------- */
 
-//	@Override
+	@Override
 	public <K extends Object> Future<List<byte[]>> mget(String ... keys) {
 
 		if(null == keys || keys.length == 0) throw new IllegalArgumentException("no keys specified");
@@ -837,7 +838,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 
-//	@Override
+	@Override
 	public <K extends Object> Future<List<byte[]>> smembers(K key) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(key)) == null)
@@ -845,12 +846,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 		return new FutureByteArrayList(this.queueRequest(Command.SMEMBERS, keydata));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<List<byte[]>> keys() {
 		return this.keys("*");
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<List<byte[]>> keys(K pattern) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(pattern)) == null)
@@ -871,7 +872,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(this.queueRequest(Command.KEYSTOLIST, keydata, listnamedata));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<List<byte[]>> lrange(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -883,7 +884,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArrayList(this.queueRequest(Command.LRANGE, keybytes, fromBytes, toBytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<byte[]> substr(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -895,7 +896,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArray(this.queueRequest(Command.SUBSTR, keybytes, fromBytes, toBytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<List<byte[]>> zrange(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -907,7 +908,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArrayList(this.queueRequest(Command.ZRANGE, keybytes, fromBytes, toBytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<List<byte[]>> zrangebyscore(K key, double minScore, double maxScore) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -919,7 +920,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArrayList(this.queueRequest(Command.ZRANGEBYSCORE, keybytes, minScoreBytes, maxScoreBytes));
 	}
 	
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> zremrangebyscore(K key, double minScore, double maxScore) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -931,7 +932,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(this.queueRequest(Command.ZREMRANGEBYSCORE, keybytes, minScoreBytes, maxScoreBytes));
 	}
 	
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> zcount(K key, double minScore, double maxScore) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -943,7 +944,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureLong(this.queueRequest(Command.ZCOUNT, keybytes, minScoreBytes, maxScoreBytes));
 	}
 	
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> zremrangebyrank(K key, long minRank, long maxRank) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -956,7 +957,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 
-//	@Override
+	@Override
 	public <K extends Object> Future<List<byte[]>> zrevrange(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -968,7 +969,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArrayList(this.queueRequest(Command.ZREVRANGE, keybytes, fromBytes, toBytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<List<ZSetEntry>> zrangeSubset(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -980,7 +981,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureZSetList(this.queueRequest(Command.ZRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Option.WITHSCORES.bytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<List<ZSetEntry>> zrevrangeSubset(K key, long from, long to) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -992,7 +993,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureZSetList(this.queueRequest(Command.ZREVRANGE$OPTS, keybytes, fromBytes, toBytes, Command.Option.WITHSCORES.bytes));
 	}
 	
-//	@Override
+	@Override
 	public <K extends Object> Sort sort(final K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1001,7 +1002,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		final JRedisFutureSupport client = this;
 		Sort sortQuery = new SortSupport (keybytes) {
 
-			//	@Override 
+				@Override 
 			protected Future<List<byte[]>> execAsynchSort(byte[]... fullSortCmd) {
 				return new FutureByteArrayList(client.queueRequest(Command.SORT, fullSortCmd));
 			}
@@ -1022,11 +1023,11 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 	/* ------------------------------- commands that don't get a response --------- */
 
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus quit()  {
 		return new FutureStatus(this.queueRequest(Command.QUIT));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<List<byte[]>> sinter(K set1, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(set1)) == null)
@@ -1043,7 +1044,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArrayList(this.queueRequest(Command.SINTER, keybytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<List<byte[]>> sunion(K set1, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(set1)) == null)
@@ -1060,7 +1061,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArrayList(this.queueRequest(Command.SUNION, keybytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<List<byte[]>> sdiff(K set1, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(set1)) == null)
@@ -1076,7 +1077,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureByteArrayList(this.queueRequest(Command.SDIFF, keybytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus sinterstore(K dest, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(dest)) == null)
@@ -1095,7 +1096,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.SINTERSTORE, setbytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus sunionstore(K dest, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(dest)) == null)
@@ -1114,7 +1115,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.SUNIONSTORE, setbytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus sdiffstore(K dest, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(dest)) == null)
@@ -1133,7 +1134,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.SDIFFSTORE, setbytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> del(K ... keys) {
 		if(null == keys || keys.length == 0) throw new IllegalArgumentException("no keys specified");
 		byte[] keydata = null;
@@ -1151,7 +1152,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> exists(K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1162,7 +1163,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 
-//	@Override
+	@Override
 	public <K extends Object> FutureLong lpush(K key, byte[] value) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1174,15 +1175,15 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		
 		return new FutureLong(this.queueRequest(Command.LPUSH, keybytes, value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> FutureLong lpush(K key, String value) {
 		return lpush(key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> FutureLong lpush(K key, Number value) {
 		return lpush(key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> FutureLong lpush (K key, T value)
 	{
 		return lpush(key, DefaultCodec.encode(value));
@@ -1190,7 +1191,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	
 
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> lrem(K key, byte[] value, int count) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1201,22 +1202,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.LREM, keybytes, value, countBytes);
 		return new FutureLong(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> lrem (K listKey, String value, int count){
 		return lrem (listKey, DefaultCodec.encode(value), count);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> lrem (K listKey, Number numberValue, int count) {
 		return lrem (listKey, String.valueOf(numberValue).getBytes(), count);
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable>
 	Future<Long> lrem (K listKey, T object, int count){
 		return lrem (listKey, DefaultCodec.encode(object), count);
 	}
 
 
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus lset(K key, long index, byte[] value) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1225,20 +1226,20 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		byte[] indexBytes = Convert.toBytes(index);
 		return new FutureStatus(this.queueRequest(Command.LSET, keybytes, indexBytes, value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus lset (K key, long index, String value) {
 		return lset (key, index, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus lset (K key, long index, Number numberValue){
 		return lset (key, index, String.valueOf(numberValue).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> FutureStatus lset (K key, long index, T object){
 		return lset (key, index, DefaultCodec.encode(object));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> move(K key, int dbIndex) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1249,7 +1250,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> srem(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1258,21 +1259,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.SREM, keybytes, member);
 		return new FutureBoolean(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> srem (K key, String value) {
 		return srem (key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> srem (K key, Number value) {
 		return srem (key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> Future<Boolean> srem (K key, T value)
 	{
 		return srem (key, DefaultCodec.encode(value));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> zrem(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1281,22 +1282,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.ZREM, keybytes, member);
 		return new FutureBoolean(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> zrem (K key, String value) {
 		return zrem (key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> zrem (K key, Number value) {
 		return zrem (key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> Future<Boolean> zrem (K key, T value)
 	{
 		return zrem (key, DefaultCodec.encode(value));
 	}
 
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Double> zscore(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1305,21 +1306,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.ZSCORE, keybytes, member);
 		return new FutureDouble(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Double> zscore (K key, String value) {
 		return zscore (key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Double> zscore (K key, Number value) {
 		return zscore (key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> Future<Double> zscore (K key, T value)
 	{
 		return zscore (key, DefaultCodec.encode(value));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> zrank(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1328,21 +1329,21 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.ZRANK, keybytes, member);
 		return new FutureLong(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> zrank (K key, String value) {
 		return zrank (key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> zrank (K key, Number value) {
 		return zrank (key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> Future<Long> zrank (K key, T value)
 	{
 		return zrank (key, DefaultCodec.encode(value));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> zrevrank(K key, byte[] member) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1351,22 +1352,22 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<Response> futureResponse = this.queueRequest(Command.ZREVRANK, keybytes, member);
 		return new FutureLong(futureResponse);
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> zrevrank (K key, String value) {
 		return zrevrank (key, DefaultCodec.encode(value));
 	}
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> zrevrank (K key, Number value) {
 		return zrevrank (key, String.valueOf(value).getBytes());
 	}
-//	@Override
+	@Override
 	public <K extends Object, T extends Serializable> Future<Long> zrevrank (K key, T value)
 	{
 		return zrevrank (key, DefaultCodec.encode(value));
 	}
 
 
-//	@Override
+	@Override
 	public <K extends Object> FutureStatus ltrim(K key, long keepFrom, long keepTo) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1377,7 +1378,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.LTRIM, keybytes, fromBytes, toBytes));
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> expire(K key, int ttlseconds) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1389,7 +1390,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureBoolean(futureResponse);
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Boolean> expireat(K key, long epochtime) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1402,7 +1403,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureBoolean(futureResponse);
 	}
 
-//	@Override
+	@Override
 	public <K extends Object> Future<Long> ttl (K key) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -1593,27 +1594,28 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         }
 	}
 
-	public static class FutureDataDictionary extends FutureResultBase implements Future<Map<String, byte[]>>{
+	public static class FutureDataDictionary extends FutureResultBase implements Future<Map<byte[], byte[]>>{
 
         protected FutureDataDictionary (Future<Response> pendingRequest) { super(pendingRequest); }
 
-        public Map<String, byte[]> get () throws InterruptedException, ExecutionException {
+        public Map<byte[], byte[]> get () throws InterruptedException, ExecutionException {
         	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get();
         	return convert(resp.getMultiBulkData());
         }
 
-        public Map<String, byte[]> get (long timeout, TimeUnit unit)
+        public Map<byte[], byte[]> get (long timeout, TimeUnit unit)
         	throws InterruptedException, ExecutionException, TimeoutException
         {
         	MultiBulkResponse resp = (MultiBulkResponse) pendingRequest.get(timeout, unit);
         	return convert(resp.getMultiBulkData());
         }
-        private static final Map<String, byte[]> convert (List<byte[]> bulkdata) {
-        	Map<String, byte[]> map = null;
+        private static final Map<byte[], byte[]> convert (List<byte[]> bulkdata) {
+        	Map<byte[], byte[]> map = null;
         	if(null != bulkdata) {
-        		map = new HashMap<String, byte[]>(bulkdata.size()/2);
+        		map = new HashMap<byte[], byte[]>(bulkdata.size()/2);
         		for(int i=0; i<bulkdata.size(); i+=2){
-        			map.put(DefaultCodec.toStr(bulkdata.get(i)), bulkdata.get(i+1));
+//        			map.put(DefaultCodec.toStr(bulkdata.get(i)), bulkdata.get(i+1));
+        			map.put(bulkdata.get(i), bulkdata.get(i+1));
         		}
         	}
         	return map;

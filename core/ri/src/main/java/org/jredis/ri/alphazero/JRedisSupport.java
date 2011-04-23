@@ -623,7 +623,7 @@ public abstract class JRedisSupport implements JRedis {
 		return hset (key, field, DefaultCodec.encode(object));
 	}
 	
-	public <K extends Object> byte[] hget(K hashKey, String hashField)  throws RedisException {
+	public <K extends Object> byte[] hget(K hashKey, K hashField)  throws RedisException {
 		byte[] hashKeyBytes = null;
 		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
@@ -643,7 +643,7 @@ public abstract class JRedisSupport implements JRedis {
 		return bulkData;
 	}
 	
-	public <K extends Object> boolean hexists(K hashKey, String hashField)  throws RedisException {
+	public <K extends Object> boolean hexists(K hashKey, K hashField)  throws RedisException {
 		byte[] hashKeyBytes = null;
 		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
@@ -662,8 +662,8 @@ public abstract class JRedisSupport implements JRedis {
 		}
 		return resp;
 	}
-	
-	public <K extends Object> boolean hdel(K hashKey, String hashField)  throws RedisException {
+//	@Override
+	public <K extends Object> boolean hdel(K hashKey, K hashField)  throws RedisException {
 		byte[] hashKeyBytes = null;
 		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
@@ -682,7 +682,7 @@ public abstract class JRedisSupport implements JRedis {
 		}
 		return resp;
 	}
-	
+	@Override
 	public <K extends Object> long hlen(K hashKey)  throws RedisException {
 		byte[] hashKeyBytes = null;
 		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
@@ -699,23 +699,26 @@ public abstract class JRedisSupport implements JRedis {
 		return resp;
 	}
 	@Redis(versions="1.3.n")
-	public <K extends Object> List<String> hkeys(K hashKey)  throws RedisException {
+	@Override
+	public <K extends Object> List<byte[]> hkeys(K hashKey)  throws RedisException {
 		byte[] hashKeyBytes = null;
 		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
 
-		List<String> resp = null;
+		List<byte[]> multibulkData = null;
 		try {
 			MultiBulkResponse response = (MultiBulkResponse) this.serviceRequest(Command.HKEYS, hashKeyBytes);
-			if(null != response.getMultiBulkData()) resp = DefaultCodec.toStr(response.getMultiBulkData());
+//			if(null != response.getMultiBulkData()) resp = DefaultCodec.toStr(response.getMultiBulkData());
+			multibulkData = response.getMultiBulkData();
 		}
 		catch (ClassCastException e){
 			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
 		}
-		return resp;
+		return multibulkData;
 	}
 
 	@Redis(versions="1.3.n")
+	@Override
 	public <K extends Object> List<byte[]> hvals(K hashKey)  throws RedisException {
 		byte[] hashKeyBytes = null;
 		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
@@ -733,19 +736,20 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 	@Redis(versions="1.3.n")
-	public <K extends Object> Map<String, byte[]> hgetall(K hashKey)  throws RedisException {
+	@Override
+	public <K extends Object> Map<byte[], byte[]> hgetall(K hashKey)  throws RedisException {
 		byte[] hashKeyBytes = null;
 		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
 
-		Map<String, byte[]> resp = null;
+		Map<byte[], byte[]> resp = null;
 		try {
 			MultiBulkResponse response = (MultiBulkResponse) this.serviceRequest(Command.HGETALL, hashKeyBytes);
 			List<byte[]> bulkdata = response.getMultiBulkData();
 			if(null != bulkdata) {
-				resp = new HashMap<String, byte[]>(bulkdata.size()/2);
+				resp = new HashMap<byte[], byte[]>(bulkdata.size()/2);
 				for(int i=0; i<bulkdata.size(); i+=2){
-					resp.put(DefaultCodec.toStr(bulkdata.get(i)), bulkdata.get(i+1));
+					resp.put(bulkdata.get(i), bulkdata.get(i+1));
 				}
 			}
 		}

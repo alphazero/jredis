@@ -1697,7 +1697,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			Future<List<byte[]>> frHkeys = provider.hkeys(keys.get(0));
 			
 			// get all
-			Future<Map<String, byte[]>> frHmap1 = provider.hgetall(keys.get(0));
+			Future<Map<byte[], byte[]>> frHmap1 = provider.hgetall(keys.get(0));
 			
 			// delete all keys
 			for(int i =1; i<5; i++) {
@@ -1710,10 +1710,10 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
                 }
 			}
 			// get all again
-			Future<Map<String, byte[]>> frHmap2 = provider.hgetall(keys.get(0));
+			Future<Map<byte[], byte[]>> frHmap2 = provider.hgetall(keys.get(0));
     			
 			// get all for non-existent hash
-			Future<Map<String, byte[]>> frHmap3 = provider.hgetall("no-such-hash");
+			Future<Map<byte[], byte[]>> frHmap3 = provider.hgetall("no-such-hash");
         			
 			try {
 				assertTrue (hsetResp1.get(), "hset using byte[] value");
@@ -1724,16 +1724,16 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 				assertEquals( frHmap1.get().size(), 4, "hash map length");
 				assertEquals( frHkeys.get().size(), 4, "keys list length");
 
-				Map<String, byte[]> hmap = frHmap1.get();
+				Map<String, byte[]> hmap = DefaultCodec.toDataDictionary(frHmap1.get());
 				assertEquals(hmap.get(keys.get(1)), dataList.get(0), "byte[] value mapping should correspond to prior HSET");
 				assertEquals(DefaultCodec.toStr(hmap.get(keys.get(2))), stringList.get(0), "String value mapping should correspond to prior HSET");
 				assertEquals(DefaultCodec.toLong(hmap.get(keys.get(3))).longValue(), 222, "Number value mapping should correspond to prior HSET");
 				assertEquals(DefaultCodec.decode(hmap.get(keys.get(4))), objectList.get(0), "Object value mapping should correspond to prior HSET");
 				
-				Map<String, byte[]> hmap2 = frHmap2.get();
+				Map<String, byte[]> hmap2 = DefaultCodec.toDataDictionary(frHmap2.get());
 				assertEquals(hmap2, Collections.EMPTY_MAP, "result should be empty");
 				
-				Map<String, byte[]> hmap3 = frHmap3.get();
+				Map<String, byte[]> hmap3 = DefaultCodec.toDataDictionary(frHmap3.get());
 				assertEquals(hmap3, Collections.EMPTY_MAP, "hgetall for non existent hash should be empty");
 			}
 			catch(ExecutionException e){

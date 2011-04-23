@@ -849,7 +849,7 @@ public interface JRedis {
 	 * @return
 	 */
 	@Redis(versions="1.3.4")
-	public <K extends Object> byte[] hget(K key, String field)  throws RedisException;
+	public <K extends Object> byte[] hget(K key, K field)  throws RedisException;
 	
 	
 	/**
@@ -861,7 +861,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public <K extends Object> boolean hexists(K key, String field)  throws RedisException;
+	public <K extends Object> boolean hexists(K key, K field)  throws RedisException;
 	
 	/**
 	 * 
@@ -872,7 +872,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public <K extends Object> boolean hdel(K key, String field)  throws RedisException;
+	public <K extends Object> boolean hdel(K key, K field)  throws RedisException;
 	
 	/**
 	 * 
@@ -892,7 +892,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public <K extends Object> List<String> hkeys(K key)  throws RedisException;
+	public <K extends Object> List<byte[]> hkeys(K key)  throws RedisException;
 	
 	/**
 	 * 
@@ -912,7 +912,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public <K extends Object> Map<String, byte[]> hgetall(K key)  throws RedisException;
+	public <K extends Object> Map<byte[], byte[]> hgetall(K key)  throws RedisException;
 	
 	// ------------------------------------------------------------------------
 	// Transactional commands

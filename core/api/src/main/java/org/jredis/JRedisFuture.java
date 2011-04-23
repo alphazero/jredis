@@ -852,7 +852,7 @@ public interface JRedisFuture {
 	 * @throws RedisException
 	 */
 	@Redis(versions="1.3.n")
-	public <K extends Object> Future<Map<String, byte[]>> hgetall(K key);
+	public <K extends Object> Future<Map<byte[], byte[]>> hgetall(K key);
 	
 	// ------------------------------------------------------------------------
 	// Multiple databases handling commands

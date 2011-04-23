@@ -25,7 +25,9 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jredis.JRedis;
 import org.jredis.semantics.KeyCodec;
@@ -87,6 +89,14 @@ public class DefaultCodec {
 			else 
 				list.add(null);
 		return list;
+	}
+	public static final Map<String, byte[]> toDataDictionary (Map<byte[], byte[]> binaryMap) {
+		if(null == binaryMap) return null;
+		Map<String, byte[]> dict = new HashMap<String, byte[]>(binaryMap.size());
+		for(byte[] bkey : binaryMap.keySet()) 
+			if(null!= bkey) 
+				dict.put(toStr(bkey), binaryMap.get(bkey)); 
+		return dict;
 	}
 	/**
 	 * @param bytes

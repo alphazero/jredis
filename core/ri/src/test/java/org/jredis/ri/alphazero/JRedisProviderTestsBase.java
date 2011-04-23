@@ -619,17 +619,17 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			objectList.get(0).setName("Hash Stash");
 			assertTrue( provider.hset(keys.get(0), keys.get(4), objectList.get(0)), "hset using Object value");
 			
-			List<String> hkeys = provider.hkeys(keys.get(0));
+			List<byte[]> hkeys = provider.hkeys(keys.get(0));
 			assertEquals( hkeys.size(), 4, "keys list length");
 			
-			for(String key : hkeys){
+			for(byte[] key : hkeys){
 				assertTrue(provider.hdel(keys.get(0), key), "deleting existing field should be true");
 			}
 			assertEquals(provider.hlen(keys.get(0)), 0, "hash should empty");
-			List<String> hkeys2 = provider.hkeys(keys.get(0));
+			List<byte[]> hkeys2 = provider.hkeys(keys.get(0));
 			assertEquals(hkeys2, Collections.EMPTY_LIST, "keys list should be empty");
 			
-			List<String> hkeys3 = provider.hkeys("no-such-hash");
+			List<byte[]> hkeys3 = provider.hkeys("no-such-hash");
 			assertEquals(hkeys3, Collections.EMPTY_LIST, "keys list of non-existent hash should be empty.");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
@@ -654,10 +654,10 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			List<byte[]> hvals = provider.hvals(keys.get(0));
 			assertEquals( hvals.size(), 4, "value list length");
 			
-			List<String> hkeys = provider.hkeys(keys.get(0));
+			List<byte[]> hkeys = provider.hkeys(keys.get(0));
 			assertEquals( hkeys.size(), 4, "keys list length");
 			
-			for(String key : hkeys){
+			for(byte[] key : hkeys){
 				assertTrue(provider.hdel(keys.get(0), key), "deleting existing field should be true");
 			}
 			assertEquals(provider.hlen(keys.get(0)), 0, "hash should empty");
@@ -686,27 +686,29 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			objectList.get(0).setName("Hash Stash");
 			assertTrue( provider.hset(keys.get(0), keys.get(4), objectList.get(0)), "hset using Object value");
 			
-			Map<String, byte[]> hmap = provider.hgetall(keys.get(0));
-			assertEquals( hmap.size(), 4, "hash map length");
+			Map<byte[], byte[]> hbinmap = provider.hgetall(keys.get(0));
+			assertEquals( hbinmap.size(), 4, "hash map length");
 			
-			List<String> hkeys = provider.hkeys(keys.get(0));
-			assertEquals( hkeys.size(), 4, "keys list length");
-			
-			for(String key : hkeys)
-				assertTrue(hmap.get(key) != null, "key should exists in map and have a corresponding non null value");
+			List<byte[]> hbinkeys = provider.hkeys(keys.get(0));
+			assertEquals( hbinkeys.size(), 4, "keys list length");
+			Map<String, byte[]> hmap = DefaultCodec.toDataDictionary(hbinmap);
+			int i = 0;
+			for(String key : DefaultCodec.toStr(hbinkeys)) {
+				assertTrue(hmap.get(key) != null, String.format("key %d should exists in map and have a corresponding non null value", i++));
+			}
 			
 			assertEquals(hmap.get(keys.get(1)), dataList.get(0), "byte[] value mapping should correspond to prior HSET");
 			assertEquals(DefaultCodec.toStr(hmap.get(keys.get(2))), stringList.get(0), "String value mapping should correspond to prior HSET");
 			assertEquals(DefaultCodec.toLong(hmap.get(keys.get(3))).longValue(), 222, "Number value mapping should correspond to prior HSET");
 			assertEquals(DefaultCodec.decode(hmap.get(keys.get(4))), objectList.get(0), "Object value mapping should correspond to prior HSET");
 			
-			for(String key : hkeys)
+			for(byte[] key : hbinkeys)
 				assertTrue(provider.hdel(keys.get(0), key), "deletion of existing key in hash should be true");
 			
-			Map<String, byte[]> hmap2 = provider.hgetall(keys.get(0));
+			Map<byte[], byte[]> hmap2 = provider.hgetall(keys.get(0));
 			assertEquals(hmap2, Collections.EMPTY_MAP, "hash map should be empty");
 			
-			Map<String, byte[]> hmap3 = provider.hgetall("no-such-hash");
+			Map<byte[], byte[]> hmap3 = provider.hgetall("no-such-hash");
 			assertEquals(hmap3, Collections.EMPTY_MAP, "hgetall for non existent hash should be empty");
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
