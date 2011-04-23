@@ -1117,13 +1117,13 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 //	@Override
-	public <K extends Object> List<byte[]> mget(String...keys) throws RedisException {
+	public <K extends Object> List<byte[]> mget(K...keys) throws RedisException {
 
 		if(null == keys || keys.length == 0) throw new IllegalArgumentException("no keys specified");
 		byte[] keydata = null;
 		byte[][] keybytes = new byte[keys.length][];
 		int i=0;
-		for(String k : keys) {
+		for(K k : keys) {
 			if((keydata = getKeyBytes(k)) == null) 
 				throw new IllegalArgumentException ("invalid key => ["+k+"] @ index: " + i);
 			
@@ -1158,12 +1158,12 @@ public abstract class JRedisSupport implements JRedis {
 		return multiBulkData;
 	}
 //	@Override
-	public <K extends Object> List<String> keys() throws RedisException {
+	public <K extends Object> List<byte[]> keys() throws RedisException {
 		return this.keys("*");
 	}
 
 //	@Override
-	public <K extends Object> List<String> keys(K pattern) throws RedisException {
+	public <K extends Object> List<byte[]> keys(K pattern) throws RedisException {
 		byte[] keydata = null;
 		if((keydata = getKeyBytes(pattern)) == null) 
 			throw new RedisException (Command.KEYS, "ERR Invalid key.");
@@ -1176,7 +1176,8 @@ public abstract class JRedisSupport implements JRedis {
 		catch (ClassCastException e){
 			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
 		}
-		return DefaultCodec.toStr(multiBulkData);
+//		return DefaultCodec.toStr(multiBulkData);
+		return multiBulkData;
 		/*
 		byte[] bulkData= null;
 		try {

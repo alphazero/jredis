@@ -161,7 +161,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public <K extends Object> List<byte[]> mget(String...keys) throws RedisException;
+	public <K extends Object> List<byte[]> mget(K...keys) throws RedisException;
 
 	/**
 	 * @Redis MSET
@@ -283,7 +283,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public <K extends Object> List<String> keys (K pattern) throws RedisException;
+	public <K extends Object> List<byte[]> keys (K pattern) throws RedisException;
 	
 	/**
 	 * Convenience method.  Equivalent to calling <code>jredis.keys("*");</code>
@@ -292,7 +292,7 @@ public interface JRedis {
 	 * @throws RedisException
 	 * @see {@link JRedis#keys(String)}
 	 */
-	public <K extends Object> List<String> keys () throws RedisException;
+	public <K extends Object> List<byte[]> keys () throws RedisException;
 
 	/**
 	 * @Redis RANDOMKEY

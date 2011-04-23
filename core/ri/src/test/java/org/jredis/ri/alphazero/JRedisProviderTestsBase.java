@@ -25,6 +25,8 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -3016,7 +3018,10 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			for (int i=0; i<SMALL_CNT; i++)
 				provider.set(keys.get(i), dataList.get(i));
 
-			List<String> rediskeys = provider.keys();
+			List<byte[]> redisBinkeys = provider.keys();
+			List<String> rediskeys = new ArrayList<String>(redisBinkeys.size());
+			for(byte[] bk : redisBinkeys)
+				rediskeys.add(new String(bk));
 			assertEquals(SMALL_CNT, rediskeys.size(), "size of key list should be SMALL_CNT");
 			for(int i=0; i<SMALL_CNT; i++) 
 				assertTrue(rediskeys.contains(keys.get(i)), "should contain " + keys.get(i));
@@ -3037,7 +3042,10 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 			for (int i=0; i<SMALL_CNT; i++)
 				provider.set(patternList.get(i), dataList.get(i));
 
-			List<String> rediskeys = provider.keys("*"+patternA+"*");
+			List<byte[]> redisBinkeys = provider.keys("*"+patternA+"*");
+			List<String> rediskeys = new ArrayList<String>(redisBinkeys.size());
+			for(byte[] bk : redisBinkeys)
+				rediskeys.add(new String(bk));
 			assertEquals(SMALL_CNT, rediskeys.size(), "size of key list should be SMALL_CNT");
 			for(int i=0; i<SMALL_CNT; i++) 
 				assertTrue(rediskeys.contains(patternList.get(i)), "should contain " + patternList.get(i));
