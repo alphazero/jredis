@@ -808,7 +808,7 @@ public interface JRedis {
 	 * @return
 	 */
 	@Redis(versions="1.3.n")
-	public <K extends Object> boolean hset(K key, String field, byte[] value)  throws RedisException;
+	public <K extends Object> boolean hset(K key, K field, byte[] value)  throws RedisException;
 	
 	/**
 	 * @Redis HSET
@@ -818,7 +818,7 @@ public interface JRedis {
 	 * @return
 	 */
 	@Redis(versions="1.3.n")
-	public <K extends Object> boolean hset(K key, String field, String string)  throws RedisException;
+	public <K extends Object> boolean hset(K key, K field, String string)  throws RedisException;
 	
 	/**
 	 * @Redis HSET
@@ -828,7 +828,7 @@ public interface JRedis {
 	 * @return
 	 */
 	@Redis(versions="1.3.n")
-	public <K extends Object> boolean hset(K key, String field, Number number)  throws RedisException;
+	public <K extends Object> boolean hset(K key, K field, Number number)  throws RedisException;
 	
 	/**
 	 * @Redis HSET
@@ -840,7 +840,7 @@ public interface JRedis {
 	 */
 	@Redis(versions="1.3.4")
 	public <K extends Object, T extends Serializable> 
-		boolean hset(K key, String field, T object)  throws RedisException;
+		boolean hset(K key, K field, T object)  throws RedisException;
 	
 	/**
 	 * @Redis HGET

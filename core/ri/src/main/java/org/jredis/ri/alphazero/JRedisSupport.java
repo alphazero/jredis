@@ -592,7 +592,7 @@ public abstract class JRedisSupport implements JRedis {
 	// Commands operating on hashes
 	// ------------------------------------------------------------------------
 	
-	public <K extends Object> boolean hset(K hashKey, String hashField, byte[] value)  throws RedisException {
+	public <K extends Object> boolean hset(K hashKey, K hashField, byte[] value)  throws RedisException {
 		byte[] hashKeyBytes = null;
 		if((hashKeyBytes = getKeyBytes(hashKey)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
@@ -612,16 +612,14 @@ public abstract class JRedisSupport implements JRedis {
 		}
 		return response;
 	}
-	
-	
-	public <K extends Object> boolean hset(K key, String field, String stringValue)  throws RedisException {
+	public <K extends Object> boolean hset(K key, K field, String stringValue)  throws RedisException {
 		return hset (key, field, DefaultCodec.encode(stringValue));
 	}
-	public <K extends Object> boolean hset(K key, String field, Number numberValue)  throws RedisException {
+	public <K extends Object> boolean hset(K key, K field, Number numberValue)  throws RedisException {
 		return hset (key, field, String.valueOf(numberValue).getBytes());
 	}
 	public <K extends Object, T extends Serializable> 
-	boolean hset(K key, String field, T object)  throws RedisException {
+	boolean hset(K key, K field, T object)  throws RedisException {
 		return hset (key, field, DefaultCodec.encode(object));
 	}
 	
