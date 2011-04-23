@@ -1517,14 +1517,14 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 	@Override
-	public <K extends Object> List<byte[]> sunion(String set1, String... sets) throws RedisException {
+	public <K extends Object> List<byte[]> sunion(K set1, K... sets) throws RedisException {
 		byte[] keydata = null;
 		if((keydata = getKeyBytes(set1)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+set1+"]");
 
 		byte[][] keybytes = new byte[1+sets.length][];
 		int i=0; keybytes[i++] = keydata;
-		for(String k : sets) {
+		for(K k : sets) {
 			if((keydata = getKeyBytes(k)) == null) 
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			keybytes[i++] = keydata;
@@ -1542,14 +1542,14 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 	@Override
-	public <K extends Object> List<byte[]> sdiff(String set1, String... sets) throws RedisException {
+	public <K extends Object> List<byte[]> sdiff(K set1, K... sets) throws RedisException {
 		byte[] keydata = null;
 		if((keydata = getKeyBytes(set1)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+set1+"]");
 
 		byte[][] keybytes = new byte[1+sets.length][];
 		int i=0; keybytes[i++] = keydata;
-		for(String k : sets) {
+		for(K k : sets) {
 			if((keydata = getKeyBytes(k)) == null) 
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			keybytes[i++] = keydata;
@@ -1586,7 +1586,7 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 	@Override
-	public <K extends Object> void sunionstore(String dest, String... sets) throws RedisException {
+	public <K extends Object> void sunionstore(K dest, K... sets) throws RedisException {
 		byte[] keydata = null;
 		if((keydata = getKeyBytes(dest)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+dest+"]");
@@ -1595,7 +1595,7 @@ public abstract class JRedisSupport implements JRedis {
 		int i=0; 
 		setbytes[i++] = keydata;
 		byte[] setdata =null;
-		for(String k : sets) {
+		for(K k : sets) {
 			if((setdata = getKeyBytes(k)) == null) 
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			setbytes[i++] = setdata;
@@ -1605,7 +1605,7 @@ public abstract class JRedisSupport implements JRedis {
 	}
 
 	@Override
-	public <K extends Object> void sdiffstore(String dest, String... sets) throws RedisException {
+	public <K extends Object> void sdiffstore(K dest, K... sets) throws RedisException {
 		byte[] keydata = null;
 		if((keydata = getKeyBytes(dest)) == null) 
 			throw new IllegalArgumentException ("invalid key => ["+dest+"]");
@@ -1614,7 +1614,7 @@ public abstract class JRedisSupport implements JRedis {
 		int i=0; 
 		setbytes[i++] = keydata;
 		byte[] setdata =null;
-		for(String k : sets) {
+		for(K k : sets) {
 			if((setdata = getKeyBytes(k)) == null) 
 				throw new IllegalArgumentException ("invalid key => ["+k+"]");
 			setbytes[i++] = setdata;

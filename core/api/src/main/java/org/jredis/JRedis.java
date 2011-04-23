@@ -561,7 +561,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public <K extends Object> List<byte[]> sunion (String set1, String...sets) throws RedisException;
+	public <K extends Object> List<byte[]> sunion (K set1, K...sets) throws RedisException;
 	
 	/**
 	 * @Redis SUNIONSTORE
@@ -569,7 +569,7 @@ public interface JRedis {
 	 * @param sets
 	 * @throws RedisException
 	 */
-	public <K extends Object> void sunionstore (String destSetKey, String...sets) throws RedisException;
+	public <K extends Object> void sunionstore (K destSetKey, K...sets) throws RedisException;
 
 	/**
 	 * @Redis SDIFF
@@ -578,7 +578,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public <K extends Object> List<byte[]> sdiff (String set1, String...sets) throws RedisException;
+	public <K extends Object> List<byte[]> sdiff (K set1, K...sets) throws RedisException;
 	
 	/**
 	 * @Redis SDIFFSTORE
@@ -586,7 +586,7 @@ public interface JRedis {
 	 * @param sets
 	 * @throws RedisException
 	 */
-	public <K extends Object> void sdiffstore (String destSetKey, String...sets) throws RedisException;
+	public <K extends Object> void sdiffstore (K destSetKey, K...sets) throws RedisException;
 
 	/**
 	 * @Redis SMEMBERS
