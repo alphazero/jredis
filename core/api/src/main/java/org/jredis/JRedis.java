@@ -545,7 +545,7 @@ public interface JRedis {
 	 * @return
 	 * @throws RedisException
 	 */
-	public <K extends Object> List<byte[]> sinter (String set1, String...sets) throws RedisException;
+	public <K extends Object> List<byte[]> sinter (K set1, K...sets) throws RedisException;
 	/**
 	 * @Redis SINTERSTORE
 	 * @param destSetKey

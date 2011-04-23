@@ -129,12 +129,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	public <K extends Object> FutureStatus flushdb() {
 		return new FutureStatus(this.queueRequest(Command.FLUSHDB));
 	}
-//	@Override
+
 //	public <K extends Object> FutureStatus select(int index) {
 //		this.queueRequest(Command.SELECT, Convert.toBytes(index));
 //		return this;
 //	}
-
+	@Override
 	public <K extends Object> Future<ResponseStatus>  slaveof(String host, int port) {
 		byte[] hostbytes = null;
 		if((hostbytes = JRedisSupport.getKeyBytes(host)) == null)
