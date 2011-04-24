@@ -288,8 +288,8 @@ public enum Command {
     	KEY_KEY,
     	/**  */
     	KEY_NUM,
-    	/**  */
-    	KEY_SPEC,
+//    	/**  */
+//    	KEY_SPEC,
     	/**  */
     	KEY_NUM_NUM,
     	/** */

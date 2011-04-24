@@ -126,23 +126,23 @@ public abstract class ProtocolBase implements Protocol {
 			}
 			break;
 
-			case KEY_SPEC:
-			{             
-              buffer.write(SIZE_BYTE);
-              buffer.write(Convert.toBytes(args[0].length));
-              buffer.write(CRLF);
-              buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
-              buffer.write(CRLF);
-              
-              buffer.write(SIZE_BYTE);
-              buffer.write(Convert.toBytes(args[1].length));
-              buffer.write(CRLF);
-              
-			  buffer.write(Assert.notNull(args[1], "key2 arg", ProviderException.class));
-			  buffer.write(CRLF);
-				// -------------------
-			}
-			break;
+//			case KEY_SPEC:
+//			{             
+//              buffer.write(SIZE_BYTE);
+//              buffer.write(Convert.toBytes(args[0].length));
+//              buffer.write(CRLF);
+//              buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
+//              buffer.write(CRLF);
+//              
+//              buffer.write(SIZE_BYTE);
+//              buffer.write(Convert.toBytes(args[1].length));
+//              buffer.write(CRLF);
+//              
+//			  buffer.write(Assert.notNull(args[1], "key2 arg", ProviderException.class));
+//			  buffer.write(CRLF);
+//				// -------------------
+//			}
+//			break;
 
 			case KEY_NUM_NUM:
 				buffer.write(SIZE_BYTE);
