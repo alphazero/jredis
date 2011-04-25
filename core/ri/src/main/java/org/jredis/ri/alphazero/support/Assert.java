@@ -105,6 +105,15 @@ public class Assert {
 		return obj;
 	}
 	
+	public static final <T, E extends RuntimeException> 
+	T notNull
+		(T obj, int idx, Class<E> clazz)
+	throws E
+	{
+		if(null == obj){ throwIt(String.format("null reference: arg {%d}", idx), clazz);}
+		return obj;
+	}
+	
 	/**
 	 * <b>Usage</b>: <pre><code>
 	 * // ... somewhere within the bowels of your code ..
