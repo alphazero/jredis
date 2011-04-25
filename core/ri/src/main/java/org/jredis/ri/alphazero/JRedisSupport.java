@@ -1705,7 +1705,7 @@ public abstract class JRedisSupport implements JRedis {
 
 		long remcnt = 0;
 		try {
-			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.LREM, keybytes, value, countBytes);
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.LREM, keybytes, countBytes, value);
 			remcnt = valResponse.getLongValue();
 		}
 		catch (ClassCastException e){

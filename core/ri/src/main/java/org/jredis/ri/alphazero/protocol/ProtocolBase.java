@@ -208,16 +208,17 @@ public abstract class ProtocolBase implements Protocol {
 				buffer.write(CRLF);
 				
 				buffer.write(SIZE_BYTE);
+				buffer.write(Convert.toBytes(Assert.notNull(args[1], 1, ProviderException.class).length));
+				buffer.write(CRLF);
+				buffer.write(args[1]); // << 1
+				
+				buffer.write(CRLF);
+				buffer.write(SIZE_BYTE);
 				buffer.write(Convert.toBytes(Assert.notNull(args[2], 2, ProviderException.class).length)); 
 				buffer.write(CRLF);
 				buffer.write(args[2]); // << 2
 				buffer.write(CRLF);
 				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[1], 1, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[1]); // << 1
-				buffer.write(CRLF);
 				break;
 
 			case MULTI_KEY:

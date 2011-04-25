@@ -1199,7 +1199,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
 		byte[] countBytes = Convert.toBytes(count);
 
-		Future<Response> futureResponse = this.queueRequest(Command.LREM, keybytes, value, countBytes);
+		Future<Response> futureResponse = this.queueRequest(Command.LREM, keybytes, countBytes, value);
 		return new FutureLong(futureResponse);
 	}
 	@Override
