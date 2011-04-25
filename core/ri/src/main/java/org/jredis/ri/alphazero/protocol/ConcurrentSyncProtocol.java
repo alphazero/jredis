@@ -20,7 +20,7 @@ import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
 
 /**
- * This basically extends {@link SynchProtocol} so that the response buffers
+ * This basically extends {@link SyncProtocol} so that the response buffers
  * are not shared, so that it can be used in multi-threaded environments. 
  * @author  Joubin (alphazero@sensesay.net)
  * @version alpha.0, Apr 23, 2009
@@ -28,12 +28,10 @@ import org.jredis.protocol.Response;
  * 
  */
 
-public class ConcurrentSynchProtocol extends SynchProtocol {
+public class ConcurrentSyncProtocol extends SyncProtocol {
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
-	/**  */
-//	SynchLineResponse cache_synchLineResponse = null;
 	
 	// ------------------------------------------------------------------------
 	// Super Extensions
@@ -51,33 +49,31 @@ public class ConcurrentSynchProtocol extends SynchProtocol {
 
 	@Override
 	protected Response createStatusResponse(Command cmd) {
-		return new SynchLineResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd, ValueType.STATUS);
+		return new SyncLineResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd, ValueType.STATUS);
 	}
 	
 	@Override
 	protected Response createBooleanResponse(Command cmd) {
-		return new SynchLineResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd, ValueType.BOOLEAN);
+		return new SyncLineResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd, ValueType.BOOLEAN);
 	}
 	@Override
 	protected Response createStringResponse(Command cmd) {
-		return new SynchLineResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd, ValueType.STRING);
+		return new SyncLineResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd, ValueType.STRING);
 	}
 	
 	@Override
 	protected Response createNumberResponse(Command cmd /*, boolean isBigNum*/) {
 		ValueType flavor = ValueType.NUMBER64;
-		return new SynchLineResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd, flavor);
+		return new SyncLineResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd, flavor);
 	}
 	
-//	SynchBulkResponse  cache_synchBulkResponse = null;
 	@Override
 	protected Response createBulkResponse(Command cmd) {
-		return new SynchBulkResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd);
+		return new SyncBulkResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd);
 	}
 	
-//	SynchMultiBulkResponse  cache_synchMultiBulkResponse = null;
 	@Override
 	protected Response createMultiBulkResponse(Command cmd) {
-		return new SynchMultiBulkResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd);
+		return new SyncMultiBulkResponse (new byte[PREFERRED_LINE_BUFFER_SIZE], cmd);
 	}
 }

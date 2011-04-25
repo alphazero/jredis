@@ -1456,11 +1456,11 @@ public abstract class JRedisSupport implements JRedis {
 			}
 
 			@Override
-	        protected Future<List<byte[]>> execAsynchSort (byte[]... fullSortCmd) {
+	        protected Future<List<byte[]>> execAsyncSort (byte[]... fullSortCmd) {
 				throw new IllegalStateException("JRedis does not support asynchronous sort.");
 	        }
 			@Override
-	        protected Future<List<byte[]>> execAsynchSortStore (byte[]... fullSortCmd) {
+	        protected Future<List<byte[]>> execAsyncSortStore (byte[]... fullSortCmd) {
 				throw new IllegalStateException("JRedis does not support asynchronous sort.");
 	        }
 		};

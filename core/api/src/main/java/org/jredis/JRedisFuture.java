@@ -894,11 +894,11 @@ public interface JRedisFuture {
 	
 	/**
 	 * <p>For Usage details regarding sort semantics, see {@link JRedis#sort}.  The
-	 * only difference in usage is that you must use the {@link Sort#execAsynch()} method
+	 * only difference in usage is that you must use the {@link Sort#execAsync()} method
 	 * which returns a {@link Future} instances.
 	 * <p>Usage:
 	 * <p><code><pre>
-	 * Future<List<byte[]>>  futureResults = redis.sort("my-list-or-set-key").BY("weight*").LIMIT(1, 11).GET("object*").DESC().ALPHA().execAsynch();
+	 * Future<List<byte[]>>  futureResults = redis.sort("my-list-or-set-key").BY("weight*").LIMIT(1, 11).GET("object*").DESC().ALPHA().execAsync();
 	 * List<byte[]> results = futureResult.get();  // wait for the asynchronous response to be processed
 	 * for(byte[] item : results) {
 	 *     // do something with item ..

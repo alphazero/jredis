@@ -146,17 +146,17 @@ public abstract class SortSupport implements Sort {
 			res = execSortStore(buildSortCmd());
 		return res;
 	}
-	public Future<List<byte[]>> execAsynch() {
+	public Future<List<byte[]>> execAsync() {
 //		System.out.format("sort spec: [%S %S %S %S %S %S]\n", bySpec, limitSpec, getSpec, descSpec, alphaSpec, storeSpec);
 		Future<List<byte[]>>  res = null;
 		if(!stores)
-			res = execAsynchSort (buildSortCmd());
+			res = execAsyncSort (buildSortCmd());
 		else 
-			res = execAsynchSortStore(buildSortCmd());
+			res = execAsyncSortStore(buildSortCmd());
 		return res;
 	}
 	protected abstract List<byte[]> execSort (byte[]... fullSortCmd) throws IllegalStateException, RedisException;
 	protected abstract List<byte[]> execSortStore (byte[]... fullSortCmd) throws IllegalStateException, RedisException;
-	protected abstract Future<List<byte[]>> execAsynchSort (byte[]... fullSortCmd);
-	protected abstract Future<List<byte[]>> execAsynchSortStore (byte[]... fullSortCmd);
+	protected abstract Future<List<byte[]>> execAsyncSort (byte[]... fullSortCmd);
+	protected abstract Future<List<byte[]>> execAsyncSortStore (byte[]... fullSortCmd);
 }

@@ -36,7 +36,7 @@ import org.jredis.ri.alphazero.support.Log;
  * 
  */
 
-public class SynchPipelineConnection extends PipelineConnectionBase {
+public class SyncPipelineConnection extends PipelineConnectionBase {
 
     // ------------------------------------------------------------------------
     // Properties
@@ -48,7 +48,7 @@ public class SynchPipelineConnection extends PipelineConnectionBase {
      * @param spec
      * @throws ClientRuntimeException
      */
-    public SynchPipelineConnection (ConnectionSpec spec) throws ClientRuntimeException {
+    public SyncPipelineConnection (ConnectionSpec spec) throws ClientRuntimeException {
 	    super(spec.setModality(Modality.Synchronous));
     }
 

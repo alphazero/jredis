@@ -1003,10 +1003,10 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Sort sortQuery = new SortSupport (keybytes) {
 
 				@Override 
-			protected Future<List<byte[]>> execAsynchSort(byte[]... fullSortCmd) {
+			protected Future<List<byte[]>> execAsyncSort(byte[]... fullSortCmd) {
 				return new FutureByteArrayList(client.queueRequest(Command.SORT, fullSortCmd));
 			}
-			protected Future<List<byte[]>> execAsynchSortStore(byte[]... fullSortCmd) {
+			protected Future<List<byte[]>> execAsyncSortStore(byte[]... fullSortCmd) {
 				Future<Response> fResp = client.queueRequest(Command.SORT$STORE, fullSortCmd);
 				new FutureLong(fResp);
 				return new FutureSortStoreResp(fResp);

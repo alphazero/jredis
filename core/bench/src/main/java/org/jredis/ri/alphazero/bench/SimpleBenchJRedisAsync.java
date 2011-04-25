@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.jredis.JRedisFuture;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.ri.alphazero.JRedisAsynchClient;
+import org.jredis.ri.alphazero.JRedisAsyncClient;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 
 public class SimpleBenchJRedisAsync {
@@ -17,7 +17,7 @@ public class SimpleBenchJRedisAsync {
 	private void run() {
 		int database = 11;
 		ConnectionSpec connSpec = DefaultConnectionSpec.newSpec("localhost", 6379, database, "jredis".getBytes());
-		JRedisFuture jredis = new JRedisAsynchClient(connSpec);
+		JRedisFuture jredis = new JRedisAsyncClient(connSpec);
 		
 		byte[] key = "bench-jredis-pipeline-key".getBytes();
 		int iters = 100 * 1000;

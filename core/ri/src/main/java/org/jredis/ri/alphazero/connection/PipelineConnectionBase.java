@@ -34,7 +34,7 @@ import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Request;
 import org.jredis.protocol.Response;
-import org.jredis.ri.alphazero.protocol.ConcurrentSynchProtocol;
+import org.jredis.ri.alphazero.protocol.ConcurrentSyncProtocol;
 import org.jredis.ri.alphazero.protocol.VirtualResponse;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.FastBufferedInputStream;
@@ -151,7 +151,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
      */
     @Override
     protected Protocol newProtocolHandler () {
-		return new ConcurrentSynchProtocol();
+		return new ConcurrentSyncProtocol();
 //		return new SynchProtocol();
     }
 

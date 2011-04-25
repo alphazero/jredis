@@ -27,7 +27,7 @@ import org.jredis.RedisException;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.protocol.ResponseStatus;
 import org.jredis.ri.alphazero.BulkSetMapping;
-import org.jredis.ri.alphazero.JRedisAsynchClient;
+import org.jredis.ri.alphazero.JRedisAsyncClient;
 import org.jredis.ri.alphazero.JRedisClient;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 
@@ -121,7 +121,7 @@ public class UsingBulkCommands {
 		.setCredentials("jredis".getBytes())
 		.setDatabase(10);
 
-		JRedisFuture jredis = new JRedisAsynchClient(spec);
+		JRedisFuture jredis = new JRedisAsyncClient(spec);
 
 		System.out.println ("\nusing the AsyncClient: \n\n");
 		useMSet(jredis);

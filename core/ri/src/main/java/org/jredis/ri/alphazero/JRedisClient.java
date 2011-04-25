@@ -74,7 +74,7 @@ import org.jredis.ri.alphazero.support.Assert;
  * 
  */
 @Redis(versions={"1.00"})
-public class JRedisClient extends SynchJRedisBase  {
+public class JRedisClient extends SyncJRedisBase  {
 	
 	// ------------------------------------------------------------------------
 	// Properties
@@ -89,8 +89,8 @@ public class JRedisClient extends SynchJRedisBase  {
 	public JRedisClient (ConnectionSpec connectionSpec){
 		connectionSpec.setConnectionFlag(Connection.Flag.RELIABLE, true);
 		connectionSpec.setConnectionFlag(Connection.Flag.SHARED, false);
-		Connection synchConnection = createSynchConnection (connectionSpec);
-		setConnection (synchConnection);
+		Connection syncConnection = createSyncConnection (connectionSpec);
+		setConnection (syncConnection);
 	}
 	/**
 	 * Connects to the localhost:6379 redis server using the password.

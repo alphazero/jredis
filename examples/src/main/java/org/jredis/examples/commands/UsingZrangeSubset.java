@@ -27,7 +27,7 @@ import org.jredis.RedisType;
 import org.jredis.ZSetEntry;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.protocol.Command;
-import org.jredis.ri.alphazero.JRedisAsynchClient;
+import org.jredis.ri.alphazero.JRedisAsyncClient;
 import org.jredis.ri.alphazero.JRedisClient;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.DefaultCodec;
@@ -76,7 +76,7 @@ public class UsingZrangeSubset {
 		.setCredentials("jredis".getBytes())
 		.setDatabase(10);
 
-		JRedisFuture jredis = new JRedisAsynchClient(spec);
+		JRedisFuture jredis = new JRedisAsyncClient(spec);
 
 		System.out.println ("\n\n** using JRedisFuture **");
 		useZRangeSubset(jredis);

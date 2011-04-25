@@ -31,7 +31,7 @@ import org.jredis.protocol.Command;
 import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Request;
 import org.jredis.protocol.Response;
-import org.jredis.ri.alphazero.protocol.ConcurrentSynchProtocol;
+import org.jredis.ri.alphazero.protocol.ConcurrentSyncProtocol;
 import org.jredis.ri.alphazero.protocol.VirtualResponse;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.FastBufferedInputStream;
@@ -46,7 +46,7 @@ import org.jredis.ri.alphazero.support.Log;
  * 
  */
 
-public class AsynchConnection extends ConnectionBase implements Connection {
+public class AsyncConnection extends ConnectionBase implements Connection {
 	// ------------------------------------------------------------------------
 	// Properties
 	// ------------------------------------------------------------------------
@@ -62,7 +62,7 @@ public class AsynchConnection extends ConnectionBase implements Connection {
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
-	public AsynchConnection (
+	public AsyncConnection (
 			ConnectionSpec connectionSpec
 		)
 		throws ClientRuntimeException, ProviderException 
@@ -94,7 +94,7 @@ public class AsynchConnection extends ConnectionBase implements Connection {
      */
     @Override
     protected Protocol newProtocolHandler () {
-		return new ConcurrentSynchProtocol();
+		return new ConcurrentSyncProtocol();
     }
     
     /**
@@ -156,7 +156,7 @@ public class AsynchConnection extends ConnectionBase implements Connection {
     	 */
 
         public void run () {
-			Log.log("AsynchConnection processor thread <%s> started.", Thread.currentThread().getName());
+			Log.log("AsyncConnection processor thread <%s> started.", Thread.currentThread().getName());
         	/** Response handler thread specific protocol handler -- optimize fencing */
         	Protocol protocol = Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class);
         	PendingRequest pending = null;
@@ -198,7 +198,7 @@ public class AsynchConnection extends ConnectionBase implements Connection {
 					// are expected, so quit is NOT sent.  we simply close connection on this
 					// end. 
 					if(pending.cmd == Command.QUIT) {
-						AsynchConnection.this.disconnect();
+						AsyncConnection.this.disconnect();
 						break;
 					}
                 }
@@ -206,7 +206,7 @@ public class AsynchConnection extends ConnectionBase implements Connection {
 	                e1.printStackTrace();
                 }
         	}
-			Log.log("AsynchConnection processor thread <%s> stopped.", Thread.currentThread().getName());
+			Log.log("AsyncConnection processor thread <%s> stopped.", Thread.currentThread().getName());
         }
     }
 }

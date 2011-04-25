@@ -46,10 +46,10 @@ public class DefaultConnectionFactory implements Connection.Factory {
 			case PubSub:
 				throw new ProviderException("NOT IMPLEMENTED!");
 			case Asynchronous:
-				conn = newAsynchConnection(spec);
+				conn = newAsyncConnection(spec);
 				break;
 			case Synchronous:
-				conn = new SynchConnection(spec);
+				conn = new SyncConnection(spec);
 				break;
     	}
     	// TODO: factories create completed products --
@@ -68,19 +68,19 @@ public class DefaultConnectionFactory implements Connection.Factory {
 	 * per {@link ConnectionSpec} settings. 
      * @param spec
      */
-    private Connection newAsynchConnection (ConnectionSpec spec) {
+    private Connection newAsyncConnection (ConnectionSpec spec) {
 
     	Connection conn = null;
     	if(spec.getConnectionFlag(Flag.PIPELINE)){
-			conn = new AsynchPipelineConnection(spec); // why not for all asyncs?
+			conn = new AsyncPipelineConnection(spec); // why not for all asyncs?
     	}
     	else {
     		if(spec.getConnectionFlag(Flag.SHARED)){
         		throw new ProviderException("NOT IMPLEMENTED! [Asynch|SHARED|not_PIPELINE]");
     		}
     		else {
-    			conn = new AsynchConnection(spec);
-//    			conn = new AsynchPipelineConnection(spec); // why not for all asyncs?
+    			conn = new AsyncConnection(spec);
+//    			conn = new AsyncPipelineConnection(spec); // why not for all asyncs?
     		}
     	}
     	return conn;

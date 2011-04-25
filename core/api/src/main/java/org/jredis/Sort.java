@@ -83,7 +83,7 @@ public interface Sort extends Query {
 	/** 
 	 * Store the sort results in another key.
 	 * <p>
-	 * <b>This command alters the semantics of the {@link Query#exec()} (or  {@link Query#execAsynch()()}</b>
+	 * <b>This command alters the semantics of the {@link Query#exec()} (or  {@link Query#execAsync()()}</b>
 	 * to return a list of size 1, with the single entry being the long value representing the size
 	 * of the created (store destination) list.  
 	 * <p>

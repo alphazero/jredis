@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Houshyar
+ *   Copyright 2009 - 2011 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ import org.jredis.ri.alphazero.support.Log;
  * @since   alpha.0
  * 
  */
-public class SynchProtocol extends ProtocolBase {
+public class SyncProtocol extends ProtocolBase {
 	
 	// ------------------------------------------------------------------------
 	// Protocol Handler's Data Buffer (pseudo-Registers) specific attributes
@@ -64,7 +64,7 @@ public class SynchProtocol extends ProtocolBase {
 	protected static final int			INPUT_STREAM_BUFFER_SIZE = 1024 * 128;
 	
 	// ------------------------------------------------------------------------
-	// SynchConnection's can use the same buffers again and again and ...
+	// SyncConnection's can use the same buffers again and again and ...
 	// ------------------------------------------------------------------------
 	
 	/** Shared by <b>all</b> {@link Request} instances of this <b>non-thread-safe</b> {@link Protocol} implementation. */
@@ -80,7 +80,7 @@ public class SynchProtocol extends ProtocolBase {
 	// Constructor(s)
 	// ------------------------------------------------------------------------
 	
-	public SynchProtocol() {
+	public SyncProtocol() {
 		sharedRequestBuffer = new ByteArrayOutputStream (PREFERRED_REQUEST_BUFFER_SIZE);
 		sharedRequestObject = new StreamBufferRequest (sharedRequestBuffer);
 		sharedResponseBuffer = new byte [PREFERRED_LINE_BUFFER_SIZE];
@@ -108,66 +108,66 @@ public class SynchProtocol extends ProtocolBase {
 		return sharedRequestObject;
 	}
 
-	SynchLineResponse cache_synchLineResponse = null;
+	SyncLineResponse cache_syncLineResponse = null;
 	@Override
 	protected Response createStatusResponse(Command cmd) {
-		if(null == cache_synchLineResponse)
-			cache_synchLineResponse = new SynchLineResponse(cmd, ValueType.STATUS);
+		if(null == cache_syncLineResponse)
+			cache_syncLineResponse = new SyncLineResponse(cmd, ValueType.STATUS);
 		else {
-			cache_synchLineResponse.reset(cmd);
+			cache_syncLineResponse.reset(cmd);
 		}
-		return cache_synchLineResponse;
+		return cache_syncLineResponse;
 	}
 	@Override
 	protected Response createBooleanResponse(Command cmd) {
-		if(null == cache_synchLineResponse)
-			cache_synchLineResponse = new SynchLineResponse(cmd, ValueType.BOOLEAN);
+		if(null == cache_syncLineResponse)
+			cache_syncLineResponse = new SyncLineResponse(cmd, ValueType.BOOLEAN);
 		else {
-			cache_synchLineResponse.reset(cmd, ValueType.BOOLEAN);
+			cache_syncLineResponse.reset(cmd, ValueType.BOOLEAN);
 		}
-		return cache_synchLineResponse;
+		return cache_syncLineResponse;
 	}
 	@Override
 	protected Response createStringResponse(Command cmd) {
-		if(null == cache_synchLineResponse)
-			cache_synchLineResponse = new SynchLineResponse(cmd, ValueType.STRING);
+		if(null == cache_syncLineResponse)
+			cache_syncLineResponse = new SyncLineResponse(cmd, ValueType.STRING);
 		else {
-			cache_synchLineResponse.reset(cmd, ValueType.STRING);
+			cache_syncLineResponse.reset(cmd, ValueType.STRING);
 		}
-		return cache_synchLineResponse;
+		return cache_syncLineResponse;
 	}
 	@Override
 	protected Response createNumberResponse(Command cmd /*, boolean isBigNum*/) {
 		ValueType flavor = ValueType.NUMBER64;
-		if(null == cache_synchLineResponse)
-			cache_synchLineResponse = new SynchLineResponse(cmd, flavor);
+		if(null == cache_syncLineResponse)
+			cache_syncLineResponse = new SyncLineResponse(cmd, flavor);
 		else {
-			cache_synchLineResponse.reset(cmd, flavor);
+			cache_syncLineResponse.reset(cmd, flavor);
 		}
-		return cache_synchLineResponse;
+		return cache_syncLineResponse;
 	}
 	
-	SynchBulkResponse  cache_synchBulkResponse = null;
+	SyncBulkResponse  cache_syncBulkResponse = null;
 	@Override
 	protected Response createBulkResponse(Command cmd) {
-		if(null == cache_synchBulkResponse)
-			cache_synchBulkResponse = new SynchBulkResponse(cmd);
+		if(null == cache_syncBulkResponse)
+			cache_syncBulkResponse = new SyncBulkResponse(cmd);
 		else {
-			cache_synchBulkResponse.reset(cmd);
+			cache_syncBulkResponse.reset(cmd);
 		}
-		return cache_synchBulkResponse;
+		return cache_syncBulkResponse;
 	}
 
 	
-	SynchMultiBulkResponse  cache_synchMultiBulkResponse = null;
+	SyncMultiBulkResponse  cache_syncMultiBulkResponse = null;
 	@Override
 	protected Response createMultiBulkResponse(Command cmd) {
-		if(null == cache_synchMultiBulkResponse)
-			cache_synchMultiBulkResponse = new SynchMultiBulkResponse(cmd);
+		if(null == cache_syncMultiBulkResponse)
+			cache_syncMultiBulkResponse = new SyncMultiBulkResponse(cmd);
 		else {
-			cache_synchMultiBulkResponse.reset(cmd);
+			cache_syncMultiBulkResponse.reset(cmd);
 		}
-		return cache_synchMultiBulkResponse;
+		return cache_syncMultiBulkResponse;
 	}
 	
 	// ------------------------------------------------------------------------
@@ -197,12 +197,12 @@ public class SynchProtocol extends ProtocolBase {
 	 * @since   alpha.0
 	 * 
 	 */
-	public abstract class SynchResponseBase extends ResponseSupport {
+	public abstract class SyncResponseBase extends ResponseSupport {
 
 		byte[]		buffer;
 		int			offset;
 		
-		protected SynchResponseBase(byte[] buffer, Command cmd, Type type) {
+		protected SyncResponseBase(byte[] buffer, Command cmd, Type type) {
 			super(cmd, type);
 			this.buffer = buffer;
 			offset = 0;
@@ -269,13 +269,13 @@ public class SynchProtocol extends ProtocolBase {
 	 * @since   alpha.0
 	 *
 	 */
-	public class SynchLineResponse extends SynchResponseBase implements StatusResponse, ValueResponse {
+	public class SyncLineResponse extends SyncResponseBase implements StatusResponse, ValueResponse {
 		private ValueType 	flavor;
 		private String		stringValue;
 		private long		longValue;
 		private boolean		booleanValue;
 		
-		private SynchLineResponse(Command cmd, ValueType flavor) {
+		private SyncLineResponse(Command cmd, ValueType flavor) {
 			this (sharedResponseBuffer, cmd, flavor);
 		}
 		/**
@@ -283,7 +283,7 @@ public class SynchProtocol extends ProtocolBase {
 		 * @param cmd
 		 * @param status
 		 */
-		public  SynchLineResponse(byte[] buff, Command cmd, ValueType flavor) {
+		public  SyncLineResponse(byte[] buff, Command cmd, ValueType flavor) {
 			super(buff, cmd, Type.Value);
 			this.flavor = flavor;
 		}
@@ -296,18 +296,18 @@ public class SynchProtocol extends ProtocolBase {
 			this.flavor = flavor;
 		}
 
-//		@Override
+		@Override
 		public boolean getBooleanValue() throws IllegalStateException {
 			if(flavor != ValueType.BOOLEAN) throw new IllegalStateException ("Response value type is " + flavor.name() + " not " + ValueType.BOOLEAN.name());
 			return booleanValue;
 		}
 		
-//		@Override
+		@Override
 		public long getLongValue() throws IllegalStateException {
 			if(flavor != ValueType.NUMBER64) throw new IllegalStateException ("Response value type is " + flavor.name() + " not " + ValueType.NUMBER64.name());
 			return longValue;
 		}
-//		@Override
+		@Override
 		public String getStringValue() throws IllegalStateException {
 			if(flavor != ValueType.STRING) throw new IllegalStateException ("Response value type is " + flavor.name() + " not " + ValueType.STRING.name());
 			return stringValue;
@@ -317,7 +317,7 @@ public class SynchProtocol extends ProtocolBase {
 		 * Delegates the io handling to the base class and parses the value reponse
 		 * based on the data flavor.
 		 */
-//		@Override
+		@Override
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
 			
@@ -358,9 +358,9 @@ public class SynchProtocol extends ProtocolBase {
 	 * @since   alpha.0
 	 * TODO: Use overflow buffers to increase read efficiency.
 	 */
-	public abstract class SynchMultiLineResponseBase extends SynchResponseBase {
+	public abstract class SyncMultiLineResponseBase extends SyncResponseBase {
 
-        protected SynchMultiLineResponseBase (byte[] buffer, Command cmd, Type type) {
+        protected SyncMultiLineResponseBase (byte[] buffer, Command cmd, Type type) {
 	        super(buffer, cmd, type);
         }
 		
@@ -453,7 +453,7 @@ public class SynchProtocol extends ProtocolBase {
 	// Inner Type
 	// ============================================================ Response(s)
 	// ------------------------------------------------------------------------
-	public class SynchBulkResponse extends SynchMultiLineResponseBase implements BulkResponse {
+	public class SyncBulkResponse extends SyncMultiLineResponseBase implements BulkResponse {
 		/**  */
 		byte[] data = null;
 
@@ -461,11 +461,11 @@ public class SynchProtocol extends ProtocolBase {
 		 * Uses the sharedResponseBuffer for reading of the response control line.
 		 * @param cmd
 		 */
-		private SynchBulkResponse(Command cmd) {
+		private SyncBulkResponse(Command cmd) {
 			this (sharedResponseBuffer, cmd);
 		}
 
-		public SynchBulkResponse(byte[] buff, Command cmd) {
+		public SyncBulkResponse(byte[] buff, Command cmd) {
 			super (buff, cmd, Type.Bulk);
 		}
 		
@@ -474,13 +474,13 @@ public class SynchProtocol extends ProtocolBase {
 			this.data = null;
 		}
 
-//		@Override
+		@Override
 		public byte[] getBulkData() {
 			assertResponseRead();
 			return data;
 		}
 
-//		@Override
+		@Override
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
 
@@ -509,7 +509,7 @@ public class SynchProtocol extends ProtocolBase {
 	// Inner Type
 	// ============================================================ Response(s)
 	// ------------------------------------------------------------------------
-	public class SynchMultiBulkResponse extends SynchMultiLineResponseBase implements MultiBulkResponse {
+	public class SyncMultiBulkResponse extends SyncMultiLineResponseBase implements MultiBulkResponse {
 
 		/**  */
 		List<byte[]>   datalist;
@@ -517,11 +517,11 @@ public class SynchProtocol extends ProtocolBase {
 		/**
 		 * @param cmd
 		 */
-		private SynchMultiBulkResponse(Command cmd) {
+		private SyncMultiBulkResponse(Command cmd) {
 			this (sharedResponseBuffer, cmd);
 		}
 
-		public SynchMultiBulkResponse(byte[] buff, Command cmd) {
+		public SyncMultiBulkResponse(byte[] buff, Command cmd) {
 			super (buff, cmd, Type.MultiBulk);
 		}
 
@@ -530,13 +530,13 @@ public class SynchProtocol extends ProtocolBase {
 			this.datalist = null;
 		}
 
-//		@Override
+		@Override
 		public List<byte[]> getMultiBulkData() throws ClientRuntimeException, ProviderException {
 			assertResponseRead();
 			return datalist;
 		}
 
-//		@Override
+		@Override
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			if(didRead) return;
 			

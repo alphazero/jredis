@@ -60,7 +60,7 @@ public interface Query {
 	 */
 	// TODO: why illegal state?
 	public List<byte[]> exec () throws IllegalStateException, RedisException;	
-	public Future<List<byte[]>> execAsynch ();	
+	public Future<List<byte[]>> execAsync ();	
 	
 	public static class Support {
 		public static long unpackValue (List<byte[]> queryResult){

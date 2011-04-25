@@ -30,11 +30,11 @@ import org.jredis.connector.Connection;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.Response;
-import org.jredis.ri.alphazero.connection.AsynchPipelineConnection;
+import org.jredis.ri.alphazero.connection.AsyncPipelineConnection;
 
 /**
  * Asynchronous Redis client implementing {@link JRedisFuture} and using 
- * an {@link AsynchPipelineConnection} for command processing.
+ * an {@link AsyncPipelineConnection} for command processing.
  * <p>
  * TODO: details the usage and characteristics.
  *
@@ -63,7 +63,7 @@ public class JRedisPipeline extends JRedisFutureSupport {
 	 */
 	public JRedisPipeline (ConnectionSpec connectionSpec) {
 		// note: using a non shared connection mod
-		connection = new AsynchPipelineConnection(connectionSpec);
+		connection = new AsyncPipelineConnection(connectionSpec);
 	}
 	
 	// ------------------------------------------------------------------------

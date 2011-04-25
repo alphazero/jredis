@@ -38,7 +38,7 @@ public class DefaultProtocolFactory implements Protocol.Factory {
     	 * check various Connection.Property/Spec keys.  
     	 * 
     	 */
-		return connSpec.getConnectionFlag(Connection.Flag.SHARED) ? new ConcurrentSynchProtocol() : new SynchProtocol();
+		return connSpec.getConnectionFlag(Connection.Flag.SHARED) ? new ConcurrentSyncProtocol() : new SyncProtocol();
     }
 
 }

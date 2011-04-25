@@ -27,7 +27,7 @@ import org.jredis.connector.ConnectionSpec;
  * 
  */
 
-public class AsynchPipelineConnection extends PipelineConnectionBase{
+public class AsyncPipelineConnection extends PipelineConnectionBase{
 
     // ------------------------------------------------------------------------
     // Properties
@@ -39,7 +39,7 @@ public class AsynchPipelineConnection extends PipelineConnectionBase{
      * @param spec
      * @throws ClientRuntimeException
      */
-    public AsynchPipelineConnection (ConnectionSpec spec) throws ClientRuntimeException {
+    public AsyncPipelineConnection (ConnectionSpec spec) throws ClientRuntimeException {
 	    super(spec.setModality(Modality.Asynchronous));
     }
 }

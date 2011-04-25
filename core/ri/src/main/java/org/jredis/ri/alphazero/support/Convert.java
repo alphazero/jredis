@@ -111,32 +111,29 @@ public class Convert {
 	 */
 	public static final int toInt(byte[] potentiallySignedAsciiBytes, int offset, int len) throws IllegalArgumentException
 	{
-		byte[] buff = potentiallySignedAsciiBytes; // lets use a sensible name ;)
+		final byte[] buff = potentiallySignedAsciiBytes; // lets use a sensible name ;)
 		if(null == buff) throw new IllegalArgumentException ("Null input");
 		if(len > buff.length) throw new IllegalArgumentException ("buffer length of " + buff.length + " less than the spec'd len " + len);
 
 		boolean negative = false;
 		int digitCnt = len;
-		switch(buff[offset]) {
-		    case BYTE_MINUS:
-		    	negative = true;
-		    	// Intentional fall-through
-		    case BYTE_PLUS:
-				offset++;
-				digitCnt--;
+		final byte bs = buff[offset];
+		if(bs ==BYTE_MINUS || bs == BYTE_PLUS){
+			if(bs == BYTE_MINUS) negative = true;
+			offset++;
+			digitCnt--;
 		}
 		if(digitCnt > MAX_POSITIVE_32_BIT_DIGITS) throw new IllegalArgumentException ("This \"int\" has more digits than a 32 bit signed number:" + digitCnt);
 		
 		// lets do it
 		int value = 0;
 		for(int p = 0; p < digitCnt; p++){
-			byte b = buff[offset+p];
+			final byte b = buff[offset+p];
 			if(b < BYTE_ZERO || b > BYTE_NINE) throw new IllegalArgumentException("That's not a number!  byte value: " + b);
 			value = value*10 + b - BYTE_ZERO;
 		}
 		if(negative) value = 0 - value;
 		
-		// done.
 		return value;
 	}
 	
@@ -152,13 +149,14 @@ public class Convert {
 	 */
 	public static final long toLong(byte[] potentiallySignedAsciiBytes, int offset, int len) throws IllegalArgumentException
 	{
-		byte[] buff = potentiallySignedAsciiBytes; // lets use a sensible name ;)
+		final byte[] buff = potentiallySignedAsciiBytes; // lets use a sensible name ;)
 		if(null == buff) throw new IllegalArgumentException ("Null input");
 		if(len > buff.length) throw new IllegalArgumentException ("buffer length of " + buff.length + " less than the spec'd len " + len);
 
 		boolean negative = false;
 		int digitCnt = len;
-		if(buff[offset]==BYTE_MINUS || buff[offset]==BYTE_PLUS){ 
+		final byte bs = buff[offset];
+		if(bs ==BYTE_MINUS || bs == BYTE_PLUS){
 			if(buff[offset]==BYTE_MINUS) negative = true; 
 			offset++;
 			digitCnt--;
@@ -168,13 +166,12 @@ public class Convert {
 		// lets do it
 		long value = 0;
 		for(int p = 0; p < digitCnt; p++){
-			byte b = buff[offset+p];
+			final byte b = buff[offset+p];
 			if(b < BYTE_ZERO || b > BYTE_NINE) throw new IllegalArgumentException("That's not a number!  byte value: " + b);
 			value = value*10 + b - BYTE_ZERO;
 		}
 		if(negative) value = 0 - value;
 		
-		// done.
 		return value;
 	}
 	

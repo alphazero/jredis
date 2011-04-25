@@ -33,8 +33,8 @@ import org.testng.annotations.Test;
  * @since   alpha.0
  * 
  */
-@Test(sequential = true, suiteName="JRedisAsynchClient-tests")
-public class JRedisAsynchClientTest extends JRedisFutureProviderTestsBase {
+@Test(sequential = true, suiteName="JRedisAsyncClient-tests")
+public class JRedisAsyncClientTest extends JRedisFutureProviderTestsBase {
 
 	// ------------------------------------------------------------------------
 	// TEST SETUP 
@@ -48,7 +48,7 @@ public class JRedisAsynchClientTest extends JRedisFutureProviderTestsBase {
 		JRedisFuture provider = null;
 		try {
 			ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec(this.host, this.port, this.db2, this.password.getBytes());
-			provider = new JRedisAsynchClient(connectionSpec);
+			provider = new JRedisAsyncClient(connectionSpec);
         }
         catch (ClientRuntimeException e) {
         	Log.error(e.getLocalizedMessage());

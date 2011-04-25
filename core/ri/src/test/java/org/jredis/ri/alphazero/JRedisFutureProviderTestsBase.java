@@ -765,11 +765,11 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 			}
 			
 			int cnt1 = MEDIUM_CNT, cnt2 = 9, cnt3 = 1;
-			Future<List<byte[]>> sortListResp1 = provider.sort(listkey).ALPHA().LIMIT(0, cnt1).DESC().execAsynch();
-			Future<List<byte[]>> sortListResp2 = provider.sort(listkey).ALPHA().LIMIT(10, cnt2).DESC().execAsynch();
-			Future<List<byte[]>> sortListResp3 = provider.sort(listkey).ALPHA().LIMIT(MEDIUM_CNT-1, cnt3).DESC().execAsynch();
+			Future<List<byte[]>> sortListResp1 = provider.sort(listkey).ALPHA().LIMIT(0, cnt1).DESC().execAsync();
+			Future<List<byte[]>> sortListResp2 = provider.sort(listkey).ALPHA().LIMIT(10, cnt2).DESC().execAsync();
+			Future<List<byte[]>> sortListResp3 = provider.sort(listkey).ALPHA().LIMIT(MEDIUM_CNT-1, cnt3).DESC().execAsync();
 			
-			Future<List<byte[]>> sortSetResp = provider.sort(setkey).ALPHA().LIMIT(0, 555).DESC().execAsynch();
+			Future<List<byte[]>> sortSetResp = provider.sort(setkey).ALPHA().LIMIT(0, 555).DESC().execAsync();
 			
 			try {
 				assertEquals(sortListResp1.get().size(), cnt1, "expecting sort results of size MEDIUM_CNT");
@@ -793,7 +793,7 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 					System.out.format("%s\n", s);
 				
 				String destKey = String.format("%s_store", listkey);
-				List<byte[]> ssres = provider.sort(listkey).ALPHA().LIMIT(0, MEDIUM_CNT).DESC().STORE(destKey).execAsynch().get();
+				List<byte[]> ssres = provider.sort(listkey).ALPHA().LIMIT(0, MEDIUM_CNT).DESC().STORE(destKey).execAsync().get();
 				assertNotNull(ssres, "result of srot with STORE should be non-null");
 				assertEquals(ssres.size(), 1, "result of sort with STORE should be a list of single entry (the stored list's size)");
 				long sortedListSize = Query.Support.unpackValue(ssres);

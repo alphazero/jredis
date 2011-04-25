@@ -42,7 +42,6 @@ public class JRedisClientBenchmark extends JRedisBenchmark {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		host = "192.168.1.222";
 		String host = "127.0.0.1";
 		int    port = 6379;
 		int	   size = 3;
@@ -56,7 +55,6 @@ public class JRedisClientBenchmark extends JRedisBenchmark {
 		if(args.length > 4) host = args[4];
 		
 		System.out.format("==> Usage: [db [conn [req [size [host]]]]\n");
-//		System.out.format("*** host: %s:%d (db: %d) | datasize: %d | connections: %d | request/conn: %d \n\n", host, port, db, size ,connectionCnt, reqCnt);
 		
 		new JRedisClientBenchmark().runBenchmarks (host, port, workerCnt, reqCnt, size, db);
 	}

@@ -462,10 +462,10 @@ public abstract class ConnectionBase implements Connection{
     protected final void initializeOnConnect () throws ProviderException, ClientRuntimeException, RedisException{
     	switch (spec.getModality()){
 			case Asynchronous:
-				initializeAsynchConnection();
+				initializeAsyncConnection();
 				break;
 			case Synchronous:
-				initializeSynchConnection();
+				initializeSyncConnection();
 				break;
 			default:
 				throw new ProviderException("Modality " + spec.getModality().name() + " is not supported.");
@@ -477,7 +477,7 @@ public abstract class ConnectionBase implements Connection{
      * @throws ClientRuntimeException
      * @throws RedisException
      */
-    protected final void initializeSynchConnection () throws ProviderException, ClientRuntimeException, RedisException{
+    protected final void initializeSyncConnection () throws ProviderException, ClientRuntimeException, RedisException{
 		if(null!=spec.getCredentials()) {
 			this.serviceRequest(Command.AUTH, spec.getCredentials());
 		}
@@ -490,7 +490,7 @@ public abstract class ConnectionBase implements Connection{
      * @throws ClientRuntimeException
      * @throws RedisException
      */
-    protected final void initializeAsynchConnection () throws ProviderException, ClientRuntimeException, RedisException{
+    protected final void initializeAsyncConnection () throws ProviderException, ClientRuntimeException, RedisException{
     	try {
     		if(null!=spec.getCredentials()) {
     			this.queueRequest(Command.AUTH, spec.getCredentials()).get();
