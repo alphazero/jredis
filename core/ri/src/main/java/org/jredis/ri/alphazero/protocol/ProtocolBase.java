@@ -89,7 +89,6 @@ public abstract class ProtocolBase implements Protocol {
 			byte[] cmdLenBytes = Convert.toBytes(cmd.bytes.length);
 			byte[] lineCntBytes = Convert.toBytes(args.length+1);
 
-            // -------------------
             buffer.write(COUNT_BYTE);
             buffer.write(lineCntBytes);
             buffer.write(CRLF);
@@ -98,129 +97,22 @@ public abstract class ProtocolBase implements Protocol {
             buffer.write(CRLF);
             buffer.write(cmd.bytes);
             buffer.write(CRLF);
-            // -------------------
             
 			switch (cmd.requestType) {
 
 			case NO_ARG:
 			    break;
+			    
 			case KEY:
 			case VALUE:
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[0], 0, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[0]);
-				buffer.write(CRLF);	
-				break;
-
 			case KEY_NUM_NUM:
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[0], 0, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[0]);
-				buffer.write(CRLF);	
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[1], 1, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[1]);
-				buffer.write(CRLF);
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[2], 2, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[2]);
-				buffer.write(CRLF);
-				// -------------------
-				break;
-
 			case KEY_NUM_NUM_OPTS:			
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[0], 0, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[0]);
-				buffer.write(CRLF);	
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[1], 1, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[1]);
-				buffer.write(CRLF);
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[2], 2, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[2]);
-				buffer.write(CRLF);
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[3], 3, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[3]);
-				buffer.write(CRLF);
-				// -------------------
-				break;
-
             case KEY_KEY:
             case KEY_NUM:
 			case KEY_VALUE:
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[0], 0, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[0]);
-				buffer.write(CRLF);
-				
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[1], 1, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[1]);
-				buffer.write(CRLF);
-				break;
-
 			case KEY_IDX_VALUE:
 			case KEY_KEY_VALUE:
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[0], 0, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[0]);
-				buffer.write(CRLF);
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[1], 1, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[1]);
-				buffer.write(CRLF);
-				
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[2], 3, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[2]);
-				buffer.write(CRLF);
-				break;
-			
 			case KEY_CNT_VALUE: /* NOTE: _NOT GENERIC_ TODO: modify the marshal in support */
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[0], 0, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[0]);
-				buffer.write(CRLF);
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[1], 1, ProviderException.class).length));
-				buffer.write(CRLF);
-				buffer.write(args[1]); // << 1
-				
-				buffer.write(CRLF);
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(Assert.notNull(args[2], 2, ProviderException.class).length)); 
-				buffer.write(CRLF);
-				buffer.write(args[2]); // << 2
-				buffer.write(CRLF);
-				
-				break;
-
 			case MULTI_KEY:
 				for(int i=0;i<args.length; i++){
 					buffer.write(SIZE_BYTE);
