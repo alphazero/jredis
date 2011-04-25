@@ -106,21 +106,19 @@ public abstract class ProtocolBase implements Protocol {
 			    break;
 			case KEY:
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[0].length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[0], "key arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
+				buffer.write(args[0]);
 				buffer.write(CRLF);	
 				// -------------------
 				break;
 
 			case VALUE:
 			{
-				byte[] value = Assert.notNull(args[0], "value arg", ProviderException.class);				
-				
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(value.length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[0], "value arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(value);
+				buffer.write(args[0]);
 				buffer.write(CRLF);
 				// -------------------
 			}
@@ -128,48 +126,48 @@ public abstract class ProtocolBase implements Protocol {
 
 			case KEY_NUM_NUM:
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[0].length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[0], "key arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
+				buffer.write(args[0]);
 				buffer.write(CRLF);	
 				
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[1].length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[1], "num_1 arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[1], "num_1 arg", ProviderException.class));
+				buffer.write(args[1]);
 				buffer.write(CRLF);
 				
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[2].length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[2], "num_2 arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[2], "num_2 arg", ProviderException.class));
+				buffer.write(args[2]);
 				buffer.write(CRLF);
 				// -------------------
 				break;
 
 			case KEY_NUM_NUM_OPTS:			
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[0].length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[0], "key arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
+				buffer.write(args[0]);
 				buffer.write(CRLF);	
 				
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[1].length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[1], "num_1 arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[1], "num_1 arg", ProviderException.class));
-				buffer.write(CRLF);
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[2].length));
-				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[2], "num_2 arg", ProviderException.class));
+				buffer.write(args[1]);
 				buffer.write(CRLF);
 				
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[3].length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[2], "num_2 arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[3], "opt args", ProviderException.class));
+				buffer.write(args[2]);
+				buffer.write(CRLF);
+				
+				buffer.write(SIZE_BYTE);
+				buffer.write(Convert.toBytes(Assert.notNull(args[3], "opt args", ProviderException.class).length));
+				buffer.write(CRLF);
+				buffer.write(args[3]);
 				buffer.write(CRLF);
 				// -------------------
 				break;
@@ -178,19 +176,17 @@ public abstract class ProtocolBase implements Protocol {
             case KEY_NUM:
 			case KEY_VALUE:
 			{
-				byte[] value = Assert.notNull(args[1], "value arg", ProviderException.class);
-				
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[0].length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[0], "key arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
+				buffer.write(args[0]);
 				buffer.write(CRLF);
 				
 				
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(value.length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[1], "value arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(value, "value arg", ProviderException.class));
+				buffer.write(args[1]);
 				buffer.write(CRLF);
 				// -------------------
 			}
@@ -199,50 +195,46 @@ public abstract class ProtocolBase implements Protocol {
 			case KEY_IDX_VALUE:
 			case KEY_KEY_VALUE:
 			{
-				byte[] value = Assert.notNull(args[2], "value arg", ProviderException.class);
+				buffer.write(SIZE_BYTE);
+				buffer.write(Convert.toBytes(Assert.notNull(args[0], "key arg", ProviderException.class).length));
+				buffer.write(CRLF);
+				buffer.write(args[0]);
+				buffer.write(CRLF);
 				
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[0].length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[1], "index arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
-				buffer.write(CRLF);
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[1].length));
-				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[1], "index arg", ProviderException.class));
+				buffer.write(args[1]);
 				buffer.write(CRLF);
 				
 				
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(value.length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[2], "value arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(value, "value arg", ProviderException.class));
+				buffer.write(args[2]);
 				buffer.write(CRLF);
 				// -------------------
 			}
 			break;
 			
-			case KEY_CNT_VALUE:
+			case KEY_CNT_VALUE: /* NOTE: NOT GENERIC TODO: modify the marshal in support */
 			{
-				byte[] value = Assert.notNull(args[1], "value arg", ProviderException.class);
-				
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[0].length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[0], "key arg", ProviderException.class).length));
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[0], "key arg", ProviderException.class));
-				buffer.write(CRLF);
-				
-				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(args[2].length));
-				buffer.write(CRLF);
-				buffer.write(Assert.notNull(args[2], "index arg", ProviderException.class));
+				buffer.write(args[0]);
 				buffer.write(CRLF);
 				
 				buffer.write(SIZE_BYTE);
-				buffer.write(Convert.toBytes(value.length));
+				buffer.write(Convert.toBytes(Assert.notNull(args[2], "index arg", ProviderException.class).length)); 
 				buffer.write(CRLF);
-				buffer.write(Assert.notNull(value, "value arg", ProviderException.class));
+				buffer.write(args[2]); // << 2
+				buffer.write(CRLF);
+				
+				buffer.write(SIZE_BYTE);
+				buffer.write(Convert.toBytes(Assert.notNull(args[1], "value arg", ProviderException.class).length));
+				buffer.write(CRLF);
+				buffer.write(args[1]); // << 1
 				buffer.write(CRLF);
 				// -------------------
 			}
@@ -254,9 +246,9 @@ public abstract class ProtocolBase implements Protocol {
 
 				for(int i=0;i<keycnt; i++){
 					buffer.write(SIZE_BYTE);
-					buffer.write(Convert.toBytes(args[i].length));
+					buffer.write(Convert.toBytes(Assert.notNull(args[i], "key arg:" + i, ProviderException.class).length));
 					buffer.write(CRLF);
-					buffer.write(Assert.notNull(args[i], "key arg", ProviderException.class));
+					buffer.write(args[i]);
 					buffer.write(CRLF);
 				}
 				//buffer.write(CRLF);
@@ -265,7 +257,8 @@ public abstract class ProtocolBase implements Protocol {
 			break;
 			
 			case BULK_SET:
-				Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX || cmd == Command.LINSERT, "Only MSET, MSETNX, LINSERT bulk commands are supported", NotSupportedException.class);
+				final String errmsg = "Only MSET, MSETNX, LINSERT bulk commands are supported";
+				Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX || cmd == Command.LINSERT, errmsg, NotSupportedException.class);
 
 				buffer.write(COUNT_BYTE);
 				buffer.write(lineCntBytes);
@@ -279,15 +272,15 @@ public abstract class ProtocolBase implements Protocol {
 				for(int s=0; s<args.length; s++){
 					buffer.write(SIZE_BYTE);
 					if (args[s] != null) {
-  					buffer.write(Convert.toBytes(args[s].length));
-  					buffer.write(CRLF);
-  					buffer.write(args[s]);
-  					buffer.write(CRLF);
-  				} else {
+	  					buffer.write(Convert.toBytes(args[s].length));
+	  					buffer.write(CRLF);
+	  					buffer.write(args[s]);
+	  					buffer.write(CRLF);
+	  				} else {
 						buffer.write(ASCII_ZERO);
 						buffer.write(CRLF);
 						buffer.write(CRLF);
-  				}
+	  				}
 				}
 				break;
 			
