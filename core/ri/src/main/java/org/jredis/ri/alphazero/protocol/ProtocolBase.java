@@ -66,21 +66,19 @@ public abstract class ProtocolBase implements Protocol {
 	protected ProtocolBase () {}
 	
 	// ------------------------------------------------------------------------
-	// Interface
-	// ============================================================== Protocol
+	// Interface: Protocol
 	// ------------------------------------------------------------------------
 	
-	// TODO: lets just forget about this multi-version nonsense.  
-	// and get rid of version all together.
-//	@Override
+	/* TODO: lets just forget about this multi-version nonsense. */  
+	@Override
 	public boolean isCompatibleWithVersion(String version) {
 		return version.equals("0.09");
 	}
 	
-//	@Override
 	/* (non-Javadoc)
 	 * @see org.jredis.connector.Protocol#createRequest(org.jredis.Command, byte[][])
 	 */
+	@Override
 	public Request createRequest(Command cmd, byte[]... args) throws ProviderException, IllegalArgumentException {
 		
 		ByteArrayOutputStream buffer = createRequestBufffer (cmd);
@@ -103,28 +101,10 @@ public abstract class ProtocolBase implements Protocol {
 			case NO_ARG:
 			    break;
 			    
-			case KEY:
-			case VALUE:
-			case KEY_NUM_NUM:
-			case KEY_NUM_NUM_OPTS:			
-            case KEY_KEY:
-            case KEY_NUM:
-			case KEY_VALUE:
-			case KEY_IDX_VALUE:
-			case KEY_KEY_VALUE:
-			case KEY_CNT_VALUE: /* NOTE: _NOT GENERIC_ TODO: modify the marshal in support */
-			case MULTI_KEY:
-				for(int i=0;i<args.length; i++){
-					buffer.write(SIZE_BYTE);
-					buffer.write(Convert.toBytes(Assert.notNull(args[i], i, ProviderException.class).length));
-					buffer.write(CRLF);
-					buffer.write(args[i]);
-					buffer.write(CRLF);
-				}
-				break;
-			
+			// TODO: check w/ antirez if in fact nulls are now generally accepted
+			// that is the only diff here.
 			case BULK_SET:
-				final String errmsg = "Only MSET, MSETNX, LINSERT bulk commands are supported";
+				String errmsg = "Only MSET, MSETNX, LINSERT bulk commands are supported";
 				Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX || cmd == Command.LINSERT, errmsg, NotSupportedException.class);
 
 				// THIS IS CLEARLY BROKEN ... SO MUCH FOR COMPREHSIVE TESTS ...
@@ -152,6 +132,16 @@ public abstract class ProtocolBase implements Protocol {
 				}
 				break;
 			
+			default:
+				for(int i=0;i<args.length; i++){
+					buffer.write(SIZE_BYTE);
+					buffer.write(Convert.toBytes(Assert.notNull(args[i], i, ProviderException.class).length));
+					buffer.write(CRLF);
+					buffer.write(args[i]);
+					buffer.write(CRLF);
+				}
+				break;
+			
 			}
 		}
 		catch (IOException e) {
@@ -160,10 +150,10 @@ public abstract class ProtocolBase implements Protocol {
 		return createRequest(buffer);
 	}
 	
-//	@Override
 	/* (non-Javadoc)
 	 * @see org.jredis.connector.Protocol#createResponse(org.jredis.Command)
 	 */
+	@Override
 	public Response createResponse(Command cmd) throws ProviderException, ClientRuntimeException {
 
 		Response response = null;
@@ -210,10 +200,11 @@ public abstract class ProtocolBase implements Protocol {
 	protected abstract Response createStringResponse(Command cmd) ;
 	protected abstract Response createStatusResponse(Command cmd);
 
-	// ------------------------------------------------------------------------
-	// Inner Type
-	// =============================================================== Request
-	// ------------------------------------------------------------------------
+	
+	// ========================================================================
+	// Inner Types
+	// ========================================================================
+	
 	/**
 	 * SimpleRequest implements the required {@link Request#read(InputStream)}
 	 * using a (likely) shared data buffer.  It is not thread safe and can only
@@ -245,7 +236,7 @@ public abstract class ProtocolBase implements Protocol {
 		/* (non-Javadoc)
 		 * @see com.alphazero.jredis.connector.Message#read(java.io.InputStream)
 		 */
-//		@Override
+		@Override
 		public void read(InputStream in) throws ClientRuntimeException, ProviderException {
 			throw new ProviderException("Request.read is not supported by this class! [Apr 2, 2009]");
 		}
@@ -255,7 +246,7 @@ public abstract class ProtocolBase implements Protocol {
 		 * 
 		 * @param out the stream to write the Request message to.
 		 */
-//		@Override
+		@Override
 		public void write(OutputStream out) throws ClientRuntimeException, ProviderException {
 			try {
 				// you would expect these to throw exceptions if the socket has been reset
