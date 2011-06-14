@@ -921,6 +921,18 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	}
 	
 	@Override
+	public <K extends Object> Future<List<ZSetEntry>> zrangebyscoreSubset(K key, double minScore, double maxScore) {
+		byte[] keybytes = null;
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] minScoreBytes = Convert.toBytes(minScore);
+		byte[] maxScoreBytes = Convert.toBytes(maxScore);
+
+		return new FutureZSetList(this.queueRequest(Command.ZRANGEBYSCORE$OPTS, keybytes, minScoreBytes, maxScoreBytes, Command.Option.WITHSCORES.bytes));
+	}
+
+	@Override
 	public <K extends Object> Future<Long> zremrangebyscore(K key, double minScore, double maxScore) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)

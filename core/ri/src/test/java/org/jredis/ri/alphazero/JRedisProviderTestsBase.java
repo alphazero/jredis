@@ -2089,6 +2089,27 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 	}
 	
 	@Test
+	public void testZrangebyscoreWithScoresStringByteArray() {
+		cmd = Command.ZRANGEBYSCORE$OPTS.code + " byte[]";
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+
+			String setkey = keys.get(0);
+			for(int i=0;i<MEDIUM_CNT; i++)
+				assertTrue(provider.zadd(setkey, i, dataList.get(i)), "zadd of random element should be true");
+
+			List<ZSetEntry>  range = provider.zrangebyscoreSubset(setkey, 0, SMALL_CNT);
+			assertTrue(range.size() > 0, "should have non empty results for range by score here");
+			for(int i=0;i<SMALL_CNT-1; i++){
+				assertEquals(range.get(i).getValue(), dataList.get(i), "expected value in the range by score missing");
+				assertEquals(range.get(i).getScore(), (double)i, "score of element from zrangebyscore_withscore");
+			}
+		}
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+
+	@Test
 	public void testZremrangebyscoreStringByteArray() {
 		cmd = Command.ZREMRANGEBYSCORE.code + " byte[]";
 		Log.log("TEST: %s command", cmd);
