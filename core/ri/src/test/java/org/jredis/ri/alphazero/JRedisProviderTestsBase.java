@@ -567,6 +567,25 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
+	
+    /**
+     * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#setex(java.lang.String, long, byte[])}.
+     */
+    @Test
+    public void testSetexStringByteArray() throws InterruptedException {
+        cmd = Command.SETEX.code + " | " + Command.GET;
+        Log.log("TEST: %s command", cmd);
+        try {
+            provider.flushdb();
+            
+            provider.setex(keys.get(0), 0, objectList.get(0));
+            
+            Thread.sleep(1250); // compensate for any latency
+            
+            assertNull(provider.get(keys.get(0)));
+        } 
+        catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+    }
 
 	@Test
 	public void testHsetHgetHexists() {

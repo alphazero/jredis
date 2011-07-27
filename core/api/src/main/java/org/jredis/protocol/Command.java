@@ -42,7 +42,8 @@ public enum Command {
 	QUIT 		(RequestType.NO_ARG, 		ResponseType.VIRTUAL), 
 
 	// String values operations
-	SET 		(RequestType.KEY_VALUE, 	ResponseType.STATUS), 
+	SET 		(RequestType.KEY_VALUE, 	ResponseType.STATUS),
+	SETEX       (RequestType.KEY_CNT_VALUE, ResponseType.STATUS),
 	GET 		(RequestType.KEY, 			ResponseType.BULK), 
 	GETSET		(RequestType.KEY_VALUE, 	ResponseType.BULK), 
 	MGET		(RequestType.MULTI_KEY, 	ResponseType.MULTI_BULK), 
