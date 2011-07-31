@@ -393,7 +393,31 @@ public abstract class JRedisSupport implements JRedis {
 	{
 		set(key, DefaultCodec.encode(value));
 	}
-	
+
+    @Override
+    public <K extends Object> void setex(K key, long seconds, byte[] value) throws RedisException {
+        byte[] keybytes = null;
+        if((keybytes = getKeyBytes(key)) == null) 
+            throw new IllegalArgumentException ("invalid key => ["+key+"]");
+        if (seconds < 0L)
+            throw new IllegalArgumentException("negative expire time => ["+seconds+"]");
+
+        this.serviceRequest(Command.SETEX, keybytes, String.valueOf(seconds).getBytes(), value);
+    }
+    @Override
+    public <K extends Object> void setex(K key, long seconds, String value) throws RedisException {
+        setex(key, seconds, DefaultCodec.encode(value));
+    }
+    @Override
+    public <K extends Object> void setex(K key, long seconds, Number value) throws RedisException {
+        setex(key, seconds, String.valueOf(value).getBytes());
+    }
+    @Override
+    public <K extends Object, T extends Serializable> void setex(K key, long seconds, T value) throws RedisException
+    {
+        setex(key, seconds, DefaultCodec.encode(value));
+    }
+    
 	@Override
 	public <K extends Object> byte[] getset(K key, byte[] value) throws RedisException {
 		byte[] keybytes = null;

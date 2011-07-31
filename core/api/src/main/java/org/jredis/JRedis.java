@@ -125,7 +125,52 @@ public interface JRedis {
 	 */
 	public <K extends Object, T extends Serializable> 
 		   void set (K key, T object) throws RedisException;
-
+	
+	/**
+	 * @Redis SETEX
+	 * @param key
+	 * @param seconds timeout in seconds
+	 * @param value
+     * @throws RedisException on user error.
+     * @throws ProviderException on un-documented features/bug
+     * @throws ClientRuntimeException on errors due to operating environment (Redis or network)
+	 */
+	public <K extends Object> void setex(K key, long seconds, byte[] value) throws RedisException;
+    /**
+     * Convenient method for {@link String} data binding
+     * @Redis SETEX
+     * @param key
+     * @param seconds timeout in seconds
+     * @param stringValue
+     * @throws RedisException
+     * @see {@link JRedis#setex(String, long, byte[])}
+     */
+	public <K extends Object> void setex(K key, long seconds, String stringValue) throws RedisException;
+    /**
+     * Convenient method for {@link String} numeric values binding
+     * @Redis SETEX
+     * @param key
+     * @param seconds timeout in seconds
+     * @param numberValue
+     * @throws RedisException
+     * @see {@link JRedis#setex(String, long, byte[])}
+     */
+    public <K extends Object> void setex(K key, long seconds, Number numberValue) throws RedisException;
+    /**
+     * Binds the given java {@link Object} to the key.  Serialization format is
+     * implementation specific.  Simple implementations may apply the basic {@link Serializable}
+     * protocol.
+     * @Redis SETEX
+     * @param <T>
+     * @param key
+     * @param seconds timeout in seconds
+     * @param object
+     * @throws RedisException
+     * @see {@link JRedis#setex(String, byte[])}
+     */
+    public <K extends Object, T extends Serializable> 
+           void setex(K key, long seconds, T object) throws RedisException;
+    
 	/**
 	 * @Redis SETNX
 	 * @param key
