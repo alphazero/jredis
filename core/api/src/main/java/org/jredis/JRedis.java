@@ -914,6 +914,28 @@ public interface JRedis {
 	@Redis(versions="1.3.n")
 	public <K extends Object> Map<byte[], byte[]> hgetall(K key)  throws RedisException;
 	
+	/**
+	 *
+	 * @Redis HMSET
+	 * @param key
+	 * @param sets
+	 * @return
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.8")
+	public <K extends Object> void hmset(K key, K...sets)  throws RedisException;
+
+	/**
+	 *
+	 * @Redis HMGET
+	 * @param key
+	 * @param keys
+	 * @return values as a List<byte[]>
+	 * @throws RedisException
+	 */
+	@Redis(versions="1.3.10")
+	public <K extends Object> List<byte[]> hmget(K key, K...keys)  throws RedisException;
+
 	// ------------------------------------------------------------------------
 	// Transactional commands
 	// ------------------------------------------------------------------------

@@ -760,6 +760,58 @@ public abstract class JRedisSupport implements JRedis {
 		return resp;
 	}
 
+	@Redis(versions="1.3.8")
+	@Override
+	public <K extends Object> void hmset(K hashKey, K...sets)  throws RedisException {
+		byte[][] hashKeyBytes = new byte[sets.length+1][];
+		int i = 0;
+
+		if ((hashKeyBytes[i++] = getKeyBytes(hashKey)) == null) {
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+		}
+
+		for(K k : sets) {
+			if ((hashKeyBytes[i++] = getKeyBytes(k)) == null) {
+				throw new IllegalArgumentException ("invalid key => ["+k+"]");
+			}
+		}
+
+		this.serviceRequest(Command.HMSET, hashKeyBytes);
+	}
+
+	@Redis(versions="1.3.10")
+	@Override
+	public <K extends Object> List<byte[]> hmget(K hashKey, K...keys)  throws RedisException {
+		byte[][] hashKeyBytes = new byte[keys.length+1][];
+		int i = 0;
+
+		if ((hashKeyBytes[i++] = getKeyBytes(hashKey)) == null) {
+			throw new IllegalArgumentException ("invalid key => ["+hashKey+"]");
+		}
+
+		for(K k : keys) {
+			if ((hashKeyBytes[i++] = getKeyBytes(k)) == null) {
+				throw new IllegalArgumentException ("invalid key => ["+k+"]");
+			}
+		}
+
+		List<byte[]> resp = null;
+		try {
+			MultiBulkResponse response = (MultiBulkResponse) this.serviceRequest(Command.HMGET, hashKeyBytes);
+			List<byte[]> bulkdata = response.getMultiBulkData();
+			if(null != bulkdata) {
+				resp = new ArrayList<byte[]>(bulkdata.size());
+				for(i=0; i<bulkdata.size(); i++){
+					resp.add(bulkdata.get(i));
+				}
+			}
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a MultiBulkResponse here => " + e.getLocalizedMessage(), e);
+		}
+		return resp;
+	}
+
 	
 	/* ------------------------------- commands returning int value --------- */
 

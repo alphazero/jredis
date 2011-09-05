@@ -715,6 +715,44 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 	}
 	
 	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#hmset(java.lang.String, ...)}.
+	 */
+	@Test
+	public void testHmset() {
+		cmd = Command.HMSET.code + " | " + Command.HGET;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+
+			assertTrue( provider.hset(keys.get(0), keys.get(1), ""), "hset using String value");
+			assertTrue( provider.hset(keys.get(0), keys.get(2), ""), "hset using String value");
+			provider.hmset(keys.get(0), keys.get(1), stringList.get(0), keys.get(2), stringList.get(1));
+			assertEquals( DefaultCodec.toStr(provider.hget(keys.get(0), keys.get(1))), stringList.get(0), "hmset failed field 0");
+			assertEquals( DefaultCodec.toStr(provider.hget(keys.get(0), keys.get(2))), stringList.get(1), "hmset failed field 1");
+		}
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+
+	/**
+	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#hmget(java.lang.String, ...)}.
+	 */
+	@Test
+	public void testHmget() {
+		cmd = Command.HMGET.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+
+			assertTrue( provider.hset(keys.get(0), keys.get(1), stringList.get(0)), "hset using String value");
+			assertTrue( provider.hset(keys.get(0), keys.get(2), stringList.get(1)), "hset using String value");
+			List<byte[]> resp = provider.hmget(keys.get(0), keys.get(1), keys.get(2));
+			assertEquals( DefaultCodec.toStr(resp.get(0)), stringList.get(0), "hmget invalid index 0");
+			assertEquals( DefaultCodec.toStr(resp.get(1)), stringList.get(1), "hmget invalid index 1");
+		}
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+
+	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#set(java.lang.String, byte[])}.
 	 */
 	@Test

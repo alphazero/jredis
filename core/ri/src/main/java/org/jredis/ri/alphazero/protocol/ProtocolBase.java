@@ -132,6 +132,22 @@ public abstract class ProtocolBase implements Protocol {
 				}
 				break;
 			
+			case KEY_BULK_SET:
+				for (byte[] arg : args) {
+					buffer.write(SIZE_BYTE);
+					if (arg != null) {
+						buffer.write(Convert.toBytes(arg.length));
+						buffer.write(CRLF);
+						buffer.write(arg);
+						buffer.write(CRLF);
+					} else {
+						buffer.write(ASCII_ZERO);
+						buffer.write(CRLF);
+						buffer.write(CRLF);
+					}
+				}
+				break;
+
 			default:
 				for(int i=0;i<args.length; i++){
 					buffer.write(SIZE_BYTE);
