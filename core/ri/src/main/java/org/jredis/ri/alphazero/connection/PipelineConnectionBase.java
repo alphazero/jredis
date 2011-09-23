@@ -69,7 +69,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	private Thread 					respHandlerThread;
 
 	/**  */
-	private BlockingQueue<PendingRequest>	pendingResponseQueue;
+	BlockingQueue<PendingRequest>	pendingResponseQueue;
 
 	/** synchronization object used to serialize request queuing  */
 	private Object					serviceLock = new Object();
@@ -102,7 +102,8 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 	/**
      * 
      */
-    @Override
+    @SuppressWarnings("boxing")
+	@Override
     protected void initializeComponents () {
     	
     	spec.setConnectionFlag(Flag.PIPELINE, true);
@@ -164,7 +165,8 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     /**
      * Just make sure its a {@link FastBufferedInputStream}.
      */
-    @Override
+    @SuppressWarnings("boxing")
+	@Override
 	protected final InputStream newInputStream (InputStream socketInputStream) throws IllegalArgumentException {
     	
     	InputStream in = super.newInputStream(socketInputStream);
@@ -217,7 +219,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 		return pendingResponse;
     }
 
-    private void onResponseHandlerError (ClientRuntimeException cre, PendingRequest request) {
+    void onResponseHandlerError (ClientRuntimeException cre, PendingRequest request) {
     	Log.error("Pipeline response handler encountered an error: " + cre.getMessage());
     	
     	// signal fault
@@ -230,9 +232,9 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 		// 1 - block the request phase
 		// 2 - try reconnect
 		// 3-ok: 		reconnected, resume processing
-		// 2-not ok: 	close shop, and set all pendings to error
+		// 2-not ok: 	close shop, and set all pending responses to error
     	
-		// for now .. flush the remaining pending resposes from queue
+		// for now .. flush the remaining pending responses from queue
     	// with execution error
     	//
 		PendingRequest pending = null;

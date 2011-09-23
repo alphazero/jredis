@@ -49,14 +49,15 @@ public class UsingJRedisPipeline extends UsingJRedisFuture {
 		ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec("localhost", 6379, database, "jredis".getBytes());
 		
 		connectionSpec.setDatabase (13);
-	    new UsingJRedisPipeline (connectionSpec);
+//	    new UsingJRedisPipeline (connectionSpec);
 	    
 	    exampleUseofSyncInPipeline(connectionSpec);
     }
 	/**
      * @param connectionSpec
      */
-    private static void exampleUseofSyncInPipeline (ConnectionSpec connectionSpec) {
+    @SuppressWarnings("boxing")
+	private static void exampleUseofSyncInPipeline (ConnectionSpec connectionSpec) {
     	
     	// Note that we are using a JRedisPipeline reference and not a generic
     	// JRedisFuture here

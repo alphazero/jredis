@@ -334,24 +334,25 @@ public interface ConnectionSpec {
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag, java.lang.Boolean) */
-//      @Override
+		@Override
 		final public ConnectionSpec setSocketFlag(Connection.Socket.Flag flag, Boolean value){
 			socketFlags.put(flag, value);
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setSocketProperty(org.jredis.connector.ConnectionSpec.SocketProperty, java.lang.Integer) */
-//      @Override
+		@Override
 		final public ConnectionSpec setSocketProperty(Connection.Socket.Property property, Integer value){
 			socketProperties.put(property, value);
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getConnectionFlag(org.jredis.connector.ConnectionSpec.ConnectionFlag) */
-//      @Override
+		@Override
 		final public boolean getConnectionFlag (Connection.Flag flag){
 			return Connection.Flag.isSet(connectionFlagBitmask, flag);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setConnectionFlag(org.jredis.connector.ConnectionSpec.ConnectionFlag, java.lang.Boolean) */
-//      @Override
+		@SuppressWarnings("boxing")
+		@Override
 		final public ConnectionSpec setConnectionFlag(Connection.Flag flag, Boolean value){
 			connectionFlagBitmask = 
 				value ? 
@@ -360,12 +361,12 @@ public interface ConnectionSpec {
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getHeartbeat() */
-//      @Override
+		@Override
 		final public int	getHeartbeat() {
         	return heartbeat/1000;
         }
  		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setHeartbeat(int) */
-//      @Override
+		@Override
 		final public ConnectionSpec setHeartbeat(int seconds) {
         	this.heartbeat = seconds * 1000;
         	return this;

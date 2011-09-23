@@ -45,7 +45,8 @@ public class UsingConnectionSpec {
      * Alright, so here we're going to fiddle with the various TCP settings that the JRedisClient
      * will use in its connection.  
      */
-    private static void exampleUsingCustomTCPSettings () {
+    @SuppressWarnings("boxing")
+	private static void exampleUsingCustomTCPSettings () {
     	// try our own values for various flags and properties
     	//
     	{
@@ -71,7 +72,7 @@ public class UsingConnectionSpec {
 		    	connectionSpec
 		    		// to be or not to be -- you decide
 		    		//
-		    		.setSocketFlag(Connection.Socket.Flag.SO_KEEP_ALIVE, false)				// DO NOT keep socket allive
+		    		.setSocketFlag(Connection.Socket.Flag.SO_KEEP_ALIVE, Boolean.FALSE)				// DO NOT keep socket allive
 
 		    		// connect retries on connection breaks
 		    		//
@@ -119,7 +120,8 @@ public class UsingConnectionSpec {
      * <p>
      * Then we try setting the basic {@link ConnectionSpec} properties:  host, port, password, and database.
      */
-    private static void exampleUsingDefaultConnectionSpec () {
+    @SuppressWarnings("boxing")
+	private static void exampleUsingDefaultConnectionSpec () {
     	
     	// 1st example: using defaults
     	// if your server expects a AUTH password, this will fail so see next block

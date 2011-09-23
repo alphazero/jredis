@@ -58,6 +58,7 @@ public class AsyncConnection extends ConnectionBase implements Connection {
 
 	/**  */
 	private BlockingQueue<PendingRequest>	pendingQueue;
+	BlockingQueue<PendingRequest> getPendingQueue() { return pendingQueue; }
 	
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -100,7 +101,8 @@ public class AsyncConnection extends ConnectionBase implements Connection {
     /**
      * Just make sure its a {@link FastBufferedInputStream}.
      */
-    @Override
+    @SuppressWarnings("boxing")
+	@Override
 	protected final InputStream newInputStream (InputStream socketInputStream) throws IllegalArgumentException {
     	
     	InputStream in = super.newInputStream(socketInputStream);
@@ -160,9 +162,10 @@ public class AsyncConnection extends ConnectionBase implements Connection {
         	/** Response handler thread specific protocol handler -- optimize fencing */
         	Protocol protocol = Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class);
         	PendingRequest pending = null;
+        	final BlockingQueue<PendingRequest>	_pendingQueue = getPendingQueue();
         	while(true){
 				try {
-	                pending = pendingQueue.take();
+	                pending = _pendingQueue.take();
 					try {
 						Request request = Assert.notNull(protocol.createRequest (pending.cmd, pending.args), "request object from handler", ProviderException.class);
 						request.write(getOutputStream());

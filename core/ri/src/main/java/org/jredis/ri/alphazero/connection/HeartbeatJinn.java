@@ -16,6 +16,7 @@
 
 package org.jredis.ri.alphazero.connection;
 
+import java.security.ProviderException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.jredis.ClientRuntimeException;
@@ -118,6 +119,9 @@ public class HeartbeatJinn extends Thread implements Connection.Listener{
 						case Synchronous:
 							response = conn.serviceRequest(Command.PING);
 							break;
+						case Monitor:
+						case PubSub:
+							throw new ProviderException(String.format("%s connector not supported", modality.name()));
 						}
 						if(!response.isError()){ 
 //							if(conn.getSpec().getLogLevel().equals(LogLevel.DEBUG))
@@ -166,6 +170,7 @@ public class HeartbeatJinn extends Thread implements Connection.Listener{
 	 * 
      * @see org.jredis.connector.Connection.Listener#onEvent(org.jredis.connector.Connection.Event)
      */
+	// TODO: let's hook this up.
     public void onEvent (Event event) {
 //		if (conn.getSpec().getLogLevel()==ConnectionSpec.LogLevel.DEBUG)
 		Log.debug("onEvent %s : <%s>", event.getType().name(), this);
@@ -186,6 +191,8 @@ public class HeartbeatJinn extends Thread implements Connection.Listener{
 				break;
 			case SHUTDOWN:
 				shutdown();
+				break;
+			case STOPPING:
 				break;
     	}
     }

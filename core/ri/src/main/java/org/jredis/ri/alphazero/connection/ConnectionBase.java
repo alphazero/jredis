@@ -58,7 +58,7 @@ import org.jredis.ri.alphazero.support.Log;
  * are expected to support.  (They would simply implement the method that they support.)
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, Apr 20, 2009
+ * @version alpha.0, Apr 20, 2009-2011
  * @since   alpha.0
  * 
  */
@@ -69,12 +69,12 @@ public abstract class ConnectionBase implements Connection{
 	// Properties
 	// ------------------------------------------------------------------------
 	
-	/** Thread specific protocol handler -- optimize fencing */
+	/** 
+	 * Thread specific protocol handler -- optimize fencing 
+	 * Protocol specific matters are delegated to an instance of {@link Protocol} 
+	 */
 	ThreadLocal<Protocol> thrdProtocol = new ThreadLocal<Protocol>();
 	
-	/** Protocol specific matters are delegated to an instance of {@link Protocol} */
-//	private Protocol 			protocol;
-
 	/** Connection specs used to create this {@link Connection} */
 	final protected ConnectionSpec  	spec;
 	
@@ -92,7 +92,6 @@ public abstract class ConnectionBase implements Connection{
 
 	/** address of the socket connection */
 	private final InetSocketAddress  	socketAddress;
-	
 	
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -122,15 +121,15 @@ public abstract class ConnectionBase implements Connection{
 			throw new ProviderException("Unexpected error on initialize -- BUG", e);
 		} 
 
-    if (spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) {
-      try {
-        connect ();
-      } catch (ClientRuntimeException e) {
-        // if connecting failed, clean up on our way out.
-        cleanup();
-        throw e;
-      }
-    }
+		if (spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) {
+			try {
+				connect ();
+			} catch (ClientRuntimeException e) {
+				// if connecting failed, clean up on our way out.
+				cleanup();
+				throw e;
+			}
+		}
 	}
 
 	// ------------------------------------------------------------------------
@@ -202,8 +201,7 @@ public abstract class ConnectionBase implements Connection{
      * </pre>
      */
     protected void initializeComponents () {
-		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
-
+//		setProtocolHandler (Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class));
 		if(spec.getConnectionFlag(Connection.Flag.RELIABLE)){
 			Log.log("WARNING: heartbeat is disabled.");
 //	    	heartbeat = new HeartbeatJinn(this, this.spec.getHeartbeat(), " [" + this + "] heartbeat");
@@ -211,6 +209,7 @@ public abstract class ConnectionBase implements Connection{
 		}
     }
 
+    // TODO: diff this 
     protected void cleanup () {
     }
 
@@ -255,7 +254,8 @@ public abstract class ConnectionBase implements Connection{
      * @param socketInputStream
      * @return
      */
-    protected InputStream newInputStream(InputStream socketInputStream) { 
+    @SuppressWarnings("boxing")
+	protected InputStream newInputStream(InputStream socketInputStream) { 
     	return  new FastBufferedInputStream(socketInputStream, spec.getSocketProperty(SO_RCVBUF));
     }
     
@@ -376,7 +376,7 @@ public abstract class ConnectionBase implements Connection{
 		socketClose();
 		isConnected = false;
 
-    cleanup();
+		cleanup();
 		notifyDisconnected();
 		Log.debug ("DISCONNECTED | conn: %s", toString());
 	}
@@ -399,6 +399,7 @@ public abstract class ConnectionBase implements Connection{
 	 * 
 	 * @throws IOException thrown by the socket object.
 	 */
+	@SuppressWarnings("boxing")
 	private final void newSocketConnect () 
 		throws IOException 
 	{
@@ -517,7 +518,8 @@ public abstract class ConnectionBase implements Connection{
         }
     }
 	
-    @Override
+    @SuppressWarnings("boxing")
+	@Override
     public String toString() {
 //    	String selfdesc = String.format("%s@%d", getClass().getSimpleName(), hashCode());
     	return String.format("Connection: %-12s %s:%d db:%d | %s@%d", spec.getModality().name().toUpperCase(), spec.getAddress(), spec.getPort(), spec.getDatabase(), getClass().getSimpleName(), hashCode());
@@ -526,13 +528,20 @@ public abstract class ConnectionBase implements Connection{
 	// Property accessors
 	// ------------------------------------------------------------------------
 	
-	final protected void setProtocolHandler(Protocol protocolHandler) {
-		if(protocolHandler == null) throw new ProviderException("protocol handler is null - BUG");
-    	thrdProtocol.set(protocolHandler);
+//	final protected void setProtocolHandler(Protocol protocolHandler) {
+//		new Exception().printStackTrace();
+//		System.out.format(">>>>>>>>>>> PROTOCOL HANDLER: %s\n", protocolHandler);
+//		if(protocolHandler == null) throw new ProviderException("protocol handler is null - BUG");
+//    	thrdProtocol.set(protocolHandler);
 //		this.protocol = notNull(protocolHandler, "protocolHandler for ConnectionBase", ClientRuntimeException.class);
-	}
+//	}
 	
 	final protected Protocol getProtocolHandler() {
+		if(thrdProtocol.get() == null) {
+			final Protocol protocol = Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class);
+	    	thrdProtocol.set(protocol);
+		}
+//		System.out.format("<<<<<<<<<<< PROTOCOL HANDLER: %s\n", thrdProtocol.get());
 		return notNull(thrdProtocol.get(), "protocolHandler for ConnectionBase", ClientRuntimeException.class);
 	}
 

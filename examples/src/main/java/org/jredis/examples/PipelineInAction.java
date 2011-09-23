@@ -48,6 +48,7 @@ import org.jredis.ri.alphazero.support.Log;
  */
 
 public class PipelineInAction {
+	@SuppressWarnings("boxing")
 	public static void main (String[] args) {
     	final ConnectionSpec spec = DefaultConnectionSpec.newSpec();
     	spec.setCredentials("jredis".getBytes());
@@ -63,7 +64,8 @@ public class PipelineInAction {
     /**
      * @param spec
      */
-    private static void usingSynchSemantics (ConnectionSpec spec) {
+    @SuppressWarnings("boxing")
+	private static void usingSynchSemantics (ConnectionSpec spec) {
     	JRedisPipeline pipeline = new JRedisPipeline(spec);
     	try {
     		long start = System.currentTimeMillis();
@@ -104,11 +106,11 @@ public class PipelineInAction {
      * @param reqCnt
      * @param forever
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({ "unused", "boxing" })
     private static void runJRedisPipelineGET (ConnectionSpec spec, int reqCnt, int size, boolean forever) {
     	long totTime = 0;
     	long avgRespTime = 0;
-    	float avgThroughput = (float)0;
+    	float avgThroughput = 0;
     	long iters = 0;
     	JRedisFuture pipeline = new JRedisPipeline(spec);
     	try {
@@ -127,6 +129,8 @@ public class PipelineInAction {
 	    			cnt++;
 	    		}
 	    		long reqDoneTime = timer.mark();
+	    		assert futureBytes != null;
+				@SuppressWarnings("null")
 				byte[] value = futureBytes.get();
 	    		long respDoneTime = timer.mark();
 //				System.out.format("JRedisPipeline: %d GETs invoked   @ %5d  (%.2f ops/s)\n", cnt, reqDoneTime, timer.opsPerSecAtDelta(cnt, reqDoneTime));
@@ -134,7 +138,7 @@ public class PipelineInAction {
 //				System.out.format("JRedisPipeline: %d GETs completed @ %5d  (%.2f ops/s) [%d msecs to comp] \n", cnt, timer.deltaAtMark(), throughput, respDoneTime-reqDoneTime);
 				if(iters > 0){
 					totTime += respDoneTime;
-					avgRespTime = (totTime) / (long)iters;
+					avgRespTime = (totTime) / iters;
 					avgThroughput =(float)( reqCnt * 1000) / (float) avgRespTime;
 					System.out.format("JRedisPipeline: %d GETs [%d bytes/GET] average response time @ %dms (%.2f ops/s) last: %dms\n", cnt, data.length, avgRespTime, avgThroughput, respDoneTime);
 //					Assert.isEquivalent(data, value);
@@ -155,11 +159,11 @@ public class PipelineInAction {
 	        e.printStackTrace();
         }
     }
-    @SuppressWarnings("unused")
+    @SuppressWarnings({ "unused", "boxing" })
     private static void runJRedisPipelinePING (ConnectionSpec spec, int reqCnt, int size, boolean forever) {
     	long totTime = 0;
     	long avgRespTime = 0;
-    	float avgThroughput = (float)0;
+    	float avgThroughput = 0;
     	long iters = 0;
     	JRedisFuture pipeline = new JRedisPipeline(spec);
     	try {
@@ -172,14 +176,16 @@ public class PipelineInAction {
 	    			cnt++;
 	    		}
 	    		long reqDoneTime = timer.mark();
-				futureStat.get();
+	    		assert futureStat != null;
+				@SuppressWarnings("null")
+				ResponseStatus rstat = futureStat.get();
 	    		long respDoneTime = timer.mark();
 //				System.out.format("JRedisPipeline: %d PINGs invoked   @ %5d  (%.2f ops/s)\n", cnt, reqDoneTime, timer.opsPerSecAtDelta(cnt, reqDoneTime));
 				float throughput = timer.opsPerSecAtMark(cnt);
 //				System.out.format("JRedisPipeline: %d PINGs completed @ %5d  (%.2f ops/s) [%d msecs to comp] \n", cnt, timer.deltaAtMark(), throughput, respDoneTime-reqDoneTime);
 				if(iters > 0){
 					totTime += reqDoneTime;
-					avgRespTime = (totTime) / (long)iters;
+					avgRespTime = (totTime) / iters;
 					avgThroughput =(float)( reqCnt * 1000) / (float) avgRespTime;
 					System.out.print("\r");
 					System.out.format("JRedisPipeline: %d PINGs average response time @ %dms (%.2f ops/s)", cnt, avgRespTime, avgThroughput);
@@ -200,11 +206,12 @@ public class PipelineInAction {
 	        e.printStackTrace();
         }
     }
-    private static void runJRedisPipelineLPUSH (ConnectionSpec spec, int reqCnt, int size, boolean forever) {
+    @SuppressWarnings("boxing")
+	private static void runJRedisPipelineLPUSH (ConnectionSpec spec, int reqCnt, int size, boolean forever) {
     	JRedisFuture pipeline = new JRedisPipeline(spec);
     	long totTime = 0;
     	long avgRespTime = 0;
-    	float avgThroughput = (float)0;
+    	float avgThroughput = 0;
     	long iters = 0;
     	try {
     		String key = "pipeKey";
@@ -221,13 +228,15 @@ public class PipelineInAction {
 	    			cnt++;
 	    		}
 	    		long reqDoneTime = timer.mark();
-				futureStat.get();
+	    		assert futureStat != null;
+	    		@SuppressWarnings({ "null", "unused" })
+				ResponseStatus rstat = futureStat.get();
 	    		long respDoneTime = timer.mark();
 				System.out.format("JRedisPipeline: %d LPUSHs invoked   @ %5d  (%.2f ops/s)\n", cnt, reqDoneTime, timer.opsPerSecAtDelta(cnt, reqDoneTime));
 				System.out.format("JRedisPipeline: %d LPUSHs completed @ %5d  (%.2f ops/s) [%d msecs to comp] \n", cnt, timer.deltaAtMark(), timer.opsPerSecAtMark(cnt), respDoneTime-reqDoneTime);
 				if(iters > 0){
 					totTime += reqDoneTime;
-					avgRespTime = (totTime) / (long)iters;
+					avgRespTime = (totTime) / iters;
 					avgThroughput =(float)( reqCnt * 1000) / (float) avgRespTime;
 					System.out.format("JRedisPipeline: %d LPUSHs average response time @ %dms (%.2f ops/s) \n", cnt, avgRespTime, avgThroughput);
 				}
@@ -255,11 +264,12 @@ public class PipelineInAction {
      * @param reqCnt
      * @param forever
      */
-    private static void runJRedisPipelineSET (ConnectionSpec spec, int reqCnt, int size, boolean forever) {
+    @SuppressWarnings("boxing")
+	private static void runJRedisPipelineSET (ConnectionSpec spec, int reqCnt, int size, boolean forever) {
     	JRedisFuture pipeline = new JRedisPipeline(spec);
     	long totTime = 0;
     	long avgRespTime = 0;
-    	float avgThroughput = (float)0;
+    	float avgThroughput = 0;
     	long iters = 0;
     	try {
     		String key = "pipeKey";
@@ -275,11 +285,13 @@ public class PipelineInAction {
 	    			futureStat = pipeline.set(key, data);
 	    			cnt++;
 	    		}
-				futureStat.get();
+	    		assert futureStat != null;
+	    		@SuppressWarnings({ "null", "unused" })
+				ResponseStatus rstat = futureStat.get();
 	    		long respDoneTime = timer.mark();
 				if(iters > 0){
 					totTime += respDoneTime;
-					avgRespTime = (totTime) / (long)iters;
+					avgRespTime = (totTime) / iters;
 					avgThroughput =(float)( reqCnt * 1000) / (float) avgRespTime;
 					System.out.format("JRedisPipeline: %d SETs [%d bytes/GET] average response time @ %dms (%.2f ops/s) \n", cnt, data.length, avgRespTime, avgThroughput);
 				}
@@ -305,11 +317,12 @@ public class PipelineInAction {
      * @param reqCnt
      * @param forever
      */
-    private static void runJRedisPipelineINCR (ConnectionSpec spec, int reqCnt, int size, boolean forever) {
+    @SuppressWarnings("boxing")
+	private static void runJRedisPipelineINCR (ConnectionSpec spec, int reqCnt, int size, boolean forever) {
     	JRedisFuture pipeline = new JRedisPipeline(spec);
     	long totTime = 0;
     	long avgRespTime = 0;
-    	float avgThroughput = (float)0;
+    	float avgThroughput = 0;
     	long iters = 0;
     	try {
     		String key = "pipeCounter";
@@ -324,6 +337,8 @@ public class PipelineInAction {
 	    			cnt++;
 	    		}
 	    		long reqDoneTime = timer.mark();
+	    		assert futureLong != null;
+				@SuppressWarnings("null")
 				long counter = futureLong.get();
 	    		long respDoneTime = timer.mark();
 				System.out.format("JRedisPipeline: %d INCRs invoked   @ %5d  (%.2f ops/s)\n", cnt, reqDoneTime, timer.opsPerSecAtDelta(cnt, reqDoneTime));
@@ -331,7 +346,7 @@ public class PipelineInAction {
 				System.out.format ("counter is now: %d\n\n", counter);
 				if(iters > 0){
 					totTime += reqDoneTime;
-					avgRespTime = (totTime) / (long)iters;
+					avgRespTime = (totTime) / iters;
 					avgThroughput =(float)( reqCnt * 1000) / (float) avgRespTime;
 					System.out.format("JRedisPipeline: %d INCRs average response time @ %dms (%.2f ops/s) \n", cnt, avgRespTime, avgThroughput);
 				}

@@ -17,14 +17,15 @@
 package org.jredis.ri;
 
 import static org.testng.Assert.fail;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
 import org.jredis.ri.alphazero.support.Log;
-import org.testng.Assert;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Parameters;
 
@@ -194,6 +195,7 @@ public abstract class JRedisTestSuiteBase<T> extends ProviderTestBase<T>{
 	 * We're using random data and can't guarantee exact teset data.
 	 * TODO: flip switch to use random or deterministic data.
 	 */
+	@SuppressWarnings("boxing")
 	private final void setupTestSuiteData () {
 		/** setup data */
 		cnt = MEDIUM_CNT;

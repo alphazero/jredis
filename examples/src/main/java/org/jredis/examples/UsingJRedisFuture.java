@@ -56,6 +56,7 @@ public abstract class UsingJRedisFuture {
 	 * </ul>
 	 * @throws InterruptedException 
 	 */
+	@SuppressWarnings("boxing")
 	public void theBasics () throws InterruptedException {
 		Log.log("theBasics()");
 		
