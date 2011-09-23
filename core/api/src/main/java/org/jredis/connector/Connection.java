@@ -300,13 +300,15 @@ public interface Connection {
 			int bitset = OPAQUE_BITMASK;
 			return bitset(bitset, flags);
 		}
-		static final public int bitset(int bitset, Flag...flags){
-			for(Flag f : flags) bitset = bitset | f.bitmask;
-			return bitset;
+		static final public int bitset(final int bitset, Flag...flags){
+			int _bitset = bitset;
+			for(Flag f : flags) _bitset = _bitset | f.bitmask;
+			return _bitset;
 		}
-		static final public int bitclear(int bitset, Flag...flags){
-			for(Flag f : flags) bitset = bitset ^ f.bitmask;
-			return bitset;
+		static final public int bitclear(final int bitset, Flag...flags){
+			int _bitset = bitset;
+			for(Flag f : flags) _bitset = _bitset ^ f.bitmask;
+			return _bitset;
 		}
 		public static boolean isSet(int bitset, Flag flag) {
 			return (bitset & flag.bitmask) > OPAQUE_BITMASK;
