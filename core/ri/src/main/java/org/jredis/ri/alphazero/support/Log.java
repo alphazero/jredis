@@ -16,7 +16,6 @@
 
 package org.jredis.ri.alphazero.support;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -118,25 +117,11 @@ public class Log {
 		@Override final
 		public String format(LogRecord record) {
 			// TODO: clean up the mess above and fix this.
-//			final StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-//			String cname = null;
-//			String mname = null;
-//			if(stack.length < 7){
-//				cname = record.getSourceClassName();
-//				mname = record.getSourceMethodName();
-//			}
-//			else {
-//				cname = stack[8].getClassName();
-//				final int idx = cname.lastIndexOf('.');
-//				if(idx != -1) cname = cname.substring(idx+1);
-//				mname = stack[8].getMethodName();
-//			}
 			final Level level = record.getLevel();
 			final String logger = record.getLoggerName();
 			final String msg = record.getMessage();
 			final Object[] msgparams = record.getParameters();
 			final int tid = record.getThreadID();
-			final long seqnum = record.getSequenceNumber();
 			final long time = record.getMillis();
 			
 			String _msg = null;
@@ -148,11 +133,6 @@ public class Log {
 			}
 			
 			final Date d = new Date(time);
-//			final int mo = d.getMonth() +1;
-//			final int day = d.getDate();
-//			final int year = d.getYear()+1900;
-//			return String.format("[%s] %s tid:%d %s %d-%02d-%02d (%d) %s.%s - %s%s", level.getLocalizedName(), logger, tid, d, year, mo, day, time, cname, mname, _msg, LINESEP);
-//			return String.format("[%s] %s tid:%d %s %d %s.%s - %s%s", level.getLocalizedName(), logger, tid, d, time, cname, mname, _msg, LINESEP);
 			return String.format("[%s] %s tid:%d %s %d => %s%s", level.getLocalizedName(), logger, tid, d, time, _msg, LINESEP);
 		}
 	}
