@@ -87,8 +87,8 @@ public class JRedisClient extends SyncJRedisBase  {
 	// ------------------------------------------------------------------------
 
 	public JRedisClient (ConnectionSpec connectionSpec){
-		connectionSpec.setConnectionFlag(Connection.Flag.RELIABLE, true);
-		connectionSpec.setConnectionFlag(Connection.Flag.SHARED, false);
+		connectionSpec.setConnectionFlag(Connection.Flag.RELIABLE, Boolean.TRUE);
+		connectionSpec.setConnectionFlag(Connection.Flag.SHARED, Boolean.FALSE);
 		Connection syncConnection = createSyncConnection (connectionSpec);
 		setConnection (syncConnection);
 	}

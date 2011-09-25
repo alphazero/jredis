@@ -1,5 +1,5 @@
 /*
- *   Copyright 2009 Joubin Houshyar
+ *   Copyright 2009-2011 Joubin Houshyar
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -49,15 +49,16 @@ public class ConnectionReset extends ConnectionException {
 
 	/**  */
 	private static final long serialVersionUID = _specification.Version.major;
-
+	
+	private static final String info = "potential redis timeout";
 	/**
 	 * @param string
 	 * @param e
 	 */
 	public ConnectionReset(String msg, SocketException e) {
-		super(msg, e);
+		super(String.format("(%s) %s", info, msg), e);
 	}
 	public ConnectionReset(String msg) {
-		super(msg);
+		super(String.format("(%s) %s", info, msg));
 	}
 }

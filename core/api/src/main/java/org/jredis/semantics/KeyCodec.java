@@ -53,6 +53,4 @@ import org.jredis.Codec;
  * 
  */
 
-public interface KeyCodec<K extends Object> extends Codec<K> {
-
-}
+public interface KeyCodec<K extends Object> extends Codec<K> {/* nop */}

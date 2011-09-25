@@ -30,7 +30,7 @@ public final class FastBufferedInputStream extends java.io.InputStream {
 	 * maximum bytes read  
 	 */
 	final 
-	private byte[] iobuffer;;
+	private byte[] iobuffer;
 
 	/** underying input stream */
 	final
@@ -64,6 +64,7 @@ public final class FastBufferedInputStream extends java.io.InputStream {
 	 * @throws IOException if a read on the underlying stream returns 0 length bytes.
 	 * This (obviously) shouldn't happen but if it does, it would be treated as an exception.
 	 */
+	@SuppressWarnings("boxing")
 	private final int getMoreBytes (int len) throws IOException {
 
 		// hit the date source until we have enough bytes
@@ -168,6 +169,6 @@ public final class FastBufferedInputStream extends java.io.InputStream {
 		byte[] b = new byte[1];
 		int c = read(b, 0, 1);
 		if(c == -1) return -1;
-		return (int) b[0];
+		return b[0];
 	}
 }

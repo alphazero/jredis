@@ -329,6 +329,7 @@ public abstract class JRedisSupport implements JRedis {
 		return zadd (key, score, DefaultCodec.encode(value));
 	}
 
+	@SuppressWarnings("boxing")
 	@Override
 	public <K extends Object> Double zincrby(K key, double score, byte[] member) 
 	throws RedisException 
@@ -1830,6 +1831,7 @@ public abstract class JRedisSupport implements JRedis {
 		return zrem (key, DefaultCodec.encode(value));
 	}
 
+	@SuppressWarnings("boxing")
 	@Override
 	public <K extends Object> Double zscore(K key, byte[] member) throws RedisException {
 		byte[] keybytes = null;

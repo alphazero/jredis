@@ -85,6 +85,7 @@ public class ObjectInfo {
 		return Long.parseLong(addressStrRep.substring(2), 16);
 	}
 
+	@SuppressWarnings("boxing")
 	@Override
 	public String toString() {
 		Formatter formatter = new Formatter();

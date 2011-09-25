@@ -59,6 +59,7 @@ public class GZip {
 			buffer = new ByteArrayOutputStream();
 			gizpInputStream = new GZIPInputStream(new ByteArrayInputStream(data));
 			int n=-1;
+			@SuppressWarnings("unused")
 			int tot = 0;
 			byte[] _buffer = new byte[1024 * 12];
 			while(-1 != (n = gizpInputStream.read(_buffer))){

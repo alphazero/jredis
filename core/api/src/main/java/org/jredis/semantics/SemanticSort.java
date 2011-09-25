@@ -27,6 +27,4 @@ import org.jredis.Sort;
  * 
  */
 
-public interface SemanticSort <T> extends Sort {
-
-}
+public interface SemanticSort <T> extends Sort {/* nop */}

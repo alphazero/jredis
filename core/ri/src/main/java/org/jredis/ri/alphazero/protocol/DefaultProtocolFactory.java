@@ -19,7 +19,7 @@ package org.jredis.ri.alphazero.protocol;
 import org.jredis.NotSupportedException;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.protocol.Protocol;
-import org.jredis.connector.Connection;;
+import org.jredis.connector.Connection;
 
 /**
  * [TODO: document me!]

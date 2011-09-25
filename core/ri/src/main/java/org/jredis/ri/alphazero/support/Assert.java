@@ -105,6 +105,7 @@ public class Assert {
 		return obj;
 	}
 	
+	@SuppressWarnings("boxing")
 	public static final <T, E extends RuntimeException> 
 	T notNull
 		(T obj, int idx, Class<E> clazz)
@@ -260,6 +261,7 @@ public class Assert {
 		int scni = src.getClassName().indexOf(simpleClassName) > 0 ? src.getClassName().indexOf(simpleClassName)-1 : 0;
 		String packageName = src.getClassName().substring(0, scni);
 		
+		@SuppressWarnings("boxing")
 		String info = new Formatter().format("%s in method %s.%s() [file: %s line:%d - package: %s]", msg,
 				simpleClassName, src.getMethodName(), src.getFileName(), src.getLineNumber(), packageName).toString();
 

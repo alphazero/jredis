@@ -25,6 +25,4 @@ package org.jredis.protocol;
  * 
  */
 
-public interface StatusResponse extends Response {
-
-}
+public interface StatusResponse extends Response {/* nop */}

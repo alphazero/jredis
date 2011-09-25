@@ -32,10 +32,10 @@ public interface KeyValueSet <K extends Object, T> {
 	public KeyValueSet<K, T> add(K key, T value);
 	byte[][] getMappings ();
 	
-	public interface ByteArrays<K extends Object> extends KeyValueSet<K, byte[]>{}
-	public interface Numbers<K extends Object>  extends KeyValueSet<K, Number>{}
-	public interface Strings<K extends Object>  extends KeyValueSet<K, String>{}
-	public interface Objects<K extends Object, T extends Serializable> extends KeyValueSet<K, T>{}
+	public interface ByteArrays<K extends Object> extends KeyValueSet<K, byte[]>{/* nop */}
+	public interface Numbers<K extends Object>  extends KeyValueSet<K, Number>{/* nop */}
+	public interface Strings<K extends Object>  extends KeyValueSet<K, String>{/* nop */}
+	public interface Objects<K extends Object, T extends Serializable> extends KeyValueSet<K, T>{/* nop */}
 	
 //	abstract static class  GenImpl<T> implements  BulkSetMappings<T> {
 //		protected final Map<String, T> map = new HashMap<String, T>();

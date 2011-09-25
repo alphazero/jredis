@@ -1008,7 +1008,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 			}
 			protected Future<List<byte[]>> execAsyncSortStore(byte[]... fullSortCmd) {
 				Future<Response> fResp = client.queueRequest(Command.SORT$STORE, fullSortCmd);
-				new FutureLong(fResp);
+//				new FutureLong(fResp); // hah?
 				return new FutureSortStoreResp(fResp);
 			}
 			protected List<byte[]> execSort(byte[]... fullSortCmd) {
@@ -1455,12 +1455,14 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
         protected FutureBoolean (Future<Response> pendingRequest) { super(pendingRequest); }
 
-        public Boolean get () throws InterruptedException, ExecutionException {
+        @SuppressWarnings("boxing")
+		public Boolean get () throws InterruptedException, ExecutionException {
         	ValueResponse valResp = (ValueResponse) pendingRequest.get();
         	return valResp.getBooleanValue();
         }
 
-        public Boolean get (long timeout, TimeUnit unit)
+        @SuppressWarnings("boxing")
+		public Boolean get (long timeout, TimeUnit unit)
         	throws InterruptedException, ExecutionException, TimeoutException
         {
         	ValueResponse valResp = (ValueResponse) pendingRequest.get(timeout, unit);
@@ -1507,12 +1509,14 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
         protected FutureLong (Future<Response> pendingRequest) { super(pendingRequest); }
 
-        public Long get () throws InterruptedException, ExecutionException {
+        @SuppressWarnings("boxing")
+		public Long get () throws InterruptedException, ExecutionException {
         	ValueResponse valResp = (ValueResponse) pendingRequest.get();
         	return valResp.getLongValue();
         }
 
-        public Long get (long timeout, TimeUnit unit)
+        @SuppressWarnings("boxing")
+		public Long get (long timeout, TimeUnit unit)
         	throws InterruptedException, ExecutionException, TimeoutException
         {
         	ValueResponse valResp = (ValueResponse) pendingRequest.get(timeout, unit);
@@ -1523,14 +1527,16 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
         protected FutureDouble (Future<Response> pendingRequest) { super(pendingRequest); }
 
-        public Double get () throws InterruptedException, ExecutionException {
+        @SuppressWarnings("boxing")
+		public Double get () throws InterruptedException, ExecutionException {
         	BulkResponse bulkResp = (BulkResponse) pendingRequest.get();
         	if(bulkResp.getBulkData() != null)
         		return Convert.toDouble(bulkResp.getBulkData());
         	return null;
         }
 
-        public Double get (long timeout, TimeUnit unit)
+        @SuppressWarnings("boxing")
+		public Double get (long timeout, TimeUnit unit)
         	throws InterruptedException, ExecutionException, TimeoutException
         {
         	BulkResponse bulkResp = (BulkResponse) pendingRequest.get(timeout, unit);

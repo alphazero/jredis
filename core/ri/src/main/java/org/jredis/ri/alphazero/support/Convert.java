@@ -109,8 +109,9 @@ public class Convert {
 	 * @return
 	 * @throw IllegalArgumentException if buffer contains anything other than values 48 to 57
 	 */
-	public static final int toInt(byte[] potentiallySignedAsciiBytes, int offset, int len) throws IllegalArgumentException
+	public static final int toInt(final byte[] potentiallySignedAsciiBytes, final int offsetin, final int len) throws IllegalArgumentException
 	{
+		int offset = offsetin;
 		final byte[] buff = potentiallySignedAsciiBytes; // lets use a sensible name ;)
 		if(null == buff) throw new IllegalArgumentException ("Null input");
 		if(len > buff.length) throw new IllegalArgumentException ("buffer length of " + buff.length + " less than the spec'd len " + len);
@@ -147,8 +148,9 @@ public class Convert {
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
-	public static final long toLong(byte[] potentiallySignedAsciiBytes, int offset, int len) throws IllegalArgumentException
+	public static final long toLong(byte[] potentiallySignedAsciiBytes, final int offsetin, int len) throws IllegalArgumentException
 	{
+		int offset = offsetin;
 		final byte[] buff = potentiallySignedAsciiBytes; // lets use a sensible name ;)
 		if(null == buff) throw new IllegalArgumentException ("Null input");
 		if(len > buff.length) throw new IllegalArgumentException ("buffer length of " + buff.length + " less than the spec'd len " + len);

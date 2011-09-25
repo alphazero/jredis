@@ -58,9 +58,9 @@ public class JRedisAsyncClient extends JRedisFutureSupport {
 	public JRedisAsyncClient (ConnectionSpec connectionSpec) {
 		// note: using a shared connection mod
 		connSpec = Assert.notNull(connectionSpec, "ConnectionSpec 'connectionSpec'", ClientRuntimeException.class);
-		connectionSpec.setConnectionFlag(Connection.Flag.RELIABLE, true);  // REVU: TODO: review all these spot mods.
-		connectionSpec.setConnectionFlag(Connection.Flag.SHARED, false);  // REVU: TODO: review all these spot mods.
-		connectionSpec.setConnectionFlag(Connection.Flag.PIPELINE, false);  // REVU: TODO: review all these spot mods.
+		connectionSpec.setConnectionFlag(Connection.Flag.RELIABLE, Boolean.TRUE);  // REVU: TODO: review all these spot mods.
+		connectionSpec.setConnectionFlag(Connection.Flag.SHARED, Boolean.FALSE);  // REVU: TODO: review all these spot mods.
+		connectionSpec.setConnectionFlag(Connection.Flag.PIPELINE, Boolean.FALSE);  // REVU: TODO: review all these spot mods.
 		connectionSpec.setModality(Modality.Asynchronous);
 //		connection = new AsyncConnection(connectionSpec, true);
 		connection = createAsyncConnection();

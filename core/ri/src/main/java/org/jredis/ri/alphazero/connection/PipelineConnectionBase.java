@@ -207,8 +207,11 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 		
 		synchronized (serviceLock) {
 			
-			if(cmd != Command.QUIT)
+			if(cmd != Command.QUIT) {
+//				System.out.format("out is %s\n", getOutputStream().getClass().getName());	// TODO: REMOVE -- testing
+//				System.out.format("req is %s\n", request.getClass().getName());				// TODO: REMOVE -- testing
 				request.write(getOutputStream());
+			}
 			else {
 				pendingQuit = true;
 				isActive.set(false);

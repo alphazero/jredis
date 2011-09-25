@@ -158,27 +158,30 @@ public abstract class ProtocolBase implements Protocol {
 
 		Response response = null;
 		switch (cmd.responseType){
-			case BOOLEAN:
-				response = createBooleanResponse(cmd);
-				break;
-			case BULK:
-				response = createBulkResponse (cmd);
-				break;
-			case MULTI_BULK:
-				response = createMultiBulkResponse (cmd);
-				break;
-			case NUMBER:
-				response = createNumberResponse (cmd);
-				break;
-			case STATUS:
-				response = createStatusResponse (cmd);
-				break;
-			case STRING:
-				response = createStringResponse (cmd);
-				break;
-			case VIRTUAL:
-				response = new VirtualResponse(ResponseStatus.STATUS_CIAO);
-				break;
+		case BOOLEAN:
+			response = createBooleanResponse(cmd);
+			break;
+		case BULK:
+			response = createBulkResponse (cmd);
+			break;
+		case MULTI_BULK:
+			response = createMultiBulkResponse (cmd);
+			break;
+		case NUMBER:
+			response = createNumberResponse (cmd);
+			break;
+		case STATUS:
+			response = createStatusResponse (cmd);
+			break;
+		case STRING:
+			response = createStringResponse (cmd);
+			break;
+		case VIRTUAL:
+			response = new VirtualResponse(ResponseStatus.STATUS_CIAO);
+			break;
+		case QUEUED:
+		case RESULT_SET:
+			throw new NotSupportedException(String.format("ResponseType %s not yet supported", cmd.requestType.name()));
 		
 		}
 

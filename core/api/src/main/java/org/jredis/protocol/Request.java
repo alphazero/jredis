@@ -27,4 +27,4 @@ import org.jredis.connector.Message;
  * @since   alpha.0
  * 
  */
-public interface Request extends Message {}
+public interface Request extends Message {/* nop */}

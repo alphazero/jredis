@@ -146,11 +146,13 @@ public class DefaultCodec {
 	 * @return
 	 */
 //	@Deprecated
+	@SuppressWarnings("boxing")
 	public static final Long toLong (byte[]  bytes) {
 //		return new Long (toStr (bytes));
 		return Convert.toLong(bytes);
 	}
 	
+	@SuppressWarnings("boxing")
 	public static final List<Long> toLong(List<byte[]> bytearray){
 		if(null == bytearray) return null;
 		List<Long> list = new ArrayList<Long>(bytearray.size());
@@ -165,6 +167,7 @@ public class DefaultCodec {
     public static double toDouble (byte[] bs) {
 	    return Convert.toDouble(bs);
     }
+	@SuppressWarnings("boxing")
 	public static final List<Double> toDouble(List<byte[]> bytearray){
 		if(null == bytearray) return null;
 		List<Double> list = new ArrayList<Double>(bytearray.size());
@@ -198,7 +201,7 @@ public class DefaultCodec {
 		for (byte[] bytes : byteList) {
 			if(null != bytes){
 				T object = (T) decode(bytes);
-				objectList.add ((T) object);
+				objectList.add (object);
 			}
 			else{
 				objectList.add(null);
