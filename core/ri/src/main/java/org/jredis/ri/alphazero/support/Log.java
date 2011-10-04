@@ -133,7 +133,7 @@ public class Log {
 			}
 			
 			final Date d = new Date(time);
-			return String.format("[%s] %s tid:%d %s %d => %s%s", level.getLocalizedName(), logger, tid, d, time, _msg, LINESEP);
+			return String.format("%014d %s %s[tid:%d] <%s>: %s%s", time, d, logger, tid, level.getLocalizedName(), _msg, LINESEP);
 		}
 	}
 }
