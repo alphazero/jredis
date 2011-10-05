@@ -306,7 +306,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
         	/** Response handler thread specific protocol handler -- optimize fencing */
         	Protocol protocol = Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class);
         	
-			Log.log("Pipeline <%s> thread for <%s> started.", Thread.currentThread().getName(), PipelineConnectionBase.this);
+			Log.log("Pipeline <%s> thread for <%s> started.", Thread.currentThread().getName(), PipelineConnectionBase.this.toString());
         	PendingRequest pending = null;
         	while(run_flag.get()){
         		Response response = null;

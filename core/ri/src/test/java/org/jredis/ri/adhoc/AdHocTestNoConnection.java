@@ -21,13 +21,9 @@ public class AdHocTestNoConnection {
 	JRedisFuture jredis = null;
 	public AdHocTestNoConnection() throws Throwable{
 		spec = DefaultConnectionSpec.newSpec("localhost", NOT_A_USUAL_REDIS_PORT, 11, "jredis".getBytes());
-		try {
-			jredis = new JRedisPipeline(spec);
-		} catch (Throwable t) {
-//			t.printStackTrace();
-			throw t;
-		}
+		jredis = new JRedisPipeline(spec);
 	}
+	/** this is not supposed to get called unless you actually run redis on port 9999 :P */
 	public void run() {
 		final byte[] key = "foo".getBytes();
 		for(;;){
