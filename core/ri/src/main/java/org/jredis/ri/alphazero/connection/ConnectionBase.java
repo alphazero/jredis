@@ -126,7 +126,8 @@ public abstract class ConnectionBase implements Connection{
 				connect ();
 			} catch (ClientRuntimeException e) {
 				// if connecting failed, clean up on our way out.
-				cleanup();
+//				cleanup();
+				notifyShutingDown();
 				throw e;
 			}
 		}
@@ -209,9 +210,9 @@ public abstract class ConnectionBase implements Connection{
 		}
     }
 
-    // TODO: diff this 
-    protected void cleanup () {
-    }
+//    // TODO: diff this 
+//    protected void cleanup () {
+//    }
 
     /**
      * Extension point -- callback on this method when {@link ConnectionBase} has connected to server.
@@ -298,28 +299,23 @@ public abstract class ConnectionBase implements Connection{
 			catch (RuntimeException e){
 				Log.error("while attempting reconnect: " + e.getMessage());
 				if(++attempts == spec.getReconnectCnt()) {
-//					Log.problem("Retry limit exceeded attempting reconnect.");
+					Log.problem("Retry limit exceeded attempting reconnect.");
 					
-					onConnectionFault("Reconnect retry limit exceeded.  Failed to reconnect to the server after " + attempts + " reconnect attempts");
-//					throw new ClientRuntimeException ("Failed to reconnect to the server.");
+					String faultmsg = String.format("Reconnect retry limit exceeded.  Failed to reconnect to the server after %d reconnect attempts", attempts);
+					onConnectionFault(faultmsg, true);
 				}
 			}
 		}
 	}
-	/**
-	 * Will throw a {@link ClientRuntimeException}
-	 * @throws IllegalStateException
-	 */
-	protected final void onConnectionFault (String fault) throws ClientRuntimeException {
-		onConnectionFault(fault, true);
-	}
+
 	/**
 	 * Will throw a {@link ClientRuntimeException} if raiseEx is true
 	 * @throws IllegalStateException
 	 */
 	protected final void onConnectionFault (String fault, boolean raiseEx) throws ClientRuntimeException {
 		notifyFaulted(fault);
-		Log.problem("Conn FAULT: %s - %s", fault, this);
+		Log.problem("Shutting down due to connection FAULT: %s - %s", fault, this);
+		notifyShutingDown();
  		if(raiseEx) 
  			throw new ClientRuntimeException(fault);
 	}
@@ -338,7 +334,8 @@ public abstract class ConnectionBase implements Connection{
 			newSocketConnect();
 		} 
 		catch (IOException e) {
-			onConnectionFault("Socket connect failed [cause: "+e+"] -- make sure the server is running at " + spec.getAddress().getHostName());
+			String faultmsg = String.format("Socket connect failed [cause: %s] -- make sure the server is running at %s", e, spec.getAddress().getHostName());
+			onConnectionFault(faultmsg, true);
 //			throw new ClientRuntimeException(
 //				"Socket connect failed -- make sure the server is running at " + spec.getAddress().getHostName(), e);
 		}
@@ -376,7 +373,6 @@ public abstract class ConnectionBase implements Connection{
 		socketClose();
 		isConnected = false;
 
-		cleanup();
 		notifyDisconnected();
 		Log.debug ("DISCONNECTED | conn: %s", toString());
 	}

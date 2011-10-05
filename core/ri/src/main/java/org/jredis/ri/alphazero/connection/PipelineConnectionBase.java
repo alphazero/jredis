@@ -124,11 +124,11 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	isActive.set(false);
     }
     
-    @Override
-    protected void cleanup () {
-      super.cleanup();
-      respHandlerThread.interrupt();
-    }
+//    @Override
+//    protected void cleanup () {
+//      super.cleanup();
+//      respHandlerThread.interrupt();
+//    }
 
     @Override
     protected void notifyConnected () {
@@ -406,9 +406,9 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 				case SHUTDOWN:
 					// exit
 					break;
-				case STOPPING:
-					// stop
-					break;
+////				case STOPPING:
+////					// stop
+//					break;
         	
         	}
         }

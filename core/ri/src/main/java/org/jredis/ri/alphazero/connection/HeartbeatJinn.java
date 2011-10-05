@@ -181,19 +181,18 @@ public class HeartbeatJinn extends Thread implements Connection.Listener{
 			case CONNECTED:
 				connected.set(true);
 				break;
+			case DISCONNECTING:
 			case DISCONNECTED:
 				connected.set(false);
 				break;
 			case FAULTED:
 //				shutdown();  // REVU: this is wrong.
 				break;
-			case DISCONNECTING:
-				break;
 			case SHUTDOWN:
 				shutdown();
 				break;
-			case STOPPING:
-				break;
+//			case STOPPING:
+//				break;
     	}
     }
 }

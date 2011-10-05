@@ -256,7 +256,7 @@ public interface Connection {
 			 * Raised to signal the beginning of the shutdown sequence (commences after listerners are notified.  
 			 * Cease all activity on receipt 
 			 * */
-			STOPPING,
+//			STOPPING,
 			/** Raised when Connector is terminated.  Dispose of your references on receipt. */
 			SHUTDOWN
 		}
