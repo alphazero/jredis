@@ -266,8 +266,8 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
      */
     public final class ResponseHandler implements Runnable, Connection.Listener {
 
-//    	private final AtomicBoolean work_flag;
-    	private final AtomicBoolean run_flag;
+    	private final AtomicBoolean work_flag;
+    	private final AtomicBoolean alive_flag;
     	
     	// ------------------------------------------------------------------------
     	// Constructor
@@ -278,8 +278,8 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
          */
         public ResponseHandler () {
         	PipelineConnectionBase.this.addListener(this);
-//        	this.work_flag = new AtomicBoolean(false);
-        	this.run_flag = new AtomicBoolean(true); // TODO: should be false
+        	this.work_flag = new AtomicBoolean(true); 
+        	this.alive_flag = new AtomicBoolean(false);
         } 
         
     	// ------------------------------------------------------------------------
@@ -303,12 +303,13 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	 */
 //        @Override
         public void run () {
+        	alive_flag.compareAndSet(false, true);
         	/** Response handler thread specific protocol handler -- optimize fencing */
         	Protocol protocol = Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class);
         	
 			Log.log("Pipeline <%s> thread for <%s> started.", Thread.currentThread().getName(), PipelineConnectionBase.this.toString());
         	PendingRequest pending = null;
-        	while(run_flag.get()){
+        	while(work_flag.get()){
         		Response response = null;
 				try {
 	                pending = pendingResponseQueue.take();
@@ -361,13 +362,25 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
                 }
         	}
 			Log.log("Pipeline <%s> thread for <%s> stopped.", Thread.currentThread().getName(), PipelineConnectionBase.this);
-//			Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
+			alive_flag.compareAndSet(true, false);
         }
 
-        final private void stop() {
-        	Log.log("%s stopping.", this);
-        	run_flag.set(false);
+        final private void stopHandler() {
+        	Log.log("%s stopping handler thread", this);
+        	work_flag.set(false);
         	PipelineConnectionBase.this.respHandlerThread.interrupt();
+        }
+        final private void shutdownHandler() {
+        	Log.log("%s shutting down response handler", this);
+        	/*
+        	 * It is not expected that shutdown would get called before
+        	 * stop, but if it has, this makes sure we first go through
+        	 * the stop sequence.
+        	 */
+        	if(work_flag.get() != false || alive_flag.get() != false)
+        		stopHandler();
+        	alive_flag.set(false);
+			PipelineConnectionBase.this.removeListener(this);
         }
     	// ------------------------------------------------------------------------
     	// INTERFACE
@@ -404,15 +417,11 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 					break;
 				case FAULTED:
 				case DISCONNECTING:
-					stop();
+					stopHandler();
 					break;
 				case SHUTDOWN:
-					PipelineConnectionBase.this.removeListener(this);
+					shutdownHandler();
 					break;
-////				case STOPPING:
-////					// stop
-//					break;
-        	
         	}
         }
     }
