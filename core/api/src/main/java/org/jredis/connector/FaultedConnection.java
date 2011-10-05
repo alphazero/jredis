@@ -49,6 +49,7 @@ public class FaultedConnection implements Connection {
 		this.errorMsg = errMsg;
 		this.connSpec = connSpec;
 	}
+// TODO: restore this method of Connection
 	/* (non-Javadoc) @see org.jredis.connector.Connection#getModality() */
 //	@Override
 	public Modality getModality() 
@@ -57,13 +58,13 @@ public class FaultedConnection implements Connection {
 	}
 
 	/* (non-Javadoc) @see org.jredis.connector.Connection#getSpec() */
-//	@Override
+	@Override
 	public ConnectionSpec getSpec() {
 		return connSpec;
 	}
 	
 	/* (non-Javadoc) @see org.jredis.connector.Connection#serviceRequest(org.jredis.protocol.Command, byte[][]) */
-//	@Override
+	@Override
 	public Response serviceRequest(Command cmd, byte[]... args) throws RedisException, ClientRuntimeException,
 			ProviderException 
 	{
@@ -71,14 +72,14 @@ public class FaultedConnection implements Connection {
 	}
 
 	/* (non-Javadoc) @see org.jredis.connector.Connection#queueRequest(org.jredis.protocol.Command, byte[][]) */
-//	@Override
+	@Override
 	public Future<Response> queueRequest(Command cmd, byte[]... args)
 			throws ClientRuntimeException, ProviderException 
 	{
 		throw new ClientRuntimeException (errorMsg);
 	}
     /* (non-Javadoc) @see org.jredis.connector.Connection#addListener(org.jredis.connector.Connection.Listener) */
-//	@Override
+	@Override
     final public boolean addListener (Listener connListener) {
     	throw new NotSupportedException("Events not supported");
     }

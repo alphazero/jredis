@@ -31,12 +31,12 @@ public final class BasicCodecManager implements CodecManager {
 	}
 
 	@SuppressWarnings("unchecked")
-//	@Override
+	@Override
 	public <T> Codec<T> getCodec(Class<T> type) {
 		return (Codec<T>) map.get(type);
 	}
 
-//	@Override
+	@Override
 	public <T> boolean register(Codec<T> code, Class<T> type) {
 		Codec<?> existing = map.get(type);
 		if(null == existing){
