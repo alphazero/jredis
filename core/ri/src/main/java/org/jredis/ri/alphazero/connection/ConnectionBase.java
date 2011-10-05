@@ -122,14 +122,7 @@ public abstract class ConnectionBase implements Connection{
 		} 
 
 		if (spec.getConnectionFlag(Flag.CONNECT_IMMEDIATELY)) {
-			try {
-				connect ();
-			} catch (ClientRuntimeException e) {
-				// if connecting failed, clean up on our way out.
-//				cleanup();
-				notifyShutingDown();
-				throw e;
-			}
+			connect ();
 		}
 	}
 
@@ -334,7 +327,7 @@ public abstract class ConnectionBase implements Connection{
 			newSocketConnect();
 		} 
 		catch (IOException e) {
-			String faultmsg = String.format("Socket connect failed [cause: %s] -- make sure the server is running at %s", e, spec.getAddress().getHostName());
+			String faultmsg = String.format("Socket connect failed [cause: %s] -- make sure the server is running at %s:%d", e, spec.getAddress().getHostName(), spec.getPort());
 			onConnectionFault(faultmsg, true);
 //			throw new ClientRuntimeException(
 //				"Socket connect failed -- make sure the server is running at " + spec.getAddress().getHostName(), e);

@@ -364,6 +364,11 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 //			Log.log("Pipeline thread <%s> stopped.", Thread.currentThread().getName());
         }
 
+        final private void stop() {
+        	Log.log("%s stopping.", this);
+        	run_flag.set(false);
+        	PipelineConnectionBase.this.respHandlerThread.interrupt();
+        }
     	// ------------------------------------------------------------------------
     	// INTERFACE
     	/* =================================================== Connection.Listener
@@ -384,7 +389,8 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
         		Log.bug("event source [%s] is not this pipeline [%s]", event.getSource(), PipelineConnectionBase.this);
         		// BUG: what to do about it?
         	}
-        	Log.log("Pipeline.ResponseHandler: onEvent %s", event);
+//        	(new Exception()).printStackTrace();
+        	Log.log("Pipeline.ResponseHandler: onEvent %s source: %s", event.getType().name(), event.getSource());
         	switch (event.getType()){
 				case CONNECTED:
 					// (re)start
@@ -393,18 +399,15 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 					// should be stopped now
 					//
 					break;
-				case FAULTED:
-					// stop
-					break;
 				case CONNECTING:
 					// no op
 					break;
+				case FAULTED:
 				case DISCONNECTING:
-					
-					// stop
+					stop();
 					break;
 				case SHUTDOWN:
-					// exit
+					PipelineConnectionBase.this.removeListener(this);
 					break;
 ////				case STOPPING:
 ////					// stop
