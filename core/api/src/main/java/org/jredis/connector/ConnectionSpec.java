@@ -196,7 +196,7 @@ public interface ConnectionSpec {
 	public static class RefImpl implements ConnectionSpec {
 
 		// ------------------------------------------------------------------------
-		// Attrs
+		// Attributes
 		// ------------------------------------------------------------------------
 		
 		/** {@link Map} of the {@link SocketFlag}s of the {@link ConnectionSpec} */
@@ -222,22 +222,22 @@ public interface ConnectionSpec {
 		// Interface
 		// ------------------------------------------------------------------------
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getAddress() */
-//		@Override
+		@Override
 		final public InetAddress getAddress () {
 			return (InetAddress) getConnectionProperty(Connection.Property.HOST);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getCredentials() */
-//		@Override
+		@Override
 		final public byte[] getCredentials () {
 			return (byte[]) getConnectionProperty(Connection.Property.CREDENTIAL);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getDatabase() */
-//		@Override
+		@Override
 		final public int getDatabase () {
 			return (Integer) getConnectionProperty(Connection.Property.DB);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getPort() */
-//		@Override
+		@Override
 		final public int getPort () {
 			return (Integer) getConnectionProperty(Connection.Property.PORT);
 		}
@@ -252,22 +252,22 @@ public interface ConnectionSpec {
 		}
 		
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getReconnectCnt() */
-//		@Override
+		@Override
 		final public int getReconnectCnt () {
 			return (Integer) getConnectionProperty(Connection.Property.MAX_CONNECT_ATTEMPT);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getSocketFlag(org.jredis.connector.ConnectionSpec.SocketFlag) */
-//		@Override
+		@Override
 		final public boolean getSocketFlag (Connection.Socket.Flag flag) {
 			return socketFlags.get(flag);
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getSocketProperty(org.jredis.connector.ConnectionSpec.SocketProperty) */
-//		@Override
+		@Override
 		final public Integer getSocketProperty (Connection.Socket.Property property) {
 			return socketProperties.get(property);
 		}
         /* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#getConnectionProperty(org.jredis.connector.Connection.Property) */
-//		@Override
+		@Override
         final public Object getConnectionProperty(Property prop){
 			return connectionProperties.get(prop);			
 		}
@@ -281,20 +281,20 @@ public interface ConnectionSpec {
         	return this;
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setPort(int) */
-//		@Override
+		@Override
 		final public ConnectionSpec setPort (int port) {
 			setConnectionProperty(Connection.Property.PORT, port);
 //        	this.port = port;
         	return this;
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setCredentials(byte[]) */
-//      @Override
+		@Override
 		final public ConnectionSpec setCredentials (byte[] credentials) {
 			setConnectionProperty(Connection.Property.CREDENTIAL, credentials);
         	return this;
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setCredentials(java.lang.String) */
-//      @Override
+		@Override
 		final public ConnectionSpec setCredentials (String credentials) {
 			byte[] bytes;
 			if(credentials == null || credentials.length() == 0)
@@ -304,26 +304,26 @@ public interface ConnectionSpec {
         	return setCredentials(bytes);
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setDatabase(int) */
-//      @Override
+		@Override
 		final public ConnectionSpec setDatabase (int database) {
 			setConnectionProperty(Connection.Property.DB, database);
         	return this;
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setReconnectCnt(int) */
-//      @Override
+		@Override
 		final public ConnectionSpec setReconnectCnt (int reconnectCnt) {
 			setConnectionProperty(Connection.Property.MAX_CONNECT_ATTEMPT, reconnectCnt);
         	return this;
         }
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setConnectionProperty(org.jredis.connector.Connection.Property, java.lang.Object) */
-//		@Override
+		@Override
 		final public ConnectionSpec setConnectionProperty(Property prop, Object value){
 			try {  connectionProperties.put(prop, value); }
 			catch (ClassCastException e){ throw new IllegalArgumentException("value type", e);}
 			return this;
 		}
 		/* (non-Javadoc) @see org.jredis.connector.ConnectionSpec#setModality(org.jredis.connector.Connection.Modality) */
-//		@Override
+		@Override
 		final public ConnectionSpec setModality (Modality modality) {
 			setConnectionProperty(Connection.Property.MODALITY, modality);
 			return this;
