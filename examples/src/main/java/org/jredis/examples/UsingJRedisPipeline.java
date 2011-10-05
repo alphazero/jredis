@@ -45,22 +45,22 @@ import org.jredis.ri.alphazero.support.Log;
 public class UsingJRedisPipeline extends UsingJRedisFuture {
 
 	public static void main (String[] args) {
-		int database = 11;
+		final int database = 13;
 		ConnectionSpec connectionSpec = DefaultConnectionSpec.newSpec("localhost", 6379, database, "jredis".getBytes());
 		
-		connectionSpec.setDatabase (13);
-//	    new UsingJRedisPipeline (connectionSpec);
-	    
 	    exampleUseofSyncInPipeline(connectionSpec);
     }
 	/**
+	 * Example highlights usage pattern of pipeline with both the natural asynchronous
+	 * semantics and synchronous semantics provided by {@link JRedisPipeline#sync()}
+	 * 
      * @param connectionSpec
      */
     @SuppressWarnings("boxing")
 	private static void exampleUseofSyncInPipeline (ConnectionSpec connectionSpec) {
     	
     	// Note that we are using a JRedisPipeline reference and not a generic
-    	// JRedisFuture here
+    	// JRedisFuture here -- this exposes the additional 
     	
     	JRedisPipeline pipeline = new JRedisPipeline(connectionSpec);
     	
@@ -77,6 +77,8 @@ public class UsingJRedisPipeline extends UsingJRedisFuture {
     	try {
     		long start = System.currentTimeMillis();
     		
+    		/* a sequence of asynchronous calls */
+    		
 	        pipeline.ping();
 	        pipeline.flushdb();
 
@@ -86,7 +88,13 @@ public class UsingJRedisPipeline extends UsingJRedisFuture {
 	        	rand.nextBytes(data);
 	        	pipeline.lpush("my-list", data);
 	        }
-	        /* sync call */
+	        /* 
+	         * switch to synchronous semantics
+	         * the following call will block until
+	         * all the responses for above + the llen() 
+	         * itself have been received.
+	         */
+	        
 	        long llen = pipeline.sync().llen("my-list");
 	        
 	        String cntrKey = "my-cntr";
@@ -115,6 +123,7 @@ public class UsingJRedisPipeline extends UsingJRedisFuture {
         }
         finally{
         	pipeline.sync().quit();
+        	Log.log("shutting down.");
         }
     }
 	/**
