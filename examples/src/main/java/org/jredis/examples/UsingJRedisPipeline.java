@@ -84,7 +84,7 @@ public class UsingJRedisPipeline extends UsingJRedisFuture {
 
 	        Random rand = new Random();
 	        byte[] data = new byte[8];
-	        for(int i=0; i<100000; i++){
+	        for(int i=0; i<1000000; i++){
 	        	rand.nextBytes(data);
 	        	pipeline.lpush("my-list", data);
 	        }
