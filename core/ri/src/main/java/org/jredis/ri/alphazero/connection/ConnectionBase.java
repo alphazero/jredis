@@ -227,7 +227,7 @@ public abstract class ConnectionBase implements Connection{
     protected void notifyFaulted (String info) {
     	notifyListeners(new Event(this, Type.FAULTED, info));
     }
-    protected void notifyShutingDown () {
+    protected void notifyShuttingDown () {
     	notifyListeners(new Event(this, Type.SHUTDOWN));
     }
     /**
@@ -308,7 +308,7 @@ public abstract class ConnectionBase implements Connection{
 	protected final void onConnectionFault (String fault, boolean raiseEx) throws ClientRuntimeException {
 		notifyFaulted(fault);
 		Log.problem("Shutting down due to connection FAULT: %s - %s", fault, this);
-		notifyShutingDown();
+		notifyShuttingDown();
  		if(raiseEx) 
  			throw new ClientRuntimeException(fault);
 	}
@@ -374,7 +374,7 @@ public abstract class ConnectionBase implements Connection{
 	 * @throws IllegalStateException
 	 */
 	protected final void shutdown () throws IllegalStateException {
-		notifyShutingDown();
+		notifyShuttingDown();
 	}
 	
 	/**
