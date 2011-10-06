@@ -24,6 +24,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.jredis.ClientRuntimeException;
 import org.jredis.ProviderException;
@@ -245,7 +246,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 			try {
 				pending = pendingResponseQueue.remove();
 				pending.setCRE(cre);
-				Log.log("set pending %s response to error with CRE", pending.cmd);
+				Log.error("set pending %s response to error with CRE", pending.cmd);
 			}
 			catch (NoSuchElementException empty){ break; }
 		}
@@ -268,6 +269,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 
     	private final AtomicBoolean work_flag;
     	private final AtomicBoolean alive_flag;
+    	private final AtomicReference<Thread> thread;
     	
     	// ------------------------------------------------------------------------
     	// Constructor
@@ -280,6 +282,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
         	PipelineConnectionBase.this.addListener(this);
         	this.work_flag = new AtomicBoolean(true); 
         	this.alive_flag = new AtomicBoolean(false);
+        	this.thread = new AtomicReference<Thread>(null);
         } 
         
     	// ------------------------------------------------------------------------
@@ -303,6 +306,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	 */
 //        @Override
         public void run () {
+        	thread.compareAndSet(null, Thread.currentThread());
         	alive_flag.compareAndSet(false, true);
         	/** Response handler thread specific protocol handler -- optimize fencing */
         	Protocol protocol = Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class);
@@ -368,10 +372,10 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
         final private void stopHandler() {
         	Log.log("%s stopping handler thread", this);
         	work_flag.set(false);
-        	PipelineConnectionBase.this.respHandlerThread.interrupt();
+        	thread.get().interrupt();
+//        	PipelineConnectionBase.this.respHandlerThread.interrupt();
         }
         final private void shutdownHandler() {
-        	Log.log("%s shutting down response handler", this);
         	/*
         	 * It is not expected that shutdown would get called before
         	 * stop, but if it has, this makes sure we first go through
@@ -381,6 +385,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
         		stopHandler();
         	alive_flag.set(false);
 			PipelineConnectionBase.this.removeListener(this);
+        	Log.log("%s response handler has shutdown", this);
         }
     	// ------------------------------------------------------------------------
     	// INTERFACE
@@ -411,7 +416,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 				case DISCONNECTED:
 					// should be stopped now
 					//
-					break;
+//					break;
 				case CONNECTING:
 					// no op
 					break;
