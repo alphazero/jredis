@@ -170,7 +170,7 @@ public class JRedisClient extends SyncJRedisBase  {
 	/* (non-Javadoc)
 	 * @see org.jredis.resource.Resource#getInterface()
 	 */
-//	@Override
+	@Override
 	public JRedis getInterface() {
 		return this;
 	}

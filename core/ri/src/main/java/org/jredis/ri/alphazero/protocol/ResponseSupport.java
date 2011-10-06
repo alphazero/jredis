@@ -48,22 +48,22 @@ import org.jredis.protocol.ResponseStatus;
 		// Interface
 		// ------------------------------------------------------------------------
 		
-//		@Override
+		@Override
 		public boolean didRead() { return didRead;  }
 
-//		@Override
+		@Override
 		public ResponseStatus getStatus() {return status; }
 		
-//		@Override
+		@Override
 		public Type getType() { return type;}
 
-//		@Override
+		@Override
 		public boolean isError() {
 			assertResponseRead(); 
 			return isError; 
 		}
 
-//		@Override
+		@Override
 		public void write(OutputStream out) throws ClientRuntimeException, ProviderException {
 			throw new RuntimeException ("Message.write not implemented! [Apr 10, 2009]");
 		}

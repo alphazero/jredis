@@ -98,12 +98,12 @@ public abstract class SyncJRedisBase extends JRedisSupport implements Resource<J
 	
 	private Context context;
 
-//	@Override
+	@Override
 	public final Context getContext() throws ResourceException {
 		return context;
 	}
 
-//	@Override
+	@Override
 	public final void setContext(Context context) throws ResourceException {
 		this.context = context;
 	}

@@ -49,9 +49,9 @@ public class FaultedConnection implements Connection {
 		this.errorMsg = errMsg;
 		this.connSpec = connSpec;
 	}
-// TODO: restore this method of Connection
+
 	/* (non-Javadoc) @see org.jredis.connector.Connection#getModality() */
-//	@Override
+//	@Override // TODO: restore this method of Connection
 	public Modality getModality() 
 	{
 		throw new ClientRuntimeException (errorMsg);
@@ -84,7 +84,7 @@ public class FaultedConnection implements Connection {
     	throw new NotSupportedException("Events not supported");
     }
     /* (non-Javadoc) @see org.jredis.connector.Connection#removeListener(org.jredis.connector.Connection.Listener) */
-//    @Override
+    @Override
     final public boolean removeListener (Listener connListener) {
     	throw new NotSupportedException("Events not supported");
     }

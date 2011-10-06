@@ -134,12 +134,12 @@ public abstract class ConnectionBase implements Connection{
 	 */
 	// ------------------------------------------------------------------------
 
-//	@Override
+	@Override
 	public ConnectionSpec getSpec () {
 		return this.spec;
 	}
 	
-//	@Override
+	@Override
 	public Response serviceRequest(Command cmd, byte[]... args)
 			throws RedisException, ClientRuntimeException, ProviderException 
 	{
@@ -148,7 +148,7 @@ public abstract class ConnectionBase implements Connection{
 				"byte[]...) is not supported.");
 	}
 
-//	@Override
+	@Override
 	public Future<Response> queueRequest(Command cmd, byte[]... args) 
 		throws ClientRuntimeException, ProviderException 
 	{
@@ -202,10 +202,6 @@ public abstract class ConnectionBase implements Connection{
 //	    	heartbeat.start();
 		}
     }
-
-//    // TODO: diff this 
-//    protected void cleanup () {
-//    }
 
     /**
      * Extension point -- callback on this method when {@link ConnectionBase} has connected to server.

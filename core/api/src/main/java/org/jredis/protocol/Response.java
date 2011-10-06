@@ -60,10 +60,10 @@ public interface Response extends Message {
 	 */
 	public boolean isError ();
 	
-//	/** 
-//	 * @return {@link Response.Type} of this response. 
-//	 */
-//	public Type getType ();
+	/** 
+	 * @return {@link Response.Type} of this response. 
+	 */
+	public Type getType ();
 
 
 	/**

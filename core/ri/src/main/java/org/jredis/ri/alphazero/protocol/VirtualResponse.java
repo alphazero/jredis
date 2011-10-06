@@ -50,19 +50,19 @@ public final class VirtualResponse implements Response {
 		this.status = status;
 	}
 
-//	@Override
+	@Override
 	public boolean didRead() {return true;}
 
-//	@Override
+	@Override
 	public ResponseStatus getStatus() { return status;}
 
-//	@Override
+	@Override
 	public Type getType() { return Type.Status;}
 
-//	@Override
+	@Override
 	public boolean isError() { return false;}
 
-//	@Override
+	@Override
 	/**
 	 * The purpose of this class is to provide responses that are not actually read from
 	 * the server.  Typically this is for commands that closed the connection on the send, such
@@ -73,7 +73,7 @@ public final class VirtualResponse implements Response {
 	 */
 	public void read(InputStream in) throws ClientRuntimeException, ProviderException { return;}
 
-//	@Override
+	@Override
 	public void write(OutputStream out) throws ClientRuntimeException, ProviderException {
 		throw new RuntimeException ("Streamable.write not implemented! [Apr 4, 2009]");
 	}

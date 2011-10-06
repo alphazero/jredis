@@ -135,7 +135,7 @@ public final class PendingRequest implements Future<Response> {
 	// ------------------------------------------------------------------------
 	
 	/* (non-Javadoc) @see java.util.concurrent.Future#get() */
-	//        @Override
+	@Override
 	public Response get () throws InterruptedException, ExecutionException {
 		completion.await();
 
@@ -144,7 +144,7 @@ public final class PendingRequest implements Future<Response> {
 	}
 
 	/* (non-Javadoc) @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit) */
-	//        @Override
+	@Override
 	public Response get (long timeout, TimeUnit unit)
 	throws InterruptedException, ExecutionException, TimeoutException 
 	{
@@ -159,7 +159,7 @@ public final class PendingRequest implements Future<Response> {
 	 * Pipeline does not support canceling of requests -- will always return false.
 	 * @see java.util.concurrent.Future#cancel(boolean) 
 	 */
-	//        @Override
+	@Override
 	public boolean cancel (boolean mayInterruptIfRunning) { return false; }
 
 	/**  
@@ -167,14 +167,13 @@ public final class PendingRequest implements Future<Response> {
 	 * @see PendingRequest#cancel(boolean)
 	 * @see java.util.concurrent.Future#isCancelled()
 	 */
-	//        @Override
+	@Override
 	public boolean isCancelled () { return false; }
 
 
-	//        @Override
+	/* (non-Javadoc) @see java.util.concurrent.Future#isDone() */
+	@Override
 	public boolean isDone () { 
-//		return completion.isSignalled();
-		
 		return completion.isSignalled(); 
 	}
 }

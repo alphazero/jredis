@@ -93,6 +93,7 @@ public class SyncConnection extends ConnectionBase implements Connection {
 	/* (non-Javadoc)
 	 * @see org.jredis.connector.Connection#getModality()
 	 */
+	// TODO: restore this
 //	@Override
 	public final Modality getModality() {
 		return Connection.Modality.Synchronous;
@@ -101,6 +102,7 @@ public class SyncConnection extends ConnectionBase implements Connection {
 	/* (non-Javadoc)
 	 * @see org.jredis.ri.alphazero.connection.ConnectionBase#serviceRequest(org.jredis.protocol.Command, byte[][])
 	 */
+	@Override
 	public Response serviceRequest (Command cmd, byte[]... args) 
 		throws RedisException
 	{

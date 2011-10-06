@@ -125,12 +125,6 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	isActive.set(false);
     }
     
-//    @Override
-//    protected void cleanup () {
-//      super.cleanup();
-//      respHandlerThread.interrupt();
-//    }
-
     @Override
     protected void notifyConnected () {
     	super.notifyConnected();
@@ -304,7 +298,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
     	 * means faulted server, specially given the fact that a pipeline has a heartbeat
     	 * so the issue can not be timeout.
     	 */
-//        @Override
+        @Override
         public void run () {
         	thread.compareAndSet(null, Thread.currentThread());
         	alive_flag.compareAndSet(false, true);
@@ -402,6 +396,7 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 		 * 
          * @see org.jredis.connector.Connection.Listener#onEvent(org.jredis.connector.Connection.Event)
          */
+        @Override
         public void onEvent (Event event) {
         	if(event.getSource() != PipelineConnectionBase.this) {
         		Log.bug("event source [%s] is not this pipeline [%s]", event.getSource(), PipelineConnectionBase.this);
