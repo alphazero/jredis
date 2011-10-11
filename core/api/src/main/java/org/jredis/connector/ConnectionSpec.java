@@ -154,7 +154,7 @@ public interface ConnectionSpec {
 	public int	getReconnectCnt ();
 	/**
 	 * @param cnt
-     * @return the {@link ConnectionSpec}
+	 * @return the {@link ConnectionSpec}
 	 */
 	public ConnectionSpec setReconnectCnt(int cnt);
 	/**

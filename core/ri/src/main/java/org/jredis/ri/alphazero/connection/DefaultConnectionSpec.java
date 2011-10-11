@@ -52,23 +52,21 @@ final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	static final int DEFAULT_REDIS_DB = 0;
 	static final byte[] DEFAULT_REDIS_PASSWORD = null;
 	
-	/** defaults to 3 */
-	static final int DEFAULT_RECONNECT_CNT = 3;
-	/** defautls to 48KB */
+	/** def value: <code>48KB</code> */
 	private static final int DEFAULT_RCV_BUFF_SIZE = 1024 * 48;
-	/** defaults to 48KB */
+	/** def value: <code>48KB</code> */
 	private static final int DEFAULT_SND_BUFF_SIZE = 1024 * 48;
-	/** defaults to 5000 msecs */
+	/** def value: <code>5000 msecs</code> */
 	static final int DEFAULT_READ_TIMEOUT_MSEC = 5000;
 	
-	/** defaults to 1 second (the min on Redis) */
+	/** def value: <code>1</code> sec. (min timeout in redis conf */
 	static final int DEFAULT_HEARTBEAT_SEC = 1;
 	
-	/** higher priority pref is bandwidth */
+	/** def value: <code>0</code> e.g. higher priority pref is bandwidth */
 	private static final int DEFAULT_SO_PREF_BANDWIDTH = 0;
-	/** second priority pref is latency */
+	/** def value: <code>1</code> e.g. second priority pref is latency */
 	private static final int DEFAULT_SO_PREF_LATENCY = 1;
-	/** thrid priority pref is connection time */
+	/** def value: <code>3</code> e.g. third priority pref is connection time */
 	private static final int DEFAULT_SO_PREF_CONN_TIME = 2;
 	
 	/** def value: <code>true</code> */
@@ -85,7 +83,7 @@ final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
 	/** def value: <code>Modality.Synchronous</code> */
 	private static final Modality DEFAULT_CP_CONN_MODALITY = Modality.Synchronous;
 	/** def value: <code>3</code> */
-	private static final Integer DEFAULT_CP_MAX_CONNECT_ATTEMPT = 3;
+	private static final int DEFAULT_CP_MAX_CONNECT_ATTEMPT = 3;
 	
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -139,8 +137,8 @@ final public class DefaultConnectionSpec extends ConnectionSpec.RefImpl {
      * @see DefaultProtocolFactory
      */
     private void setDefaultValues () {
-    	// reconnect try count
-    	setReconnectCnt(DEFAULT_RECONNECT_CNT);
+//    	// reconnect try count
+//    	setReconnectCnt(DEFAULT_CP_MAX_CONNECT_ATTEMPT);
     	
     	//  tcp socket flags
     	setSocketFlag(Connection.Socket.Flag.SO_KEEP_ALIVE, true);

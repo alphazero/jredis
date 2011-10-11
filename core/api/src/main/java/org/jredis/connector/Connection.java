@@ -172,8 +172,7 @@ public interface Connection {
 		MODALITY,
 		/** On Connect (or reconnect after faults or timeouts) the maximum duration that you are willing to wait, milliseconds */
 		MAX_CONNECT_WAIT,
-		/** To be deprecated -- number of reconnect attempts after timeouts or faults. */
-		@Deprecated
+		/** number of reconnect attempts after timeouts or faults. */
 		MAX_CONNECT_ATTEMPT,
 		/** if specified, is used to create the new protocol */
 		PROTOCOL_CLASS,
