@@ -45,8 +45,7 @@ import org.jredis.ri.alphazero.support.Log;
  * Abstract base for all Pipeline connections, providing basically all of the
  * required functionality for a pipeline with asynchronous semantics.  
  * 
- * The asynch extensions merely need to provide support for 
- * {@link Connection#getModality()}.  Synchronous pipelines can simply call
+ * Synchronous pipelines can simply call
  * the {@link PipelineConnectionBase#queueRequest(Command, byte[])} method
  * in their implementation of the synchronous {@link Connection#serviceRequest(Command, byte[])} 
  * method and block on {@link Future#get()} to realize the blocking semantics 

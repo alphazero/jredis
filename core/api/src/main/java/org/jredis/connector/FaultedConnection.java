@@ -50,13 +50,6 @@ public class FaultedConnection implements Connection {
 		this.connSpec = connSpec;
 	}
 
-	/* (non-Javadoc) @see org.jredis.connector.Connection#getModality() */
-//	@Override // TODO: restore this method of Connection
-	public Modality getModality() 
-	{
-		throw new ClientRuntimeException (errorMsg);
-	}
-
 	/* (non-Javadoc) @see org.jredis.connector.Connection#getSpec() */
 	@Override
 	public ConnectionSpec getSpec() {
