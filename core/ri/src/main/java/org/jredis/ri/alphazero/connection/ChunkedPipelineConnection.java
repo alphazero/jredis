@@ -247,8 +247,16 @@ public class ChunkedPipelineConnection
 					}
 					
 					if(sendreq){
-						System.arraycopy(reqbytes, 0, chunkbuff, off, reqbyteslen);
-						off+=reqbyteslen;
+						// good enough hack for reqs > MTU 
+						// assumes that overflow was true! 
+						if(reqbyteslen > MTU_SIZE) {
+							out.write(reqbytes);
+							out.flush();
+						}
+						else {
+							System.arraycopy(reqbytes, 0, chunkbuff, off, reqbyteslen);
+							off+=reqbyteslen;
+						}
 					}
 
 					if(doflush) {
@@ -305,25 +313,31 @@ public class ChunkedPipelineConnection
 	// Inner Class
 	// ------------------------------------------------------------------------
     
-    public final class PendingCPRequest extends PendingRequest {
+    final class PendingCPRequest extends PendingRequest {
 
     	final ChunkedPipelineConnection pipeline;
 		public PendingCPRequest(ChunkedPipelineConnection pipeline, Command cmd) {
 			super(cmd);
 			this.pipeline = pipeline;
 		}
-		@Override
+		@Override final
 		public Response get() 
 			throws InterruptedException, ExecutionException {
-			pipeline.queueRequest(Command.FLUSH);
+			requestFlush();
 			return super.get();
 		}
-		@Override
+		@Override final
 		public Response get(long timeout, TimeUnit unit)
 			throws InterruptedException, ExecutionException, TimeoutException 
 		{
-			pipeline.queueRequest(Command.FLUSH);
+			requestFlush();
 			return super.get(timeout, unit);
+		}
+		final 
+		private void requestFlush() {
+			if(cmd != Command.QUIT) {
+				pipeline.queueRequest(Command.FLUSH);
+			}
 		}
     }
     /**
