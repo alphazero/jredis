@@ -23,8 +23,11 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -220,7 +223,8 @@ public class ChunkedPipelineConnection
 		final byte[]	reqbytes = _reqbytes;
 		final int		reqbyteslen = _reqbyteslen;
 		
-		final PendingRequest 	queuedRequest = new PendingRequest(cmd);
+//		final PendingRequest 	queuedRequest = new PendingRequest(cmd);
+		final PendingRequest 	queuedRequest = new PendingCPRequest(this, cmd);
 		
 		/* possibly silly optimization, pulled out of sync block */
 		final OutputStream out = getOutputStream();
@@ -300,6 +304,28 @@ public class ChunkedPipelineConnection
 	// ------------------------------------------------------------------------
 	// Inner Class
 	// ------------------------------------------------------------------------
+    
+    public final class PendingCPRequest extends PendingRequest {
+
+    	final ChunkedPipelineConnection pipeline;
+		public PendingCPRequest(ChunkedPipelineConnection pipeline, Command cmd) {
+			super(cmd);
+			this.pipeline = pipeline;
+		}
+		@Override
+		public Response get() 
+			throws InterruptedException, ExecutionException {
+			pipeline.queueRequest(Command.FLUSH);
+			return super.get();
+		}
+		@Override
+		public Response get(long timeout, TimeUnit unit)
+			throws InterruptedException, ExecutionException, TimeoutException 
+		{
+			pipeline.queueRequest(Command.FLUSH);
+			return super.get(timeout, unit);
+		}
+    }
     /**
      * Provides the response processing logic as a {@link Runnable}.
      * <p>
