@@ -40,6 +40,7 @@ public enum Command {
 	// connection handling
 	PING 		(RequestType.NO_ARG, 		ResponseType.STATUS), 
 	QUIT 		(RequestType.NO_ARG, 		ResponseType.VIRTUAL), 
+	FLUSH 		(RequestType.NO_ARG, 		ResponseType.NOP), 
 
 	// String values operations
 	SET 		(RequestType.KEY_VALUE, 	ResponseType.STATUS), 
@@ -159,7 +160,7 @@ public enum Command {
 	
 	// Remote server control commands
 	INFO		(RequestType.NO_ARG, 		ResponseType.BULK), 
-	MONITOR	    (RequestType.NO_ARG, 		ResponseType.VIRTUAL), 
+	MONITOR	    (RequestType.NO_ARG, 		ResponseType.VIRTUAL), // BUG: NOTE: TODO: not virtual ..
 	SLAVEOF		(RequestType.KEY_KEY, 		ResponseType.STATUS),
 	
 	;// -- end --
@@ -324,6 +325,8 @@ public enum Command {
      * @see Response
      */
     public enum ResponseType {
+    	/**  */
+    	NOP (StatusResponse.class),
     	/**  */
     	VIRTUAL (StatusResponse.class),
     	/**  */

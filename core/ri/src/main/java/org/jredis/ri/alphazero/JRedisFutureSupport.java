@@ -1028,6 +1028,11 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.QUIT));
 	}
 	@Override
+	public <K extends Object> FutureStatus flush()  {
+		return new FutureStatus(this.queueRequest(Command.FLUSH));
+	}
+	/* ------------------------------- commands that don't get a response END --------- */
+	@Override
 	public <K extends Object> Future<List<byte[]>> sinter(K set1, K... sets) {
 		byte[] keydata = null;
 		if((keydata = JRedisSupport.getKeyBytes(set1)) == null)

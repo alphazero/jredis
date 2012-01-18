@@ -70,6 +70,16 @@ public interface Protocol {
 	 * @See {@link Response#read(java.io.InputStream)}
 	 */
 	public Response createResponse (Command cmd) throws ProviderException, ClientRuntimeException ;
+
+	/**
+	 * EXPERIMENTAL 
+	 * @param cmd
+	 * @param args
+	 * @return
+	 * @throws ProviderException
+	 * @throws IllegalArgumentException
+	 */
+	public byte[] createRequestBuffer(Command cmd, byte[]...args) throws ProviderException, IllegalArgumentException;
 	
 	public interface Factory {
 		/**
