@@ -10,6 +10,7 @@ import org.jredis.ri.alphazero.JRedisChunkedPipeline;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 
+@SuppressWarnings("unused")
 public class AdHocTestChunkPipeline {
 	public static void main(String[] args) throws Throwable {
 		try {
@@ -30,7 +31,7 @@ public class AdHocTestChunkPipeline {
 	}
 	
 	static final int wcnt = 2;
-	static final int reqnums = 300000;
+	static final int reqnums = 150000;
 	
 	private void run() {
 		final Thread[] workers = new Thread[wcnt];
@@ -57,7 +58,7 @@ public class AdHocTestChunkPipeline {
 		return new Thread(task, tname);
 	}
 	
-	@SuppressWarnings("unused")
+//	@SuppressWarnings("unused")
 	private Runnable task (final JRedisFuture jredis) {
 		return new Runnable() {
 			final JRedisFuture conn = jredis;
@@ -73,23 +74,16 @@ public class AdHocTestChunkPipeline {
 					fCntr = conn.incr(cntr);
 				}
 				conn.flush();
-//				if(fCntr.isDone()) {
-//					Log.log("done");
+
+//				try {
+//					Long counter = fCntr.get();
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				} catch (ExecutionException e) {
+//					e.printStackTrace();
 //				}
-//				else {
-//					Log.log("notdone");
-					try {
-						Long counter = fCntr.get();
-//						Log.log("counter: %d", counter);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (ExecutionException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-//			}
+				
+			}
 		};
 	}
 }
