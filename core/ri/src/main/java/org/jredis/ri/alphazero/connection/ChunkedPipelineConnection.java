@@ -314,6 +314,7 @@ public class ChunkedPipelineConnection
 				}
 
 				/* NOTE: this is the bottleneck now and quite possibly the cause of the jitter */
+				/* cond here inside sync block is 1:1 consumer producer */
 				pendingResponseQueue.add(queuedRequest);
 			}
 		} catch (IOException e) {
