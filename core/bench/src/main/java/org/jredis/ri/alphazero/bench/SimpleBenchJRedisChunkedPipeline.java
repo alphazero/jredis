@@ -9,6 +9,7 @@ import org.jredis.connector.ConnectionSpec;
 import org.jredis.protocol.ResponseStatus;
 import org.jredis.ri.alphazero.JRedisChunkedPipeline;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
+import org.jredis.ri.alphazero.support.Log;
 
 public class SimpleBenchJRedisChunkedPipeline implements Runnable {
 	public static void main(String[] args) {
@@ -45,7 +46,7 @@ public class SimpleBenchJRedisChunkedPipeline implements Runnable {
 				long delta_ns = System.nanoTime() - start;
 				long delta_ms = TimeUnit.MILLISECONDS.convert(delta_ns, TimeUnit.NANOSECONDS);
 				float opsrate = iters/delta_ms;
-				System.out.format("counter: %d  msec:%d ops/msecs:%f  [q-delta:%d] [delta:%d]\n", counter, delta_ms, opsrate, queued, delta_ns);
+				Log.log("counter: %d  msec:%d ops/msecs:%f  [q-delta:%d] [delta:%d]", counter, delta_ms, opsrate, queued, delta_ns);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				break;

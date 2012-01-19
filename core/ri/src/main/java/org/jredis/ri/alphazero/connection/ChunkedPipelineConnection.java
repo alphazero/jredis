@@ -223,12 +223,13 @@ public class ChunkedPipelineConnection
 		final byte[]	reqbytes = _reqbytes;
 		final int		reqbyteslen = _reqbyteslen;
 		
-//		final PendingRequest 	queuedRequest = new PendingRequest(cmd);
+		/* PendingCPRequest provides transparent hook to force flush on future get(..) */
 		final PendingRequest 	queuedRequest = new PendingCPRequest(this, cmd);
 		
 		/* possibly silly optimization, pulled out of sync block */
 		final OutputStream out = getOutputStream();
-		final boolean isflush = cmd == Command.FLUSH;
+		final boolean isflush = cmd == Command.CONN_FLUSH;
+		final boolean exceeds = reqbyteslen > MTU_SIZE;
 		
 		/* auth is used on connector initialization and must be sent asap */ 
 		final boolean doflush = 
@@ -237,7 +238,7 @@ public class ChunkedPipelineConnection
 			isflush;
 		
 		synchronized (serviceLock) {
-			boolean overflows = off + reqbyteslen > MTU_SIZE ? true : false;
+			boolean overflows = exceeds || off + reqbyteslen > MTU_SIZE ? true : false;
 			if(cmd != Command.QUIT) {  // WATCH THIS -- BUG PRONE
 				try {		// this is in the wrong place
 					if(overflows) {
@@ -249,7 +250,7 @@ public class ChunkedPipelineConnection
 					if(sendreq){
 						// good enough hack for reqs > MTU 
 						// assumes that overflow was true! 
-						if(reqbyteslen > MTU_SIZE) {
+						if(exceeds) {
 							out.write(reqbytes);
 							out.flush();
 						}
@@ -336,7 +337,7 @@ public class ChunkedPipelineConnection
 		final 
 		private void requestFlush() {
 			if(cmd != Command.QUIT) {
-				pipeline.queueRequest(Command.FLUSH);
+				pipeline.queueRequest(Command.CONN_FLUSH);
 			}
 		}
     }

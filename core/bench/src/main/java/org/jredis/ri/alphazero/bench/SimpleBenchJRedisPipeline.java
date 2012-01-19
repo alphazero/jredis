@@ -8,6 +8,7 @@ import org.jredis.JRedisFuture;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.JRedisPipeline;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
+import org.jredis.ri.alphazero.support.Log;
 
 public class SimpleBenchJRedisPipeline {
 	public static void main(String[] args) {
@@ -19,7 +20,7 @@ public class SimpleBenchJRedisPipeline {
 		ConnectionSpec connSpec = DefaultConnectionSpec.newSpec("localhost", 6379, database, "jredis".getBytes());
 		JRedisFuture jredis = new JRedisPipeline(connSpec);
 		
-		byte[] key = "bench-jredis-pipeline-key".getBytes();
+		byte[] key = "pipe".getBytes();
 		int iters = 100 * 1000;
 		
 		try {
@@ -41,7 +42,7 @@ public class SimpleBenchJRedisPipeline {
 				long delta_ns = System.nanoTime() - start;
 				long delta_ms = TimeUnit.MILLISECONDS.convert(delta_ns, TimeUnit.NANOSECONDS);
 				float opsrate = iters/delta_ms;
-				System.out.format("counter: %d  msec:%d ops/msecs:%f  [q-delta:%d] [delta:%d]\n", counter, delta_ms, opsrate, queued, delta_ns);
+				Log.log ("counter: %d  msec:%d ops/msecs:%f  [q-delta:%d] [delta:%d]", counter, delta_ms, opsrate, queued, delta_ns);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				break;

@@ -40,7 +40,7 @@ public enum Command {
 	// connection handling
 	PING 		(RequestType.NO_ARG, 		ResponseType.STATUS), 
 	QUIT 		(RequestType.NO_ARG, 		ResponseType.VIRTUAL), 
-	FLUSH 		(RequestType.NO_ARG, 		ResponseType.NOP), 
+	CONN_FLUSH 		(RequestType.NO_ARG, 		ResponseType.NOP), 
 
 	// String values operations
 	SET 		(RequestType.KEY_VALUE, 	ResponseType.STATUS), 
