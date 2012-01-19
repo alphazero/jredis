@@ -29,8 +29,8 @@ public class AdHocTestChunkPipeline {
 		jredis = new JRedisChunkedPipeline(spec);
 	}
 	
-	static final int wcnt = 1;
-	static final int reqnums = 100000;
+	static final int wcnt = 2;
+	static final int reqnums = 300000;
 	
 	private void run() {
 		final Thread[] workers = new Thread[wcnt];
@@ -73,14 +73,14 @@ public class AdHocTestChunkPipeline {
 					fCntr = conn.incr(cntr);
 				}
 				conn.flush();
-				if(fCntr.isDone()) {
-					Log.log("done");
-				}
-				else {
-					Log.log("notdone");
+//				if(fCntr.isDone()) {
+//					Log.log("done");
+//				}
+//				else {
+//					Log.log("notdone");
 					try {
 						Long counter = fCntr.get();
-						Log.log("counter: %d", counter);
+//						Log.log("counter: %d", counter);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -89,7 +89,7 @@ public class AdHocTestChunkPipeline {
 						e.printStackTrace();
 					}
 				}
-			}
+//			}
 		};
 	}
 }
