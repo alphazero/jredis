@@ -42,6 +42,7 @@ public class SimpleBenchJRedisChunkedPipeline implements Runnable {
 			}
 			long queued = System.nanoTime() - start;
 			try {
+				jredis.flush();
 				long counter = frCounter.get();  // NOTE: excellent place to put implicit flush()
 				long delta_ns = System.nanoTime() - start;
 				long delta_ms = TimeUnit.MILLISECONDS.convert(delta_ns, TimeUnit.NANOSECONDS);

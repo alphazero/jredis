@@ -1028,7 +1028,7 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		return new FutureStatus(this.queueRequest(Command.QUIT));
 	}
 	@Override
-	public <K extends Object> FutureStatus flush()  {
+	public FutureStatus flush()  {
 		return new FutureStatus(this.queueRequest(Command.CONN_FLUSH));
 	}
 	/* ------------------------------- commands that don't get a response END --------- */

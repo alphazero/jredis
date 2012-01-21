@@ -20,6 +20,7 @@ import static org.testng.Assert.fail;
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.connector.ConnectionSpec;
+import org.jredis.protocol.Command;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.AfterTest;
@@ -34,7 +35,7 @@ import org.testng.annotations.Test;
  */
 //@Test(invocationCount=20, threadPoolSize=5, sequential=false)
 @Test(sequential = true, suiteName="JRedisChunkedPipeline-tests")
-public class JRedisChunkedPIpelineClientTest extends JRedisFutureProviderTestsBase {
+public class JRedisChunkedPipelineClientTest extends JRedisFutureProviderTestsBase {
 
 	// ------------------------------------------------------------------------
 	// TEST SETUP 
@@ -77,8 +78,7 @@ public class JRedisChunkedPIpelineClientTest extends JRedisFutureProviderTestsBa
 	public void testQuit() {
 		try {
 			JRedisFuture pipeline = getProviderInstance();
-			pipeline.ping().get();
-			pipeline.quit().get();
+			pipeline.quit();
 		} 
 		catch (Exception e) {
 			fail("QUIT" + e);

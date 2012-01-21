@@ -106,12 +106,32 @@ public class ChunkedPipelineConnection
 	/** counted down on notifyConnect */
 	private CountDownLatch		    connectionEstablished;
 
-	// chunk buffer size
-	static final int MTU_SIZE = 2884; // assumes TCP MTU of 1500. pick some power of 8 less than MTU*x.
-	// chunk buffer offset
+	/** MTU multiples to use as upper bound of the size of the chunk buffer */
+	static final int MTU_FACTOR = 1; // TODO: ConnectionSpec me.
+	
+	static final int MTU_SIZE = 1488;
+	
+	/** chunk buffer size */
+	static final int CHUNK_BUFF_SIZE = MTU_SIZE * MTU_FACTOR;
+	
+	/** minimum request size in bytes -- using PING e.g. 14 b */
+	static final int MIN_REQ_SIZE = 14; 
+	
+	/** Chunk Queue size (slots) */
+	static final int CHUNK_Q_SIZE = CHUNK_BUFF_SIZE / MIN_REQ_SIZE;
+	
+	/** chunk buffer offset */
 	private int off = 0;
+	
+	/** chunk buffer */
 	private byte[] chunkbuff;
-
+	
+	/** Chunk Queue available slot index */
+	private int idx = 0;
+	
+	/** Chunk Queue of requests in Chunk buffer */
+	private PendingCPRequest[] chunkqueue;
+	
 
 	// ------------------------------------------------------------------------
 	// Constructor(s)
@@ -139,7 +159,8 @@ public class ChunkedPipelineConnection
 		spec.setConnectionFlag(Flag.RELIABLE, true);
 		spec.setConnectionFlag(Flag.SHARED, true);
 
-		chunkbuff = new byte[MTU_SIZE];
+		chunkbuff = new byte[CHUNK_BUFF_SIZE];
+		chunkqueue = new PendingCPRequest[CHUNK_Q_SIZE];
 
 		super.initializeComponents();
 
@@ -182,10 +203,10 @@ public class ChunkedPipelineConnection
 	}
 
 	// TODO: write chunking + mod ProtocolBase.Stream...Request + Command.FLUSH_BUFFERS.  // DONE
-	//    @Override
-	//    protected OutputStream newOutputStream(OutputStream socketOutputStream) {
-	//    	return new BufferedOutputStream(socketOutputStream);
-	//    }
+//	    @Override
+//	    protected OutputStream newOutputStream(OutputStream socketOutputStream) {
+//	    	return new BufferedOutputStream(socketOutputStream, MTU_SIZE);
+//	    }
 
 	/**
 	 * Just make sure its a {@link FastBufferedInputStream}.
@@ -208,9 +229,10 @@ public class ChunkedPipelineConnection
 
 
 	/**
-	 * This is a pseudo asynchronous method.  The actual write to server does 
-	 * occur in this method, so when this method returns, your request has been
-	 * sent.  This simply defers the response read to the response handler.
+	 * This is a true asynchronous method.  The actual request write to server 
+	 * possibly does occur in this method if the connection determines it is 
+	 * optimal to flush the pipeline buffer, or, if you explicitly had requested
+	 * flush via {@link Command#CONN_FLUSH}. 
 	 * <p>
 	 * Other item of note is that once a QUIT request has been queued, no further
 	 * requests are accepted and a ClientRuntimeException is thrown.
@@ -242,21 +264,25 @@ public class ChunkedPipelineConnection
 		}
 
 		/* PendingCPRequest provides transparent hook to force flush on future get(..) */
-		final PendingRequest 	queuedRequest = new PendingCPRequest(this, cmd);
+		final PendingCPRequest 	queuedRequest = new PendingCPRequest(this, cmd);
 
 		/* possibly silly optimization, pulled out of sync block */
 		final OutputStream out = getOutputStream();
 		final boolean isflush = cmd == Command.CONN_FLUSH;
-		final boolean exceeds = reqbyteslen > MTU_SIZE;
+		final boolean exceeds = reqbyteslen > CHUNK_BUFF_SIZE;
+		final boolean isquit = cmd == Command.QUIT;
 
 		/* auth is used on connector initialization and must be sent asap */ 
 		final boolean doflush = 
-			cmd == Command.AUTH || 
-			cmd == Command.SELECT || 
+			cmd == Command.AUTH 	|| 
+			cmd == Command.SELECT 	|| 
+			isquit					||
 			isflush;
 
-		/* NOTES:
-		 * This hacked implementation is zero-copy on direct writes and will also copy
+		/* ------------
+		 * NOTES:
+		 * 
+		 * This ~hacked implementation is zero-copy on direct writes and will also copy
 		 * directly to the chunk buffer.  Performance for single threaded is a 
 		 * bit improved but for n threaded loading, it is really negligible.
 		 * 
@@ -274,48 +300,62 @@ public class ChunkedPipelineConnection
 		 * - equally annoying is the fact that if a client thread is flushing/writing
 		 * to the socket, other threads could be writing to a mem buffer.  (This would
 		 * require double buffering ala graphics.)
-		 * 
 		 */
+		
 		try {
 			synchronized (serviceLock) {
 				/* don't move -- off is contended */
-				boolean overflows = exceeds || off + reqbyteslen > MTU_SIZE ? true : false;
+				boolean overflows = exceeds || off + reqbyteslen > CHUNK_BUFF_SIZE ? true : false;
 				
-				if(cmd != Command.QUIT) {  // WATCH THIS SPACE -- BUG PRONE
-					if(overflows) {
-						out.write(chunkbuff, 0, off);
-						out.flush();
-						off = 0;
+				if(overflows) {
+					out.write(chunkbuff, 0, off);
+					out.flush();
+					off = 0;
+					for(int i=0; i<idx; i++) {
+						PendingCPRequest item = chunkqueue[i];
+						pendingResponseQueue.add(item);
 					}
+					idx = 0;
+				}
 
-					if(sendreq){
-						if(exceeds) {
-							/* can optimize and dispense with new byte[] -- only for large payloads */
-							out.write(protocol.createRequestBuffer(cmd, args));
+				if(sendreq){
+					if(exceeds) {
+						/* can optimize and dispense with new byte[] -- only for large payloads */
+						/* chunkqueue should be empty and idx 0 : assert for now */
+						out.write(protocol.createRequestBuffer(cmd, args));
+						out.flush();
+						pendingResponseQueue.add(queuedRequest);
+					}
+					else {
+						// NOTE: this 'new' here is not necessary and is only because of copy/paste from
+						// ProtocolBase (see ProtocolHelper.writeReq..().
+						ProtocolHelper.writeRequestToBuffer(new ProtocolHelper.Buffer(chunkbuff, off), cmd, args);
+						off+=reqbyteslen;
+
+						chunkqueue[idx] = queuedRequest;
+						idx++;
+					}
+				}
+
+				if(doflush) {
+					if(!isquit){
+						if(off>0){
+							out.write(chunkbuff, 0, off);
 							out.flush();
-						}
-						else {
-							// NOTE: this 'new' here is not necessary and is only because of copy/paste from
-							// ProtocolBase (see ProtocolHelper.writeReq..().
-							ProtocolHelper.writeRequestToBuffer(new ProtocolHelper.Buffer(chunkbuff, off), cmd, args);
-							off+=reqbyteslen;
+							off = 0;
+							for(int i=0; i<idx; i++) {
+								PendingCPRequest item = chunkqueue[i];
+								pendingResponseQueue.add(item);
+							}
+							idx = 0;
 						}
 					}
-
-					if(doflush) {
-						out.write(chunkbuff, 0, off);
-						out.flush();
-						off = 0;
+					else {
+						pendingQuit = true;
+						isActive.set(false);
+						pendingResponseQueue.add(queuedRequest);
 					}
 				}
-				else if(cmd == Command.QUIT) { // BUG ALERT: see above (ditto)
-					pendingQuit = true;
-					isActive.set(false);
-				}
-
-				/* NOTE: this is the bottleneck now and quite possibly the cause of the jitter */
-				/* cond here inside sync block is 1:1 consumer producer */
-				pendingResponseQueue.add(queuedRequest);
 			}
 		} catch (IOException e) {
 			Log.error("on %s", cmd.code);
@@ -487,9 +527,15 @@ public class ChunkedPipelineConnection
 		}
 		final 
 		private void requestFlush() {
+//			Log.log("[%s] requesting flush ..", cmd.code);
 			if(cmd != Command.QUIT) {
+//				Log.log("[%s] requesting flush .. INSIDE", cmd.code);
 				pipeline.queueRequest(Command.CONN_FLUSH);
 			}
+			else {
+				new Exception().printStackTrace();
+			}
+//			Log.log("[%s] requesting flush .. DONE", cmd.code);
 		}
 	}
 	/**

@@ -12,12 +12,16 @@ import org.jredis.ri.alphazero.support.Log;
 
 @SuppressWarnings("unused")
 public class AdHocTestChunkPipeline {
+	static final int MAX_ITER = Integer.MAX_VALUE;
 	public static void main(String[] args) throws Throwable {
 		try {
 			AdHocTestChunkPipeline tester = new AdHocTestChunkPipeline();
-			while(true){
+			int iter = 0;
+			while(iter < MAX_ITER){
 				tester.run();
+				iter++;
 			}
+			tester.stop();
 		} catch (Exception e) {
 			e.printStackTrace();
 //			Log.error("fault", e); // TODO: 
@@ -33,6 +37,9 @@ public class AdHocTestChunkPipeline {
 	static final int wcnt = 2;
 	static final int reqnums = 150000;
 	
+	private void stop() {
+		jredis.quit();
+	}
 	private void run() {
 		final Thread[] workers = new Thread[wcnt];
 		for(int i=0;i< workers.length; i++){
@@ -73,7 +80,7 @@ public class AdHocTestChunkPipeline {
 //					conn.ping();
 					fCntr = conn.incr(cntr);
 				}
-				conn.flush();
+//				conn.flush();
 
 //				try {
 //					Long counter = fCntr.get();
