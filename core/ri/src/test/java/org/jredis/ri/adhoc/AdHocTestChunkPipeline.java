@@ -1,6 +1,8 @@
 package org.jredis.ri.adhoc;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -34,8 +36,8 @@ public class AdHocTestChunkPipeline {
 		jredis = new JRedisChunkedPipeline(spec);
 	}
 	
-	static final int wcnt = 2;
-	static final int reqnums = 150000;
+	static final int wcnt = 100;
+	static final int reqnums = 3000;
 	
 	private void stop() {
 		jredis.quit();

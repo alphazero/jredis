@@ -36,6 +36,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jredis.ClientRuntimeException;
 import org.jredis.NotSupportedException;
@@ -48,6 +50,7 @@ import org.jredis.protocol.Protocol;
 import org.jredis.protocol.Response;
 import org.jredis.protocol.Command.ResponseType;
 import org.jredis.ri.alphazero.protocol.ConcurrentSyncProtocol;
+import org.jredis.ri.alphazero.protocol.ProtocolBase;
 import org.jredis.ri.alphazero.protocol.VirtualResponse;
 import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
@@ -92,7 +95,8 @@ public class ChunkedPipelineConnection
 	BlockingQueue<PendingRequest>	pendingResponseQueue;
 
 	/** synchronization object used to serialize request queuing  */
-	private Object					serviceLock = new Object();
+//	private Object					serviceLock = new Object();
+	private Lock requestlock;
 
 	/** 
 	 * flag (default false) indicates if a pending QUIT command is being processed.  
@@ -107,7 +111,7 @@ public class ChunkedPipelineConnection
 	private CountDownLatch		    connectionEstablished;
 
 	/** MTU multiples to use as upper bound of the size of the chunk buffer */
-	static final int MTU_FACTOR = 1; // TODO: ConnectionSpec me.
+	private static final int MTU_FACTOR = 1; // TODO: ConnectionSpec me.
 	
 	static final int MTU_SIZE = 1488;
 	
@@ -121,18 +125,18 @@ public class ChunkedPipelineConnection
 	static final int CHUNK_Q_SIZE = CHUNK_BUFF_SIZE / MIN_REQ_SIZE;
 	
 	/** chunk buffer offset */
-	private int off = 0;
+	private int off;
 	
 	/** chunk buffer */
 	private byte[] chunkbuff;
 	
 	/** Chunk Queue available slot index */
-	private int idx = 0;
+	private int idx;
 	
 	/** Chunk Queue of requests in Chunk buffer */
 	private PendingCPRequest[] chunkqueue;
 	
-
+//	private int seqnum;
 	// ------------------------------------------------------------------------
 	// Constructor(s)
 	// ------------------------------------------------------------------------
@@ -160,11 +164,15 @@ public class ChunkedPipelineConnection
 		spec.setConnectionFlag(Flag.SHARED, true);
 
 		chunkbuff = new byte[CHUNK_BUFF_SIZE];
+		off = 0;
 		chunkqueue = new PendingCPRequest[CHUNK_Q_SIZE];
+		idx = 0;
+//		seqnum = 0;
+		requestlock = new ReentrantLock(false);
+		
+		super.initializeComponents(); // REVU: this is a bit oddly placed .. 
 
-		super.initializeComponents();
-
-		serviceLock = new Object();
+//		serviceLock = new Object();
 		isActive = new AtomicBoolean(false);
 		connectionEstablished = new CountDownLatch(1);
 
@@ -303,17 +311,19 @@ public class ChunkedPipelineConnection
 		 */
 		
 		try {
-			synchronized (serviceLock) {
+			requestlock.lock();
+//				seqnum ++;
+				
 				/* don't move -- off is contended */
 				boolean overflows = exceeds || off + reqbyteslen > CHUNK_BUFF_SIZE ? true : false;
 				
 				if(overflows) {
-					out.write(chunkbuff, 0, off);
-					out.flush();
-					off = 0;
+					out.write(chunkbuff, 0, off);						// CONTENDED
+					out.flush();										// CONTENDED
+					off = 0;											// CONTENDED
 					for(int i=0; i<idx; i++) {
 						PendingCPRequest item = chunkqueue[i];
-						pendingResponseQueue.add(item);
+						pendingResponseQueue.add(item);					// CONTENDED II
 					}
 					idx = 0;
 				}
@@ -356,13 +366,15 @@ public class ChunkedPipelineConnection
 						pendingResponseQueue.add(queuedRequest);
 					}
 				}
-			}
+//			}
 		} catch (IOException e) {
 			Log.error("on %s", cmd.code);
 			throw new ClientRuntimeException(String.format("IOFault (cmd: %s)", cmd.code), e);
 		} catch (ArrayIndexOutOfBoundsException e){
 			Log.error("on %s", cmd.code);
 			throw new ProviderException("BUG - recheck assumptions ..", e);
+		} finally {
+			requestlock.unlock();
 		}
 		return queuedRequest;
 	}
@@ -398,8 +410,16 @@ public class ChunkedPipelineConnection
 	// ------------------------------------------------------------------------
 	// Inner Class
 	// ------------------------------------------------------------------------
+	
+	/**
+	 * A not so KISSy reproduction of necessary {@link Protocol} support
+	 * from {@link ProtocolBase}.  Stays here until update of the interface
+	 * to allow for sharing of the codebase.
+	 * @author Joubin <alphazero@sensesay.net>
+	 *
+	 */
 	final static class ProtocolHelper {
-		/* hackedy hack */
+		/* hackedy hack -- to go bye bye soon  */
 		static class Buffer {
 			byte[] b = null;
 			private int off = 0;
@@ -505,10 +525,18 @@ public class ChunkedPipelineConnection
 		}
 
 	}
+	/**
+	 * ChunkedPipeline specific of {@link PendingRequest}.  This class
+	 * maintains a reference to the pipeline to allow for transparent 
+	 * invokation of {@value Command#CONN_FLUSH}.
+	 * 
+	 * @author Joubin <alphazero@sensesay.net>
+	 */
 	final class PendingCPRequest extends PendingRequest {
 
-		final ChunkedPipelineConnection pipeline;
-		public PendingCPRequest(ChunkedPipelineConnection pipeline, Command cmd) {
+		private final ChunkedPipelineConnection pipeline;
+		
+		PendingCPRequest(ChunkedPipelineConnection pipeline, Command cmd) {
 			super(cmd);
 			this.pipeline = pipeline;
 		}
@@ -525,19 +553,16 @@ public class ChunkedPipelineConnection
 			requestFlush();
 			return super.get(timeout, unit);
 		}
-		final 
-		private void requestFlush() {
-//			Log.log("[%s] requesting flush ..", cmd.code);
+		final private void requestFlush() {
 			if(cmd != Command.QUIT) {
-//				Log.log("[%s] requesting flush .. INSIDE", cmd.code);
 				pipeline.queueRequest(Command.CONN_FLUSH);
 			}
 			else {
 				new Exception().printStackTrace();
 			}
-//			Log.log("[%s] requesting flush .. DONE", cmd.code);
 		}
 	}
+	
 	/**
 	 * Provides the response processing logic as a {@link Runnable}.
 	 * <p>
