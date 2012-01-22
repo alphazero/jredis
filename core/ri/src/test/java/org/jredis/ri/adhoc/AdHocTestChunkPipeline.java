@@ -77,10 +77,15 @@ public class AdHocTestChunkPipeline {
 				final byte[] cntr = (tname + "#").getBytes();
 				Future<Long> fCntr = null;
 				for(int i=0; i<reqnums; i++) {
+					try {
 //					conn.set(key, key);
 //					conn.get(key);
 //					conn.ping();
 					fCntr = conn.incr(cntr);
+					} catch (Throwable t){
+//						t.printStackTrace();
+						System.exit(1);
+					}
 				}
 //				conn.flush();
 

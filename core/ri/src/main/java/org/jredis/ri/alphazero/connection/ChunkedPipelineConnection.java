@@ -314,62 +314,62 @@ public class ChunkedPipelineConnection
 			requestlock.lock();
 //				seqnum ++;
 				
-				/* don't move -- off is contended */
-				boolean overflows = exceeds || off + reqbyteslen > CHUNK_BUFF_SIZE ? true : false;
-				
-				if(overflows) {
-					out.write(chunkbuff, 0, off);						// CONTENDED
-					out.flush();										// CONTENDED
-					off = 0;											// CONTENDED
-					for(int i=0; i<idx; i++) {
-						PendingCPRequest item = chunkqueue[i];
-						pendingResponseQueue.add(item);					// CONTENDED II
-					}
-					idx = 0;
+			/* don't move -- off is contended */
+			boolean overflows = exceeds || off + reqbyteslen > CHUNK_BUFF_SIZE ? true : false;
+			
+			if(overflows) {
+				out.write(chunkbuff, 0, off);						// CONTENDED
+				out.flush();										// CONTENDED
+				off = 0;											// CONTENDED
+				for(int i=0; i<idx; i++) {
+					PendingCPRequest item = chunkqueue[i];
+					pendingResponseQueue.add(item);					// CONTENDED II
 				}
+				idx = 0;
+			}
 
-				if(sendreq){
-					if(exceeds) {
-						/* can optimize and dispense with new byte[] -- only for large payloads */
-						/* chunkqueue should be empty and idx 0 : assert for now */
-						out.write(protocol.createRequestBuffer(cmd, args));
+			if(sendreq){
+				if(exceeds) {
+					/* can optimize and dispense with new byte[] -- only for large payloads */
+					/* chunkqueue should be empty and idx 0 : assert for now */
+					out.write(protocol.createRequestBuffer(cmd, args));
+					out.flush();
+					pendingResponseQueue.add(queuedRequest);
+				}
+				else {
+					// NOTE: this 'new' here is not necessary and is only because of copy/paste from
+					// ProtocolBase (see ProtocolHelper.writeReq..().
+					ProtocolHelper.writeRequestToBuffer(new ProtocolHelper.Buffer(chunkbuff, off), cmd, args);
+					off+=reqbyteslen;
+
+					chunkqueue[idx] = queuedRequest;
+					idx++;
+				}
+			}
+
+			if(doflush) {
+				if(!isquit){
+					if(off>0){
+						out.write(chunkbuff, 0, off);
 						out.flush();
-						pendingResponseQueue.add(queuedRequest);
-					}
-					else {
-						// NOTE: this 'new' here is not necessary and is only because of copy/paste from
-						// ProtocolBase (see ProtocolHelper.writeReq..().
-						ProtocolHelper.writeRequestToBuffer(new ProtocolHelper.Buffer(chunkbuff, off), cmd, args);
-						off+=reqbyteslen;
-
-						chunkqueue[idx] = queuedRequest;
-						idx++;
-					}
-				}
-
-				if(doflush) {
-					if(!isquit){
-						if(off>0){
-							out.write(chunkbuff, 0, off);
-							out.flush();
-							off = 0;
-							for(int i=0; i<idx; i++) {
-								PendingCPRequest item = chunkqueue[i];
-								pendingResponseQueue.add(item);
-							}
-							idx = 0;
+						off = 0;
+						for(int i=0; i<idx; i++) {
+							PendingCPRequest item = chunkqueue[i];
+							pendingResponseQueue.add(item);
 						}
-					}
-					else {
-						pendingQuit = true;
-						isActive.set(false);
-						pendingResponseQueue.add(queuedRequest);
+						idx = 0;
 					}
 				}
-//			}
+				else {
+					pendingQuit = true;
+					isActive.set(false);
+					pendingResponseQueue.add(queuedRequest);
+				}
+			}
 		} catch (IOException e) {
-			Log.error("on %s", cmd.code);
-			throw new ClientRuntimeException(String.format("IOFault (cmd: %s)", cmd.code), e);
+			Log.error("IOException cmd:%s isConnected:%b", cmd.code, isConnected());
+			this.onConnectionFault(String.format("IOFault (cmd: %s)", cmd.code), true);
+//			throw new ClientRuntimeException(String.format("IOFault (cmd: %s)", cmd.code), e);
 		} catch (ArrayIndexOutOfBoundsException e){
 			Log.error("on %s", cmd.code);
 			throw new ProviderException("BUG - recheck assumptions ..", e);
@@ -576,7 +576,8 @@ public class ChunkedPipelineConnection
 	 */
 	public final class ResponseHandler implements Runnable, Connection.Listener {
 
-		private final AtomicBoolean work_flag;
+//		private final AtomicBoolean work_flag;
+		private volatile boolean work_flag; // REVU: checked in every loop - no need for atomic.
 		private final AtomicBoolean alive_flag;
 		private final AtomicReference<Thread> thread;
 
@@ -589,7 +590,8 @@ public class ChunkedPipelineConnection
 		 */
 		public ResponseHandler () {
 			ChunkedPipelineConnection.this.addListener(this);
-			this.work_flag = new AtomicBoolean(true); 
+//			this.work_flag = new AtomicBoolean(true); 
+			this.work_flag = true;
 			this.alive_flag = new AtomicBoolean(false);
 			this.thread = new AtomicReference<Thread>(null);
 		} 
@@ -622,7 +624,8 @@ public class ChunkedPipelineConnection
 
 			Log.log("Pipeline <%s> thread for <%s> started.", Thread.currentThread().getName(), ChunkedPipelineConnection.this.toString());
 			PendingRequest pending = null;
-			while(work_flag.get()){
+//			while(work_flag.get()){
+			while(work_flag){
 				Response response = null;
 				try {
 					pending = pendingResponseQueue.take();
@@ -682,7 +685,8 @@ public class ChunkedPipelineConnection
 
 		final private void stopHandler() {
 			Log.log("%s stopping handler thread", this);
-			work_flag.set(false);
+//			work_flag.set(false);
+			work_flag = false;
 			thread.get().interrupt();
 			//        	PipelineConnectionBase.this.respHandlerThread.interrupt();
 		}
@@ -692,7 +696,8 @@ public class ChunkedPipelineConnection
 			 * stop, but if it has, this makes sure we first go through
 			 * the stop sequence.
 			 */
-			if(work_flag.get() != false || alive_flag.get() != false)
+//			if(work_flag.get() != false || alive_flag.get() != false)
+			if(work_flag != false || alive_flag.get() != false)
 				stopHandler();
 			alive_flag.set(false);
 			ChunkedPipelineConnection.this.removeListener(this);
