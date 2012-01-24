@@ -25,18 +25,21 @@ import static org.jredis.ri.alphazero.protocol.ProtocolBase.SIZE_BYTE;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jredis.ClientRuntimeException;
@@ -56,6 +59,7 @@ import org.jredis.ri.alphazero.support.Assert;
 import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.FastBufferedInputStream;
 import org.jredis.ri.alphazero.support.Log;
+//import org.jredis.ri.alphazero.support.Concurrent2LockQueue.Node;
 
 /**
  * WIP NOTES: 
@@ -92,7 +96,10 @@ public class ChunkedPipelineConnection
 	private Thread 					respHandlerThread;
 
 	/**  */
-	BlockingQueue<PendingRequest>	pendingResponseQueue;
+//	BlockingQueue<PendingRequest>	pendingResponseQueue;
+//	BlockingQueue<PendingRequest>	pendingResponseQueue;
+	BlockingQueue<PendingCPRequest[]>	pendingResponseQueue;
+	
 
 	/** synchronization object used to serialize request queuing  */
 //	private Object					serviceLock = new Object();
@@ -111,7 +118,7 @@ public class ChunkedPipelineConnection
 	private CountDownLatch		    connectionEstablished;
 
 	/** MTU multiples to use as upper bound of the size of the chunk buffer */
-	private static final int MTU_FACTOR = 1; // TODO: ConnectionSpec me.
+	private static final int MTU_FACTOR = 2; // TODO: ConnectionSpec me.
 	
 	static final int MTU_SIZE = 1488;
 	
@@ -176,7 +183,10 @@ public class ChunkedPipelineConnection
 		isActive = new AtomicBoolean(false);
 		connectionEstablished = new CountDownLatch(1);
 
-		pendingResponseQueue = new LinkedBlockingQueue<PendingRequest>();
+//		pendingResponseQueue = new LinkedBlockingQueue<PendingRequest>();
+//		pendingResponseQueue = new Concurrent2LockQueue<PendingRequest>();
+		pendingResponseQueue = new Concurrent2LockQueue<PendingCPRequest[]>();
+		
 		respHandler = new ResponseHandler();
 		respHandlerThread = new Thread(respHandler, "response-handler");
 		respHandlerThread.start();
@@ -287,29 +297,9 @@ public class ChunkedPipelineConnection
 			isquit					||
 			isflush;
 
-		/* ------------
-		 * NOTES:
+		/* CRITICAL BLOCK: 
 		 * 
-		 * This ~hacked implementation is zero-copy on direct writes and will also copy
-		 * directly to the chunk buffer.  Performance for single threaded is a 
-		 * bit improved but for n threaded loading, it is really negligible.
-		 * 
-		 * Looking at what remains, the synchronized block is an issue on
-		 * the send side. 
-		 * 
-		 * send/receive order must be preserved so approaches like lock stripping
-		 * won't be trivial.  Here are the issues:
-		 * 
-		 * - it is annoying that we're using a concurrent queue inside a synchronized 
-		 * block.  Solution would require generating sequences numbers for queued 
-		 * pending responses and the response handler would need to juggle those to
-		 * keep things straight.  
-		 * 
-		 * - equally annoying is the fact that if a client thread is flushing/writing
-		 * to the socket, other threads could be writing to a mem buffer.  (This would
-		 * require double buffering ala graphics.)
 		 */
-		
 		try {
 			requestlock.lock();
 //				seqnum ++;
@@ -321,10 +311,13 @@ public class ChunkedPipelineConnection
 				out.write(chunkbuff, 0, off);						// CONTENDED
 				out.flush();										// CONTENDED
 				off = 0;											// CONTENDED
-				for(int i=0; i<idx; i++) {
-					PendingCPRequest item = chunkqueue[i];
-					pendingResponseQueue.add(item);					// CONTENDED II
-				}
+				
+				pendingResponseQueue.add(chunkqueue);
+				chunkqueue = new PendingCPRequest[CHUNK_Q_SIZE];
+//				for(int i=0; i<idx; i++) {
+//					PendingCPRequest item = chunkqueue[i];
+//					pendingResponseQueue.add(item);					// CONTENDED II
+//				}
 				idx = 0;
 			}
 
@@ -334,7 +327,10 @@ public class ChunkedPipelineConnection
 					/* chunkqueue should be empty and idx 0 : assert for now */
 					out.write(protocol.createRequestBuffer(cmd, args));
 					out.flush();
-					pendingResponseQueue.add(queuedRequest);
+					chunkqueue[0] = queuedRequest;
+					final PendingCPRequest[] oneoffitem =  new PendingCPRequest[1];
+					oneoffitem[0] = queuedRequest;
+					pendingResponseQueue.add(oneoffitem);
 				}
 				else {
 					// NOTE: this 'new' here is not necessary and is only because of copy/paste from
@@ -353,17 +349,22 @@ public class ChunkedPipelineConnection
 						out.write(chunkbuff, 0, off);
 						out.flush();
 						off = 0;
-						for(int i=0; i<idx; i++) {
-							PendingCPRequest item = chunkqueue[i];
-							pendingResponseQueue.add(item);
-						}
+						pendingResponseQueue.add(chunkqueue);
+						chunkqueue = new PendingCPRequest[CHUNK_Q_SIZE];
+//						for(int i=0; i<idx; i++) {
+//							PendingCPRequest item = chunkqueue[i];
+//							pendingResponseQueue.add(item);
+//						}
 						idx = 0;
 					}
 				}
 				else {
 					pendingQuit = true;
 					isActive.set(false);
-					pendingResponseQueue.add(queuedRequest);
+					final PendingCPRequest[] oneoffitem =  new PendingCPRequest[1];
+					oneoffitem[0] = queuedRequest;
+					pendingResponseQueue.add(oneoffitem);
+//					pendingResponseQueue.add(queuedRequest);
 				}
 			}
 		} catch (IOException e) {
@@ -376,6 +377,8 @@ public class ChunkedPipelineConnection
 		} finally {
 			requestlock.unlock();
 		}
+		/* CRITICAL BLOCK: END*/
+		
 		return queuedRequest;
 	}
 
@@ -384,32 +387,266 @@ public class ChunkedPipelineConnection
 
 		// signal fault
 		onConnectionFault(cre.getMessage(), false);
-
+		
 		// set execution error for future object
 		request.setCRE(cre);
 
-		// BEST:
-		// 1 - block the request phase
-		// 2 - try reconnect
-		// 3-ok: 		reconnected, resume processing
-		// 2-not ok: 	close shop, and set all pending responses to error
-
-		// for now .. flush the remaining pending responses from queue
-		// with execution error
-		//
-		PendingRequest pending = null;
+//		PendingCPRequest pending = null;
 		while(true){
 			try {
-				pending = pendingResponseQueue.remove();
-				pending.setCRE(cre);
-				Log.error("set pending %s response to error with CRE", pending.cmd);
+//				pending = pendingResponseQueue.remove();
+				PendingCPRequest[] items = null;
+				items = pendingResponseQueue.remove();
+				for(PendingCPRequest item : items){
+					if(item == null) { break; }
+					item.setCRE(cre);
+					Log.error("set pending %s response to error with CRE", item.cmd);
+				}
+//				pending.setCRE(cre);
+//				Log.error("set pending %s response to error with CRE", pending.cmd);
 			}
 			catch (NoSuchElementException empty){ break; }
 		}
 	}
-	// ------------------------------------------------------------------------
+	
+	// ========================================================================
 	// Inner Class
-	// ------------------------------------------------------------------------
+	// ========================================================================
+	
+	/**
+	 * This was pretty much based on Maged M. Michael, and Michael L. Scott's
+	 * 2 Lock concurrent queue as described in their paper, "Simple, Fast, 
+	 * and Practical Non-Blocking and Blocking Concurrent Algorithms" 
+	 * ({michael, scott}@cs.rochester.edu).  
+	 * 
+	 * For the specific use case of {@link ChunkedPipelineConnection}, 
+	 * we will have 1:1 producer-consumer concurrency and can do
+	 * away with the 2 locks of their algorithm and get better performance.
+	 * 
+	 * This class partially supports the {@link BlockingQueue} for the
+	 * purposes of the pipeline.  It is not intended for general use.
+	 *
+	 * @author  joubin (alphazero@sensesay.net)
+	 * @date    Dec 9, 2009 (original)
+	 * @date    Jan 23, 2012 (this version)
+	 * 
+	 */
+	public static class Concurrent2LockQueue<E> implements BlockingQueue<E>{
+
+		/**
+		 * @param <E>
+		 */
+		private static final class Node<E> {
+			private volatile E 			item;
+			private volatile Node<E>	next;
+
+			@SuppressWarnings("unchecked")
+	        private static final
+			AtomicReferenceFieldUpdater<Node, Node>
+			nextUpdater = 
+				AtomicReferenceFieldUpdater.newUpdater
+				(Node.class, Node.class, "next");
+
+			@SuppressWarnings("unchecked")
+	        private static final
+			AtomicReferenceFieldUpdater<Node, Object>
+			itemUpdater = 
+				AtomicReferenceFieldUpdater.newUpdater
+				(Node.class, Object.class, "item");
+
+			private Node(E x, Node<E> n) { item = x; next = n; }
+//			boolean casItem (E expected, E update) {
+//				return itemUpdater.compareAndSet(this, expected, update);
+//			}
+			
+			private final E getItem() { return item; }
+			private final void setItem(E update) { itemUpdater.set(this, update); }
+			private final void setNext(Node<E> update) { nextUpdater.set(this, update); }
+			private final Node<E> getNext() { return next; }
+		}
+
+		// --------------------------------------------------------------
+		// Properties
+		// --------------------------------------------------------------
+		private transient volatile Node<E> head = new Node<E>(null, null);
+		private transient volatile Node<E> tail = head;
+//		private final transient Lock Lh;
+//		private final transient Lock Lt;
+
+	    public Concurrent2LockQueue () {
+//	    	Lh = new ReentrantLock(false);
+//	    	Lt = new ReentrantLock(false);
+	    }
+
+		// --------------------------------------------------------------
+		// INTERFACE: BlockingQueue<E>
+		// --------------------------------------------------------------
+	    
+	    /* (non-Javadoc) @see java.util.concurrent.BlockingQueue#offer(java.lang.Object) */
+	    public final boolean offer(E item) {
+	    	if(null == item) throw new NullPointerException("item");
+	    	Node<E> n = new Node<E>(item, null);
+//	    	Lt.lock();
+//	    	try{
+			Node<E> t = tail;
+			t.setNext(n);
+			tail = n;
+//	    	} 
+//	    	finally { Lt.unlock(); }
+	    	return true;
+	    }
+	    
+		/* (non-Javadoc) @see java.util.concurrent.BlockingQueue#poll(long, java.util.concurrent.TimeUnit) */
+		@Override final
+		public E poll(long timeout, TimeUnit unit) throws InterruptedException {
+			throw new RuntimeException("not supported");
+		}
+		
+	    /* (non-Javadoc) @see java.util.Queue#poll() */
+	    public final E poll () {
+	    	E hi = null;
+//	    	Lh.lock();
+//	    	try{
+			Node<E> h = head;
+			Node<E> newhead = h.getNext();
+			if(newhead != null) {
+				hi = newhead.getItem();
+				head = newhead;
+				newhead.setItem(null);
+				h.setNext(null);
+			} 
+//	    	} 
+//	    	finally { Lh.unlock(); }
+	    	return hi;
+	    }
+	    
+	    /* (non-Javadoc) @see java.util.Queue#peek() */
+	    @Override final
+	    public E peek () {
+	    	E item = null;
+//	    	Lh.lock();
+//	    	try{
+			Node<E> h = head;
+			Node<E> f = h.getNext();
+			if(f != null) {
+				item = f.getItem();
+			}
+//	    	} 
+//	    	finally { Lh.unlock(); }
+	    	return item;
+	    }
+	    
+		/* (non-Javadoc) @see java.util.concurrent.BlockingQueue#take() */
+		@Override final
+		public E take() throws InterruptedException {
+			E	item = null;
+			while(true){
+				item = poll();
+				if(item != null) 
+					break;
+				LockSupport.parkNanos(10L); // magic number -- let's configure this.
+				if(Thread.interrupted()){
+					Log.error("%s interrupted!", Thread.currentThread().getName());
+					throw new InterruptedException();
+				}
+			}
+			return item;
+		}
+		
+		/* (non-Javadoc) @see java.util.Queue#remove() */
+		@Override final
+		public E remove() {
+			E item = poll();
+			if(item == null) 
+				throw new NoSuchElementException();
+			return item;
+		}
+
+		/* (non-Javadoc) @see java.util.concurrent.BlockingQueue#add(java.lang.Object) */
+		@Override final
+		public boolean add(E e) {
+			return this.offer(e);
+		}
+
+		/* -- NOT SUPPORTED -- BEGIN */
+		
+		@Override final
+		public E element() {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public boolean addAll(Collection<? extends E> c) {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public void clear() {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public boolean contains(Object o) {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public boolean containsAll(Collection<?> c) {
+			throw new RuntimeException("not supported");
+		}
+		@Override final public boolean isEmpty() {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public Iterator<E> iterator() {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public boolean remove(Object o) {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public boolean removeAll(Collection<?> c) {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public boolean retainAll(Collection<?> c) {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public int size() {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public Object[] toArray() {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public <T> T[] toArray(T[] a) {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public int drainTo(Collection<? super E> c) {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public int drainTo(Collection<? super E> c, int maxElements) {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public void put(E e) throws InterruptedException {
+			throw new RuntimeException("not supported");
+		}
+		@Override final
+		public int remainingCapacity() {
+			throw new RuntimeException("not supported");
+		}
+		/* -- NOT SUPPORTED -- END */
+	}
+	
+	// ========================================================================
+	// Inner Class
+	// ========================================================================
 	
 	/**
 	 * A not so KISSy reproduction of necessary {@link Protocol} support
@@ -525,6 +762,11 @@ public class ChunkedPipelineConnection
 		}
 
 	}
+	
+	// ========================================================================
+	// Inner Class
+	// ========================================================================
+	
 	/**
 	 * ChunkedPipeline specific of {@link PendingRequest}.  This class
 	 * maintains a reference to the pipeline to allow for transparent 
@@ -563,6 +805,10 @@ public class ChunkedPipelineConnection
 		}
 	}
 	
+	// ========================================================================
+	// Inner Class
+	// ========================================================================
+	
 	/**
 	 * Provides the response processing logic as a {@link Runnable}.
 	 * <p>
@@ -597,10 +843,7 @@ public class ChunkedPipelineConnection
 		} 
 
 		// ------------------------------------------------------------------------
-		// INTERFACE
-		/* ====================================================== Thread (Runnable)
-		 * 
-		 */
+		// INTERFACE: Runnable
 		// ------------------------------------------------------------------------
 		/**
 		 * Keeps processing the {@link PendingRequest}s in the pending {@link Queue}
@@ -623,57 +866,67 @@ public class ChunkedPipelineConnection
 			Protocol protocol = Assert.notNull (newProtocolHandler(), "the delegate protocol handler", ClientRuntimeException.class);
 
 			Log.log("Pipeline <%s> thread for <%s> started.", Thread.currentThread().getName(), ChunkedPipelineConnection.this.toString());
-			PendingRequest pending = null;
-//			while(work_flag.get()){
+			PendingCPRequest pending = null;
+			//			while(work_flag.get()){
 			while(work_flag){
 				Response response = null;
 				try {
-					pending = pendingResponseQueue.take();
-					try {
-						//						Log.log("Waiting for %s", pending.cmd.code);
-						// TODO: here -- simplify
-						response = protocol.createResponse(pending.cmd);
-						response.read(getInputStream());
-						pending.response = response;
-						pending.completion.signal();
-						if(response.getStatus().isError()) {
-							Log.error ("(Asynch) Error response for " + pending.cmd.code + " => " + response.getStatus().message());
+					PendingCPRequest[] items = null;
+					items = pendingResponseQueue.take();
+//					Log.log("dequeued %s len:%d", items, items.length);
+					for(PendingCPRequest item : items) {
+						if(item == null) { break; }
+						pending = item;
+//						Log.log("PendingResponse for %s", pending.cmd.code);
+						//					pending = pendingResponseQueue.take();
+						//					System.out.format("Got it %s\n", pending.cmd.code);
+						try {
+							//						Log.log("Waiting for %s", pending.cmd.code);
+							// TODO: here -- simplify
+							response = protocol.createResponse(pending.cmd);
+							response.read(getInputStream());
+							pending.response = response;
+							pending.completion.signal();
+							if(response.getStatus().isError()) {
+								Log.error ("(Asynch) Error response for " + pending.cmd.code + " => " + response.getStatus().message());
+							}
+
 						}
 
-					}
+						// this exception handling as of now is basically broken and fairly useless
+						// really, what we want is making a distinction between bugs and runtime problems
+						// and in case of connection issues, signal the retry mechanism.
+						// in the interim, all incoming requests must be rejected (e.g. PipelineReconnecting ...)
+						// and all remaining pending responses must be set to error.
+						// major TODO
 
-					// this exception handling as of now is basically broken and fairly useless
-					// really, what we want is making a distinction between bugs and runtime problems
-					// and in case of connection issues, signal the retry mechanism.
-					// in the interim, all incoming requests must be rejected (e.g. PipelineReconnecting ...)
-					// and all remaining pending responses must be set to error.
-					// major TODO
+						catch (ProviderException bug){
+							Log.bug ("ProviderException: " + bug.getMessage());
+							onResponseHandlerError(bug, pending);
+							break;
+						}
+						catch (ClientRuntimeException cre) {
+							Log.problem ("ClientRuntimeException: " + cre.getMessage());
+							onResponseHandlerError(cre, pending);
+							break;
+						}
+						catch (RuntimeException e){
+							Log.problem ("Unexpected (and not handled) RuntimeException: " + e.getMessage());
+							onResponseHandlerError(new ClientRuntimeException("Unexpected (and not handled) RuntimeException", e), pending);
+							break;
+						}
 
-					catch (ProviderException bug){
-						Log.bug ("ProviderException: " + bug.getMessage());
-						onResponseHandlerError(bug, pending);
-						break;
-					}
-					catch (ClientRuntimeException cre) {
-						Log.problem ("ClientRuntimeException: " + cre.getMessage());
-						onResponseHandlerError(cre, pending);
-						break;
-					}
-					catch (RuntimeException e){
-						Log.problem ("Unexpected (and not handled) RuntimeException: " + e.getMessage());
-						onResponseHandlerError(new ClientRuntimeException("Unexpected (and not handled) RuntimeException", e), pending);
-						break;
-					}
-
-					// redis (1.00) simply shutsdown connection even if pending responses
-					// are expected, so quit is NOT sent.  we simply close connection on this
-					// end. 
-					if(pending.cmd == Command.QUIT) {
-						ChunkedPipelineConnection.this.disconnect();
-						break;
+						// redis (1.00) simply shutsdown connection even if pending responses
+						// are expected, so quit is NOT sent.  we simply close connection on this
+						// end. 
+						if(pending.cmd == Command.QUIT) {
+							ChunkedPipelineConnection.this.disconnect();
+							break;
+						}
 					}
 				}
-				catch (InterruptedException e1) {
+				//				catch (InterruptedException e1) {
+				catch (Throwable e1) {
 					Log.log("Pipeline thread interrupted.");
 					break;
 					//e1.printStackTrace();
@@ -704,9 +957,8 @@ public class ChunkedPipelineConnection
 			Log.log("%s response handler has shutdown", this);
 		}
 		// ------------------------------------------------------------------------
-		// INTERFACE
-		/* =================================================== Connection.Listener
-		 * 
+		// INTERFACE: Connection.Listener
+		/* 
 		 * hooks for integrating the response handler thread's state with the 
 		 * wrapping connection's state through event callbacks. 
 		 */
@@ -748,4 +1000,3 @@ public class ChunkedPipelineConnection
 		}
 	}
 }
-
