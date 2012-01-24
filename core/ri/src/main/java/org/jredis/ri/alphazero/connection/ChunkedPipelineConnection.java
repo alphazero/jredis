@@ -431,7 +431,7 @@ public class ChunkedPipelineConnection
 	 * @date    Jan 23, 2012 (this version)
 	 * 
 	 */
-	public static class Concurrent2LockQueue<E> implements BlockingQueue<E>{
+	final static class Concurrent2LockQueue<E> implements BlockingQueue<E>{
 
 		/**
 		 * @param <E>
@@ -774,7 +774,7 @@ public class ChunkedPipelineConnection
 	 * 
 	 * @author Joubin <alphazero@sensesay.net>
 	 */
-	final class PendingCPRequest extends PendingRequest {
+	final static class PendingCPRequest extends PendingRequest {
 
 		private final ChunkedPipelineConnection pipeline;
 		
