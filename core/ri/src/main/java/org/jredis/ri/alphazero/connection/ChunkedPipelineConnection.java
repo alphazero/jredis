@@ -131,14 +131,17 @@ public class ChunkedPipelineConnection
 	/** Chunk Queue size (slots) */
 	static final int CHUNK_Q_SIZE = CHUNK_BUFF_SIZE / MIN_REQ_SIZE;
 	
-	/** chunk buffer offset */
-	private int off;
-	
 	/** chunk buffer */
 	private byte[] chunkbuff;
 	
-	/** Chunk Queue available slot index */
-	private int idx;
+//	/** chunk buffer offset */
+//	private int off;
+	
+//	/** Chunk Queue available slot index */
+//	private int idx;
+	/** chunk [idx | off] control long word */
+	private long chunk_ctl_word;
+	private static final long mask = (-4294901760L - 65536)>>> 32;
 	
 	/** Chunk Queue of requests in Chunk buffer */
 	private PendingCPRequest[] chunkqueue;
@@ -171,9 +174,10 @@ public class ChunkedPipelineConnection
 		spec.setConnectionFlag(Flag.SHARED, true);
 
 		chunkbuff = new byte[CHUNK_BUFF_SIZE];
-		off = 0;
 		chunkqueue = new PendingCPRequest[CHUNK_Q_SIZE];
-		idx = 0;
+//		off = 0;
+//		idx = 0;
+		chunk_ctl_word = 0L;
 //		seqnum = 0;
 		requestlock = new ReentrantLock(false);
 		
@@ -302,9 +306,13 @@ public class ChunkedPipelineConnection
 		 */
 		try {
 			requestlock.lock();
-//				seqnum ++;
-				
-			/* don't move -- off is contended */
+			
+			/* 8 byte control word is [ idx | off ] */
+			/* chunk_ctl_word is contended and must be accessed only inside of critical block */
+			final long ctl_word = chunk_ctl_word;
+			int off = (int) ctl_word;
+			int idx = (int) (ctl_word >> 32);
+
 			boolean overflows = exceeds || off + reqbyteslen > CHUNK_BUFF_SIZE ? true : false;
 			
 			if(overflows) {
@@ -314,10 +322,6 @@ public class ChunkedPipelineConnection
 				
 				pendingResponseQueue.add(chunkqueue);
 				chunkqueue = new PendingCPRequest[CHUNK_Q_SIZE];
-//				for(int i=0; i<idx; i++) {
-//					PendingCPRequest item = chunkqueue[i];
-//					pendingResponseQueue.add(item);					// CONTENDED II
-//				}
 				idx = 0;
 			}
 
@@ -337,7 +341,6 @@ public class ChunkedPipelineConnection
 					// ProtocolBase (see ProtocolHelper.writeReq..().
 					ProtocolHelper.writeRequestToBuffer(new ProtocolHelper.Buffer(chunkbuff, off), cmd, args);
 					off+=reqbyteslen;
-
 					chunkqueue[idx] = queuedRequest;
 					idx++;
 				}
@@ -351,10 +354,6 @@ public class ChunkedPipelineConnection
 						off = 0;
 						pendingResponseQueue.add(chunkqueue);
 						chunkqueue = new PendingCPRequest[CHUNK_Q_SIZE];
-//						for(int i=0; i<idx; i++) {
-//							PendingCPRequest item = chunkqueue[i];
-//							pendingResponseQueue.add(item);
-//						}
 						idx = 0;
 					}
 				}
@@ -364,13 +363,20 @@ public class ChunkedPipelineConnection
 					final PendingCPRequest[] oneoffitem =  new PendingCPRequest[1];
 					oneoffitem[0] = queuedRequest;
 					pendingResponseQueue.add(oneoffitem);
-//					pendingResponseQueue.add(queuedRequest);
 				}
 			}
+			
+			/* update 8 byte control word [ idx | off ] */
+//			final long hibits = ((long)idx) << 32;
+//			final long mask = (-4294901760L - 65536)>>> 32;
+//			final long lobits =  mask & off;
+//			final long ctl_word_up = hibits | lobits; 
+//			chunk_ctl_word = hibits | lobits;
+			chunk_ctl_word = ((long)idx) << 32 | mask & off;
+			
 		} catch (IOException e) {
 			Log.error("IOException cmd:%s isConnected:%b", cmd.code, isConnected());
 			this.onConnectionFault(String.format("IOFault (cmd: %s)", cmd.code), true);
-//			throw new ClientRuntimeException(String.format("IOFault (cmd: %s)", cmd.code), e);
 		} catch (ArrayIndexOutOfBoundsException e){
 			Log.error("on %s", cmd.code);
 			throw new ProviderException("BUG - recheck assumptions ..", e);
