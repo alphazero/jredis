@@ -120,10 +120,11 @@ public class ChunkedPipelineConnection
 	/** MTU multiples to use as upper bound of the size of the chunk buffer */
 	private static final int MTU_FACTOR = 2; // TODO: ConnectionSpec me.
 	
+	/** Assuming TCP MTU of 1500 - ~tcp header overhead rounded to nearest power of 8  */
 	static final int MTU_SIZE = 1488;
 	
 	/** chunk buffer size */
-	static final int CHUNK_BUFF_SIZE = MTU_SIZE * MTU_FACTOR;
+	static final int CHUNK_BUFF_SIZE = Math.min(MTU_SIZE * MTU_FACTOR, 0xFFFF);
 	
 	/** minimum request size in bytes -- using PING e.g. 14 b */
 	static final int MIN_REQ_SIZE = 14; 
@@ -134,14 +135,8 @@ public class ChunkedPipelineConnection
 	/** chunk buffer */
 	private byte[] chunkbuff;
 	
-//	/** chunk buffer offset */
-//	private int off;
-	
-//	/** Chunk Queue available slot index */
-//	private int idx;
-	/** chunk [idx | off] control long word */
-	private long chunk_ctl_word;
-	private static final long mask = (-4294901760L - 65536)>>> 32;
+	/**  chunk [hi:idx | lo:off] control long word */
+	private int ctl_word;
 	
 	/** Chunk Queue of requests in Chunk buffer */
 	private PendingCPRequest[] chunkqueue;
@@ -175,27 +170,24 @@ public class ChunkedPipelineConnection
 
 		chunkbuff = new byte[CHUNK_BUFF_SIZE];
 		chunkqueue = new PendingCPRequest[CHUNK_Q_SIZE];
-//		off = 0;
-//		idx = 0;
-		chunk_ctl_word = 0L;
-//		seqnum = 0;
+
+		ctl_word = 0;
+
 		requestlock = new ReentrantLock(false);
 		
 		super.initializeComponents(); // REVU: this is a bit oddly placed .. 
 
-//		serviceLock = new Object();
+
 		isActive = new AtomicBoolean(false);
 		connectionEstablished = new CountDownLatch(1);
 
-//		pendingResponseQueue = new LinkedBlockingQueue<PendingRequest>();
-//		pendingResponseQueue = new Concurrent2LockQueue<PendingRequest>();
 		pendingResponseQueue = new Concurrent2LockQueue<PendingCPRequest[]>();
 		
 		respHandler = new ResponseHandler();
 		respHandlerThread = new Thread(respHandler, "response-handler");
 		respHandlerThread.start();
 
-		isActive.set(false);
+		isActive.set(false); // REVU: ? superstitious ?
 	}
 
 	@Override
@@ -301,24 +293,23 @@ public class ChunkedPipelineConnection
 			isquit					||
 			isflush;
 
-		/* CRITICAL BLOCK: 
-		 * 
-		 */
 		try {
 			requestlock.lock();
 			
-			/* 8 byte control word is [ idx | off ] */
+			/* ======== CRITICAL BLOCK ====== */
+			
+			/* 4 byte control word is [ idx | off ] */
 			/* chunk_ctl_word is contended and must be accessed only inside of critical block */
-			final long ctl_word = chunk_ctl_word;
-			int off = (int) ctl_word;
-			int idx = (int) (ctl_word >> 32);
+			final int __ctl_word = ctl_word;	// REVU: opportunity ..
+			int idx = __ctl_word >> 16;
+			int off = __ctl_word & 0x0000FFFF;
 
 			boolean overflows = exceeds || off + reqbyteslen > CHUNK_BUFF_SIZE ? true : false;
 			
 			if(overflows) {
-				out.write(chunkbuff, 0, off);						// CONTENDED
-				out.flush();										// CONTENDED
-				off = 0;											// CONTENDED
+				out.write(chunkbuff, 0, off);
+				out.flush();
+				off = 0;
 				
 				pendingResponseQueue.add(chunkqueue);
 				chunkqueue = new PendingCPRequest[CHUNK_Q_SIZE];
@@ -337,6 +328,7 @@ public class ChunkedPipelineConnection
 					pendingResponseQueue.add(oneoffitem);
 				}
 				else {
+					// REVU: next optimization step !
 					// NOTE: this 'new' here is not necessary and is only because of copy/paste from
 					// ProtocolBase (see ProtocolHelper.writeReq..().
 					ProtocolHelper.writeRequestToBuffer(new ProtocolHelper.Buffer(chunkbuff, off), cmd, args);
@@ -366,14 +358,10 @@ public class ChunkedPipelineConnection
 				}
 			}
 			
-			/* update 8 byte control word [ idx | off ] */
-//			final long hibits = ((long)idx) << 32;
-//			final long mask = (-4294901760L - 65536)>>> 32;
-//			final long lobits =  mask & off;
-//			final long ctl_word_up = hibits | lobits; 
-//			chunk_ctl_word = hibits | lobits;
-			chunk_ctl_word = ((long)idx) << 32 | mask & off;
+			/* update 4 byte control word [ idx | off ] */
+			ctl_word = (idx << 16) | (off | 0x0); 
 			
+			/* ==END=== CRITICAL BLOCK ====== */
 		} catch (IOException e) {
 			Log.error("IOException cmd:%s isConnected:%b", cmd.code, isConnected());
 			this.onConnectionFault(String.format("IOFault (cmd: %s)", cmd.code), true);
@@ -383,7 +371,6 @@ public class ChunkedPipelineConnection
 		} finally {
 			requestlock.unlock();
 		}
-		/* CRITICAL BLOCK: END*/
 		
 		return queuedRequest;
 	}
