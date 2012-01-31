@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 import org.jredis.JRedisFuture;
 import org.jredis.connector.ConnectionSpec;
 import org.jredis.ri.alphazero.JRedisChunkedPipeline;
+import org.jredis.ri.alphazero.JRedisPipeline;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 
@@ -34,10 +35,11 @@ public class AdHocTestChunkPipeline {
 	public AdHocTestChunkPipeline() {
 		spec = DefaultConnectionSpec.newSpec().setCredentials("jredis").setDatabase(11);
 		jredis = new JRedisChunkedPipeline(spec);
+//		jredis = new JRedisPipeline(spec);
 	}
 	
-	static final int wcnt = 100;
-	static final int reqnums = 3000;
+	static final int wcnt = 2;
+	static final int reqnums = 150000;
 	
 	private void stop() {
 		jredis.quit();
@@ -89,13 +91,14 @@ public class AdHocTestChunkPipeline {
 				}
 //				conn.flush();
 
-//				try {
-//					Long counter = fCntr.get();
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				} catch (ExecutionException e) {
-//					e.printStackTrace();
-//				}
+				try {
+					Long counter = fCntr.get();
+//					Log.log("%s:%016d", tname, counter);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
 				
 			}
 		};

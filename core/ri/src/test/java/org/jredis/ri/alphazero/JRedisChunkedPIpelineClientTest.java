@@ -17,10 +17,10 @@
 package org.jredis.ri.alphazero;
 
 import static org.testng.Assert.fail;
+
 import org.jredis.ClientRuntimeException;
 import org.jredis.JRedisFuture;
 import org.jredis.connector.ConnectionSpec;
-import org.jredis.protocol.Command;
 import org.jredis.ri.alphazero.connection.DefaultConnectionSpec;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.AfterTest;
@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
  * 
  */
 //@Test(invocationCount=20, threadPoolSize=5, sequential=false)
-@Test(sequential = true, suiteName="JRedisChunkedPipeline-tests")
+@Test(singleThreaded = false, suiteName="JRedisChunkedPipeline-tests", invocationCount=20, threadPoolSize=5)
 public class JRedisChunkedPipelineClientTest extends JRedisFutureProviderTestsBase {
 
 	// ------------------------------------------------------------------------
@@ -74,7 +74,7 @@ public class JRedisChunkedPipelineClientTest extends JRedisFutureProviderTestsBa
 	 * We first ping and await the response to insure pipeline has processed
 	 * all pending responses, and then issue the quit command.
 	 */
-	@AfterTest
+	@AfterTest()
 	public void testQuit() {
 		try {
 			JRedisFuture pipeline = getProviderInstance();
