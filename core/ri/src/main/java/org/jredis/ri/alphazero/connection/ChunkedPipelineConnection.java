@@ -212,7 +212,6 @@ public class ChunkedPipelineConnection
 		//		return new SynchProtocol();
 	}
 
-	// TODO: write chunking + mod ProtocolBase.Stream...Request + Command.FLUSH_BUFFERS.  // DONE
 //	    @Override
 //	    protected OutputStream newOutputStream(OutputStream socketOutputStream) {
 //	    	return new BufferedOutputStream(socketOutputStream, MTU_SIZE);
@@ -467,7 +466,7 @@ public class ChunkedPipelineConnection
 	    /* (non-Javadoc) @see java.util.concurrent.BlockingQueue#offer(java.lang.Object) */
 	    public final boolean offer(E item) {
 	    	if(null == item) throw new NullPointerException("item");
-	    	Node<E> n = new Node<E>(item, null);
+	    	final Node<E> n = new Node<E>(item, null);
 
 	    	Node<E> t = tail;
 			t.setNext(n);
@@ -484,18 +483,18 @@ public class ChunkedPipelineConnection
 		
 	    /* (non-Javadoc) @see java.util.Queue#poll() */
 	    public final E poll () {
-	    	E hi = null;
+	    	E item = null;
 
-			Node<E> h = head;
-			Node<E> newhead = h.getNext();
+			final Node<E> h = head;
+			final Node<E> newhead = h.getNext();
 			if(newhead != null) {
-				hi = newhead.getItem();
+				item = newhead.getItem();
 				head = newhead;
 				newhead.setItem(null);
 				h.setNext(null);
 			} 
 
-	    	return hi;
+	    	return item;
 	    }
 	    
 	    /* (non-Javadoc) @see java.util.Queue#peek() */
@@ -503,8 +502,8 @@ public class ChunkedPipelineConnection
 	    public E peek () {
 	    	E item = null;
 
-			Node<E> h = head;
-			Node<E> f = h.getNext();
+			final Node<E> h = head;
+			final Node<E> f = h.getNext();
 			if(f != null) {
 				item = f.getItem();
 			}
@@ -520,7 +519,7 @@ public class ChunkedPipelineConnection
 				item = poll();
 				if(item != null) 
 					break;
-				LockSupport.parkNanos(10L); // magic number -- let's configure this.
+				LockSupport.parkNanos(1L); // magic number -- let's configure this.
 				if(Thread.interrupted()){
 					Log.error("%s interrupted!", Thread.currentThread().getName());
 					throw new InterruptedException();
@@ -532,7 +531,7 @@ public class ChunkedPipelineConnection
 		/* (non-Javadoc) @see java.util.Queue#remove() */
 		@Override final
 		public E remove() {
-			E item = poll();
+			final E item = poll();
 			if(item == null) 
 				throw new NoSuchElementException();
 			return item;
