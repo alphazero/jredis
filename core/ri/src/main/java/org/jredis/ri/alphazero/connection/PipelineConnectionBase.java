@@ -191,19 +191,21 @@ public abstract class PipelineConnectionBase extends ConnectionBase {
 		if(!isConnected()) 
 			throw new NotConnectedException ("Not connected!");
 		
-		Protocol		protocol = Assert.notNull(getProtocolHandler(), "thread protocol handler", ProviderException.class);
-		Request 		request = Assert.notNull(protocol.createRequest (cmd, args), "request object from handler", ProviderException.class);
-//		PendingRequest 	pendingResponse = new PendingRequest(request, cmd);
-		PendingRequest 	pendingResponse = new PendingRequest(cmd);
-		
 		if(pendingQuit) 
 			throw new ClientRuntimeException("Pipeline shutting down: Quit in progess; no further requests are accepted.");
+		
+		Protocol		protocol = Assert.notNull(getProtocolHandler(), "thread protocol handler", ProviderException.class);
+		Request 		request = Assert.notNull(protocol.createRequest (cmd, args), "request object from handler", ProviderException.class);
+		PendingRequest 	pendingResponse = new PendingRequest(cmd);
+		
+		if(cmd == Command.CONN_FLUSH) {
+			Log.log("%s not supported -- ignored", cmd.code);
+			return pendingResponse;
+		}
 		
 		synchronized (serviceLock) {
 			
 			if(cmd != Command.QUIT) {
-//				System.out.format("out is %s\n", getOutputStream().getClass().getName());	// TODO: REMOVE -- testing
-//				System.out.format("req is %s\n", request.getClass().getName());				// TODO: REMOVE -- testing
 				request.write(getOutputStream());
 			}
 			else {

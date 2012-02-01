@@ -45,7 +45,7 @@ public abstract class ConcurrentJRedisProviderTestsBase extends JRedisProviderTe
 			case VIRTUAL:
 				break;
 	 */
-	@Test(invocationCount=20, threadPoolSize=5, sequential=false)
+	@Test(invocationCount=20, threadPoolSize=5, singleThreaded=false)
 	public void testConcurrentBulkCommands() {
 		String cmd = Command.GET.responseType.name();
 		String threadName = Thread.currentThread().getName();
@@ -65,7 +65,7 @@ public abstract class ConcurrentJRedisProviderTestsBase extends JRedisProviderTe
 	/**
 	 * 
 	 */
-	@Test(invocationCount=20, threadPoolSize=5, sequential=false)
+	@Test(invocationCount=20, threadPoolSize=5, singleThreaded=false)
 	public void testConcurrentBooleanCommands() {
 		String cmd = Command.EXISTS.responseType.name();
 		String threadName = Thread.currentThread().getName();
@@ -83,7 +83,7 @@ public abstract class ConcurrentJRedisProviderTestsBase extends JRedisProviderTe
 	/**
 	 * 
 	 */
-	@Test(invocationCount=20, threadPoolSize=5, sequential=false)
+	@Test(invocationCount=20, threadPoolSize=5, singleThreaded=false)
 	public void testConcurrentNumberCommands() {
 		String cmd = Command.INCR.responseType.name();
 		String cntr_key = Thread.currentThread().getName() + "::" + keys.get(0);

@@ -304,7 +304,8 @@ public abstract class ConnectionBase implements Connection{
 	protected final void onConnectionFault (String fault, boolean raiseEx) throws ClientRuntimeException {
 		notifyFaulted(fault);
 		Log.problem("Shutting down due to connection FAULT: %s - %s", fault, this);
-		notifyShuttingDown();
+//		notifyShuttingDown();
+		shutdown(); // REVU: best to add a pending shutdown flag ..
  		if(raiseEx) 
  			throw new ClientRuntimeException(fault);
 	}
@@ -357,7 +358,7 @@ public abstract class ConnectionBase implements Connection{
 	 * @throws IllegalStateException
 	 */
 	protected final void disconnect () throws IllegalStateException {
-		Assert.isTrue (isConnected(), IllegalStateException.class);
+		Assert.isTrue (isConnected(), IllegalStateException.class); // REVU: client threads will keep banging on faulted pipelines ...
 		
 		socketClose();
 		isConnected = false;
@@ -371,6 +372,12 @@ public abstract class ConnectionBase implements Connection{
 	 */
 	protected final void shutdown () throws IllegalStateException {
 		notifyShuttingDown();
+		/* client threads can be banging on a connection and queued up
+		 * on a lock, so isConnected() may have been true
+		 * before they acquired it.  
+		 */
+		if(isConnected)
+			disconnect();
 	}
 	
 	/**

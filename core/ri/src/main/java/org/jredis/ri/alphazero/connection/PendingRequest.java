@@ -39,7 +39,7 @@ import org.jredis.ri.alphazero.support.Signal;
  * @since   alpha.0
  * 
  */
-public final class PendingRequest implements Future<Response> {
+public class PendingRequest implements Future<Response> {
 
 	// ------------------------------------------------------------------------
 	// Properties

@@ -90,6 +90,13 @@ public interface JRedisFuture {
 	 */
 	public <K extends Object> Future<ResponseStatus> quit ();
 	
+	/**
+	 * Optional connection control command. 
+	 * @param <K>
+	 * @return
+	 */
+	public Future<ResponseStatus> flush ();
+	
 	// ------------------------------------------------------------------------
 	// "Commands operating on string values"
 	// ------------------------------------------------------------------------

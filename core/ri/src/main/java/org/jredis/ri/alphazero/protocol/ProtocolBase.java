@@ -75,6 +75,98 @@ public abstract class ProtocolBase implements Protocol {
 		return version.equals("0.09");
 	}
 	
+	public byte[] createRequestBuffer(Command cmd, byte[]...args) throws ProviderException, IllegalArgumentException {
+		class Buffer {
+			byte[] b = null;
+			private int off = 0;
+			Buffer(int size){
+				b = new byte[size];
+			}
+			void write (byte[] d){
+				final int dlen = d.length;
+				System.arraycopy(d, 0, b, off, dlen);
+				off+=dlen;
+			}
+			void write (byte d){
+				b[off] = d;
+				off++;
+			}
+			byte[] getBytes() {
+				return b;
+			}
+		}
+		Buffer buffer = null;
+		byte[] cmdLenBytes = Convert.toBytes(cmd.bytes.length);
+		byte[] lineCntBytes = Convert.toBytes(args.length+1);
+
+		// calculate the buffer size
+		int bsize = 1 + lineCntBytes.length + CRLF_LEN + 1 + cmdLenBytes.length + CRLF_LEN + cmd.bytes.length + CRLF_LEN;
+		for(int i=0;i<args.length; i++){
+			byte[] argLenBytes = Convert.toBytes(Assert.notNull(args[i], i, ProviderException.class).length);
+			int _bsize = 1 + argLenBytes.length + CRLF_LEN + args[i].length + CRLF_LEN;
+			bsize += _bsize;
+		}
+		
+		buffer = new Buffer(bsize);
+        buffer.write(COUNT_BYTE);  		// 1
+        buffer.write(lineCntBytes);		// lineCntBytes.length()
+        buffer.write(CRLF);				// CRLF.lengt
+        buffer.write(SIZE_BYTE);		// 1
+        buffer.write(cmdLenBytes);		// length
+        buffer.write(CRLF);				// CRLF_LEN
+        buffer.write(cmd.bytes);		//
+        buffer.write(CRLF);
+        
+		switch (cmd.requestType) {
+
+		case NO_ARG:
+		    break;
+		    
+		// TODO: check w/ antirez if in fact nulls are now generally accepted
+		// that is the only diff here.
+		case BULK_SET:
+			String errmsg = "Only MSET, MSETNX, LINSERT bulk commands are supported";
+			Assert.isTrue(cmd == Command.MSET || cmd == Command.MSETNX || cmd == Command.LINSERT, errmsg, NotSupportedException.class);
+
+			// THIS IS CLEARLY BROKEN ... SO MUCH FOR COMPREHSIVE TESTS ...
+			buffer.write(COUNT_BYTE);
+			buffer.write(lineCntBytes);
+			buffer.write(CRLF);
+			buffer.write(SIZE_BYTE);
+			buffer.write(cmdLenBytes);
+			buffer.write(CRLF);
+			buffer.write(cmd.bytes);
+			buffer.write(CRLF);
+			
+			for(int s=0; s<args.length; s++){
+				buffer.write(SIZE_BYTE);
+				if (args[s] != null) {
+  					buffer.write(Convert.toBytes(args[s].length));
+  					buffer.write(CRLF);
+  					buffer.write(args[s]);
+  					buffer.write(CRLF);
+  				} else {
+					buffer.write(ASCII_ZERO);
+					buffer.write(CRLF);
+					buffer.write(CRLF);
+  				}
+			}
+			break;
+		
+		default:
+			for(int i=0;i<args.length; i++){
+				buffer.write(SIZE_BYTE);
+				buffer.write(Convert.toBytes(Assert.notNull(args[i], i, ProviderException.class).length));
+				buffer.write(CRLF);
+				buffer.write(args[i]);
+				buffer.write(CRLF);
+			}
+			break;
+		
+		}
+		return buffer.getBytes();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.jredis.connector.Protocol#createRequest(org.jredis.Command, byte[][])
 	 */
@@ -178,6 +270,9 @@ public abstract class ProtocolBase implements Protocol {
 			break;
 		case VIRTUAL:
 			response = new VirtualResponse(ResponseStatus.STATUS_CIAO);
+			break;
+		case NOP:
+			response = new VirtualResponse(ResponseStatus.STATUS_OK); // TODO: needs more thinking ..
 			break;
 		case QUEUED:
 		case RESULT_SET:
