@@ -1,0 +1,6 @@
+Wed Feb 1 2012 
+
+	* Merged chunk-pipelien branch to master
+	  REFERENCE commit a9cff24fd8f041ec181598c571989680a4e5ad15 is
+	  master prior to merge.
+
