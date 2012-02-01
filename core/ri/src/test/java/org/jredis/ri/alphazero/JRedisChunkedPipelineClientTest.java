@@ -27,7 +27,6 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
 /**
- * [TODO: document me!]
  *
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Jan 18, 2012	
