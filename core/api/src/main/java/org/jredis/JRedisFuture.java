@@ -719,6 +719,15 @@ public interface JRedisFuture {
 	public <K extends Object> Future<List<byte[]>> zrangebyscore (K setkey, double minScore, double maxScore); 
 
 	/**
+	 * @Redis ZRANGEBYSCORE ... WITHSCORES
+	 * @param setkey
+	 * @param minScore
+	 * @param maxScore
+	 * @return
+	 */
+	public <K extends Object> Future<List<ZSetEntry>> zrangebyscoreSubset (K setkey, double minScore, double maxScore);
+
+	/**
 	 * @Redis ZREMRANGEBYSCORE
 	 * @param setkey
 	 * @param from
