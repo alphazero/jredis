@@ -1,2 +1,86 @@
 compliance:      Redis 2.4.0 
 tested with:	 Redis 2.4.6
+
+-- compliance report (see api/src/test/org/jredis/compliance package --
+
+/// non-compliance report for JRedis       //////////////
+[ 0] auth
+[ 1] setex
+[ 2] setbit
+[ 3] getbit
+[ 4] setrange
+[ 5] getrange
+[ 6] select
+[ 7] shutdown
+[ 8] lpushx
+[ 9] rpushx
+[10] linsert
+[11] sync
+[12] monitor
+[13] persist
+[14] zrevrangebyscore
+[15] exec
+[16] blpop
+[17] brpop
+[18] brpoplpush
+[19] strlen
+[20] hsetnx
+[21] hmset
+[22] hmget
+[23] zunionstore
+[24] zinterstore
+[25] config
+[26] hincrby
+[27] subscribe
+[28] unsubscribe
+[29] psubscribe
+[30] punsubscribe
+[31] publish
+[32] watch
+[33] unwatch
+[34] object
+[35] client
+
+/////////////////////////////////////////////////////////
+
+/// non-compliance report for JRedisFuture //////////////
+[ 0] auth
+[ 1] setex
+[ 2] setbit
+[ 3] getbit
+[ 4] setrange
+[ 5] getrange
+[ 6] select
+[ 7] shutdown
+[ 8] lpushx
+[ 9] rpushx
+[10] linsert
+[11] sync
+[12] monitor
+[13] persist
+[14] zrevrangebyscore
+[15] multi
+[16] exec
+[17] discard
+[18] blpop
+[19] brpop
+[20] brpoplpush
+[21] strlen
+[22] hsetnx
+[23] hmset
+[24] hmget
+[25] zunionstore
+[26] zinterstore
+[27] config
+[28] hincrby
+[29] subscribe
+[30] unsubscribe
+[31] psubscribe
+[32] punsubscribe
+[33] publish
+[34] watch
+[35] unwatch
+[36] object
+[37] client
+
+/////////////////////////////////////////////////////////
