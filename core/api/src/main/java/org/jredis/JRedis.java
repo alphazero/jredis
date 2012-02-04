@@ -753,6 +753,16 @@ public interface JRedis {
 	public <K extends Object> List<byte[]> zrangebyscore (K setkey, double minScore, double maxScore) throws RedisException; 
 
 	/**
+	 * @Redis ZRANGEBYSCORE ... WITHSCORES
+	 * @param setkey
+	 * @param minScore
+	 * @param maxScore
+	 * @return
+	 * @throws RedisException
+	 */
+	public <K extends Object> List<ZSetEntry> zrangebyscoreSubset (K setkey, double minScore, double maxScore) throws RedisException;
+
+	/**
 	 * @Redis ZREMRANGEBYSCORE
 	 * @param setkey
 	 * @param minScore
