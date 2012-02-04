@@ -131,6 +131,8 @@ public enum Command {
 	HKEYS 		(RequestType.KEY, 			ResponseType.MULTI_BULK),
 	HVALS 		(RequestType.KEY, 			ResponseType.MULTI_BULK),
 	HGETALL 	(RequestType.KEY, 			ResponseType.MULTI_BULK),
+	HMSET		(RequestType.KEY_BULK_SET,	ResponseType.STATUS),
+	HMGET		(RequestType.KEY_BULK_SET,	ResponseType.MULTI_BULK),
 	
 	// transactional commands
 	MULTI		(RequestType.NO_ARG, 		ResponseType.STATUS),
@@ -309,7 +311,9 @@ public enum Command {
     	/**  */
     	MULTI_KEY,
     	/**  */
-    	BULK_SET
+    	BULK_SET,
+    	/**  */
+    	KEY_BULK_SET
     }
 
     /**
