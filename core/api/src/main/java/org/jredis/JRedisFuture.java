@@ -152,6 +152,10 @@ public interface JRedisFuture {
 	public <K extends Object, T extends Serializable> 
 		   Future<Boolean> setnx (K key, T object);
 
+	public <K extends Object> Future<Boolean> setbit(K key, int offset, boolean value);
+
+
+	
 	/**
 	 * @Redis GET
 	 * @param key
@@ -165,7 +169,10 @@ public interface JRedisFuture {
 	public <K extends Object, T extends Serializable> 
 		Future<byte[]> getset (K key, T object);
 
-	
+
+	public <K extends Object> Future<Boolean> getbit(K key, int offset);
+
+		
 	/**
 	 * @Redis MGET
 	 * @param key
@@ -810,6 +817,17 @@ public interface JRedisFuture {
 	@Redis(versions="1.3.4")
 	public <K extends Object> Future<byte[]> hget(K key, K entry);
 	
+
+	/**
+	 * @Redis HINCRBY
+	 * @param key
+	 * @param entry
+	 * @param increment
+	 * @return
+	 */
+	public <K extends Object> Future<Long> hincrby(K key, K entry, long increment);
+	
+	
 	/**
 	 * 
 	 * @Redis HEXISTS
@@ -998,4 +1016,6 @@ public interface JRedisFuture {
 	 * @return
 	 */
 	public <K extends Object> Future<ObjectInfo> debug (K key);
+	
+
 }

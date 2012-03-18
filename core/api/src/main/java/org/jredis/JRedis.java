@@ -1092,4 +1092,9 @@ public interface JRedis {
 	 * @see {@link ObjectInfo}
 	 */
 	public <K extends Object> ObjectInfo debug (K key) throws RedisException;
+	
+	public <K extends Object> boolean setbit(K key, int offset, boolean value) throws RedisException;
+
+	public <K extends Object> boolean getbit(K key, int offset) throws RedisException;
+	
 }

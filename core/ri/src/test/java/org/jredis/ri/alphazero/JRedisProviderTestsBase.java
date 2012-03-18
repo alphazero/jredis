@@ -293,6 +293,28 @@ public abstract class JRedisProviderTestsBase extends JRedisTestSuiteBase<JRedis
 		} 
 		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
 	}
+	
+	
+	@Test
+	public void testBitCommands() {
+		cmd = Command.SETBIT.code;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			
+			key = getRandomAsciiString (random.nextInt(24)+2);
+			provider.del(key);
+			provider.setbit(key, 0, true);
+			provider.setbit(key, 32, true);
+			assertEquals(true, provider.getbit(key,0));
+			assertEquals(true, provider.getbit(key,32));
+			assertEquals(false, provider.getbit(key,64));
+			assertEquals(false, provider.getbit(key,1));
+		} 
+		catch (RedisException e) { fail(cmd + " ERROR => " + e.getLocalizedMessage(), e); }
+	}
+	
+	
 
 	/**
 	 * Test method for {@link org.jredis.ri.alphazero.JRedisSupport#renamenx(java.lang.String, java.lang.String)}.

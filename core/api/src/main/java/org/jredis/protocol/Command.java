@@ -122,6 +122,10 @@ public enum Command {
 	ZREMRANGEBYRANK	(RequestType.KEY_NUM_NUM,	ResponseType.NUMBER),
 	ZCOUNT		(RequestType.KEY_NUM_NUM, ResponseType.NUMBER),
 		
+	// Commands operating on bit sets
+	SETBIT		(RequestType.KEY_IDX_VALUE, ResponseType.NUMBER),
+	GETBIT		(RequestType.KEY_NUM, ResponseType.NUMBER),
+	
 	// Commands operating on hashes
 	HSET 		(RequestType.KEY_KEY_VALUE, ResponseType.BOOLEAN),
 	HGET 		(RequestType.KEY_VALUE, 	ResponseType.BULK),
@@ -131,6 +135,7 @@ public enum Command {
 	HKEYS 		(RequestType.KEY, 			ResponseType.MULTI_BULK),
 	HVALS 		(RequestType.KEY, 			ResponseType.MULTI_BULK),
 	HGETALL 	(RequestType.KEY, 			ResponseType.MULTI_BULK),
+	HINCRBY		(RequestType.KEY_KEY_NUM, ResponseType.NUMBER),
 	
 	// transactional commands
 	MULTI		(RequestType.NO_ARG, 		ResponseType.STATUS),
@@ -309,7 +314,9 @@ public enum Command {
     	/**  */
     	MULTI_KEY,
     	/**  */
-    	BULK_SET
+    	BULK_SET,
+    	
+    	KEY_KEY_NUM
     }
 
     /**

@@ -39,6 +39,7 @@ import org.jredis.ZSetEntry;
 import org.jredis.protocol.Command;
 import org.jredis.protocol.ResponseStatus;
 import org.jredis.ri.JRedisTestSuiteBase;
+import org.jredis.ri.alphazero.support.Convert;
 import org.jredis.ri.alphazero.support.DefaultCodec;
 import org.jredis.ri.alphazero.support.Log;
 import org.testng.annotations.Test;
@@ -1582,6 +1583,34 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
 
+
+	@Test
+	public void testHIncrBy() throws InterruptedException {
+		cmd = Command.HSET.code + " | " + Command.HGET + " | " + Command.HINCRBY;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			Future<Boolean> hsetResp1 = provider.hset(keys.get(0), keys.get(1), 41);
+			Future<Long> hincrBy1 = provider.hincrby(keys.get(0), keys.get(1), 1);
+			Future<byte[]> hget = provider.hget(keys.get(0), keys.get(1));
+						
+			Future<Long> hincrBy2 = provider.hincrby(keys.get(0), keys.get(2), 4);
+			
+			try {
+				assertTrue (hsetResp1.get(), "hset using byte[] value");
+				assertEquals (hincrBy1.get(), (Long)42l, "hexists of field should be true");
+				assertEquals(hget.get(), Convert.toBytes(42l));
+				assertEquals(hincrBy2.get(), (Long)4l);
+
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+	
 	@Test
 	public void testHkeys() throws InterruptedException {
 		cmd = Command.HSET.code + " | " + Command.HKEYS;
@@ -1629,6 +1658,35 @@ public abstract class JRedisFutureProviderTestsBase extends JRedisTestSuiteBase<
 		} 
 		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
 	}
+	
+	@Test
+	public void testSetBitGetBit() throws InterruptedException {
+		cmd = Command.SETBIT.code + " | " + Command.GETBIT;
+		Log.log("TEST: %s command", cmd);
+		try {
+			provider.flushdb();
+			Future<Boolean> setbit1 = provider.setbit(keys.get(0), 1, true);
+			Future<Boolean> setbit32 = provider.setbit(keys.get(0), 32, true);
+
+			Future<Boolean> getbit1 = provider.getbit(keys.get(0), 1);
+			Future<Boolean> getbit2 = provider.getbit(keys.get(0), 2);
+			Future<Boolean> getbit32 = provider.getbit(keys.get(0), 32);
+			
+			try {
+				assertFalse (setbit1.get(), "original bit at 1");
+				assertFalse (setbit32.get(), "original bit at 32");
+				assertTrue (getbit1.get(), "getbit at 1");
+				assertFalse (getbit2.get(), "getbit at 2");
+				assertTrue (getbit32.get(), "getbit at 32");
+			}
+			catch(ExecutionException e){
+				Throwable cause = e.getCause();
+				fail(cmd + " ERROR => " + cause.getLocalizedMessage(), e); 
+			}
+		} 
+		catch (ClientRuntimeException e) {  fail(cmd + " Runtime ERROR => " + e.getLocalizedMessage(), e);  }
+	}
+
 
 	@Test
 	public void testHvals() throws InterruptedException {
