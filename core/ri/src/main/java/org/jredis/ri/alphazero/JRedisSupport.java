@@ -115,7 +115,41 @@ public abstract class JRedisSupport implements JRedis {
 	// ------------------------------------------------------------------------
 
 
-//	@Override
+	@Override
+	public <K> boolean setbit(K key, int offset, boolean value) throws ProviderException, ClientRuntimeException, RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		/* ValueRespose */
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.SETBIT, keybytes, Convert.toBytes(offset), Convert.toBytes(value ? 1 : 0));
+			return valResponse.getLongValue() == 1;
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+	}
+
+
+	@Override
+	public <K> boolean getbit(K key, int offset) throws ProviderException, ClientRuntimeException, RedisException {
+		byte[] keybytes = null;
+		if((keybytes = getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		/* ValueRespose */
+		try {
+			ValueResponse valResponse = (ValueResponse) this.serviceRequest(Command.GETBIT, keybytes, Convert.toBytes(offset));
+			return valResponse.getLongValue() == 1;
+		}
+		catch (ClassCastException e){
+			throw new ProviderException("Expecting a ValueResponse here => " + e.getLocalizedMessage(), e);
+		}
+	}
+
+
+	//	@Override
 //	public <K extends Object> JRedis auth(K key) throws RedisException {
 //		byte[] keydata = null;
 //		if((keydata = getKeyBytes(key)) == null) 

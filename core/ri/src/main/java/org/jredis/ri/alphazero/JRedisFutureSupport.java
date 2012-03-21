@@ -337,6 +337,32 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	// -------- set
 
 	@Override
+	public <K> Future<Boolean> setbit(K key, int offset, boolean value) {
+		byte[] keybytes = null;
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.SETBIT, keybytes,  
+				Convert.toBytes(offset), Convert.toBytes(value ? 1 : 0));
+
+		return new FutureBit(futureResponse);
+		
+	}
+
+
+	@Override
+	public <K> Future<Boolean> getbit(K key, int offset)  {
+		byte[] keybytes = null;
+		if((keybytes = JRedisSupport.getKeyBytes(key)) == null) 
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.GETBIT, keybytes,  
+				Convert.toBytes(offset));
+
+		return new FutureBit(futureResponse);
+	}
+	
+	@Override
 	public <K extends Object> FutureStatus set(K key, byte[] value) {
 		byte[] keybytes = null;
 		if((keybytes = JRedisSupport.getKeyBytes(key)) == null)
@@ -494,6 +520,20 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 	public <K extends Object> Future<Boolean> hset(K key, K field, String stringValue) {
 		return hset (key, field, DefaultCodec.encode(stringValue));
 	}
+	
+	public <K extends Object> Future<Long> hincrby(K key, K field, long increment) {
+		byte[] keyBytes = null;
+		if((keyBytes = JRedisSupport.getKeyBytes(key)) == null)
+			throw new IllegalArgumentException ("invalid key => ["+key+"]");
+
+		byte[] entryBytes = null;
+		if((entryBytes = JRedisSupport.getKeyBytes(field)) == null)
+			throw new IllegalArgumentException ("invalid field => ["+field+"]");
+
+		Future<Response> futureResponse = this.queueRequest(Command.HINCRBY, keyBytes, entryBytes, Convert.toBytes(increment));
+		return new FutureLong(futureResponse);
+	}
+	
 	public <K extends Object> Future<Boolean> hset(K key, K field, Number numberValue) {
 		return hset (key, field, String.valueOf(numberValue).getBytes());
 	}
@@ -1486,6 +1526,26 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
         	return valResp.getBooleanValue();
         }
 	}
+	
+	public static class FutureBit extends FutureResultBase implements Future<Boolean> {
+
+        protected FutureBit (Future<Response> pendingRequest) { super(pendingRequest); }
+
+        @SuppressWarnings("boxing")
+		public Boolean get () throws InterruptedException, ExecutionException {
+        	ValueResponse valResp = (ValueResponse) pendingRequest.get();
+        	return valResp.getLongValue() == 1;
+        }
+
+        @SuppressWarnings("boxing")
+		public Boolean get (long timeout, TimeUnit unit)
+        	throws InterruptedException, ExecutionException, TimeoutException
+        {
+        	ValueResponse valResp = (ValueResponse) pendingRequest.get(timeout, unit);
+        	return valResp.getLongValue() == 1;
+        }
+	}
+	
 	public static class FutureString extends FutureResultBase implements Future<String>{
 
         protected FutureString (Future<Response> pendingRequest) { super(pendingRequest); }
@@ -1779,4 +1839,6 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 		Future<byte[]> echo (T msg) {
 			return echo (DefaultCodec.encode(msg));
 	}
+	
+
 }
