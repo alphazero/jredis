@@ -1,5 +1,5 @@
-compliance:      Redis 2.4.0 
-tested with:	 Redis 2.4.6
+compliance:      Redis 2.6 
+tested with:	 Redis 2.6 (commit: 8afa5b707228bce240189b3f8d69e70cfd09a318)
 
 -- compliance report (see api/src/test/org/jredis/compliance package --
 

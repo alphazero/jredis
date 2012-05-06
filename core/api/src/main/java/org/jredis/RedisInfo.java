@@ -16,12 +16,17 @@
 
 package org.jredis;
 
+import java.util.Map;
+
 /**
- * [TODO: document me!]
- * [TODO: dbN:keys=2,expires=0 - where N: {0->n}]  << not sure if this is possible, cleanly...
- *
+ * RedisInfo is a convenience enum that tracks the canonical entries returned by INFO command.
+ * Exception to this is the db## when ## is db number e.g. db10.  
+ * <b>
+ * Note that of course the {@link JRedis#info()} command returns a {@link Map} so you can always
+ * query for the db info directly using the returned map.
+ * 
  * @author  Joubin Houshyar (alphazero@sensesay.net)
- * @version alpha.0, 04/02/09
+ * @version alpha.0-05062012
  * @since   alpha.0
  * 
  */
@@ -69,6 +74,14 @@ public enum RedisInfo {
 	uptime_in_days,
 //	hash_max_zipmap_entries,
 //	hash_max_zipmap_value,
-	vm_enabled,
+//	vm_enabled,
+	os,
+	tcp_port,
+	used_memory_lua,
+	last_bgsave_status,
+	instantaneous_ops_per_sec,
+	rejected_connections,
+	run_id,
+	bgrewriteaof_scheduled,	
 	role
 }

@@ -1744,9 +1744,12 @@ public abstract class JRedisFutureSupport implements JRedisFuture {
 
         private Map<String, String>  getResultMap (BulkResponse resp) {
     		StringTokenizer tokenizer = new StringTokenizer(new String(resp.getBulkData()), "\r\n");
-    		Map<String, String>  infomap = new HashMap<String, String>(12);
+    		Map<String, String>  infomap = new HashMap<String, String>(48);
     		while (tokenizer.hasMoreTokens()){
-    			String info = tokenizer.nextToken();
+    			final String info = tokenizer.nextToken();
+    			// ignore comments "# heading"
+    			if(info.startsWith("#"))
+    				continue;
     			int c = info.indexOf(':');
     			String _key =info.substring(0, c);
     			String _value = info.substring(c+1);

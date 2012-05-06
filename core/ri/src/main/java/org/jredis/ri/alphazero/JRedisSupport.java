@@ -1121,9 +1121,13 @@ public abstract class JRedisSupport implements JRedis {
 		}
 
 		StringTokenizer tokenizer = new StringTokenizer(new String(bulkData), "\r\n");
-		Map<String, String>  infomap = new HashMap<String, String>(12);
+		Map<String, String>  infomap = new HashMap<String, String>(48);
 		while (tokenizer.hasMoreTokens()){
 			String info = tokenizer.nextToken();
+			System.out.format("line:<%s>\n", info);
+			// ignore comments "# heading"
+			if(info.startsWith("#"))
+				continue;
 			int c = info.indexOf(':');
 			String key =info.substring(0, c);
 			String value = info.substring(c+1);
