@@ -23,15 +23,17 @@ package org.jredis;
  * @author  Joubin Houshyar (alphazero@sensesay.net)
  * @version alpha.0, Mar 17, 2010
  * @since   alpha.0 | Redis 1.3.5
- * 
+ *
  */
 public enum ObjectEncoding {
-		/** Redis 'raw'  */
-		RAW (),
-		/** Redis 'int'  */
-		INT (),
-		/** Redis 'zipmap'  */
-		ZIPMAP(),
-		/** Redis 'hashtable'  */
-		HASHTABLE
-	}
+	/** Redis 'raw'  */
+	RAW (),
+	/** Redis 'int'  */
+	INT (),
+	/** Redis 'zipmap'  */
+	ZIPMAP(),
+	/** Redis 'hashtable'  */
+	HASHTABLE,
+	/** Redis 'embstr'  */
+	EMBSTR,
+}
