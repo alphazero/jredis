@@ -6,3 +6,5 @@ target
 *.DS_Store
 *.class
 jredis.tmproj
+*.iml
+*.idea
