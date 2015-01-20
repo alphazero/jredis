@@ -65,7 +65,7 @@ public class CheckRedisCompliance {
 		this.minor = minor;
 		specfilein = getSpecFileInputStream(major, minor);
 	}
-	private final void run() throws Exception {
+	private void run() throws Exception {
 		List<String> cmdlist = getSpecCommandList();
 		checkAndReportCompliance(cmdlist, JRedis.class);
 		checkAndReportCompliance(cmdlist, JRedisFuture.class);
@@ -104,7 +104,7 @@ public class CheckRedisCompliance {
 		}
 		return cmdlist;
 	}
-	private static final InputStream getSpecFileInputStream(int major, int minor) {
+	private static InputStream getSpecFileInputStream(int major, int minor) {
 		String fname = 
 			String.format("%s%s%s-%d.%d.n.%s",
 				spec_file_path, File.separator,spec_file_prefix,  major, minor, spec_file_ext)

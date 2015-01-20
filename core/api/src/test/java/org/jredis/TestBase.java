@@ -62,32 +62,32 @@ public class TestBase {
 	// Test support - mildly enhanced TESTNG Assert semantics
 	// ------------------------------------------------------------------------
 	// notNull
-	public static final void assertNotNull(Object object, String msgfmt, Object...optionalFmtArgs){
+	public static void assertNotNull(Object object, String msgfmt, Object...optionalFmtArgs){
 		String message = String.format(msgfmt, optionalFmtArgs);
 		Assert.assertNotNull (object, message);
 	}
 	// null
-	public static final void assertNull(Object object, String msgfmt, Object...optionalFmtArgs){
+	public static void assertNull(Object object, String msgfmt, Object...optionalFmtArgs){
 		String message = String.format(msgfmt, optionalFmtArgs);
 		Assert.assertNull (object, message);		// << has bug.  reports a boolean comp result -- TODO: fix and patch.
 	}
 	
 	// equals
-	public static final void assertEquals(Object actual, Object expected, String msgfmt, Object...optionalFmtArgs){
+	public static void assertEquals(Object actual, Object expected, String msgfmt, Object...optionalFmtArgs){
 		String message = String.format(msgfmt, optionalFmtArgs);
 		Assert.assertEquals (actual, expected, message);		
 	}
-	public static final void assertEquals(byte[] actual, byte[] expected, String msgfmt, Object...optionalFmtArgs){
+	public static void assertEquals(byte[] actual, byte[] expected, String msgfmt, Object...optionalFmtArgs){
 		String message = String.format(msgfmt, optionalFmtArgs);
 		Assert.assertEquals (actual, expected, message);		
 	}
 	
 	// true/false
-	public static final void assertTrue(boolean condition, String msgfmt, Object...optionalFmtArgs){
+	public static void assertTrue(boolean condition, String msgfmt, Object...optionalFmtArgs){
 		String message = String.format(msgfmt, optionalFmtArgs);
 		Assert.assertTrue (condition, message);
 	}
-	public static final void assertFalse(boolean condition, String msgfmt, Object...optionalFmtArgs){
+	public static void assertFalse(boolean condition, String msgfmt, Object...optionalFmtArgs){
 		String message = String.format(msgfmt, optionalFmtArgs);
 		Assert.assertFalse (condition, message);
 	}
