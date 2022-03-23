@@ -38,7 +38,7 @@ import org.jredis.JRedisFuture;
  * over JRedis to determine missing commands.
  * <p>
  * TODOS: 
- * <li>need to address minor variations introduced for Java readablility.</li>
+ * <li>need to address minor variations introduced for Java readability.</li>
  * <li>beef up annotations to tighten up the compliance check</li>
  * <li>apt cycle on release would be best</li>
  * 

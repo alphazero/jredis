@@ -73,7 +73,7 @@ public abstract class JRedisTestSuiteBase<T> extends ProviderTestBase<T>{
 
 	protected final Random random = new Random(System.currentTimeMillis());
 
-	// we'll uses these for values 
+	// we'll use these for values 
 	protected final byte[]			emptyBytes = new byte[0];
 	protected final String			emptyString = "";
 	protected final List<byte[]>	dataList = new ArrayList<byte[]>();
