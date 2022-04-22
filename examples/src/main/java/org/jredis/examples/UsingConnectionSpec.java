@@ -72,7 +72,7 @@ public class UsingConnectionSpec {
 		    	connectionSpec
 		    		// to be or not to be -- you decide
 		    		//
-		    		.setSocketFlag(Connection.Socket.Flag.SO_KEEP_ALIVE, Boolean.FALSE)				// DO NOT keep socket allive
+		    		.setSocketFlag(Connection.Socket.Flag.SO_KEEP_ALIVE, Boolean.FALSE)				// DO NOT keep socket alive
 
 		    		// connect retries on connection breaks
 		    		//
@@ -82,7 +82,7 @@ public class UsingConnectionSpec {
 		    		//
 		    		.setSocketProperty(SO_PREF_CONN_TIME, 0) 	// connection time is highester pref
 		    		.setSocketProperty(SO_PREF_LATENCY, 1)		// latency is 2nd pref
-		    		.setSocketProperty(SO_PREF_BANDWIDTH, 2)	// bandwith is 3rd pref
+		    		.setSocketProperty(SO_PREF_BANDWIDTH, 2)	// bandwidth is 3rd pref
 		    	
 		    		// TCP buffer sizes -- more than likely your platform's default settings are quite large
 		    		// but if you are itching to try your own settings, please do.  Remember:  connections

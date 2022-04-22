@@ -35,7 +35,7 @@ public class TestSpecElements extends TestBase{
 	 */
 	@Test
 	public void testConnectionFlags() {
-		log.info("TEST:CONNECTOR spec sematics - ConnectionFlags");
+		log.info("TEST:CONNECTOR spec semantics - ConnectionFlags");
 		
 		Flag flags[] = {Flag.CONNECT_IMMEDIATELY, Flag.SHARED, Flag.RELIABLE};
         int bitset = Flag.bitset(flags);
@@ -60,7 +60,7 @@ public class TestSpecElements extends TestBase{
 	@Test
 	public void testCredentialsOverloads () {
 		String property = Connection.Property.CREDENTIAL.name();
-		log.info(String.format("TEST:CONNECTOR spec sematics - Credentials %s", property));
+		log.info(String.format("TEST:CONNECTOR spec semantics - Credentials %s", property));
 		
 		// check with actual passwords
 		//
